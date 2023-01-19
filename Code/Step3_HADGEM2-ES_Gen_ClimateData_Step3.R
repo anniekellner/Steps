@@ -100,7 +100,7 @@ scenario_yr_array[5,1:3] = c("rcp85",2046,2055)
 wdir_clipbound = "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/"
 
 #Set variable for the working directory for NetCDF files
-wdir_netcdf = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\LOCA_CCSM4"
+wdir_netcdf = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\HADGEM2-ES"
 
 #Set variable for the working directory for Output CSV files
 #wdir_outputcsv = "N:\\RStor\\mindyc\\compass/INRMP_CC/Nellis AFB/Climate Projections/LOCA CCSM4 Climate Data/"
