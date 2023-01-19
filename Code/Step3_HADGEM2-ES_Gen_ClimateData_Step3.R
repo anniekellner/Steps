@@ -104,7 +104,7 @@ wdir_netcdf = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\HADGEM2-ES"
 
 #Set variable for the working directory for Output CSV files
 #wdir_outputcsv = "N:\\RStor\\mindyc\\compass/INRMP_CC/Nellis AFB/Climate Projections/LOCA CCSM4 Climate Data/"
-wdir_outputcsv = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2"
+wdir_outputcsv = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_HADGEM2-ES"
 
 #Set variable for directory where function scripts are located
 wdir_functions = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Software Apps\\R scripts\\LOCA_V2"
@@ -185,7 +185,7 @@ for (yr in loopyr_start:loopyr_end)
 
 
   #Set the model netcdf file name
-  suffix_file = paste("_day_CCSM4_",scenario,"_r6i1p1_",desired_yr,"0101-",desired_yr,"1231.LOCA_2016-04-02.16th.nc",sep="")
+  suffix_file = paste("_day_HadGEM2-ES_",scenario,"_r1i1p1_EWEMBI_",desired_yr,"0101-",desired_yr,"1231.nc4",sep="")
   nctmax_file = paste("tasmax",suffix_file,sep="")
   nctmin_file = paste("tasmin",suffix_file,sep="")
   ncprcp_file = paste("pr",suffix_file,sep="")
