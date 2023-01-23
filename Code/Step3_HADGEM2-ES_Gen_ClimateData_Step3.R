@@ -13,6 +13,10 @@
 #and write CSV files at each summary level.
 #----------------------------------
 
+## EXAMPLE DATA - 1/23/23
+x <- read_stars('N:/RStor/mindyc/afccm/Climate Modeling/Data/HADGEM2-ES/rcp45/tas_day_HadGEM2-ES_rcp45_r1i1p1_EWEMBI_20060101-20101231.nc4')
+day1 <- filter(x, time = 1)
+
 
 #Display start time
 cat("\n",paste("Start time is ", Sys.time()),"\n")
@@ -29,6 +33,8 @@ library(chron)
 library (geosphere)
 require (sqldf)
 library (rgeos)
+library(stars)
+library(dplyr)
 
 #########################################
 # #Run parameters - MODIFY AS Needed 
@@ -183,9 +189,21 @@ for (yr in loopyr_start:loopyr_end)
   #Set the working directory for NetCDF files
   setwd(paste(wdir_netcdf, "\\", scenario, sep=""))
 
+  #Assign year groupng for this year for determining Netcdf file to retrieve
+  
+  if (scenario != "historical" & yr > 2005 & yr < 2011) {
+    yr_group_start = 2006
+    yr_group_end == 2010
+  }
+   else {
+    yr_remainder = yr %% 10
+    yr_group_start = yr - yr_remainder + 1
+    yr_group_end = yr_group_start + 9
+   }
+  
 
   #Set the model netcdf file name
-  suffix_file = paste("_day_HadGEM2-ES_",scenario,"_r1i1p1_EWEMBI_",desired_yr,"0101-",desired_yr,"1231.nc4",sep="")
+  suffix_file = paste("_day_HadGEM2-ES_",scenario,"_r1i1p1_EWEMBI_",yr_group_start,"0101-",yr_group_end,"1231.nc4",sep="")
   nctmax_file = paste("tasmax",suffix_file,sep="")
   nctmin_file = paste("tasmin",suffix_file,sep="")
   ncprcp_file = paste("pr",suffix_file,sep="")
