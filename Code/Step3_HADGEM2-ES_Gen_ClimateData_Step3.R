@@ -13,10 +13,6 @@
 #and write CSV files at each summary level.
 #----------------------------------
 
-## EXAMPLE DATA - 1/23/23
-x <- read_stars('N:/RStor/mindyc/afccm/Climate Modeling/Data/HADGEM2-ES/rcp45/tas_day_HadGEM2-ES_rcp45_r1i1p1_EWEMBI_20060101-20101231.nc4')
-day1 <- filter(x, time = 1)
-
 
 #Display start time
 cat("\n",paste("Start time is ", Sys.time()),"\n")
