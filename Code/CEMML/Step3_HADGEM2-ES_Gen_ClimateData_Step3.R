@@ -13,6 +13,9 @@
 #and write CSV files at each summary level.
 #----------------------------------
 
+loca <- read_stars('N:/RStor/mindyc/afccm/Climate Modeling/Data/LOCA_CCSM4/rcp45/tasmax_day_CCSM4_rcp45_r6i1p1_20060101-20061231.LOCA_2016-04-02.16th.nc')
+
+had <- read_stars('N:/RStor/mindyc/afccm/Climate Modeling/Data/HADGEM2-ES/rcp45/tasmax_day_HadGEM2-ES_rcp45_r1i1p1_EWEMBI_20060101-20101231.nc4')
 
 #Display start time
 cat("\n",paste("Start time is ", Sys.time()),"\n")
@@ -37,7 +40,9 @@ library(dplyr)
 
 #Set variable for boundary clip file name
 
-AFB_Name = "Hanscom_FourthCliff"
+AFB_Name = "Homestead_ARB"
+
+#AFB_Name = "Hanscom_FourthCliff"
 
 #AFB_Name = "JBSA_SAF"
 #AFB_Name = "JBSA_RND"
@@ -165,9 +170,9 @@ lon_min = lon_min - search_buff *.015
 for (iarray in 1:5) 
 {
   
-scenario = scenario_yr_array [iarray,1]
-start_yr = scenario_yr_array [iarray,2]
-end_yr = scenario_yr_array [iarray,3]
+scenario = scenario_yr_array[1,1] [iarray,1]
+start_yr = scenario_yr_array[1,2] [iarray,2]
+end_yr = scenario_yr_array[1,3] [iarray,3]
 desired_yrs = paste(start_yr,"-",end_yr,sep="")
 
 
@@ -185,10 +190,10 @@ for (yr in loopyr_start:loopyr_end)
   #Set the working directory for NetCDF files
   setwd(paste(wdir_netcdf, "\\", scenario, sep=""))
 
-  #Assign year groupng for this year for determining Netcdf file to retrieve
-  
+  #Assign year grouing for this year for determining Netcdf file to retrieve
+    
   if (scenario != "historical" & yr > 2005 & yr < 2011) {
-    yr_group_start = 2006
+    yr_group_start == 2006
     yr_group_end == 2010
   }
    else {
@@ -215,6 +220,10 @@ prcp.nc = nc_open(ncprcp_file)
 
 #Check for 1st year of loop and get lat/long start/cnt for 1st year loop only
 
+lon_start <- min(which(lon > lon_min))
+  
+
+
 if (yr == loopyr_start)
 {
   
@@ -222,12 +231,12 @@ if (yr == loopyr_start)
   lon = ncvar_get( tmax.nc, "lon")
   for (indx in (1:dim(lon)))  # Loop to get lon start index
   {
-    if (lon[indx]-360 > lon_min )
+    if (lon[indx] > lon_min)
     {
-      lon_start  = indx - 1
+      lon_start  = lon[indx] - 1
       for (indx2 in (lon_start: dim(lon))) #Loop to get lon count index
       {
-        if (lon[indx2]-360 > lon_max)
+        if (lon[indx2] > lon_max)
         {
           lon_count = indx2 - lon_start
           break
