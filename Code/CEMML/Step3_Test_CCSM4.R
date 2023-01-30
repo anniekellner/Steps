@@ -18,7 +18,11 @@ rm(list=ls())
 
 # Load library packages
 
-library(stars)
+library(stars) # loads sf
+library(dplyr)
+library(tmap)
+library(tmaptools)
+
 # ------------ USER SETTINGS  ---------------------------------- #
 
 ## Set directories
@@ -83,20 +87,51 @@ search_buff = 1  # Change search buffer in 0.5 mi increments as needed for small
 ###End of Run parameters
 #####################################
 
-# -------   
+# -------   LOAD DATA ---------------- #
 
+## NetCDF
 
+r <- rast('./Data/Raw/tasmax_day_CCSM4_historical_r6i1p1_19760101-19761231.LOCA_2016-04-02.16th.nc')
 
+st <- read_stars('./Data/Raw/tasmax_day_CCSM4_historical_r6i1p1_19760101-19761231.LOCA_2016-04-02.16th.nc') # 1976. Daily data.
+st <- st_as_stars(st) # converts nc to stars object 
+st <- setNames(st, "tmax") # set attribute name to tmax (because raw data is in Kelvin) 
 
+## Shapefiles
 
+afb_dir <- (paste(dir_installation_boundaries, AFB_Name, sep = '/'))
+afb <- st_read(paste(afb_dir, '.shp', sep = ""))
 
-#Create array
-scenario_yr_array = array(1:15, dim=c(5,3))
+# ------- PREP DATA ----------------------- #
 
-### LOCA only arrays
+## Projections
 
-scenario_yr_array[1,1:3] = c("historical",1976,2005)
-scenario_yr_array[2,1:3] = c("rcp45",2026,2035)
-scenario_yr_array[3,1:3] = c("rcp45",2046,2055)
-scenario_yr_array[4,1:3] = c("rcp85",2026,2035)
-scenario_yr_array[5,1:3] = c("rcp85",2046,2055)
+st <- st_set_crs(st, 4326)
+afb2 <- st_transform(afb, 4326)
+
+## Quick interactive plot to make sure things are lined up 
+tmap_mode('view')
+
+tm_shape(day100) + 
+  tm_raster(col = day100$tmax) + 
+  tm_shape(afb2) + 
+  tm_borders()
+
+# NOTE: some AFB's are so small they only span one cell. For these it is better to select cell index. 
+# Maybe 
+
+# add something to check that crs(x) = crs(y)
+
+## Crop NetCDF to base
+
+stAFB <- st_crop(st, afb2, crop = TRUE, as_points = TRUE)
+
+## Plot first day to spot check
+
+day100 <- slice(st, along = "time", 100)
+day2 <- slice(st, along = "time", 2)
+
+ras <- rast(day100)
+library(terra)
+
+ras2 <- crop(ras, afb2)
