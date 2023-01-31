@@ -13,12 +13,15 @@
 #and write CSV files at each summary level.
 #----------------------------------
 
+# Considerations: 
+  # Can make projection alignment more precise by converting all to 4326
+  # Can use all pixels touched by base or just the main one(s)
+
 #clear all objects
 rm(list=ls())
 
 # Load library packages
 
-library(stars) # loads sf
 library(terra)
 library(sf)
 library(dplyr)
@@ -82,9 +85,6 @@ AFB_Name = "Homestead_ARB"
 # AFB_Name = "Schriever_AFB"
 # AFB_Name = "Malmstrom_AFB_Boundary"
 
-#Search buffer (miles) that is used to expand search for points. 
-search_buff = 1  # Change search buffer in 0.5 mi increments as needed for small sites. 
-                 # For large sites can change to zero to improve performance.
 
 ###End of Run parameters
 #####################################
@@ -95,9 +95,9 @@ search_buff = 1  # Change search buffer in 0.5 mi increments as needed for small
 
 r <- rast('./Data/Raw/tasmax_day_CCSM4_historical_r6i1p1_19760101-19761231.LOCA_2016-04-02.16th.nc') # Trial run with 1976
 
-st <- read_stars('./Data/Raw/tasmax_day_CCSM4_historical_r6i1p1_19760101-19761231.LOCA_2016-04-02.16th.nc') # 1976. Daily data.
-st <- st_as_stars(st) # converts nc to stars object 
-st <- setNames(st, "tmax") # set attribute name to tmax (because raw data is in Kelvin) 
+#st <- read_stars('./Data/Raw/tasmax_day_CCSM4_historical_r6i1p1_19760101-19761231.LOCA_2016-04-02.16th.nc') # 1976. Daily data.
+#st <- st_as_stars(st) # converts nc to stars object 
+#st <- setNames(st, "tmax") # set attribute name to tmax (because raw data is in Kelvin) 
 
 ## Shapefiles
 
@@ -108,8 +108,8 @@ afb <- st_read(paste(afb_dir, '.shp', sep = ""))
 
 # USA
 
-usa <- st_read('./Data/Raw/US_States/Contig_US_Albers.shp') 
-usa <- st_transform(usa, 4326)
+usa <- st_read('./Data/Raw/US_States/Contig_US_Albers.shp') # Reads in in Albers Equal Area
+usa <- st_transform(usa, 4326) # Project to LL
 
 # ID state in order to narrow down area for raster processing
 
@@ -121,54 +121,47 @@ getState <- function(AFB){ # Move to functions script
   return(afb_state)
   }
 
-afb_state <- getState(afb)
-# Quick plot to check location
+stateName <- getState(afb)
 
-test <- r[[1]] # First layer (1/1/1976)
+afb_state <- filter(usa, STATE_NAME == stateName)
+
+rState <- crop(r, afb_state)
+
+# ------ TEST  ------------------------------------ #
+
+day1 <- r[[1]] # First layer (1/1/1976)
+
+rState2 <- crop(day1, afb_state) # Crop first layer to state of FL
+
+rState3 <- project(rState2, "EPSG:4326")
+
+
+# Quick interactive plot to make sure AFB is where it's supposed to be
+# Not much of a diff
 
 tmap_mode('view')
 
-tm_shape(test) + 
+# No meaningful difference between projecting both to 4326 and leaving as is in WGS84
+tm_shape(rState3) + 
   tm_raster() +
   tm_shape(afb) + 
   tm_borders()
 
 # ------- PREP DATA ----------------------- #
 
-rCrop <- crop(r, afb)
+## Crop raster to afb
 
+rAFB <- crop(rState2, afb) # can change snap setting to get all pixels touched by AFB if desired
 
-## Projections
+# Plot check
 
-r <- project(r, "EPSG:4326") # takes awhile to reproject - see about cropping first
-
-
-
-#afb2 <- st_transform(afb, 4326)
-
-## Quick interactive plot to make sure things are lined up 
-tmap_mode('view')
-
-tm_shape(day100) + 
-  tm_raster(col = day100$tmax) + 
-  tm_shape(afb2) + 
+tm_shape(rAFB) +
+  tm_raster() +
+  tm_shape(afb) + 
   tm_borders()
 
-# NOTE: some AFB's are so small they only span one cell. For these it is better to select cell index. 
-# Maybe 
+# Deciding to just take the main pixel and see how it goes
 
-# add something to check that crs(x) = crs(y)
 
-## Crop NetCDF to base
 
-stAFB <- st_crop(st, afb2, crop = TRUE, as_points = TRUE)
 
-## Plot first day to spot check
-
-day100 <- slice(st, along = "time", 100)
-day2 <- slice(st, along = "time", 2)
-
-ras <- rast(day100)
-library(terra)
-
-ras2 <- crop(ras, afb2)
