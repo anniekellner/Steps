@@ -19,6 +19,8 @@ rm(list=ls())
 # Load library packages
 
 library(stars) # loads sf
+library(terra)
+library(sf)
 library(dplyr)
 library(tmap)
 library(tmaptools)
@@ -91,7 +93,7 @@ search_buff = 1  # Change search buffer in 0.5 mi increments as needed for small
 
 ## NetCDF
 
-r <- rast('./Data/Raw/tasmax_day_CCSM4_historical_r6i1p1_19760101-19761231.LOCA_2016-04-02.16th.nc')
+r <- rast('./Data/Raw/tasmax_day_CCSM4_historical_r6i1p1_19760101-19761231.LOCA_2016-04-02.16th.nc') # Trial run with 1976
 
 st <- read_stars('./Data/Raw/tasmax_day_CCSM4_historical_r6i1p1_19760101-19761231.LOCA_2016-04-02.16th.nc') # 1976. Daily data.
 st <- st_as_stars(st) # converts nc to stars object 
@@ -99,15 +101,50 @@ st <- setNames(st, "tmax") # set attribute name to tmax (because raw data is in 
 
 ## Shapefiles
 
+# AFB
+
 afb_dir <- (paste(dir_installation_boundaries, AFB_Name, sep = '/'))
 afb <- st_read(paste(afb_dir, '.shp', sep = ""))
 
+# USA
+
+usa <- st_read('./Data/Raw/US_States/Contig_US_Albers.shp') 
+usa <- st_transform(usa, 4326)
+
+# ID state in order to narrow down area for raster processing
+
+getState <- function(AFB){ # Move to functions script 
+  afbCentroid = data.frame(longitude = as.numeric(AFB$longitude), latitude =  as.numeric(AFB$latitude))
+  afbCentroid = st_as_sf(afbCentroid, coords = c("longitude", "latitude"), crs = 4326)
+  int = st_intersection(usa, afbCentroid)
+  afb_state = int$STATE_NAME
+  return(afb_state)
+  }
+
+afb_state <- getState(afb)
+# Quick plot to check location
+
+test <- r[[1]] # First layer (1/1/1976)
+
+tmap_mode('view')
+
+tm_shape(test) + 
+  tm_raster() +
+  tm_shape(afb) + 
+  tm_borders()
+
 # ------- PREP DATA ----------------------- #
+
+rCrop <- crop(r, afb)
+
 
 ## Projections
 
-st <- st_set_crs(st, 4326)
-afb2 <- st_transform(afb, 4326)
+r <- project(r, "EPSG:4326") # takes awhile to reproject - see about cropping first
+
+
+
+#afb2 <- st_transform(afb, 4326)
 
 ## Quick interactive plot to make sure things are lined up 
 tmap_mode('view')
