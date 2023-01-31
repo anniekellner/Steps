@@ -27,6 +27,7 @@ library(sf)
 library(dplyr)
 library(tmap)
 library(tmaptools)
+library(stringr)
 
 # ------------ USER SETTINGS  ---------------------------------- #
 
@@ -91,13 +92,44 @@ AFB_Name = "Homestead_ARB"
 
 # -------   LOAD DATA ---------------- #
 
-## NetCDF
+## NetCDFs
+# Could write vector of models into Functions.R
+# Write loop to incorporate all scenarios
 
-r <- rast('./Data/Raw/tasmax_day_CCSM4_historical_r6i1p1_19760101-19761231.LOCA_2016-04-02.16th.nc') # Trial run with 1976
+fileNames <- list.files(dir_netcdfs, pattern = '.nc', full.names = TRUE, recursive = TRUE)
 
-#st <- read_stars('./Data/Raw/tasmax_day_CCSM4_historical_r6i1p1_19760101-19761231.LOCA_2016-04-02.16th.nc') # 1976. Daily data.
-#st <- st_as_stars(st) # converts nc to stars object 
-#st <- setNames(st, "tmax") # set attribute name to tmax (because raw data is in Kelvin) 
+## Select correct files
+
+#Create array
+scenario_yr_array = array(1:15, dim=c(5,3))
+colnames(scenario_yr_array) <- c("Scenario", "Year_Start", "Year_End") # unnecessary
+
+### LOCA only arrays
+scenario_yr_array[1,1:3] = c("historical",1976,2005)
+scenario_yr_array[2,1:3] = c("rcp45",2026,2035)
+scenario_yr_array[3,1:3] = c("rcp45",2046,2055)
+scenario_yr_array[4,1:3] = c("rcp85",2026,2035)
+scenario_yr_array[5,1:3] = c("rcp85",2046,2055)
+
+# Create historical raster
+
+hist_files <- fileNames %>%
+  str_subset("historical") %>%
+  str_subset("tasmax") %>% # Eventually change so can loop or whatever
+
+pattern <- paste(seq(scenario_yr_array[1,2], scenario_yr_array[1,3], 1), collapse = "|")  
+
+DT <- data.table(hist_files, result = grepl(pattern, hist_files))  
+hist <- DT %>% filter(result == TRUE)
+
+
+
+
+
+
+
+#r <- rast('./Data/Raw/tasmax_day_CCSM4_historical_r6i1p1_19760101-19761231.LOCA_2016-04-02.16th.nc') # Trial run with 1976
+
 
 ## Shapefiles
 
