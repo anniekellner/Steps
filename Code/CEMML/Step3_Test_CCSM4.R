@@ -134,12 +134,9 @@ hist_wide2 <- hist_wide %>%
 
 hist_filenames <- colnames(hist_wide2)
 
+# ------------- CREATE RASTER ------------------------------------------------ #
 
-
-
-
-
-#r <- rast('./Data/Raw/tasmax_day_CCSM4_historical_r6i1p1_19760101-19761231.LOCA_2016-04-02.16th.nc') # Trial run with 1976
+histR <- rast(hist_filenames) # makes a stack of all rasters from hist_filenames list
 
 
 ## Shapefiles
