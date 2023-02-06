@@ -28,6 +28,8 @@ library(dplyr)
 library(tmap)
 library(tmaptools)
 library(stringr)
+library(data.table)
+library(tidyr)
 
 # ------------ USER SETTINGS  ---------------------------------- #
 
@@ -90,6 +92,8 @@ AFB_Name = "Homestead_ARB"
 ###End of Run parameters
 #####################################
 
+
+
 # -------   LOAD DATA ---------------- #
 
 ## NetCDFs
@@ -114,14 +118,21 @@ scenario_yr_array[5,1:3] = c("rcp85",2046,2055)
 # Create historical raster
 
 hist_files <- fileNames %>%
-  str_subset("historical") %>%
-  str_subset("tasmax") %>% # Eventually change so can loop or whatever
+  str_subset("historical") %>% # time period of interest
+  str_subset("tasmax")  # variable of interest
 
 pattern <- paste(seq(scenario_yr_array[1,2], scenario_yr_array[1,3], 1), collapse = "|")  
 
 DT <- data.table(hist_files, result = grepl(pattern, hist_files))  
 hist <- DT %>% filter(result == TRUE)
 
+# Remove supplemental files - NOTE: this can be generalized once I get a feel for other likely 'exceptions'
+
+hist_wide <- hist %>% pivot_wider(names_from = hist_files, values_from = result) # flip data frame because 'contains' helper function only works on column names
+hist_wide2 <- hist_wide %>%
+  select(-contains("supplemental"))
+
+hist_filenames <- colnames(hist_wide2)
 
 
 
