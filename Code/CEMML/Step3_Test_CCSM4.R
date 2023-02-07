@@ -92,8 +92,6 @@ AFB_Name = "Homestead_ARB"
 ###End of Run parameters
 #####################################
 
-
-
 # -------   LOAD DATA ---------------- #
 
 ## NetCDFs
@@ -134,10 +132,11 @@ hist_wide2 <- hist_wide %>%
 
 hist_filenames <- colnames(hist_wide2)
 
-# ------------- CREATE RASTER ------------------------------------------------ #
+# ------------- SPATIAL ANALYSIS ------------------------------------------------ #
+
+## Create multilayered raster
 
 histR <- rast(hist_filenames) # makes a stack of all rasters from hist_filenames list
-
 
 ## Shapefiles
 
@@ -145,6 +144,11 @@ histR <- rast(hist_filenames) # makes a stack of all rasters from hist_filenames
 
 afb_dir <- (paste(dir_installation_boundaries, AFB_Name, sep = '/'))
 afb <- st_read(paste(afb_dir, '.shp', sep = ""))
+afb <- vect(afb) # so can play nicely in terra package
+
+###################################################################
+##    MIGHT NOT BE NECESSARY  #####################################
+###################################################################
 
 # USA
 
@@ -165,43 +169,31 @@ stateName <- getState(afb)
 
 afb_state <- filter(usa, STATE_NAME == stateName)
 
-rState <- crop(r, afb_state)
+rState <- crop(histR, afb_state)
 
-# ------ TEST  ------------------------------------ #
+######################################################################
+######################################################################
 
-day1 <- r[[1]] # First layer (1/1/1976)
+# ------ PLOT TO CHECK THAT LAYERS LINE UP  ------------------------------------ #
+# Not working 2/6/23 - need to play around with this
 
-rState2 <- crop(day1, afb_state) # Crop first layer to state of FL
+day1 <- histR[[1]] # First layer (1/1/1976)
 
-rState3 <- project(rState2, "EPSG:4326")
+map <- plot(histR); polys(afb)
 
+# Zoom in for small bases
 
-# Quick interactive plot to make sure AFB is where it's supposed to be
-# Not much of a diff
+zoom(day1, e = draw(), layer = 1, new = TRUE)
 
-tmap_mode('view')
+# ------------ EXTRACT DATA --------------------------------------------------- #
 
-# No meaningful difference between projecting both to 4326 and leaving as is in WGS84
-tm_shape(rState3) + 
-  tm_raster() +
-  tm_shape(afb) + 
-  tm_borders()
+# Next time do system.time()
+test <- terra::extract(histR, afb, fun = mean, xy = TRUE)
 
-# ------- PREP DATA ----------------------- #
+#saveRDS(test, file = './Data/Derived/temp.Rds')
 
-## Crop raster to afb
-
-rAFB <- crop(rState2, afb) # can change snap setting to get all pixels touched by AFB if desired
-
-# Plot check
-
-tm_shape(rAFB) +
-  tm_raster() +
-  tm_shape(afb) + 
-  tm_borders()
-
-# Deciding to just take the main pixel and see how it goes
-
+histR
+afb
 
 
 
