@@ -31,6 +31,10 @@ library(stringr)
 library(data.table)
 library(tidyr)
 
+# Load source scripts
+
+source('./Misc/')
+
 # ------------ USER SETTINGS  ---------------------------------- #
 
 ## Set directories
@@ -45,52 +49,8 @@ dir_functions = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Software Apps\\R sc
 
 ## Select AFB (Air Force Base) - Note: these could be listed in a separate file and pulled in/searched as a vector (using stringi)
 
-AFB_Name = "Homestead_ARB"
+AFB_Name = "Homestead_ARB" # I deleted the AFB names from the script because they can be found elsewhere
 
-#AFB_Name = "Hanscom_FourthCliff"
-#AFB_Name = "JBSA_SAF"
-#AFB_Name = "JBSA_RND"
-#AFB_Name = "JBSA_MED-LAK-KFA-PRT"
-#AFB_Name = "JBSA_GSA-MCA-SAM"
-#AFB_Name = "JBSA_CAN"
-#AFB_Name = "JBSA_BUL"
-#AFB_Name = "Dobbins_AFB"
-#AFB_Name = "LakeYellowstone"
-#AFB_Name = "Laughlin"
-#AFB_Name = "Dover_AFB"
-#AFB_Name = "Hanscom_wGSUs"
-#AFB_Name = "JBAB_Proxy"
-#AFB_Name = "RomeLab_Main"
-#AFB_Name = "Rome_Verona"
-#AFB_Name = "Badlands_Range"
-#AFB_Name = "Eglin_Niceville"
-#AFB_Name = "Cape_Cod_AS"
-#AFB_Name = "Fairchild_AFB"
-#AFB_Name = "PointArena_AFS_Proxy"
-#AFB_Name = "Ellsworth_AFB"
-#AFB_Name = "FEWarren_AFB"
-#AFB_Name = "Buckley_SFB_Dissolved"
-#AFB_Name = "Cheyenne_Mountain_HighElevationProxyv2_Sugarloaf"
-#AFB_Name = "Offut_Communications_Annex_#3_Boundary"
-#AFB_Name = "Offutt_AFB_Boundary"
-#AFB_Name = "Minot_AFB_Boundary"
-#AFB_Name = "GFAFB_Waste_Lagoon_Annex_Boundary"
-#AFB_Name = "GFAFB_Boundary"
-#AFB_Name = "WPAFB_Boundary"
-#AFB_Name = "Scott_AFB_Boundary"
-#AFB_Name = "MAFB_Boundary"
-# AFB_Name = "MHAFB_Boundary"
-# AFB_Name = "Malmstrom_Deployment_Area"
-# AFB_Name = "US_Air_Force_Academy"
-# AFB_Name = "Peterson_AFB"
-# AFB_Name = "USAF_Academy_Farish_Buffer_1mi"
-# AFB_Name = "USAF_Academy_Bullseye_Buffer_1mi"
-# AFB_Name = "Schriever_AFB"
-# AFB_Name = "Malmstrom_AFB_Boundary"
-
-
-###End of Run parameters
-#####################################
 
 # -------   LOAD DATA ---------------- #
 
@@ -104,7 +64,7 @@ fileNames <- list.files(dir_netcdfs, pattern = '.nc', full.names = TRUE, recursi
 
 #Create array
 scenario_yr_array = array(1:15, dim=c(5,3))
-colnames(scenario_yr_array) <- c("Scenario", "Year_Start", "Year_End") # unnecessary
+#colnames(scenario_yr_array) <- c("Scenario", "Year_Start", "Year_End") 
 
 ### LOCA only arrays
 scenario_yr_array[1,1:3] = c("historical",1976,2005)
@@ -113,20 +73,20 @@ scenario_yr_array[3,1:3] = c("rcp45",2046,2055)
 scenario_yr_array[4,1:3] = c("rcp85",2026,2035)
 scenario_yr_array[5,1:3] = c("rcp85",2046,2055)
 
-# Create historical raster
+# Create historical rasters
 
-hist_files <- fileNames %>%
+hist_filenames_tmax <- fileNames %>%
   str_subset("historical") %>% # time period of interest
   str_subset("tasmax")  # variable of interest
 
 pattern <- paste(seq(scenario_yr_array[1,2], scenario_yr_array[1,3], 1), collapse = "|")  
 
-DT <- data.table(hist_files, result = grepl(pattern, hist_files))  
+DT <- data.table(hist_filenames_tmax, result = grepl(pattern, hist_filenames_tmax))  
 hist <- DT %>% filter(result == TRUE)
 
 # Remove supplemental files - NOTE: this can be generalized once I get a feel for other likely 'exceptions'
 
-hist_wide <- hist %>% pivot_wider(names_from = hist_files, values_from = result) # flip data frame because 'contains' helper function only works on column names
+hist_wide <- hist %>% pivot_wider(names_from = hist_filenames_tmax, values_from = result) # flip data frame because 'contains' helper function only works on column names
 hist_wide2 <- hist_wide %>%
   select(-contains("supplemental"))
 
@@ -143,7 +103,8 @@ histR <- rast(hist_filenames) # makes a stack of all rasters from hist_filenames
 # AFB
 
 afb_dir <- (paste(dir_installation_boundaries, AFB_Name, sep = '/'))
-afb <- st_read(paste(afb_dir, '.shp', sep = ""))
+afbSF <- st_read(paste(afb_dir, '.shp', sep = ""))
+afbSF <- sf::st_as_sf(afbSF, coords = c("longitude", "latitude"), crs = st_crs(4326))
 afb <- vect(afb) # so can play nicely in terra package
 
 ###################################################################
@@ -187,13 +148,35 @@ zoom(day1, e = draw(), layer = 1, new = TRUE)
 
 # ------------ EXTRACT DATA --------------------------------------------------- #
 
-# Next time do system.time()
-test <- terra::extract(histR, afb, fun = mean, xy = TRUE)
+pivot_test <- test %>%
+  pivot_longer(cols = starts_with("tasmax"),
+               names_to = "Day",
+               names_prefix = "tasmax",
+               values_to = "Tmax",
+               values_drop_na = FALSE)
 
+
+
+# Function for extracting multiple values from stack
+
+f <- function(r, na.rm = TRUE){
+  c(Tmean = mean(r, na.rm = na.rm),
+    Tmin = min(r, na.rm = na.rm),
+    Tmax = max(r, na.rm = na.rm))
+}
+
+# Next time do system.time()
+system.time(
+test <- terra::extract(histR, afb, xy = TRUE)
+)
 #saveRDS(test, file = './Data/Derived/temp.Rds')
 
 histR
-afb
+afbSF <- st_as_sf(afb)
 
+testVals <- as.data.frame(lat = afbSF$latitude, lon = afbSF$longitude)
 
+system.time(
+testVals <- values() 
+)
 
