@@ -25,6 +25,7 @@ library(data.table)
 library(tidyr)
 library(viridis)
 library(mapview)
+library(raster)
 
 source('./Code/CEMML/Misc/character_vectors.R')
 
@@ -158,4 +159,32 @@ mapview(rx, col.regions = hcl.colors(5, palette = "viridis", alpha = 0.8)) + # 5
 ```
 
 We should also check the size of the AFB to see whether we should use the centroid or multiple cells for analysis. 
+
+```{r}
+
+# What is the cell size of the ncdf?
+
+rx <- rast(rx) # convert to terra object because estimation is better. Could also use raster::area()
+rxCrop <- terra::crop(rx, afb)
+rxCell <- cellSize(rxCrop, unit = "km")
+ncdf_cellSize <- mean(values(rxCell)) # get mean cell size of ncdf
+
+# How big is the AFB?
+
+afb_area <- expanse(afb, unit = "km")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
 
