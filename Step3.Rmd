@@ -23,6 +23,8 @@ library(tmaptools)
 library(stringr)
 library(data.table)
 library(tidyr)
+library(viridis)
+library(mapview)
 
 source('./Code/CEMML/Misc/character_vectors.R')
 
@@ -30,13 +32,13 @@ source('./Code/CEMML/Misc/character_vectors.R')
 
 # *PART ONE: User settings - choose model, scenarios, years of interest*
 
-First, let's select which of the `models` you'd like to run. Highlight the word `models` and click 'Run' at the top right (or use the shortcut *Ctrl + Enter*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). In the inline code chunk below, enter the number between the brackets ([]) that corresponds with your model of interest.
+First, let's select which of the `models` you'd like to run. Highlight the word `models` and click 'Run' at the top right (or use the shortcut *Ctrl + Enter*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
 
-`model <- models[2]` In this example, I am interested in running LOCA_CCSM4 so I entered '2'.  
+In the code chunk below, enter the number between the brackets ([]) that corresponds with your model of interest. Then let's see what variables are available for that model.
 
-Let's see what variables are available for that model. Run the code chunk below and the options will appear. 
+```{r select-model-and-check-variables}
 
-```{r get-variables}
+model <- models[2]
 
 # Using the 'historical' folder just to get a sample of filenames. If we need to change this strategy no biggie.
 
@@ -47,7 +49,6 @@ fileNames <- list.files(dir_historical_ncdfs, pattern = '.nc', full.names = FALS
 variables <- unique(substr(fileNames, 1,7)) # Numbers 1 and 7 refer to character indexes within the file names (i.e., the first seven letters of the file names)
 
 variables
-
 ```
 
 Now we can see how the variables are labeled in this dataset, and we also have created a vector with their names. If you want to edit how they look, go ahead. It could be something like: 
@@ -83,6 +84,9 @@ future2_end_year <- 2055 # End year of interest for the second future time perio
 
 dir_netcdfs = paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "")
 
+dir_installation_boundaries <- "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/" # site boundary shape files used for clipping
+
+
 # The last two are straight from the original script. Will change so that directories can be set more generally in 'settings'
 
 #dir_output_csvs = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2" # output csv
@@ -115,13 +119,43 @@ pattern <- paste(seq(scenario_yr_array[1,2], scenario_yr_array[1,3], 1), collaps
 DT <- data.table(histFileNames_var1, result = grepl(pattern, histFileNames_var1))  
 histDT_var1 <- DT %>% filter(result == TRUE) # spot check the number of observations - should equal the number of years in the time period of interest
 
+# Check to see that files look right and nothing weird made it into the list
 
+#head(histDT_var1)
+#tail(histDT_var1)
 
-
-
-hist_filenames_tmax <- fileNames %>% # this will have to be changed to make it more 'universal'. I have ideas but this works for the trial run for now. 
-  str_subset("historical") %>% # time period of interest
-  str_subset("tasmax")  # variable of interest
+histFileNames_var1 <- histDT_var1$histFileNames_var1 # turn data.frame column into a vector for use with rast()
 
 ```
+
+# *SPATIAL ANALYSIS*
+
+First, let's do a gut check to make sure the spatial files are where they should be. The map will appear below the code chunk, and you can zoom in as needed to view small AFB's 
+
+```{r gut-check-location}
+
+# Rasters
+
+rHistVar1 <- rast(histFileNames_var1) # multilayered raster for analysis
+
+rx <- raster(rHistVar1[[1]]) # Single layer raster for plotting (first layer)
+
+# AFB
+
+afb_dir <- (paste(dir_installation_boundaries, AFB_Name, sep = '/'))
+
+afbSF <- st_read(paste(afb_dir, '.shp', sep = "")) # read in using sf package first
+afbSF <- sf::st_as_sf(afbSF, coords = c("longitude", "latitude"), crs = st_crs(4326)) # EPSG:4326 is lat/long
+
+afb <- vect(afbSF) # for use with terra package
+
+# Quick plot
+
+mapview(rx, col.regions = hcl.colors(5, palette = "viridis", alpha = 0.8)) + # 5 i an ab
+  mapview(afbSF, col.regions = "black")
+
+
+```
+
+We should also check the size of the AFB to see whether we should use the centroid or multiple cells for analysis. 
 
