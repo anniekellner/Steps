@@ -97,49 +97,44 @@ future2_end_year <- 2055 # End year of interest for the second future time perio
 ####################################################################################################
 # THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT
 
-DT <- data.table(histFileNames_var1, result = grepl(pattern, histFileNames_var1))  
-histDT_var1 <- DT %>% filter(result == TRUE) # spot check the number of observations - should equal the number of years in the time period of interest
+# PART TWO: SUBSET FILES OF INTEREST
 
-# Check to see that files look right and nothing weird made it into the list
-
-histFileNames_var1 <- histDT_var1$histFileNames_var1 # turn data.frame column into a vector for use with rast()
-
-histFileNames_var1
-
-# *PART TWO: Let 'er Rip!*
-
-
-```{r directories, echo=FALSE}
-
-dir_netcdfs = paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "")
-
-dir_installation_boundaries <- "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/" # site boundary shape files used for clipping
-
-
-# The last two are straight from the original script. Will change so that directories can be set more generally in 'settings'
-
-#dir_output_csvs = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2" # output csv
-
-#dir_functions = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Software Apps\\R scripts\\LOCA_V2" # scripts that call in functions for analysis
-
-```
+You can double check the array here to make sure the years and scenarios are correct
 
 ```{r create-array}
 
-# Not sure if this only applies to LOCA, as comment implies. Can cross that bridge when we come to it. 
+scenario_yr_array = data.frame()
 
-scenario_yr_array = array(1:15, dim=c(5,3))
+scenario_yr_array[1,1:3] = c(scenario1, historical_start_year, historical_end_year)
+scenario_yr_array[2,1:3] = c(scenario2, future1_start_year, future1_end_year)
+scenario_yr_array[3,1:3] = c(scenario2, future2_start_year, future2_end_year)
+scenario_yr_array[4,1:3] = c(scenario3, future1_start_year, future1_end_year)
+scenario_yr_array[5,1:3] = c(scenario3, future2_start_year, future2_end_year)
 
-scenario_yr_array[1,1:3] = c("historical", historical_start_year, historical_end_year)
-scenario_yr_array[2,1:3] = c("rcp45", future1_start_year, future1_end_year)
-scenario_yr_array[3,1:3] = c("rcp45", future2_start_year, future2_end_year)
-scenario_yr_array[4,1:3] = c("rcp85", future1_start_year, future1_end_year)
-scenario_yr_array[5,1:3] = c("rcp85", future2_start_year, future2_end_year)
+colnames(scenario_yr_array) <- c("Scenario", "Start", "End")
+
+scenario_yr_array
+
+```
+
+```{r}
+
+s1_dir <- paste(model_dir, scenario1, sep = '\\') 
 
 ```
 
 
-```{r historical-files-variable1}
+Make sure the spatial files are where they should be. The map will appear below the code chunk, and you can zoom in as needed to view small AFB's 
+
+```{r }
+
+# Create stack for first scenario-year combo
+  # This is done separately from the others for the sake of expediency. We need to view a single raster layer for our check,      but we don't want to spend time creating all the stacks if something is amiss 
+
+s1_dir <- paste(model_dir, scenario1, sep = '\\') 
+s1v1_fileNames <- list.files(s1_dir, pattern = variables[1], full.names = TRUE) # s1 = scenario 1; v1 = variable 1
+s1v1_years <- paste(seq())   
+
 
 histFileNames_var1 <- list.files(dir_historical_ncdfs, pattern = variables[1], full.names = TRUE) # partition files by variable
 
@@ -153,19 +148,26 @@ histDT_var1 <- DT %>% filter(result == TRUE) # spot check the number of observat
 histFileNames_var1 <- histDT_var1$histFileNames_var1 # turn data.frame column into a vector for use with rast()
 
 histFileNames_var1
+
 ```
 
-# *SPATIAL ANALYSIS*
 
-First, let's do a gut check to make sure the spatial files are where they should be. The map will appear below the code chunk, and you can zoom in as needed to view small AFB's 
 
-```{r gut-check-location}
+
+
+
+```{r check-location}
+
+# Directory for AFB shapefiles
+dir_installation_boundaries <- "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/" # site boundary shape files used for clipping
 
 # Rasters
 
-rHistVar1 <- rast(histFileNames_var1) # multilayered raster for analysis
+rx_fileName <- list.files(example_dir, pattern = '.nc', full.names = TRUE)[1] # Pulls the first .nc file from the example directory (from user settings)
 
-rx <- raster(rHistVar1[[1]]) # Single layer raster for plotting (first layer)
+
+
+rx <- raster(rx_fileName) # Creates raster from first .nc file. Using raster pkg for use with mapview (terra not supported)
 
 # AFB
 
@@ -178,11 +180,54 @@ afb <- vect(afbSF) # for use with terra package
 
 # Quick plot
 
-mapview(rx, col.regions = hcl.colors(5, palette = "viridis", alpha = 0.8)) + # 5 i an ab
+mapview(rx, col.regions = hcl.colors(5, palette = "viridis", alpha = 0.8)) + # First argument is arbitrary (# colors in palette)
   mapview(afbSF, col.regions = "black")
 
 
 ```
+
+
+
+```{r set-directories, echo=FALSE}
+
+dir_installation_boundaries <- "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/" # site boundary shape files used for clipping
+
+
+# The last two are straight from the original script. Will change so that directories can be set more generally in 'settings'
+
+#dir_output_csvs = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2" # output csv
+
+#dir_functions = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Software Apps\\R scripts\\LOCA_V2" # scripts that call in functions for analysis
+
+```
+
+
+
+DT <- data.table(histFileNames_var1, result = grepl(pattern, histFileNames_var1))  
+histDT_var1 <- DT %>% filter(result == TRUE) # spot check the number of observations - should equal the number of years in the time period of interest
+
+# Check to see that files look right and nothing weird made it into the list
+
+histFileNames_var1 <- histDT_var1$histFileNames_var1 # turn data.frame column into a vector for use with rast()
+
+histFileNames_var1
+
+
+
+
+
+
+
+```{r historical-files-variable1}
+
+
+```
+
+# *SPATIAL ANALYSIS*
+
+
+
+
 
 We should also check the size of the AFB to see whether we should use the centroid or multiple cells for analysis. 
 
