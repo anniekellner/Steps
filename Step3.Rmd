@@ -29,41 +29,59 @@ source('./Code/CEMML/Misc/character_vectors.R')
 
 ```
 
-# *PART ONE: User settings - choose model, scenarios, years of interest*
+# *PART ONE: User settings - choose AFB, model, scenarios, years of interest*
 
 First, let's select which of the `models` you'd like to run. Highlight the word `models` and click 'Run' at the top right (or use the shortcut *Ctrl + Enter*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
 
-In the code chunk below, enter the number between the brackets ([]) that corresponds with your model of interest. Then let's see what variables are available for that model.
+In the code chunk below, enter the number between the brackets ([]) that corresponds with your model of interest. Then let's see what scenarios and variables are available for that model.
 
-```{r select-model-and-check-variables}
-
-model <- models[2]
-
-# Using the 'historical' folder just to get a sample of filenames. If we need to change this strategy no biggie.
-
-dir_historical_ncdfs = paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, "\\historical", sep = "")
-
-fileNames <- list.files(dir_historical_ncdfs, pattern = '.nc', full.names = FALSE)
-
-variables <- unique(substr(fileNames, 1,7)) # Numbers 1 and 7 refer to character indexes within the file names (i.e., the first seven letters of the file names)
-
-variables
-```
-
-Now we can see how the variables are labeled in this dataset, and we also have created a vector with their names. If you want to edit how they look, go ahead. It could be something like: 
-
-```{r revise-variables}
-
-variables <- c("pr", "tasmin", "tasmax")
-
-```
-
-
-```{r select AFB and years of interest}
+```{r enter-afb-and-model}
 
 AFB_Name <- "Homestead_ARB" # Can create a vector similar to 'models' above if desired
 
-## Years of interest
+model <- models[2] 
+
+model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "")
+scenario_dirs <- list.dirs(path = paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = ""), full.names = FALSE)
+
+cat(paste("The model you have selected is", model, "and the AFB is", AFB_Name))
+
+```
+
+The next chunk checks what scenarios (subfolders) are contained in the 'Data' folder associated with the model of interest.
+
+```{r results='asis'}
+
+cat("The scenarios (subfolders) associated with this model are:", sep = '\n') # cat() basically means 'print' in this context 
+cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for readability ('\n' = line)
+
+```
+
+*Enter the scenarios of interest below:*
+
+```{r enter-scenarios}
+
+scenario1 <- "historical"
+scenario2 <- "rcp45"
+scenario3 <- "rcp85"
+
+```
+
+Next, let's see which variables are represented in this dataset
+
+```{r}
+
+example_dir = paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, "\\", scenario1, sep = "")
+example_filenames <- list.files(example_dir, pattern = '.nc', full.names = FALSE) # this line might need to be adjusted if some files are .ncdf or other
+
+variables <- unique(substr(example_filenames, 1,6)) # Numbers 1 and 6 refer to character indices within the file names (i.e., the first six letters of the file name)
+
+cat("The variables in this dataset are:", sep = '\n')
+cat(paste("-", variables), sep = "\n")
+
+```
+
+```{r enter-years-of-interest}
 
 historical_start_year <- 1976 # Start year of interest for the historical time period  
 historical_end_year <- 2005 # End year of interest for the historical time period
@@ -75,6 +93,18 @@ future2_start_year <- 2046 # Start year of interest for the second future time p
 future2_end_year <- 2055 # End year of interest for the second future time period 
 
 ```
+
+####################################################################################################
+# THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT
+
+DT <- data.table(histFileNames_var1, result = grepl(pattern, histFileNames_var1))  
+histDT_var1 <- DT %>% filter(result == TRUE) # spot check the number of observations - should equal the number of years in the time period of interest
+
+# Check to see that files look right and nothing weird made it into the list
+
+histFileNames_var1 <- histDT_var1$histFileNames_var1 # turn data.frame column into a vector for use with rast()
+
+histFileNames_var1
 
 # *PART TWO: Let 'er Rip!*
 
@@ -156,7 +186,7 @@ mapview(rx, col.regions = hcl.colors(5, palette = "viridis", alpha = 0.8)) + # 5
 
 We should also check the size of the AFB to see whether we should use the centroid or multiple cells for analysis. 
 
-```{r}
+```{r decision-to-use-shp-or-centroid}
 
 # What is the cell size of the ncdf?
 
@@ -170,12 +200,6 @@ ncdf_cellSize <- mean(values(rxCell)) # get mean cell size of ncdf
 
 afb_area <- expanse(afb, unit = "km")
 
-```
-
-The area covered by each raster cell (that overlays the AFB) is `ncdf_cellSize` km^2^ and the area of the AFB is `afb_area` km^2^.
-
-```{r}
-
 # add an if_else statement to tell R whether to extract raster values from matrix or shapefile
 m <- data.frame(x = afb$longitude, y = afb$latitude) # matrix with longitude and latitude pulled from shp metadata
 
@@ -183,6 +207,11 @@ m <- data.frame(x = afb$longitude, y = afb$latitude) # matrix with longitude and
 
 #if_else(, extr = m, extr = afb)
 
+```
+
+The area covered by each raster cell (that overlays the AFB) is `ncdf_cellSize` km^2^ and the area of the AFB is `afb_area` km^2^.
+
+```{r extract-values}
 
 test <- terra::extract(rHistVar1, m)
 
@@ -195,12 +224,20 @@ piv <- test %>%
 
 #saveRDS(piv, file = './Data/Derived/pr_test.Rds')
 
+```
+
+```{r unit-conversion}
+
 piv2 <- pr_test %>%
   mutate(PPT_mm = pr*86400) # From RasterUnitConvert function
 
+```
+
+```{r check-results}
+
 # Bring in results 
 
-results <- read.csv('N:/RStor/mindyc/afccm/Climate Modeling/Results_LOCA_V2/Homestead_ARB/Homestead_ARB_historical_1976-2005_AllDays.csv')
+avdf <- read_csv('./Results/allvaluesdf.Rds')
 
 
 piv2$Compare <- results$PPT_mm
@@ -210,8 +247,6 @@ piv2$Diff <- piv2$PPT_mm - piv2$Compare
 sum(piv2$Diff)
 
 ```
-
-
 
 
 
