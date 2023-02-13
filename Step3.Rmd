@@ -76,7 +76,7 @@ future2_end_year <- 2055 # End year of interest for the second future time perio
 
 ```
 
-# PART TWO: Let 'er Rip!
+# *PART TWO: Let 'er Rip!*
 
 
 ```{r directories, echo=FALSE}
@@ -120,11 +120,9 @@ histDT_var1 <- DT %>% filter(result == TRUE) # spot check the number of observat
 
 # Check to see that files look right and nothing weird made it into the list
 
-#head(histDT_var1)
-#tail(histDT_var1)
-
 histFileNames_var1 <- histDT_var1$histFileNames_var1 # turn data.frame column into a vector for use with rast()
 
+histFileNames_var1
 ```
 
 # *SPATIAL ANALYSIS*
@@ -181,9 +179,9 @@ The area covered by each raster cell (that overlays the AFB) is `ncdf_cellSize` 
 # add an if_else statement to tell R whether to extract raster values from matrix or shapefile
 m <- data.frame(x = afb$longitude, y = afb$latitude) # matrix with longitude and latitude pulled from shp metadata
 
-extractObj <- if_else(afb_area < ncdf_cellSize, m, afb)
+#extractObj <- if_else(afb_area < ncdf_cellSize, m, afb)
 
-if_else(, extr = m, extr = afb)
+#if_else(, extr = m, extr = afb)
 
 
 test <- terra::extract(rHistVar1, m)
@@ -197,7 +195,7 @@ piv <- test %>%
 
 #saveRDS(piv, file = './Data/Derived/pr_test.Rds')
 
-piv2 <- piv %>%
+piv2 <- pr_test %>%
   mutate(PPT_mm = pr*86400) # From RasterUnitConvert function
 
 # Bring in results 
