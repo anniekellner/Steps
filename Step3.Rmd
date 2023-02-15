@@ -13,7 +13,7 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE) # 'echo' means R will print the code along with the results. 
 
-rm(list = ls()) # clear workspace
+#rm(list = ls()) # clear workspace
 
 library(terra)
 library(sf)
@@ -27,7 +27,7 @@ library(raster)
 library(lubridate)
 
 source('./Code/CEMML/Misc/character_vectors.R')
-
+source('./Code/CEMML/Functions.R')
 ```
 
 # *PART ONE: User settings - choose AFB, model, scenarios, years of interest*
@@ -36,11 +36,9 @@ source('./Code/CEMML/Misc/character_vectors.R')
 
 dir_installation_boundaries <- "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/" # site boundary shape files used for clipping
 
-# The last two are straight from the original script. Will change so that directories can be set more generally in 'settings'
+dir_output_csvs = './Results/Test' 
 
-#dir_output_csvs = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2" # output csv
-
-#dir_functions = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Software Apps\\R scripts\\LOCA_V2" # scripts that call in functions for analysis
+dir_functions = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Software Apps\\R scripts\\LOCA_V2" # scripts that call in functions for analysis
 ```
 
 
@@ -272,9 +270,6 @@ for(i in 1:length(files_s1f1)){
 ############################################################
 #saveRDS(results_baseline, file = './Results/baseline_raw.Rds') # 2/14/23
 
-piv2 <- pr_test %>%
-  mutate(PPT_mm = pr*86400) # From RasterUnitConvert function
-
 ```
 
 ```{r final-dataframes}
@@ -297,12 +292,26 @@ avdf_baseline <- tibble(lat = centroid[2], # allvaluesdf historical
                         prcp = temp_baseline[[1]]$pr_day,
                         tmax = temp_baseline[[2]]$tasmax,
                         tmin = temp_baseline[[3]]$tasmin) 
+
+
+
 ```
 
 
 
 
 ```{r unit-conversion}
+
+avdf_baseline_test <- avdf_baseline %>%
+  mutate(PPT_mm = case_when( # if raster units are "kg-m-2 -1", convert to mm (otherwise keep as is)
+    str_detect(units(rx), "kg") ~ prcp*86400)) %>%
+  mutate(PPT_in = RasterUnitConvert(PPT_mm, "MMtoIN")) %>%
+  mutate(TMaxF = case_when(
+    
+  )
+  
+
+
 
 ```
 
