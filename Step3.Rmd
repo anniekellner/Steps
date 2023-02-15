@@ -75,9 +75,9 @@ cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for reada
 
 ```{r enter-scenarios}
 
-scenario1 <- "historical"
-scenario2 <- "rcp45"
-scenario3 <- "rcp85"
+baseline <- "historical"
+scenario1 <- "rcp45"
+scenario2 <- "rcp85"
 
 ```
 
@@ -85,10 +85,10 @@ Next, let's see which variables are represented in this dataset
 
 ```{r}
 
-example_dir = paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, "\\", scenario1, sep = "")
-example_filenames <- list.files(example_dir, pattern = '.nc', full.names = FALSE) # this line might need to be adjusted if some files are .ncdf or other
+baseline_dir = paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, "\\", baseline, sep = "")
+baseline_filenames <- list.files(baseline_dir, pattern = '.nc', full.names = FALSE) # this line might need to be adjusted if some files are .ncdf or other
 
-variables <- unique(substr(example_filenames, 1,6)) # Numbers 1 and 6 refer to character indices within the file names (i.e., the first six letters of the file name)
+variables <- unique(substr(baseline_filenames, 1,6)) # Numbers 1 and 6 refer to character indices within the file names (i.e., the first six letters of the file name)
 
 cat("The variables in this dataset are:", sep = '\n')
 cat(paste("-", variables), sep = "\n")
@@ -97,8 +97,8 @@ cat(paste("-", variables), sep = "\n")
 
 ```{r enter-years-of-interest}
 
-historical_start_year <- 1976 # Start year of interest for the historical time period  
-historical_end_year <- 2005 # End year of interest for the historical time period
+baseline_start_year <- 1976 # Start year of interest for the historical time period  
+baseline_end_year <- 2005 # End year of interest for the historical time period
 
 future1_start_year <- 2026 # Start year of interest for the first future time period 
 future1_end_year <- 2035 # End year of interest for the first future time period 
@@ -110,52 +110,78 @@ future2_end_year <- 2055 # End year of interest for the second future time perio
 
 ####################################################################################################
 # THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT
+# The rest of the script should be able to be run as-is...
 
 # PART TWO: SUBSET FILES OF INTEREST
 
-You can double check the array here to make sure the years and scenarios are correct
+In this step, we are creating lists of filenames that we will eventually combine into raster stacks. WHen this chunk is finished running, you can check the objects to make sure 
 
-```{r create-array}
+```{r list-filenames}
 
-scenarios <- c(scenario1, scenario2, scenario3)
+scenarios <- c(baseline, scenario1, scenario2)
 
-scenario_yr_array = data.frame() # Maybe LOCA only?
+baseline_yrs <- paste(seq(baseline_start_year, baseline_end_year, 1), collapse = '|')
+future1_yrs <- paste(seq(future1_start_year, future1_end_year, 1), collapse = '|')
+future2_yrs <- paste(seq(future2_start_year, future2_end_year, 1), collapse = '|')
 
-scenario_yr_array[1,1:3] = c(scenario1, historical_start_year, historical_end_year)
-scenario_yr_array[2,1:3] = c(scenario2, future1_start_year, future1_end_year)
-scenario_yr_array[3,1:3] = c(scenario2, future2_start_year, future2_end_year)
-scenario_yr_array[4,1:3] = c(scenario3, future1_start_year, future1_end_year)
-scenario_yr_array[5,1:3] = c(scenario3, future2_start_year, future2_end_year)
+files_baseline <- list() # historical
+files_s1f1 <- list() # scenario1, future 1
+files_s1f2 <- list() # scenario 1, future 2
+files_s2f1 <- list() # scenario 2, future 1
+files_s2f2 <- list() # scenario 2, future 2
 
-colnames(scenario_yr_array) <- c("Scenario", "Start", "End")
+# List files for Baseline Scenario
 
-scenario_yr_array
+for(i in 1:length(variables)){ 
+  fileNames = list.files(baseline_dir, pattern = variables[i], full.names = TRUE)
+  dt = data.table(fileNames, result = grepl(baseline_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_baseline[[i]] = dt2$fileNames
+}
 
-```
+# List files for S1F1 
 
+for(i in 1:length(variables)){ 
+  dir = paste(model_dir, scenario1, sep = '\\')
+  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_s1f1[[i]] = dt2$fileNames
+  }
 
-The next chunk checks that the spatial files are where they should be. The map will appear below the code chunk, and you can zoom in as needed to view small AFB's 
+# List files for S1F2
 
-```{r pull-files-for-scenario1}
+for(i in 1:length(variables)){ 
+  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_s1f2[[i]] = dt2$fileNames
+  }
 
-# Create stack for first scenario-year combo
-  # This is done separately from the others for the sake of expediency. We need to view a single raster layer for our check,      but we don't want to spend time creating all the stacks if something is amiss 
+# List files for S2F1 
 
-s1_dir <- paste(model_dir, scenario1, sep = '\\')
-s1v1_fileNames <- list.files(s1_dir, pattern = variables[1], full.names = TRUE) # s1 = scenario 1; v1 = variable 1
-s1v1_years <- paste(seq(scenario_yr_array[1,2], scenario_yr_array[1,3], 1), collapse = "|") # partition by years of interest
+for(i in 1:length(variables)){ 
+  dir = paste(model_dir, scenario2, sep = '\\')
+  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_s2f1[[i]] = dt2$fileNames
+}
 
-dt <- data.table(s1v1_fileNames, result = grepl(s1v1_years, s1v1_fileNames))  # searches for filenames with the years of interest
-dt <- dt %>% filter(result == TRUE) # spot check the number of observations - should equal the number of years in the time period of interest
+# List files for S2F2
 
-s1v1_fileNames <- dt$s1v1_fileNames # turn data.frame column into a vector for use with rast(). Writes over earlier object with same name.
+for(i in 1:length(variables)){ 
+  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_s2f2[[i]] = dt2$fileNames
+}
 
-# Check printout below to make sure the first and last files look correct
-first(s1v1_fileNames)
-last(s1v1_fileNames)
 ```
 
 # PART THREE: SPATIAL CHECK
+
+The next chunk checks that the spatial files are where they should be. The map will appear below the code chunk, and you can zoom in as needed to view small AFB's 
 
 ```{r spatial-check}
 
@@ -170,8 +196,8 @@ afb <- vect(afbSF) # for use with terra package
 
 # Raster
 
-stackX <- rast(s1v1_fileNames)
-rx <- raster(stackX[[1]]) # using raster package for example so can use with mapview (terra not supported)
+stackBaseline_v1 <- rast(files_baseline[[1]]) # creates raster stack for first variable in files_baseline list
+rx <- raster(stackBaseline_v1[[1]]) # just for plotting
 
 # Quick plot
 
@@ -180,9 +206,9 @@ mapview(rx, col.regions = hcl.colors(5, palette = "viridis", alpha = 0.8)) + # F
 
 ```
 
-We need to check the size of the AFB to see whether we should use the centroid or multiple cells for analysis. 
+We need to check the size of the AFB to see whether we should use the centroid or multiple cells for analysis. If the results say 'matrix array', the script will use the centroid. If it says "spatVector", it will use the spatial object (afb).
 
-```{r decision-to-use-shp-or-centroid-for-extraction, results='asis'}
+```{r decision-to-use-shp-or-centroid-for-extraction, warning=FALSE, results='asis'}
 
 # What is the cell size of the ncdf?
 
@@ -203,89 +229,78 @@ centroid <- afbSF %>%
 # add an if_else statement to tell R whether to extract raster values from matrix or shapefile
 
 extract_obj <- afb
+cell <- cellFromXY(rx, centroid) # finds the cell (index) in which the centroid is located
 
-extract_obj <- if(afb_area < ncdf_cellSize) centroid else (afb)
+extract_obj <- if(afb_area < ncdf_cellSize) cell else (afb)
 
-cat("The object used for data extraction is a", class(extract_obj)) # 'matrix array' = centroid; 'spatVector' = spatial object (multiple cells)
+cat("The object used for data extraction is ", class(extract_obj)) # 'numeric' = centroid (cell number); 
+                                                                   # 'spatVector' = spatial object (multiple cells)
 
 ```
 
 
 ```{r extract-values}
 
-# Create dataframe for extracted values
+# Create list for extracted values
 
-rTimes <- time(stackX)
+# Historical
 
-v1 <- terra::extract(stackX, extract_obj)
+results_baseline <- list()
+times_baseline <- vector() # Safest thing would be to make this a list and pull the dates for each variable separately, to make sure they're correct. 
 
-results <- v1 %>%
-  pivot_longer(cols = everything(),
-               names_to = "Layer",
-               names_prefix = variables[1],
-               values_to = variables[1],
-               values_drop_na = FALSE) 
+results_s1f1 <- list()
+times_s1f1 <- vector()
 
-results <- results %>%
-  mutate(date = rTimes) %>%
-  mutate(lon = centroid[1]) %>% # WILL NEED TO CHANGE ONCE WE USE A SPATIAL OBJECT TO EXTRACT DATA
-  mutate(lat = centroid[2]) # WILL NEED TO CHANGE ONCE WE USE A SPATIAL OBJECT TO EXTRACT DATA
+results_s1f2 <- list()
+times_s1f2 <- vector()
 
-#saveRDS(results, file = './Results/temp.Rds')
+system.time( # 43.9 minutes - AK home desktop
+for(i in 1:length(files_baseline)){
+  r = rast(files_baseline[[i]])
+  #times_baseline = time(r)
+  results_baseline[[i]] = r[extract_obj]
+})
 
-```
-
-```{r loop-for-all-files}
-
-scenarios <- c(scenario1, scenario2, scenario3)
-future1 <- paste(seq(future1_start_year, future1_end_year, 1), collapse = '|')
-future2 <- paste(seq(future2_start_year, future2_end_year, 1), collapse = '|')
-
-files_hist <- list()
-files_future1 <- list()
-files_future2 <- list()
+system.time( 
+for(i in 1:length(files_s1f1)){
+  r = rast(files_s1f1[[i]])
+  #times_baseline = time(r)
+  results_s1f1[[i]] = r[extract_obj]
+})
 
 
-# List remaining files for Historical
-
-for(i in 2:length(variables)){ # start at 2 because already pulled s1v1
-  fileNames = list.files(example_dir, pattern = variables[i], full.names = TRUE)
-  dt = data.table(fileNames, result = grepl(hist_yrs, fileNames))
-  dt2 = dplyr::filter(dt, result == TRUE)
-  files_hist[[i]] = dt2$fileNames
-}
-
-# List files for Future 1
-
-for(i in 1:length(variables)){ 
-  dir = paste(model_dir, scenario2, sep = '\\')
-  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
-  dt = data.table(fileNames, result = grepl(future1, fileNames))
-  dt2 = dplyr::filter(dt, result == TRUE)
-  files_future1[[i]] = dt2$fileNames
-}
-
-# List files for Future 2
-
-for(i in 1:length(variables)){ 
-  dir = paste(model_dir, scenario3, sep = '\\')
-  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
-  dt = data.table(fileNames, result = grepl(future2, fileNames))
-  dt2 = dplyr::filter(dt, result == TRUE)
-  files_future2[[i]] = dt2$fileNames
-}
-
-```
-
-
-
-```{r create-rasters}
-
+############################################################
+#saveRDS(results_baseline, file = './Results/baseline_raw.Rds') # 2/14/23
 
 piv2 <- pr_test %>%
   mutate(PPT_mm = pr*86400) # From RasterUnitConvert function
 
 ```
+
+```{r final-dataframes}
+
+temp_baseline <- list()
+
+for(i in 1:length(results_baseline)){
+  temp_baseline[[i]] = pivot_longer(results_baseline[[i]],
+                           cols = everything(),
+                           names_to = "Layer",
+                           names_prefix = variables[i],
+                           values_to = variables[i],
+                           values_drop_na = FALSE) 
+                     
+}
+
+avdf_baseline <- tibble(lat = centroid[2], # allvaluesdf historical
+                        lon = centroid[1], 
+                        date = times_baseline, 
+                        prcp = temp_baseline[[1]]$pr_day,
+                        tmax = temp_baseline[[2]]$tasmax,
+                        tmin = temp_baseline[[3]]$tasmin) 
+```
+
+
+
 
 ```{r unit-conversion}
 
