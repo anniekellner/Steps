@@ -195,7 +195,7 @@ afb <- vect(afbSF) # for use with terra package
 # Raster
 
 stackBaseline_v1 <- rast(files_baseline[[1]]) # creates raster stack for first variable in files_baseline list
-rx <- raster(stackBaseline_v1[[1]]) # just for plotting
+rx <- raster(stackBaseline_v1[[1]]) # for plotting and getting basic raster info
 
 # Quick plot
 
@@ -239,7 +239,8 @@ cat("The object used for data extraction is ", class(extract_obj)) # 'numeric' =
 
 ```{r extract-values}
 
-# Create list for extracted values
+# Create lists for extracted values and vectors for extracting time (dates) from rasters
+# NOTE: this part of the script could be turned into a nested looped with code like for(i in 1:length(scenarios)) and for(j in 1:length(futures)) and for(k in length(1:variables)). I would add rm(r) to the end so the rasters are removed from the environment before the next loop starts
 
 # Historical
 
@@ -252,21 +253,82 @@ times_s1f1 <- vector()
 results_s1f2 <- list()
 times_s1f2 <- vector()
 
+results_s2f1 <- list()
+times_s2f1 <- vector()
+
+results_s2f2 <- list()
+times_s2f2 <- vector()
+
 system.time( # 43.9 minutes - AK home desktop
 for(i in 1:length(files_baseline)){
   r = rast(files_baseline[[i]])
   #times_baseline = time(r)
-  results_baseline[[i]] = r[extract_obj]
+  vals = r[extract_obj]
+  results_baseline[[i]] = vals %>%
+    pivot_longer(cols = everything(),
+                 names_to = "Layer",
+                 names_prefix = variables[i],
+                 values_to = variables[i],
+                 values_drop_na = FALSE) 
+  rm(r)
+})
+
+system.time( # 11 minutes
+for(i in 1:length(files_s1f1)){
+  r = rast(files_s1f1[[i]])
+  times_s1f1 = time(r)
+  vals = r[extract_obj]
+  results_s1f1[[i]] = vals %>%
+    pivot_longer(
+      cols = everything(),
+      names_to = "Layer",
+      names_prefix = variables[i],
+      values_to = variables[i],
+      values_drop_na = FALSE)
+  rm(r)
 })
 
 system.time( 
-for(i in 1:length(files_s1f1)){
-  r = rast(files_s1f1[[i]])
-  #times_baseline = time(r)
-  results_s1f1[[i]] = r[extract_obj]
+for(i in 1:length(files_s1f2)){
+  r = rast(files_s1f2[[i]])
+  #times_s1f2 = time(r)
+  vals = r[extract_obj]
+  results_s1f2[[i]] = pivot_longer(results_s1f2[[i]],
+                           cols = everything(),
+                           names_to = "Layer",
+                           names_prefix = variables[i],
+                           values_to = variables[i],
+                           values_drop_na = FALSE)
+  rm(r)
 })
 
+system.time( 
+for(i in 1:length(files_s2f1)){
+  r = rast(files_s2f1[[i]])
+  #times_s2f1 = time(r)
+  vals = r[extract_obj]
+  results_s2f1[[i]] = pivot_longer(results_s2f1[[i]],
+                           cols = everything(),
+                           names_to = "Layer",
+                           names_prefix = variables[i],
+                           values_to = variables[i],
+                           values_drop_na = FALSE)
+  rm(r)
+})
 
+system.time( 
+for(i in 1:length(files_s2f2)){
+  r = rast(files_s2f2[[i]])
+  #times_s2f2 = time(r)
+  vals = r[extract_obj]
+  results_s2f2[[i]] = pivot_longer(results_s2f2[[i]],
+                           cols = everything(),
+                           names_to = "Layer",
+                           names_prefix = variables[i],
+                           values_to = variables[i],
+                           values_drop_na = FALSE)
+  rm(r)
+})
 ############################################################
 #saveRDS(results_baseline, file = './Results/baseline_raw.Rds') # 2/14/23
 
@@ -274,24 +336,18 @@ for(i in 1:length(files_s1f1)){
 
 ```{r final-dataframes}
 
-temp_baseline <- list()
+# Equivalent of allvaluesdf (from original script)
 
-for(i in 1:length(results_baseline)){
-  temp_baseline[[i]] = pivot_longer(results_baseline[[i]],
-                           cols = everything(),
-                           names_to = "Layer",
-                           names_prefix = variables[i],
-                           values_to = variables[i],
-                           values_drop_na = FALSE) 
-                     
-}
+allvaluesdf <- list()  
 
-avdf_baseline <- tibble(lat = centroid[2], # allvaluesdf historical
-                        lon = centroid[1], 
-                        date = times_baseline, 
-                        prcp = temp_baseline[[1]]$pr_day,
-                        tmax = temp_baseline[[2]]$tasmax,
-                        tmin = temp_baseline[[3]]$tasmin) 
+for(i in 1:length()) # figure out way to put baseline, s1f1, etc. into a vector
+  
+s1f1 <- tibble(lat = centroid[2], # allvaluesdf historical
+                   lon = centroid[1], 
+                   date = times_s1f1, 
+                   prcp = results_s1f1[[1]]$pr_day,
+                   tmax = results_s1f1[[2]]$tasmax,
+                   tmin = results_s1f1[[3]]$tasmin)
 
 
 
@@ -300,13 +356,53 @@ avdf_baseline <- tibble(lat = centroid[2], # allvaluesdf historical
 
 
 
-```{r unit-conversion}
+```{r create csvs}
 
-avdf_baseline_test <- avdf_baseline %>%
+# Add derived variables to dataframes
+
+csv <- s1f1 %>%
   mutate(PPT_mm = case_when( # if raster units are "kg-m-2 -1", convert to mm (otherwise keep as is)
-    str_detect(units(rx), "kg") ~ prcp*86400)) %>%
+      str_detect(units(rx), "kg") ~ prcp*86400,
+      TRUE ~ prcp)) %>%
   mutate(PPT_in = RasterUnitConvert(PPT_mm, "MMtoIN")) %>%
   mutate(TMaxF = case_when(
+      mean(tmax > 200) ~ RasterUnitConvert(tmax, "KtoF"), # Because only values in Kelvin would be > 200
+      RasterUnitConvert(tmax, "CtoF"))) %>% # assuming if temp units are not Kelvin they will be Celsius
+  mutate(TmaxC = case_when(
+    mean(tmax > 200) ~ RasterUnitConvert(tmax, "KtoC"),
+    TRUE ~ tmax)) %>% # assuming if temp units are not Kelvin they are Celsius
+  mutate(TMinF = case_when(
+    mean(tmin > 200) ~ RasterUnitConvert(tmin, "KtoF"),
+    RasterUnitConvert(tmin, "CtoF"))) %>%
+  mutate(TminC = case_when(
+    mean(tmin > 200) ~ RasterUnitConvert(tmin, "KtoC"),
+    TRUE ~ tmin)) %>% # assuming if temp are not K they are C
+  mutate(TMeanF = (TmaxF + TminF)/2) %>%
+  mutate(TmeanC = (TmaxC + TminC)/2) %>%
+  mutate(GDDF = RasterGDD(TminF, TMaxF, 50, 86)) %>% # values of 50 and 86 come from original LOCASummmarize.R script
+  mutate(hotdays = Rasterhotdays(TMaxC)) %>%
+  mutate(colddays = Rastercolddays(TminC)) %>%
+  mutate(wetdays = Rasterwetdays(PPT_mm)) %>%
+  mutate(ftDays = RasterFTdays(TmaxC, TminC))
+
+
+
+    
+    
+
+  
+
+
+
+
+
+
+
+
+
+
+avdf_baseline_test <- avdf_baseline %>%
+
     
   )
   
