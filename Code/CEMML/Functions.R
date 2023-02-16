@@ -2,15 +2,13 @@
 ###   FUNCTIONS USED FOR STEPS PROCESS  ##########
 ##################################################
 
-
-#' UnitConvert
+#' RasterUnitConvert
 #' 
 #' Create new values reflecting unit conversion (add attribute? Or mutate?)
 #' Convert argument defines what conversion is done
-#' SPECIFY WHAT IS RETURNED
 #' 
 #' @param value_from Value to be converted
-#' @param value_to Result value converted
+#' @param ConvertType Metrics to convert
 
 RasterUnitConvert <- function(Value_From, ConvertType="CtoF") 
 {
@@ -46,7 +44,35 @@ RasterUnitConvert <- function(Value_From, ConvertType="CtoF")
   
   
   return((result))
-  
-  
-  
 }
+
+#' RasterGDD
+#' 
+#' Description: Create a raster of total growing degree days given two raster stacks
+#'              of daily Tmax and Tmin values. Rasters must be stacked with layers that
+#'             correspond to same day (layer1 represents day 1, Layer2 day2, etc in each stack).
+#'              Return raster will contain values of total GDD for the time period.
+#'              
+#' @param tminrast Raster stack of minimum temperature values (Tmin) in Deg Celsius with each layer corresponding to a day.
+#' @param tmaxrast Raster stack of maximum temperature values (Tmax) in Deg Celsius with each layer corresponding to a day.
+#' @param basetemp The base temperature in Deg Celsius used in GDD calculation
+#' @param captemp = The maximum cap temperature in Deg Ceslcius used in GDD calculation
+
+RasterGDD <- function(tminrast, tmaxrast, basetemp=10, captemp=30) 
+{
+  
+  #If Tmin or tmax values are above captemp or below basetemp, set to those values
+  tminrast[tminrast>captemp] = captemp
+  tminrast[tminrast<basetemp] = basetemp
+  
+  tmaxrast[tmaxrast>captemp] = captemp
+  tmaxrast[tmaxrast<basetemp] = basetemp
+  
+  #Calculate growing degree days based on tmax, tmin and basetemp and sum raster stack
+  GDD =  (tmaxrast + tminrast) / 2 - basetemp
+}
+
+              
+
+
+
