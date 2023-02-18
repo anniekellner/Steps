@@ -13,7 +13,7 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE) # 'echo' means R will print the code along with the results. 
 
-#rm(list = ls()) # clear workspace
+rm(list = ls()) # clear workspace
 
 library(terra)
 library(sf)
@@ -23,6 +23,7 @@ library(viridis)
 library(mapview)
 library(raster)
 library(lubridate)
+
 
 source('./Code/CEMML/Misc/character_vectors.R')
 source('N:/RStor/mindyc/afccm/Climate Modeling/Software Apps/R scripts/LOCA_V2/Function_General.R')
@@ -239,21 +240,16 @@ cat("The object used for data extraction is ", class(extract_obj)) # 'numeric' =
 ```{r extract-values}
 
 # Create lists for extracted values and vectors for extracting time (dates) from rasters
-# NOTE: this part of the script could be turned into a nested looped with code like for(i in 1:length(scenarios)) and for(j in 1:length(futures)) and for(k in length(1:variables)). I would add rm(r) to the end so the rasters are removed from the environment before the next loop starts
 
 # Historical
 
 results_baseline <- list()
 
 results_s1f1 <- list()
-varnames_s1f1 <- list()
-dates_s1f1 <- vector()
+dates_s1f1 <- list()
 
 results_s1f2 <- list()
-varnames_s1f2 <- list()
-dates_s1f2 <- vector()
-
-
+dates_s1f2 <- list()
 
 results_s2f1 <- list()
 results_s2f2 <- list()
@@ -262,7 +258,6 @@ for(i in 1:length(files_baseline)){
   r = rast(files_baseline[[i]])
   times = time(r)
   vals = r[extract_obj]
-  rData = nest()
   results_baseline[[i]] = vals %>%
     pivot_longer(cols = everything(),
                  names_to = "Layer",
@@ -275,33 +270,30 @@ for(i in 1:length(files_baseline)){
 
 for(i in 1:length(files_s1f1)){
   r = rast(files_s1f1[[i]])
-  dates_s1f1 = time(r)
+  dates_s1f1[[i]] = time(r)
+  varName = varnames(r)[1]
   vals = r[extract_obj]
-  results_s1f1[[i]] = vals %>%
-    pivot_longer(
-      cols = everything(),
-      names_to = "Layer",
-      names_prefix = variables[i],
-      values_to = variables[i],
-      values_drop_na = FALSE) %>%
-    mutate(dates = times)
+  tVals = data.table::transpose(vals) # do not use purrr:transpose
+  colnames(tVals) = varName
+  results_s1f1[[i]] = tVals
+  names(results_s1f1)[i] <- varName
   rm(r)
 }
 
-for(i in 1:length(files_s1f2)){ # good - use this template?
+#saveRDS(results_s1f1, file = './Results/s1f1_list.Rds')
+
+system.time( # 10.8 minutes AK home desktop
+for(i in 1:length(files_s1f2)){
   r = rast(files_s1f2[[i]])
-  dates_s1f2 = time(r)
-  varnames_s1f2[[i]] = varnames(r)
+  dates_s1f2[[i]] = time(r)
+  varName = varnames(r)[1]
   vals = r[extract_obj]
-  tVals = transpose(vals)
+  tVals = data.table::transpose(vals) 
+  colnames(tVals) = varName
   results_s1f2[[i]] = tVals
+  names(results_s1f2)[i] <- varName
   rm(r)
-}
-
-t2 <- as_tibble(results_s1f2, .name_repair = "unique") 
-
-
-t2 <- unnest(t) 
+})
 
 for(i in 1:length(files_s2f1)){
   r = rast(files_s2f1[[i]])
@@ -331,22 +323,36 @@ for(i in 1:length(files_s2f2)){
   rm(r)
 }
 
-rm(files_baseline, files_s1f1, files_s1f2, files_s2f1, files_s2f2) # remove all lists from environment except results
+# Need to pair dates with extracted data before removing! Do this in the loop!
 
+rm(list = ls(pattern = "^files")) # remove lists from the environment that aren't results
+rm(list = ls(pattern = "^dates"))
 ```
 
 ```{r final-dataframes}
 
 # Equivalent of allvaluesdf (from original script)
 
-lists <- Filter(function(x) is(x, "list"), mget(ls()))
+lists <- Filter(function(x) is(x, "list"), mget(ls())) # reads in all remaining lists
+tibbles <- as_tibble(lists) # tibbles are tidy objects
 
-create_allvaluesdf <- function(df){
+for(i in 1:length(tibbles))
+  tbl_nested = tibbles[i]
+  tbl <- unnest(tbl_nested) %>%
+    mutate(lat = centroid[2]) %>%
+    mutate(lon = centroid[1]) %>%
+    mutate(date = )
+  
+  
+  
+create_allvaluesdf <- function(list){
   tibble(lat = centroid[2],
          lon = centroid[1],
-         date = 
+         date = df[[1]]$dates,
+         prcp =df[[1]]$pr_day, 
+         
   
-}
+
   
 s1f1 <- tibble(lat = centroid[2], # allvaluesdf historical
                    lon = centroid[1], 
