@@ -35,12 +35,9 @@ source('N:/RStor/mindyc/afccm/Climate Modeling/Software Apps/R scripts/LOCA_V2/F
 
 dir_installation_boundaries <- "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/" # site boundary shape files used for clipping
 
-dir_output_csvs = './Results/Test' 
+dir_output_csvs = './Results/Test/' 
 
-#dir_functions = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Software Apps\\R scripts\\LOCA_V2" # scripts that call in functions for analysis
 ```
-
-
 
 First, let's select which of the `models` you'd like to run. Highlight the word `models` and click 'Run' at the top right (or use the shortcut *Ctrl + Enter*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
 
@@ -169,6 +166,7 @@ for(i in 1:length(variables)){
 # List files for S2F2
 
 for(i in 1:length(variables)){ 
+  dir = paste(model_dir, scenario2, sep = '\\')
   fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
   dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
   dt2 = dplyr::filter(dt, result == TRUE)
@@ -241,180 +239,167 @@ cat("The object used for data extraction is ", class(extract_obj)) # 'numeric' =
 
 # Create lists for extracted values and vectors for extracting time (dates) from rasters
 
+# NOTE: when it comes time to run a base that is large enough to span several raster cells, will need to amend this section. 
+  # Will need to write a function into Functions.R that extracts data differently depending on whether we're using the centroid (point) or a spatial object (vect). terra::extract() could do either without writing a separate function, but it takes a lot longer to run for point data
+
 # Historical
 
 results_baseline <- list()
-
 results_s1f1 <- list()
-dates_s1f1 <- list()
-
 results_s1f2 <- list()
-dates_s1f2 <- list()
-
 results_s2f1 <- list()
 results_s2f2 <- list()
 
 for(i in 1:length(files_baseline)){
   r = rast(files_baseline[[i]])
   times = time(r)
+  varName = varnames(r)[1]
+  varNames[[i]] = varName
   vals = r[extract_obj]
-  results_baseline[[i]] = vals %>%
-    pivot_longer(cols = everything(),
-                 names_to = "Layer",
-                 names_prefix = variables[i],
-                 values_to = variables[i],
-                 values_drop_na = FALSE) %>%
-    mutate(dates = times)
+  tVals = data.table::transpose(vals) # do not use purrr:transpose
+  colnames(tVals) = varName
+  results_baseline[[i]] = tVals
+  names(results_baseline)[i] = varName
+  results_baseline[[i]]$date = times
   rm(r)
 }
 
 for(i in 1:length(files_s1f1)){
   r = rast(files_s1f1[[i]])
-  dates_s1f1[[i]] = time(r)
+  times = time(r)
   varName = varnames(r)[1]
   vals = r[extract_obj]
-  tVals = data.table::transpose(vals) # do not use purrr:transpose
+  tVals = data.table::transpose(vals) 
   colnames(tVals) = varName
   results_s1f1[[i]] = tVals
-  names(results_s1f1)[i] <- varName
+  names(results_s1f1)[i] = varName
+  results_s1f1[[i]]$date = times
   rm(r)
 }
 
-#saveRDS(results_s1f1, file = './Results/s1f1_list.Rds')
-
-system.time( # 10.8 minutes AK home desktop
 for(i in 1:length(files_s1f2)){
   r = rast(files_s1f2[[i]])
-  dates_s1f2[[i]] = time(r)
+  times = time(r)
   varName = varnames(r)[1]
   vals = r[extract_obj]
   tVals = data.table::transpose(vals) 
   colnames(tVals) = varName
   results_s1f2[[i]] = tVals
   names(results_s1f2)[i] <- varName
+  results_s1f2[[i]]$date = times
   rm(r)
-})
+}
 
 for(i in 1:length(files_s2f1)){
   r = rast(files_s2f1[[i]])
-  times = time(r)
+  dates_s2f1[[i]] = time(r)
+  varName = varnames(r)[1]
   vals = r[extract_obj]
-  results_s2f1[[i]] = pivot_longer(results_s2f1[[i]],
-                           cols = everything(),
-                           names_to = "Layer",
-                           names_prefix = variables[i],
-                           values_to = variables[i],
-                           values_drop_na = FALSE) %>%
-    mutate(dates = times)
+  tVals = data.table::transpose(vals) 
+  colnames(tVals) = varName
+  results_s2f1[[i]] = tVals
+  names(results_s2f1)[i] <- varName
   rm(r)
 }
 
 for(i in 1:length(files_s2f2)){
   r = rast(files_s2f2[[i]])
-  times = time(r)
+  dates_s2f2[[i]] = time(r)
+  varName = varnames(r)[1]
   vals = r[extract_obj]
-  results_s2f2[[i]] = pivot_longer(results_s2f2[[i]],
-                           cols = everything(),
-                           names_to = "Layer",
-                           names_prefix = variables[i],
-                           values_to = variables[i],
-                           values_drop_na = FALSE) %>%
-    mutate(dates = times)
+  tVals = data.table::transpose(vals) 
+  colnames(tVals) = varName
+  results_s2f2[[i]] = tVals
+  names(results_s2f2)[i] <- varName
   rm(r)
 }
 
-# Need to pair dates with extracted data before removing! Do this in the loop!
-
 rm(list = ls(pattern = "^files")) # remove lists from the environment that aren't results
-rm(list = ls(pattern = "^dates"))
+
 ```
 
-```{r final-dataframes}
+```{r allvaluesdf-dataframes}
 
 # Equivalent of allvaluesdf (from original script)
 
 lists <- Filter(function(x) is(x, "list"), mget(ls())) # reads in all remaining lists
-tibbles <- as_tibble(lists) # tibbles are tidy objects
+nested_tibbles <- as_tibble(lists) # tibbles are tidy objects
 
-for(i in 1:length(tibbles))
-  tbl_nested = tibbles[i]
-  tbl <- unnest(tbl_nested) %>%
-    mutate(lat = centroid[2]) %>%
-    mutate(lon = centroid[1]) %>%
-    mutate(date = )
-  
-  
-  
-create_allvaluesdf <- function(list){
-  tibble(lat = centroid[2],
-         lon = centroid[1],
-         date = df[[1]]$dates,
-         prcp =df[[1]]$pr_day, 
-         
-  
+avdf <- list() # results mimic allvaluesdf objects created by original script, with the exception of the 'time' column
 
-  
-s1f1 <- tibble(lat = centroid[2], # allvaluesdf historical
-                   lon = centroid[1], 
-                   date = times_s1f1, 
-                   prcp = results_s1f1[[1]]$pr_day,
-                   tmax = results_s1f1[[2]]$tasmax,
-                   tmin = results_s1f1[[3]]$tasmin)
-
-
-
+for(i in 1:length(nested_tibbles)){
+  sf_combo_nested = flatten(nested_tibbles[i]) # scenario-future combo
+  sf = flatten(sf_combo_nested)
+  tbl = tibble(lat = centroid[2], # will need to be changed when spatial objects are used for extraction
+               lon = centroid[1],
+               date = pluck(sf_combo, 1, "date")) # pulls date column from first sublist
+  sf_tbl = sf %>%
+    as_tibble(sf, .name_repair = "unique") %>%
+    unnest(cols = where(is.numeric)) %>%
+    dplyr::select(-(contains("date"))) %>%
+    bind_cols(tbl) %>%
+    dplyr::select(lat, lon, contains("max"), contains("min"), contains("pr"), date) 
+  colnames(sf_tbl) = c("lat", "lon", "tmax", "tmin", "prcp", "date")
+  avdf[[i]] = sf_tbl
+  names(avdf)[i] = names(nested_tibbles[i]) 
+}    
+            
 ```
 
 
-```{r create csvs}
+```{r add-derived-vars}
 
 # Add derived variables to dataframes
+# write to csv
 
-csv <- df %>%
-  mutate(PPT_mm = case_when( # if raster units are "kg-m-2 -1", convert to mm (otherwise keep as is)
+for(i in 1:length(avdf)){
+  csv = avdf[[i]]
+  csv <- csv %>%
+    mutate(PPT_mm = case_when( # if raster units are "kg-m-2 -1", convert to mm (otherwise keep as is)
       str_detect(units(rx), "kg") ~ prcp*86400,
       TRUE ~ as.numeric(prcp))) %>%
-  mutate(PPT_in = RasterUnitConvert(PPT_mm, "MMtoIN")) %>%
-  mutate(TMaxF = case_when(
-    tmax > 200 ~ RasterUnitConvert(tmax, "KtoF"), # Because only values in Kelvin would be > 200
-    TRUE ~ RasterUnitConvert(tmax, "CtoF"))) %>% # assuming if temp units are not Kelvin they are Celsius
-  mutate(TMaxC = case_when(
-    tmax > 200 ~ RasterUnitConvert(tmax, "KtoC"),
-    TRUE ~ tmax)) %>% # assuming if temp units are not Kelvin they are Celsius
-  mutate(TMinF = case_when(
-    tmin > 200 ~ RasterUnitConvert(tmin, "KtoF"),
-    TRUE ~ RasterUnitConvert(tmin, "CtoF"))) %>% # assuming if temp units are not Kelvin they are Celsius
-  mutate(TMinC = case_when(
-    tmin > 200 ~ RasterUnitConvert(tmin, "KtoC"),
-    TRUE ~ tmin)) %>% # assuming if temp are not K they are C
-  mutate(TMeanF = (TMaxF + TMinF)/2) %>%
-  mutate(TmeanC = (TMaxC + TMinC)/2) %>%
-  mutate(GDDF = RasterGDD(TMinF, TMaxF, 50, 86)) %>% # values of 50 and 86 come from original LOCASummmarize.R script
-  mutate(hotdays = Rasterhotdays(TMaxC)) %>%
-  mutate(colddays = Rastercolddays(TMinC)) %>%
-  mutate(wetdays = Rasterwetdays(PPT_mm)) %>%
-  mutate(ftDays = RasterFTdays(TMaxC, TMinC))
-
-write.csv(csv, )
-
+    mutate(PPT_in = RasterUnitConvert(PPT_mm, "MMtoIN")) %>%
+    mutate(TMaxF = case_when(
+      tmax > 200 ~ RasterUnitConvert(tmax, "KtoF"), # Because only values in Kelvin would be > 200
+      TRUE ~ RasterUnitConvert(tmax, "CtoF"))) %>% # assuming if temp units are not Kelvin they are Celsius
+    mutate(TMaxC = case_when(
+      tmax > 200 ~ RasterUnitConvert(tmax, "KtoC"),
+      TRUE ~ tmax)) %>% # assuming if temp units are not Kelvin they are Celsius
+    mutate(TMinF = case_when(
+      tmin > 200 ~ RasterUnitConvert(tmin, "KtoF"),
+      TRUE ~ RasterUnitConvert(tmin, "CtoF"))) %>% # assuming if temp units are not Kelvin they are Celsius
+    mutate(TMinC = case_when(
+      tmin > 200 ~ RasterUnitConvert(tmin, "KtoC"),
+      TRUE ~ tmin)) %>% # assuming if temp are not K they are C
+    mutate(TMeanF = (TMaxF + TMinF)/2) %>%
+    mutate(TmeanC = (TMaxC + TMinC)/2) %>%
+    mutate(GDDF = RasterGDD(TMinF, TMaxF, 50, 86)) %>% # values of 50 and 86 come from original LOCASummmarize.R script
+    mutate(hotdays = Rasterhotdays(TMaxC)) %>%
+    mutate(colddays = Rastercolddays(TMinC)) %>%
+    mutate(wetdays = Rasterwetdays(PPT_mm)) %>%
+    mutate(ftDays = RasterFTdays(TMaxC, TMinC))
+  csv_scenario = if (str_detect(names(avdf[i]), "baseline")){
+    "historical"
+  } else if(str_detect(names(avdf[i]),"s1")) {
+    scenario1
+  } else {
+    scenario2
+  }
+  csv_years = if (str_detect(names(avdf[i]), "f1")){
+    paste(future1_start_year, "-",future1_end_year)
+  } else if (str_detect(names(avdf[i]), "f2")) {
+    paste(future2_start_year, "-",future2_end_year)
+  } else {
+    paste(baseline_start_year,"-",baseline_end_year)
+  }
+    csv_fileName = paste(AFB_Name, csv_scenario, csv_years, "AllDays", sep = '_')
+    write.csv(csv, file = paste(dir_output_csvs,csv_fileName,".csv", sep = ""))
+}
 ```
 
 
 
-```{r check-results}
 
-# Bring in results 
-
-avdf <- read_csv('./Results/allvaluesdf.Rds')
-
-
-piv2$Compare <- results$PPT_mm
-
-piv2$Diff <- piv2$PPT_mm - piv2$Compare
-
-sum(piv2$Diff)
-
-```
 
 
 
