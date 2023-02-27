@@ -254,7 +254,6 @@ for(i in 1:length(files_baseline)){
   r = rast(files_baseline[[i]])
   times = time(r)
   varName = varnames(r)[1]
-  varNames[[i]] = varName
   vals = r[extract_obj]
   tVals = data.table::transpose(vals) # do not use purrr:transpose
   colnames(tVals) = varName
