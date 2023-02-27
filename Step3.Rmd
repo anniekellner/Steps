@@ -23,7 +23,7 @@ library(viridis)
 library(mapview)
 library(raster)
 library(lubridate)
-
+library(ncdf4)
 
 source('./Code/CEMML/Misc/character_vectors.R')
 source('N:/RStor/mindyc/afccm/Climate Modeling/Software Apps/R scripts/LOCA_V2/Function_General.R')
@@ -45,9 +45,9 @@ In the code chunk below, enter the number between the brackets ([]) that corresp
 
 ```{r enter-afb-and-model}
 
-AFB_Name <- "Homestead_ARB" # Can create a vector similar to 'models' above if desired
+AFB_Name <- "Yokota_Main" # Can create a vector similar to 'models' above if desired
 
-model <- models[2] 
+model <- models[1] 
 
 model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "")
 scenario_dirs <- list.dirs(path = paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = ""), full.names = FALSE)
@@ -193,7 +193,10 @@ afb <- vect(afbSF) # for use with terra package
 # Raster
 
 stackBaseline_v1 <- rast(files_baseline[[1]]) # creates raster stack for first variable in files_baseline list
-rx <- raster(stackBaseline_v1[[1]]) # for plotting and getting basic raster info
+rx <- rast(stackBaseline_v1[[1]]) # for plotting and getting basic raster info
+rx2 <- projectRaster(rx, "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+
+#st_crs(afbSF) = crs(rx) # just in case
 
 # Quick plot
 
