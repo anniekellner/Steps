@@ -21,9 +21,9 @@ library(tidyverse)
 library(data.table)
 library(viridis)
 library(mapview)
-library(raster)
 library(lubridate)
-#library(ncdf4)
+library(tmap)
+library(tmaptools)
 
 source('./Code/CEMML/Misc/character_vectors.R')
 source('N:/RStor/mindyc/afccm/Climate Modeling/Software Apps/R scripts/LOCA_V2/Function_General.R')
@@ -189,40 +189,35 @@ stackX <- rast(files_s1f1[[1]]) # creates raster stack for first variable in s1f
 random_raster <- as.numeric(sample(1:nlyr(stackX), 1)) # get a random raster layer from StackX to use as an example
 rx <- stackX[[random_raster]]
 
-# AFB
+# AFB 
 
 afb_dir <- (paste(dir_installation_boundaries, AFB_Name, sep = '/'))
 afb_filename <- paste(afb_dir, '.shp', sep = "")
 
-afb <- vect(afb_dir)
-
-afbSF <- st_read(paste(afb_dir, '.shp', sep = "")) # read in using sf package first
-afbSF <- sf::st_as_sf(afbSF, coords = c("longitude", "latitude"), crs = st_crs(rx)) 
-
-afb <- vect(afbSF) # for use with terra package
-
+afb <- vect(afb_filename)
 
 # Crop single raster to AFB shape
 
-rxCrop <- terra::crop(rx2, afb)
-
-#st_crs(afbSF) = crs(rx) # just in case
+rxCrop <- terra::crop(rx, afb)
 
 # Quick plot
 
-mapview(rx, col.regions = hcl.colors(5, palette = "viridis", alpha = 0.8)) + # First argument is arbitrary (# colors in palette)
-  mapview(afbSF, col.regions = "black")
+#tmap_mode('view')
+
+tmap_leaflet(
+tm_shape(as(rxCrop, "Raster")) + 
+  tm_raster()) + 
 
 ```
 
-We need to check the size of the AFB to see whether we should use the centroid or multiple cells for analysis. If the results say 'matrix array', the script will use the centroid. If it says "spatVector", it will use the spatial object (afb).
+We should check the size of the AFB to see whether we should use its centroid or spatial extent to extract the data we need. If the AFB fits within a single NetCDF cell, it will be much faster to extract data using a single point.  
+
+If the output of the following code chunk say 'matrix array', the script will use the centroid. If it says "spatVector", it will use the spatial object (afb).
 
 ```{r decision-to-use-shp-or-centroid-for-extraction, warning=FALSE, results='asis'}
 
 # What is the cell size of the ncdf?
 
-rx <- rast(rx) # convert to terra object because estimation is better. Could also use raster::area()
-rxCrop <- terra::crop(rx, afb)
 rxCell <- cellSize(rxCrop, unit = "km")
 ncdf_cellSize <- mean(values(rxCell)) # get mean cell size of ncdf
 
