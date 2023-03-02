@@ -218,22 +218,20 @@ If the output of the following code chunk say 'matrix array', the script will us
 
 # What is the cell size of the ncdf?
 
-rxCell <- cellSize(rxCrop, unit = "km")
+rxCellSize <- cellSize(rxCrop, unit = "km")
 ncdf_cellSize <- mean(values(rxCell)) # get mean cell size of ncdf
 
 # How big is the AFB?
 
 afb_area <- expanse(afb, unit = "km")
 
-centroid <- afbSF %>%
-  st_centroid() %>%
-  st_geometry() %>%
-  st_coordinates()
+centroid <- geom(centroids(afb, inside = TRUE)) # inside = TRUE guarantees that the centroid is contained within the boundaries of the AFB (in some cases, depending on the shape of the AFB, the true centroid may be outside)
+centroid_matrix <- cbind(centroid[3], centroid[4]) # used to find cell index. [3] and [4] refer to the values in the 'centroid' object. If a downstream error occurs, make sure these values are actually x and y.
 
 # add an if_else statement to tell R whether to extract raster values from matrix or shapefile
 
 extract_obj <- afb
-cell <- cellFromXY(rx, centroid) # finds the cell (index) in which the centroid is located
+cell <- terra::cellFromXY(rx, centroid_matrix) # finds the cell (index) in which the centroid is located
 
 extract_obj <- if(afb_area < ncdf_cellSize) cell else (afb)
 
