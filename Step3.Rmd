@@ -13,7 +13,7 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE) # 'echo' means R will print the code along with the results. 
 
-rm(list = ls()) # clear workspace
+#rm(list = ls()) # clear workspace
 
 library(terra)
 library(sf)
@@ -23,7 +23,7 @@ library(viridis)
 library(mapview)
 library(raster)
 library(lubridate)
-library(ncdf4)
+#library(ncdf4)
 
 source('./Code/CEMML/Misc/character_vectors.R')
 source('N:/RStor/mindyc/afccm/Climate Modeling/Software Apps/R scripts/LOCA_V2/Function_General.R')
@@ -181,20 +181,30 @@ The next chunk checks that the spatial files are where they should be. The map w
 
 ```{r spatial-check}
 
+# Raster
+
+stackX <- rast(files_s1f1[[1]]) # creates raster stack for first variable in s1f1 list (using s1f1 because has fewer files than baseline)
+#rx <- raster(stackS1F1_v1[[1]]) # for plotting and getting basic raster info
+
+random_raster <- as.numeric(sample(1:nlyr(stackX), 1)) # get a random raster layer from StackX to use as an example
+rx <- stackX[[random_raster]]
+
 # AFB
 
 afb_dir <- (paste(dir_installation_boundaries, AFB_Name, sep = '/'))
+afb_filename <- paste(afb_dir, '.shp', sep = "")
+
+afb <- vect(afb_dir)
 
 afbSF <- st_read(paste(afb_dir, '.shp', sep = "")) # read in using sf package first
-afbSF <- sf::st_as_sf(afbSF, coords = c("longitude", "latitude"), crs = st_crs(4326)) # EPSG:4326 is lat/long
+afbSF <- sf::st_as_sf(afbSF, coords = c("longitude", "latitude"), crs = st_crs(rx)) 
 
 afb <- vect(afbSF) # for use with terra package
 
-# Raster
 
-stackBaseline_v1 <- rast(files_baseline[[1]]) # creates raster stack for first variable in files_baseline list
-rx <- rast(stackBaseline_v1[[1]]) # for plotting and getting basic raster info
-rx2 <- projectRaster(rx, "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs")
+# Crop single raster to AFB shape
+
+rxCrop <- terra::crop(rx2, afb)
 
 #st_crs(afbSF) = crs(rx) # just in case
 
