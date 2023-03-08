@@ -24,6 +24,7 @@ library(mapview)
 library(lubridate)
 library(tmap)
 library(tmaptools)
+library(leaflet)
 
 source('./Code/CEMML/Misc/character_vectors.R')
 source('N:/RStor/mindyc/afccm/Climate Modeling/Software Apps/R scripts/LOCA_V2/Function_General.R')
@@ -206,7 +207,15 @@ rxCrop <- terra::crop(rx, afb)
 
 tmap_leaflet(
 tm_shape(as(rxCrop, "Raster")) + 
-  tm_raster()) + 
+  tm_raster() + 
+  tm_shape(as(afb, "spatial")) + 
+  tm_borders())
+
+tmap_leaflet(
+tm_shape(rxCrop) + 
+  tm_raster() + 
+  tm_shape(afb) + 
+  tm_polygons())
 
 ```
 
@@ -297,25 +306,27 @@ for(i in 1:length(files_s1f2)){
 
 for(i in 1:length(files_s2f1)){
   r = rast(files_s2f1[[i]])
-  dates_s2f1[[i]] = time(r)
+  times = time(r)
   varName = varnames(r)[1]
   vals = r[extract_obj]
   tVals = data.table::transpose(vals) 
   colnames(tVals) = varName
   results_s2f1[[i]] = tVals
   names(results_s2f1)[i] <- varName
+  results_s2f1[[i]]$date = times
   rm(r)
 }
 
 for(i in 1:length(files_s2f2)){
   r = rast(files_s2f2[[i]])
-  dates_s2f2[[i]] = time(r)
+  times = time(r)
   varName = varnames(r)[1]
   vals = r[extract_obj]
   tVals = data.table::transpose(vals) 
   colnames(tVals) = varName
   results_s2f2[[i]] = tVals
   names(results_s2f2)[i] <- varName
+  results_s2f2[[i]]$date = times
   rm(r)
 }
 
@@ -378,7 +389,7 @@ for(i in 1:length(avdf)){
       TRUE ~ tmin)) %>% # assuming if temp are not K they are C
     mutate(TMeanF = (TMaxF + TMinF)/2) %>%
     mutate(TmeanC = (TMaxC + TMinC)/2) %>%
-    mutate(GDDF = RasterGDD(TMinF, TMaxF, 50, 86)) %>% # values of 50 and 86 come from original LOCASummmarize.R script
+    mutate(GDDF = RasterGDD(TMinF, TMaxF, 50, 86)) %>% # Threshold values of 50 and 86 come from original LOCASummmarize.R script
     mutate(hotdays = Rasterhotdays(TMaxC)) %>%
     mutate(colddays = Rastercolddays(TMinC)) %>%
     mutate(wetdays = Rasterwetdays(PPT_mm)) %>%
