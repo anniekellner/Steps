@@ -9,4 +9,5 @@ models <- c("HADGEM2-ES",
                    "LOCA_CCSM4",
                    "MACA_CCSM4",
                    "MACA_CCSM4_Monthly",
-                   "MIROC6")
+                   "MIROC6",
+                   "MPI-ESM1-2-HR")
