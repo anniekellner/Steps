@@ -409,8 +409,26 @@ for(i in 1:length(avdf)){
     paste(baseline_start_year,"-",baseline_end_year)
   }
     csv_fileName = paste(AFB_Name, csv_scenario, csv_years, "AllDays", sep = '_')
-    write.csv(csv, file = paste(dir_output_csvs,csv_fileName,".csv", sep = ""))
+    write_csv(csv, file = paste(dir_output_csvs,csv_fileName,".csv", sep = ""))
 }
+```
+
+```{r MonthSum}
+
+csv <- read_csv('./Results/Test/CNMI_Proxy_v1_historical_1986 - 2015_AllDays.csv', show_col_types = FALSE) # 
+
+csv2 <- csv %>% 
+  select(-c(lat, lon)) %>%
+  group_by(month(ymd(date))) %>%
+  summarise(across(where(is.numeric), list(mean), .names = "Avg_{.col}"))
+
+totals <- csv2 %>%
+  summarise(across(c(2:ncol(csv2)), list(mean = mean, sum = sum)))
+  
+  
+
+
+
 ```
 
 
