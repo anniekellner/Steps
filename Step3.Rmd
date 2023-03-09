@@ -415,20 +415,23 @@ for(i in 1:length(avdf)){
 
 ```{r MonthSum}
 
-csv <- read_csv('./Results/Test/CNMI_Proxy_v1_historical_1986 - 2015_AllDays.csv', show_col_types = FALSE) # 
-csv <- select(csv, -1) # for testing, because row id was included in prior script. Changed to write_csv on 3/8/23 above so hopefully this line won't be necessary.
+csv_file <- './Results/Test/CNMI_Proxy_v1_historical_1986 - 2015_AllDays.csv'
 
-csv2 <- csv %>% 
+csv <- read_csv(csv_file, show_col_types = FALSE) # I think this should be redone such that the code uses the dataframes created above rather than the resultant .csv file. When you run another model, you can save the environment in an .RData file and I can rewrite this part so you don't have to manually enter directories for the .csv files
+
+csv <- select(csv, -1) # for testing, because row id was included in prior script. Changed to write_csv on 3/8/23 above so hopefully this line won't be necessary. Can comment out or delete entirely when we use R objects instead of .csv products for this chunk
+
+csv <- csv %>% 
   select(-c(lat, lon)) %>%
   mutate(month = month(ymd(date)))
   
-csv3 <- csv2 %>%  
+csv <- csv %>%  
   group_by(month) %>%
   summarise(across(where(is.numeric), mean, .names = "Avg_{.col}")) 
 
 # Create YrAverage row
 
-YrAverage <- rbind(csv3, c("YrAverage", colMeans(csv3[,2:ncol(csv3)]))) # this works but converts columns to characters 
+YrAverage <- rbind(csv, c("YrAverage", colMeans(csv[,2:ncol(csv)]))) # this works but converts columns to characters 
 
 YrAverage <- YrAverage %>%
   mutate_at(c(2:ncol(YrAverage)), as.numeric) # convert back to numeric
@@ -438,7 +441,21 @@ YrAverage <- YrAverage %>%
 YrTotals <- rbind(YrAverage, c("YrTotals", colSums(YrAverage[,2:ncol(YrAverage)])))
 
 YrTotals <- YrTotals %>%
-  mutate_at(c(2:ncol(YrAverage)), as.numeric) # in case the results in the .csv should be numeric
+  mutate_at(c(2:ncol(YrAverage)), as.numeric) %>% # included assuming the results in the .csv should be numeric
+  replace(if_else(
+    
+  ))
+
+## row numbers - assign row_number or something like that, then use that number in combo with na_if() or replace()
+
+# Write to .csv
+
+monthSum_filename <- str_replace(basename(csv_file), "AllDays", "MonthSum")
+
+write_csv(YrTotals, file = paste(dir_output_csvs, monthSum_filename, sep = ""))
+
+
+
 
 ```
 
