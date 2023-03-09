@@ -13,7 +13,7 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE) # 'echo' means R will print the code along with the results. 
 
-#rm(list = ls()) # clear workspace
+rm(list = ls()) # clear workspace
 
 library(terra)
 library(sf)
@@ -416,18 +416,29 @@ for(i in 1:length(avdf)){
 ```{r MonthSum}
 
 csv <- read_csv('./Results/Test/CNMI_Proxy_v1_historical_1986 - 2015_AllDays.csv', show_col_types = FALSE) # 
+csv <- select(csv, -1) # for testing, because row id was included in prior script. Changed to write_csv on 3/8/23 above so hopefully this line won't be necessary.
 
 csv2 <- csv %>% 
   select(-c(lat, lon)) %>%
-  group_by(month(ymd(date))) %>%
-  summarise(across(where(is.numeric), list(mean), .names = "Avg_{.col}"))
-
-totals <- csv2 %>%
-  summarise(across(c(2:ncol(csv2)), list(mean = mean, sum = sum)))
+  mutate(month = month(ymd(date)))
   
-  
+csv3 <- csv2 %>%  
+  group_by(month) %>%
+  summarise(across(where(is.numeric), mean, .names = "Avg_{.col}")) 
 
+# Create YrAverage row
 
+YrAverage <- rbind(csv3, c("YrAverage", colMeans(csv3[,2:ncol(csv3)]))) # this works but converts columns to characters 
+
+YrAverage <- YrAverage %>%
+  mutate_at(c(2:ncol(YrAverage)), as.numeric) # convert back to numeric
+
+# Create YrTotals row
+
+YrTotals <- rbind(YrAverage, c("YrTotals", colSums(YrAverage[,2:ncol(YrAverage)])))
+
+YrTotals <- YrTotals %>%
+  mutate_at(c(2:ncol(YrAverage)), as.numeric) # in case the results in the .csv should be numeric
 
 ```
 
