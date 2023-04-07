@@ -30,7 +30,7 @@ source('N:/RStor/mindyc/afccm/Climate Modeling/Software Apps/R scripts/LOCA_V2/F
 
 ```{r clear-workspace}
 
-rm(list = ls())
+#rm(list = ls())
 
 ```
 
@@ -108,13 +108,13 @@ cat(paste("-", variables), sep = "\n")
 ```{r enter-years-of-interest}
 
 baseline_start_year <- 1985 # Start year of interest for the historical time period  
-baseline_end_year <- 2014 # End year of interest for the historical time period
+baseline_end_year <- 1995 # End year of interest for the historical time period
 
 future1_start_year <- 2021 # Start year of interest for the first future time period 
-future1_end_year <- 2050 # End year of interest for the first future time period 
+future1_end_year <- 2031 # End year of interest for the first future time period 
 
 future2_start_year <- 2051 # Start year of interest for the second future time period 
-future2_end_year <- 2080 # End year of interest for the second future time period 
+future2_end_year <- 2061 # End year of interest for the second future time period 
 
 ```
 
@@ -193,14 +193,13 @@ for(i in 1:length(variables)){
 
 # PART THREE: SPATIAL CHECK
 
-The next chunk checks that the spatial files are where they should be. The map will appear below the code chunk, and you can zoom in as needed to view small AFB's 
+The next chunk checks that the spatial files are where they should be. The map will appear below the code chunk, and you can zoom in as needed to view small AFB's. You can press the 'show in new window' button (the white square with an arrow) to open the map in another page. You may have to wait a few moments for the map to produce. 
 
 ```{r spatial-check}
 
 # Raster
 
 stackX <- rast(files_s1f1[[1]]) # creates raster stack for first variable in s1f1 list (using s1f1 because has fewer files than baseline)
-#rx <- raster(stackS1F1_v1[[1]]) # for plotting and getting basic raster info
 
 random_raster <- as.numeric(sample(1:nlyr(stackX), 1)) # get a random raster layer from StackX to use as an example
 rx <- stackX[[random_raster]]
@@ -210,6 +209,7 @@ rx <- stackX[[random_raster]]
 afb_dir <- (paste(dir_installation_boundaries, AFB_Name, sep = '/'))
 afb_filename <- paste(afb_dir, '.shp', sep = "")
 
+afbSF <- st_read(afb_filename) # Because plotting package (tmap) doesn't take terra vectors
 afb <- vect(afb_filename)
 
 # Crop single raster to AFB shape
@@ -218,24 +218,15 @@ rxCrop <- terra::crop(rx, afb)
 
 # Quick interactive plot
 
-plet(rxCrop) |> polys(afb)
-
-plot(rxCrop)
-polys(afb)
-
 #tmap_mode('view')
 
-tmap_leaflet(
-tm_shape(as(rxCrop, "Raster")) + 
+map <- tm_shape(as(rxCrop, "Raster")) + 
   tm_raster() + 
-  tm_shape(as(afb, "spatial")) + 
-  tm_borders())
+  tm_shape(afbSF) + 
+  tm_borders()
 
-tmap_leaflet(
-tm_shape(rxCrop) + 
-  tm_raster() + 
-  tm_shape(afb) + 
-  tm_polygons())
+lf <- tmap_leaflet(map)
+lf
 
 ```
 
@@ -247,8 +238,8 @@ If the output of the following code chunk say 'matrix array', the script will us
 
 # What is the cell size of the ncdf?
 
-rxCellSize <- cellSize(rxCrop, unit = "km")
-ncdf_cellSize <- mean(values(rxCell)) # get mean cell size of ncdf
+rxCellSize <- cellSize(rxCrop, unit = "km") # size of the cropped raster
+ncdf_cellSize <- mean(values(rxCellSize)) # get mean cell size of ncdf
 
 # How big is the AFB?
 
@@ -264,8 +255,15 @@ cell <- terra::cellFromXY(rx, centroid_matrix) # finds the cell (index) in which
 
 extract_obj <- if(afb_area < ncdf_cellSize) cell else (afb)
 
-cat("The object used for data extraction is ", class(extract_obj)) # 'numeric' = centroid (cell number); 
-                                                                   # 'spatVector' = spatial object (multiple cells)
+afbExt <- ext(afb)
+
+cat("The object used for data extraction is ", class(extract_obj)) 
+
+# Interpreting output: 
+  
+  #'numeric' = centroid (cell number) - this means the AFB did not extend beyond a single     cell, so the centroid will be used for data extraction
+  
+  #'spatVector' = spatial object (multiple cells) - this means the AFB spanned multiple       cells, so the polygon will be used for data extraction
 
 ```
 
@@ -285,10 +283,12 @@ results_s1f2 <- list()
 results_s2f1 <- list()
 results_s2f2 <- list()
 
+system.time(
 for(i in 1:length(files_baseline)){
   r = rast(files_baseline[[i]])
   times = time(r)
   varName = varnames(r)[1]
+  vals = values(crop(r, ext(afb)))
   vals = r[extract_obj]
   tVals = data.table::transpose(vals) # do not use purrr:transpose
   colnames(tVals) = varName
@@ -296,7 +296,7 @@ for(i in 1:length(files_baseline)){
   names(results_baseline)[i] = varName
   results_baseline[[i]]$date = times
   rm(r)
-}
+})
 
 for(i in 1:length(files_s1f1)){
   r = rast(files_s1f1[[i]])
