@@ -11,6 +11,8 @@
 # Eventually, this script will be incorporated into Step3.Rmd and no .csv files will be used for input
 
 library(dplyr)
+library(readr)
+library(lubridate)
 
 rm(list = ls())
 # ----------  USER INPUT   -------------------------- #
@@ -75,15 +77,27 @@ monthAvg <- all %>%
   group_by(month) %>%
   summarise(across(everything(), mean)) %>%
   setNames(paste0('Avg_', names(.))) %>%
-  rename(Abs_TminF = Avg_TminF)
+  rename(Abs_TminF = Avg_TminF) 
+  
 
-data %>% setNames(paste0('cars.', names(.)))
 # Create YrAverage row
 
-YrAverage <- rbind(csv, c("YrAverage", colMeans(csv[,2:ncol(csv)]))) # this works but converts columns to characters 
+YrAverage <- rbind(monthAvg, c("YrAverage", colMeans(monthAvg[,2:ncol(monthAvg)]))) # converts columns to characters 
 
-YrAverage <- YrAverage %>%
-  mutate_at(c(2:ncol(YrAverage)), as.numeric) # convert back to numeric
+YrAverage <- YrAverage %>% # convert back to numeric
+  mutate_at(c(2:ncol(YrAverage)), as.numeric) %>%
+  mutate()
+
+NAs <- YrAverage %>%
+  filter(row_number() == 13) %>%
+  mutate(across(.cols = contains("PPT"), ~na_if(.,.)))
+  mutate(across(contains("days")) == NA) %>%
+  mutate(across(contains("TminF")) == NA) %>%
+  mutate(across(contains("GDDF")) == NA) 
+           
+
+  mutate(across(.cols = starts_with("targ2"), 
+                ~replace(., cumall(. != 0), NA)))
 
 # Create YrTotals row
 
@@ -91,7 +105,7 @@ YrTotals <- rbind(YrAverage, c("YrTotals", colSums(YrAverage[,2:ncol(YrAverage)]
 
 YrTotals <- YrTotals %>%
   mutate_at(c(2:ncol(YrAverage)), as.numeric) %>% # included assuming the results in the .csv should be numeric
-  replace(if_else(
+  na_if()
     
   ))
 
