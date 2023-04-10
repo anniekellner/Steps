@@ -38,17 +38,17 @@ csv2 <- csv %>%
 # Get monthly averages for all data for which a simple monthly average is desired
 
 yearAvg <- csv2 %>%
-  dplyr::select(!c('date','PPT_in', 'PPT_mm', 'TMinF')) %>% # Exclude variables for which the result is not simply a monthly average
+  dplyr::select(!c('date','PPT_in', 'PPT_mm')) %>% # Exclude variables for which the result is not simply a monthly average
   dplyr::select(!(contains("days"))) %>%
   group_by(year, month) %>%
   summarise(across(where(is.double), mean)) 
 
-# For TminF, get monthly minumum
+# For Abs_TminF, get monthly minumum
 
-tmin <- csv2 %>%
+Abs_TminF <- csv2 %>%
   select(date, year, month, TMinF) %>%
   group_by(year, month) %>%
-  summarise(TminF = min(TMinF))
+  summarise(Abs_TminF = min(TMinF))
 
 # For precip variables, get monthly sum
 
@@ -69,7 +69,7 @@ days <- csv2 %>%
 all <- yearAvg %>%
   full_join(days) %>%
   full_join(ppt) %>%
-  full_join(tmin) %>%
+  full_join(Abs_TminF) %>%
   ungroup()
   
 monthAvg <- all %>%
@@ -77,7 +77,7 @@ monthAvg <- all %>%
   group_by(month) %>%
   summarise(across(everything(), mean)) %>%
   setNames(paste0('Avg_', names(.))) %>%
-  rename(Abs_TminF = Avg_TminF) 
+  rename(Abs_TminF = Avg_Abs_TminF) 
   
 
 # Create YrAverage row
@@ -85,32 +85,55 @@ monthAvg <- all %>%
 YrAverage <- rbind(monthAvg, c("YrAverage", colMeans(monthAvg[,2:ncol(monthAvg)]))) # converts columns to characters 
 
 YrAverage <- YrAverage %>% # convert back to numeric
-  mutate_at(c(2:ncol(YrAverage)), as.numeric) %>%
-  mutate()
+  mutate_at(c(2:ncol(YrAverage)), as.numeric) 
 
 NAs <- YrAverage %>%
   filter(row_number() == 13) %>%
-  mutate(across(.cols = contains("PPT"), ~na_if(.,.)))
-  mutate(across(contains("days")) == NA) %>%
-  mutate(across(contains("TminF")) == NA) %>%
-  mutate(across(contains("GDDF")) == NA) 
+  mutate(across(.cols = contains("PPT"), ~na_if(.,.))) %>%
+  mutate(across(.cols = contains("days"), ~na_if(.,.))) %>%
+  mutate(across(.cols = contains("TminF"), ~na_if(.,.))) %>%
+  mutate(across(.cols = contains("GDDF"), ~na_if(.,.))) 
            
-
-  mutate(across(.cols = starts_with("targ2"), 
-                ~replace(., cumall(. != 0), NA)))
+YrAverage2 <- YrAverage %>%
+  slice(1:(n()-1)) %>%
+  rbind(NAs)
 
 # Create YrTotals row
 
 YrTotals <- rbind(YrAverage, c("YrTotals", colSums(YrAverage[,2:ncol(YrAverage)])))
 
 YrTotals <- YrTotals %>%
-  mutate_at(c(2:ncol(YrAverage)), as.numeric) %>% # included assuming the results in the .csv should be numeric
-  na_if()
-    
-  ))
+  mutate_at(c(2:ncol(YrAverage)), as.numeric) %>%  # included assuming the results in the .csv should be numeric
+  select(month, 
+         Avg_PPT_in, 
+         Avg_PPT_mm, 
+         Avg_TMaxF, 
+         Avg_TminF, 
+         Avg_TMeanF, 
+         Abs_TminF, 
+         Avg_GDDF,
+         Avg_hotdays,
+         Avg_colddays,
+         Avg_wetdays,
+         Avg_drydays,
+         Avg_ftdays,
+         Avg_Rad,
+         Avg_EastWind,
+         Avg_NorthWind,
+         Avg_WindSpeed,
+         Avg_WindDirDeg,
+         Avg_SH,
+         Avg_VPdeficit,
+         Avg_VPsat,
+         Avg_VPamb,
+         Avg_RH)
 
-## row numbers - assign row_number or something like that, then use that number in combo with na_if() or replace()
-
+NAs_Totals <- YrTotals %>%
+  filter(row_number() == 13) %>%
+  mutate(across(.cols = contains("Avg_T"), ~na_if(.,.))) %>%
+  mutate(across(.cols = contains("Abs"), ~na_if(.,.))) %>%
+  mutate(across(.cols = contains("TminF"), ~na_if(.,.))) %>%
+  mutate(across(.cols = contains("GDDF"), ~na_if(.,.))) 
 # Write to .csv
 
 monthSum_filename <- str_replace(basename(csv_file), "AllDays", "MonthSum")
