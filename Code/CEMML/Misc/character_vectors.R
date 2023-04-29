@@ -11,3 +11,5 @@ models <- c("HADGEM2-ES",
                    "MACA_CCSM4_Monthly",
                    "MIROC6",
                    "MPI-ESM1-2-HR")
+
+AFB_names <- c("Homestead_ARB")
