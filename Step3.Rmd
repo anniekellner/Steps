@@ -24,8 +24,9 @@ library(tmap)
 library(tmaptools)
 library(leaflet)
 
-source('./Code/CEMML/Misc/character_vectors.R')
-source('N:/RStor/mindyc/afccm/Climate Modeling/Software Apps/R scripts/LOCA_V2/Function_General.R')
+source('./Code/Misc/character_vectors.R')
+source('./Code/CEMML/Functions/Function_General.R')
+
 ```
 
 ```{r clear-workspace}
@@ -44,7 +45,7 @@ If the AFB is managed by the Air Force, set Navy = FALSE
 
 # Is the AFB managed by the Navy?
 
-Navy = TRUE
+Navy = FALSE
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
                                        "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
@@ -61,12 +62,9 @@ In the code chunk below, enter the number between the brackets ([]) that corresp
 
 ```{r enter-afb-and-model}
 
-AFB_Name <- "Guam_Proxy_v1" # Can create a vector similar to 'models' above if desired
+AFB_Name <- "Homestead_ARB" # Can create a vector similar to 'models' above if desired
 
-model <- models[6] 
-
-model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "")
-scenario_dirs <- list.dirs(path = paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = ""), full.names = FALSE)
+model <- models[2] 
 
 cat(paste("The model you have selected is", model, "and the AFB is", AFB_Name))
 
@@ -75,6 +73,13 @@ cat(paste("The model you have selected is", model, "and the AFB is", AFB_Name))
 The next chunk checks what scenarios (subfolders) are contained in the 'Data' folder associated with the model of interest.
 
 ```{r results='asis'}
+
+# Directories
+
+model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "")
+
+#scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE)
+scenario_dirs <- list.dirs(path = "/Volumes/mindyc/afccm/Climate Modeling/Data/LOCA_CCSM4", full.names = FALSE) # Mac path
 
 cat("The scenarios (subfolders) associated with this model are:", sep = '\n') # cat() basically means 'print' in this context 
 cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for readability ('\n' = line)

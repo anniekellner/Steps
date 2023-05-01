@@ -11,3 +11,6 @@ models <- c("HADGEM2-ES",
                    "MACA_CCSM4_Monthly",
                    "MIROC6",
                    "MPI-ESM1-2-HR")
+
+AFB_name <- c("Homestead_ARB", # LOCA, MACA
+              "Guam_Proxy_v1") # HADGEM
