@@ -47,9 +47,13 @@ If the AFB is managed by the Air Force, set Navy = FALSE
 
 Navy = FALSE
 
-dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
-                                       "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
-                                      "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
+dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping) # Annie Mac
+                              "/Volumes/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries",
+                              "/Volumes/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
+
+#dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
+                                       #"N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
+                                      #"N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
                                       
 
 dir_output_csvs = './Results/Test/' 
@@ -76,10 +80,10 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 
 # Directories
 
-model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "")
+# model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "") # PC location
+model_dir <- paste("/Volumes/mindyc/afccm/Climate Modeling/Data/", model, sep = "") # Mac location
 
-#scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE)
-scenario_dirs <- list.dirs(path = "/Volumes/mindyc/afccm/Climate Modeling/Data/LOCA_CCSM4", full.names = FALSE) # Mac path
+scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
 
 cat("The scenarios (subfolders) associated with this model are:", sep = '\n') # cat() basically means 'print' in this context 
 cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for readability ('\n' = line)
@@ -91,8 +95,8 @@ cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for reada
 ```{r enter-scenarios}
 
 baseline <- "historical"
-scenario1 <- "ssp245"
-scenario2 <- "ssp585"
+scenario1 <- "rcp45"
+scenario2 <- "rcp85"
 
 ```
 
@@ -100,7 +104,7 @@ Next, let's see which variables are represented in this dataset
 
 ```{r}
 
-baseline_dir = paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, "\\", baseline, sep = "")
+baseline_dir = paste(model_dir, baseline, sep = "/")
 baseline_filenames <- list.files(baseline_dir, pattern = '.nc', full.names = FALSE) # this line might need to be adjusted if some files are .ncdf or other
 
 variables <- unique(substr(baseline_filenames, 1,6)) # Numbers 1 and 6 refer to character indices within the file names (i.e., the first six letters of the file name)
@@ -129,7 +133,7 @@ future2_end_year <- 2061 # End year of interest for the second future time perio
 
 # PART TWO: SUBSET FILES OF INTEREST
 
-In this step, we are creating lists of filenames that we will eventually combine into raster stacks. WHen this chunk is finished running, you can check the objects to make sure 
+In this step, we are creating lists of filenames that we will eventually combine into raster stacks. When this chunk is finished running, you can check the objects to make sure 
 
 ```{r list-filenames}
 
@@ -157,7 +161,7 @@ for(i in 1:length(variables)){
 # List files for S1F1 
 
 for(i in 1:length(variables)){ 
-  dir = paste(model_dir, scenario1, sep = '\\')
+  dir = paste(model_dir, scenario1, sep = '/')
   fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
   dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
   dt2 = dplyr::filter(dt, result == TRUE)
@@ -167,7 +171,7 @@ for(i in 1:length(variables)){
 # List files for S1F2
 
 for(i in 1:length(variables)){ 
-  dir = paste(model_dir, scenario1, sep = '\\')
+  dir = paste(model_dir, scenario1, sep = '/')
   fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
   dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
   dt2 = dplyr::filter(dt, result == TRUE)
@@ -177,7 +181,7 @@ for(i in 1:length(variables)){
 # List files for S2F1 
 
 for(i in 1:length(variables)){ 
-  dir = paste(model_dir, scenario2, sep = '\\')
+  dir = paste(model_dir, scenario2, sep = '/')
   fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
   dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
   dt2 = dplyr::filter(dt, result == TRUE)
@@ -187,7 +191,7 @@ for(i in 1:length(variables)){
 # List files for S2F2
 
 for(i in 1:length(variables)){ 
-  dir = paste(model_dir, scenario2, sep = '\\')
+  dir = paste(model_dir, scenario2, sep = '/')
   fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
   dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
   dt2 = dplyr::filter(dt, result == TRUE)
@@ -211,6 +215,9 @@ rx <- stackX[[random_raster]]
 
 # AFB 
 
+# temp Mac location
+
+afb_dir <- 
 afb_dir <- (paste(dir_installation_boundaries, AFB_Name, sep = '/'))
 afb_filename <- paste(afb_dir, '.shp', sep = "")
 
@@ -266,9 +273,9 @@ cat("The object used for data extraction is ", class(extract_obj))
 
 # Interpreting output: 
   
-  #'numeric' = centroid (cell number) - this means the AFB did not extend beyond a single     cell, so the centroid will be used for data extraction
+  #'numeric' = centroid (cell number) - this means the AFB did not extend beyond a single cell, so the centroid will be used for data extraction
   
-  #'spatVector' = spatial object (multiple cells) - this means the AFB spanned multiple       cells, so the polygon will be used for data extraction
+  #'spatVector' = spatial object (multiple cells) - this means the AFB spanned multiple cells, so the polygon will be used for data extraction
 
 ```
 
