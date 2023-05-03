@@ -295,7 +295,6 @@ results_s1f2 <- list()
 results_s2f1 <- list()
 results_s2f2 <- list()
 
-system.time(
 for(i in 1:length(files_baseline)){
   r = rast(files_baseline[[i]])
   times = time(r)
@@ -308,7 +307,7 @@ for(i in 1:length(files_baseline)){
   names(results_baseline)[i] = varName
   results_baseline[[i]]$date = times
   rm(r)
-})
+}
 
 for(i in 1:length(files_s1f1)){
   r = rast(files_s1f1[[i]])
