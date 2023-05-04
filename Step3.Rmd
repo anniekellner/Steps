@@ -415,9 +415,11 @@ for(i in 1:length(nested_tibbles)){
 # All values from from LOCA_summarize.R script
 # write to csv
 
+AllDays <- list() # for MonthSum section
+
 for(i in 1:length(avdf)){
   csv = avdf[[i]]
-  csv <- csv %>%
+  csv = csv %>%
     mutate(PPT_mm = case_when( # if raster units are "kg-m-2 -1", convert to mm (otherwise keep as is)
       str_detect(units(rx), "kg") ~ prcp*86400,
       TRUE ~ as.numeric(prcp))) %>%
@@ -459,12 +461,28 @@ for(i in 1:length(avdf)){
   }
     csv_fileName = paste(AFB_Name, csv_scenario, csv_years, "AllDays", sep = '_')
     write_csv(csv, file = paste(dir_output_csvs,csv_fileName,".csv", sep = ""))
+    AllDays[[i]] = csv
 }
 ```
 
+```{r remove-extraneous-stuff}
+
+# Remove unnecessary objects from the environment
+
+# If for some reason the AllDays object does not work, you can use the script './Code/Misc/MonthSum.R' to run the MonthSum analyses using the csv output files
+
+rm(list=setdiff(ls(), "AllDays"))
+
+```
+
+
+
+
 ```{r MonthSum}
 
-avdf <- as_tibble(avdf)
+# If 
+
+AllDays <- as_tibble(AllDays)
 
 monthSum <- list()
 
