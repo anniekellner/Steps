@@ -47,13 +47,10 @@ If the AFB is managed by the Air Force, set Navy = FALSE
 
 Navy = FALSE
 
-dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping) # Annie Mac
-                              "/Volumes/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries",
-                              "/Volumes/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
 
-#dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
-                                       #"N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
-                                      #"N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
+dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
+                                       "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
+                                      "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
                                       
 
 dir_output_csvs = './Results/Test/' 
@@ -80,8 +77,8 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 
 # Directories
 
-# model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "") # PC location
-model_dir <- paste("/Volumes/mindyc/afccm/Climate Modeling/Data/", model, sep = "") # Mac location
+model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "") 
+
 
 scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
 
@@ -113,6 +110,15 @@ cat("The variables in this dataset are:", sep = '\n')
 cat(paste("-", variables), sep = "\n")
 
 ```
+
+Of the variables listed, which do you want to include in your analysis? If you want to include all variables, you can skip this step
+
+```{r}
+
+variables <- c("pr_day", "tasmax", "tasmin") # an example of how you would choose among the variables if desired
+
+```
+
 
 ```{r enter-years-of-interest}
 
@@ -153,6 +159,8 @@ files_s2f2 <- list() # scenario 2, future 2
 
 for(i in 1:length(variables)){ 
   fileNames = list.files(baseline_dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
   dt = data.table(fileNames, result = grepl(baseline_yrs, fileNames))
   dt2 = dplyr::filter(dt, result == TRUE)
   files_baseline[[i]] = dt2$fileNames
@@ -163,6 +171,8 @@ for(i in 1:length(variables)){
 for(i in 1:length(variables)){ 
   dir = paste(model_dir, scenario1, sep = '/')
   fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
   dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
   dt2 = dplyr::filter(dt, result == TRUE)
   files_s1f1[[i]] = dt2$fileNames
@@ -173,6 +183,8 @@ for(i in 1:length(variables)){
 for(i in 1:length(variables)){ 
   dir = paste(model_dir, scenario1, sep = '/')
   fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
   dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
   dt2 = dplyr::filter(dt, result == TRUE)
   files_s1f2[[i]] = dt2$fileNames
@@ -183,6 +195,8 @@ for(i in 1:length(variables)){
 for(i in 1:length(variables)){ 
   dir = paste(model_dir, scenario2, sep = '/')
   fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
   dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
   dt2 = dplyr::filter(dt, result == TRUE)
   files_s2f1[[i]] = dt2$fileNames
@@ -193,6 +207,8 @@ for(i in 1:length(variables)){
 for(i in 1:length(variables)){ 
   dir = paste(model_dir, scenario2, sep = '/')
   fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
   dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
   dt2 = dplyr::filter(dt, result == TRUE)
   files_s2f2[[i]] = dt2$fileNames
@@ -215,9 +231,6 @@ rx <- stackX[[random_raster]]
 
 # AFB 
 
-# temp Mac location
-
-afb_dir <- 
 afb_dir <- (paste(dir_installation_boundaries, AFB_Name, sep = '/'))
 afb_filename <- paste(afb_dir, '.shp', sep = "")
 
@@ -377,13 +390,13 @@ avdf <- list() # results mimic allvaluesdf objects created by original script, w
 for(i in 1:length(nested_tibbles)){
   sf_combo_nested = flatten(nested_tibbles[i]) # scenario-future combo
   sf = flatten(sf_combo_nested)
-  tbl = tibble(lat = centroid[2], # will need to be changed when spatial objects are used for extraction
-               lon = centroid[1],
-               date = pluck(sf_combo, 1, "date")) # pulls date column from first sublist
+  tbl = tibble(lat = centroid_matrix[2], # will need to be changed when spatial objects are used for extraction
+               lon = centroid_matrix[1],
+               date = pluck(sf_combo_nested, 1, "date")) # pulls date column from first sublist
   sf_tbl = sf %>%
-    as_tibble(sf, .name_repair = "unique") %>%
+    as_tibble(sf, validate = NULL, .name_repair = "unique") %>% # validate argument necessary for running on cluster
     unnest(cols = where(is.numeric)) %>%
-    dplyr::select(-(contains("date"))) %>%
+    dplyr::select(!(contains("date"))) %>%
     bind_cols(tbl) %>%
     dplyr::select(lat, lon, contains("max"), contains("min"), contains("pr"), date) 
   colnames(sf_tbl) = c("lat", "lon", "tmax", "tmin", "prcp", "date")
@@ -444,51 +457,6 @@ for(i in 1:length(avdf)){
 }
 ```
 
-```{r MonthSum}
-
-csv_file <- './Results/Test/CNMI_Proxy_v1_historical_1986 - 2015_AllDays.csv'
-
-csv <- read_csv(csv_file, show_col_types = FALSE) # I think this should be redone such that the code uses the dataframes created above rather than the resultant .csv file. When you run another model, you can save the environment in an .RData file and I can rewrite this part so you don't have to manually enter directories for the .csv files
-
-csv <- select(csv, -1) # for testing, because row id was included in prior script. Changed to write_csv on 3/8/23 above so hopefully this line won't be necessary. Can comment out or delete entirely when we use R objects instead of .csv products for this chunk
-
-csv <- csv %>% 
-  select(-c(lat, lon)) %>%
-  mutate(month = month(ymd(date)))
-  
-csv <- csv %>%  
-  group_by(month) %>%
-  summarise(across(where(is.numeric), mean, .names = "Avg_{.col}")) 
-
-# Create YrAverage row
-
-YrAverage <- rbind(csv, c("YrAverage", colMeans(csv[,2:ncol(csv)]))) # this works but converts columns to characters 
-
-YrAverage <- YrAverage %>%
-  mutate_at(c(2:ncol(YrAverage)), as.numeric) # convert back to numeric
-
-# Create YrTotals row
-
-YrTotals <- rbind(YrAverage, c("YrTotals", colSums(YrAverage[,2:ncol(YrAverage)])))
-
-YrTotals <- YrTotals %>%
-  mutate_at(c(2:ncol(YrAverage)), as.numeric) %>% # included assuming the results in the .csv should be numeric
-  replace(if_else(
-    
-  ))
-
-## row numbers - assign row_number or something like that, then use that number in combo with na_if() or replace()
-
-# Write to .csv
-
-monthSum_filename <- str_replace(basename(csv_file), "AllDays", "MonthSum")
-
-write_csv(YrTotals, file = paste(dir_output_csvs, monthSum_filename, sep = ""))
-
-
-
-
-```
 
 
 
