@@ -410,6 +410,7 @@ for(i in 1:length(nested_tibbles)){
 ```{r add-derived-vars}
 
 # Add derived variables to dataframes
+# All values from from LOCA_summarize.R script
 # write to csv
 
 for(i in 1:length(avdf)){
@@ -433,11 +434,13 @@ for(i in 1:length(avdf)){
       TRUE ~ tmin)) %>% # assuming if temp are not K they are C
     mutate(TMeanF = (TMaxF + TMinF)/2) %>%
     mutate(TmeanC = (TMaxC + TMinC)/2) %>%
-    mutate(GDDF = RasterGDD(TMinF, TMaxF, 50, 86)) %>% # Threshold values of 50 and 86 come from original LOCASummmarize.R script
-    mutate(hotdays = Rasterhotdays(TMaxC)) %>%
-    mutate(colddays = Rastercolddays(TMinC)) %>%
-    mutate(wetdays = Rasterwetdays(PPT_mm)) %>%
-    mutate(ftDays = RasterFTdays(TMaxC, TMinC))
+    mutate(GDDF = RasterGDD(TMinF, TMaxF, 50, 86)) %>% 
+    mutate(hotdays = Rasterhotdays(TMaxC, hottemp = 32.2)) %>%
+    mutate(colddays = Rastercolddays(TMinC, coldtemp = 0)) %>%
+    mutate(wetdays = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
+    mutate(ftDays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) %>%
+    mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
+    dplyr::select(., lat, lon, date, PPT_in, PPT_mm, TMaxF, TMinF, TMeanF, GDDF, hotdays, colddays, wetdays, drydays, ftDays)
   csv_scenario = if (str_detect(names(avdf[i]), "baseline")){
     "historical"
   } else if(str_detect(names(avdf[i]),"s1")) {
