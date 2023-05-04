@@ -294,7 +294,6 @@ cat("The object used for data extraction is ", class(extract_obj))
 
 
 ```{r extract-values}
-
 # Create lists for extracted values and vectors for extracting time (dates) from rasters
 
 # NOTE: when it comes time to run a base that is large enough to span several raster cells, will need to amend this section. 
@@ -307,7 +306,10 @@ results_s1f1 <- list()
 results_s1f2 <- list()
 results_s2f1 <- list()
 results_s2f2 <- list()
+```
 
+
+```{r extract-values}
 for(i in 1:length(files_baseline)){
   r = rast(files_baseline[[i]])
   times = time(r)
@@ -460,6 +462,83 @@ for(i in 1:length(avdf)){
 }
 ```
 
+```{r MonthSum}
+
+avdf <- as_tibble(avdf)
+
+monthSum <- list()
+
+for(i in 1:length(avdf)){
+  df = avdf[[i]]
+  df = df %>%
+    mutate(date = ymd(date)) %>%
+    mutate(month = month(date)) %>%
+    mutate(year = year(date)) %>%
+    dplyr::select(-c(lat, lon))
+  
+  yearAvg = df %>%
+    dplyr::select(!c('date','PPT_in', 'PPT_mm')) %>% # Exclude variables for which the result is not simply a monthly average
+    dplyr::select(!(contains("days"))) %>%
+    group_by(year, month) %>%
+    summarise(across(where(is.double), mean))
+  
+  Abs_TminF = df %>%
+  select(date, year, month, TMinF) %>%
+  group_by(year, month) %>%
+  summarise(Abs_TminF = min(TMinF))
+  
+  ppt = df %>%
+  select(date, year, month, 'PPT_in', 'PPT_mm') %>%
+  group_by(year, month) %>%
+  summarise(across(contains('PPT'), sum))
+  
+  days = df %>%
+  select(date, year, month, contains('days')) %>%
+  group_by(year, month) %>%
+  summarise(across(contains('days'), sum))
+  
+  all = yearAvg %>%
+  full_join(days) %>%
+  full_join(ppt) %>%
+  full_join(Abs_TminF) %>%
+  ungroup()
+  
+  monthAvg = all %>%
+  dplyr::select(!year) %>%
+  group_by(month) %>%
+  summarise(across(everything(), mean)) %>%
+  setNames(paste0('Avg_', names(.))) %>%
+  rename(Abs_TminF = Avg_Abs_TminF) %>%
+  select(Avg_month, # put in order on MonthSum csv
+         Avg_PPT_in, 
+         Avg_PPT_mm, 
+         Avg_TMaxF, 
+         Avg_TMinF, 
+         Avg_TMeanF, 
+         Abs_TminF, 
+         Avg_GDDF,
+         Avg_hotdays,
+         Avg_colddays,
+         Avg_wetdays,
+         Avg_drydays,
+         Avg_ftdays) %>%
+    
+    if(str_detect(model, "MACA")){
+            select(Avg_Rad,
+                   Avg_EastWind,
+                   Avg_NorthWind,
+                   Avg_WindSpeed,
+                   Avg_WindDirDeg,
+                   Avg_SH,
+                   Avg_VPdeficit,
+                   Avg_VPsat,
+                   Avg_VPamb,
+                   Avg_RH)}
+  
+  monthSum[[i]] = monthAvg
+  }
+
+```
 
 
 
