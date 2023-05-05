@@ -551,7 +551,38 @@ for(i in 1:length(AllDays)){
 # Create csv
 
 for(i in 1:length(monthSum)){
+  YrAverage = colMeans(monthAvg[,2:ncol(monthAvg)]) # converts columns to characters 
+  YrTotals = colSums(monthAvg[,2:ncol(monthAvg)])
+  csv = bind_rows(monthAvg, YrAverage, YrTotals)
   
+  # NA's 
+
+  NAs <- csv %>% # YrAverage
+    filter(row_number() == 13) %>% # Because there will always be 12 months irrespective of model
+    mutate(across(.cols = contains("PPT"), ~na_if(.,.))) %>%
+    mutate(across(.cols = contains("days"), ~na_if(.,.))) %>%
+    mutate(across(.cols = contains("Abs"), ~na_if(.,.))) %>%
+    mutate(across(.cols = contains("GDDF"), ~na_if(.,.))) 
+  
+  NAs_Totals <- csv %>% # YrTotals
+    filter(row_number() == 14) %>%
+    mutate(across(.cols = contains("Avg_T"), ~na_if(.,.))) %>%
+    mutate(across(.cols = contains("Abs"), ~na_if(.,.))) %>%
+    mutate(across(.cols = 14:ncol(csv), ~na_if(.,.))) # assuming these columns stay in the same order
+  
+  csv = csv %>%
+    slice(1:(n()-2)) %>% # remove summary rows
+    bind_rows(NAs, NAs_Totals) %>% # replace with NA's included
+    rename(month = Avg_month) %>%
+    rename(Avg_TminF = Avg_TMinF) %>%
+    mutate(month = as.character(month))
+  
+  csv[13,1] = "YrAverage"
+  csv[14,1] = "YrTotals"
+  
+  csv_filename = 
+
+
 }
 
 
