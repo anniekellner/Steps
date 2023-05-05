@@ -442,9 +442,9 @@ for(i in 1:length(avdf)){
     mutate(hotdays = Rasterhotdays(TMaxC, hottemp = 32.2)) %>%
     mutate(colddays = Rastercolddays(TMinC, coldtemp = 0)) %>%
     mutate(wetdays = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
-    mutate(ftDays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) %>%
+    mutate(ftdays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) %>%
     mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
-    dplyr::select(., lat, lon, date, PPT_in, PPT_mm, TMaxF, TMinF, TMeanF, GDDF, hotdays, colddays, wetdays, drydays, ftDays)
+    dplyr::select(., lat, lon, date, PPT_in, PPT_mm, TMaxF, TMinF, TMeanF, GDDF, hotdays, colddays, wetdays, drydays, ftdays)
   csv_scenario = if (str_detect(names(avdf[i]), "baseline")){
     "historical"
   } else if(str_detect(names(avdf[i]),"s1")) {
@@ -462,6 +462,7 @@ for(i in 1:length(avdf)){
     csv_fileName = paste(AFB_Name, csv_scenario, csv_years, "AllDays", sep = '_')
     write_csv(csv, file = paste(dir_output_csvs,csv_fileName,".csv", sep = ""))
     AllDays[[i]] = csv
+    names(AllDays)[i] = names(avdf[i])
 }
 ```
 
@@ -469,25 +470,21 @@ for(i in 1:length(avdf)){
 
 # Remove unnecessary objects from the environment
 
-# If for some reason the AllDays object does not work, you can use the script './Code/Misc/MonthSum.R' to run the MonthSum analyses using the csv output files
+# If for some reason the AllDays object does not work, you can use the script './Code/Misc/MonthSum.R' to run the MonthSum analyses using the csv output files one-by-one
 
-rm(list=setdiff(ls(), "AllDays"))
+rm(list=setdiff(ls(), c("AllDays", "model")))
 
 ```
 
 
-
-
 ```{r MonthSum}
 
-# If 
-
-AllDays <- as_tibble(AllDays)
+#AllDays <- as_tibble(AllDays)
 
 monthSum <- list()
 
 for(i in 1:length(avdf)){
-  df = avdf[[i]]
+  df = AllDays[[i]]
   df = df %>%
     mutate(date = ymd(date)) %>%
     mutate(month = month(date)) %>%
