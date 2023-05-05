@@ -26,6 +26,7 @@ library(leaflet)
 
 source('./Code/Misc/character_vectors.R')
 source('./Code/CEMML/Functions/Function_General.R')
+source('./Code/Step3Functions.R')
 
 ```
 
@@ -479,11 +480,13 @@ rm(list=setdiff(ls(), c("AllDays", "model")))
 
 ```{r MonthSum}
 
-#AllDays <- as_tibble(AllDays)
-
 monthSum <- list()
 
-for(i in 1:length(avdf)){
+MACA = if_else(str_detect(model, "MACA"),
+                     TRUE,
+                     FALSE)
+
+for(i in 1:length(AllDays)){
   df = AllDays[[i]]
   df = df %>%
     mutate(date = ymd(date)) %>%
@@ -536,22 +539,21 @@ for(i in 1:length(avdf)){
          Avg_colddays,
          Avg_wetdays,
          Avg_drydays,
-         Avg_ftdays) %>%
-    
-    if(str_detect(model, "MACA")){
-            select(Avg_Rad,
-                   Avg_EastWind,
-                   Avg_NorthWind,
-                   Avg_WindSpeed,
-                   Avg_WindDirDeg,
-                   Avg_SH,
-                   Avg_VPdeficit,
-                   Avg_VPsat,
-                   Avg_VPamb,
-                   Avg_RH)}
+         Avg_ftdays)
   
+  macaCols = if(MACA == "TRUE") {getMACAcols(all)} else {NULL} 
+  
+  monthAvg = if(MACA == "TRUE") {bind_cols(monthAvg, macaCols)} else {monthAvg}
+                     
   monthSum[[i]] = monthAvg
   }
+
+# Create csv
+
+for(i in 1:length(monthSum)){
+  
+}
+
 
 ```
 
