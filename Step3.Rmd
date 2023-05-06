@@ -553,24 +553,26 @@ for(i in 1:length(AllDays)){
 # Create csv
 
 for(i in 1:length(monthSum)){
-  YrAverage = colMeans(monthAvg[,2:ncol(monthAvg)]) # converts columns to characters 
-  YrTotals = colSums(monthAvg[,2:ncol(monthAvg)])
+  YrAverage = colMeans(monthSum[[i]][,2:ncol(monthSum[[i]])]) # converts columns to characters 
+  YrTotals = colSums(monthSum[[i]][,2:ncol(monthAvg)][i])
   csv = bind_rows(monthAvg, YrAverage, YrTotals)
   
   # NA's 
 
-  NAs <- csv %>% # YrAverage
+  NAs = csv %>% # YrAverage
     filter(row_number() == 13) %>% # Because there will always be 12 months irrespective of model
     mutate(across(.cols = contains("PPT"), ~na_if(.,.))) %>%
     mutate(across(.cols = contains("days"), ~na_if(.,.))) %>%
     mutate(across(.cols = contains("Abs"), ~na_if(.,.))) %>%
     mutate(across(.cols = contains("GDDF"), ~na_if(.,.))) 
   
-  NAs_Totals <- csv %>% # YrTotals
+  NAs_Totals = csv %>% # YrTotals
     filter(row_number() == 14) %>%
     mutate(across(.cols = contains("Avg_T"), ~na_if(.,.))) %>%
-    mutate(across(.cols = contains("Abs"), ~na_if(.,.))) %>%
-    mutate(across(.cols = 14:ncol(csv), ~na_if(.,.))) # assuming these columns stay in the same order
+    mutate(across(.cols = contains("Abs"), ~na_if(.,.)))
+    
+  NAs_Totals = if(MACA == "TRUE") {mutate(across(.cols = .cols %in% colnames(macaCols), ~na_if(.,.)))
+    } else {NAs_Totals}
   
   csv = csv %>%
     slice(1:(n()-2)) %>% # remove summary rows
@@ -595,14 +597,13 @@ for(i in 1:length(monthSum)){
     paste(first(year(AllDays$results_s1f1$date)), "-", last(year(AllDays$results_s1f1$date)))
     
   } else if (str_detect(names(AllDays[i]), "f2")) {
-    paste(first(year(AllDays$results_s1f2$date)), "-", last(year(AllDays$results_s1f1$date)))
+    paste(first(year(AllDays$results_s1f2$date)),"-",last(year(AllDays$results_s1f1$date)))
   } else {
     paste(first(year(AllDays$results_baseline$date)),"-",last(year(AllDays$results_baseline$date)))
   }
-    csv_fileName = paste(AFB_Name, csv_scenario, csv_years, "MonthSum", sep = '_')
-    write_csv(csv, file = paste(dir_output_csvs,csv_fileName,".csv", sep = ""))
+    csv_fileName = paste(AFB_Name,csv_scenario,csv_years,"MonthSum",sep = '_')
+    write_csv(csv, file = paste(dir_output_csvs,csv_fileName,".csv",sep = ""))
 }
-
 ```
 
 
