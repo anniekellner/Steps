@@ -554,8 +554,8 @@ for(i in 1:length(AllDays)){
 
 for(i in 1:length(monthSum)){
   YrAverage = colMeans(monthSum[[i]][,2:ncol(monthSum[[i]])]) # converts columns to characters 
-  YrTotals = colSums(monthSum[[i]][,2:ncol(monthAvg)][i])
-  csv = bind_rows(monthAvg, YrAverage, YrTotals)
+  YrTotals = colSums(monthSum[[i]][,2:ncol(monthSum[[i]])])
+  csv = bind_rows(monthSum[[i]], YrAverage, YrTotals)
   
   # NA's 
 
