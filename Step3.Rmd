@@ -546,7 +546,7 @@ for(i in 1:length(AllDays)){
   
   monthAvg = if(MACA == "TRUE") {bind_cols(monthAvg, macaCols)} else {monthAvg}
   
-  monthSum[[i]] = csv # new df for export and use with DiffHist
+  monthSum[[i]] = monthAvg # new df for export and use with DiffHist
   names(monthSum)[i] = names(AllDays[i])
 }
 
@@ -577,6 +577,7 @@ for(i in 1:length(monthSum)){
   csv = csv %>%
     slice(1:(n()-2)) %>% # remove summary rows
     bind_rows(NAs, NAs_Totals) %>% # replace with NA's included
+    rename(month = Avg_month) %>%
     mutate(month = as.character(month))
   
   csv[13,1] = "YrAverage"
@@ -607,7 +608,7 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     paste(first(year(AllDays$results_baseline$date)),"-",last(year(AllDays$results_baseline$date)))
   }
     csv_fileName = paste(AFB_Name,csv_scenario,csv_years,"MonthSum",sep = '_')
-    write_csv(csv, file = paste(dir_output_csvs,csv_fileName,".csv",sep = ""))
+    write_csv(monthSum[[i]], file = paste(dir_output_csvs,csv_fileName,".csv",sep = ""))
 }
 ```
 
