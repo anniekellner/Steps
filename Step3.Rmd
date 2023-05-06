@@ -479,7 +479,7 @@ rm(list=setdiff(ls(), c("AllDays", "AFB_name", "model", "scenario1", "scenario2"
 ```
 
 
-```{r MonthSum}
+```{r MonthSum, message=FALSE}
 
 monthSum <- list()
 
@@ -545,10 +545,10 @@ for(i in 1:length(AllDays)){
   macaCols = if(MACA == "TRUE") {getMACAcols(all)} else {NULL} 
   
   monthAvg = if(MACA == "TRUE") {bind_cols(monthAvg, macaCols)} else {monthAvg}
-                     
-  monthSum[[i]] = monthAvg
+  
+  monthSum[[i]] = csv # new df for export and use with DiffHist
   names(monthSum)[i] = names(AllDays[i])
-  }
+}
 
 # Create csv
 
@@ -577,27 +577,32 @@ for(i in 1:length(monthSum)){
   csv = csv %>%
     slice(1:(n()-2)) %>% # remove summary rows
     bind_rows(NAs, NAs_Totals) %>% # replace with NA's included
-    rename(month = Avg_month) %>%
-    rename(Avg_TminF = Avg_TMinF) %>%
     mutate(month = as.character(month))
   
   csv[13,1] = "YrAverage"
   csv[14,1] = "YrTotals"
   
-  # Filename
-    csv_scenario = if (all$year[1] < as.integer(year(now()))){
+  monthSum[[i]] = csv # will write over original monthSum df that did not have final two columns
+  names(monthSum)[i] = names(AllDays[i])
+  }
+  
+# Save csv files 
+
+for(i in 1:length(monthSum)){
+
+csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     "historical"
-  } else if(str_detect(names(AllDays[i]),"s1")) {
+  } else if(str_detect(names(monthSum[i]),"s1")) {
     scenario1
   } else {
     scenario2
   }
   
-  csv_years = if (str_detect(names(AllDays[i]), "f1")){
+  csv_years = if (str_detect(names(monthSum[i]), "f1")){
     paste(first(year(AllDays$results_s1f1$date)), "-", last(year(AllDays$results_s1f1$date)))
     
-  } else if (str_detect(names(AllDays[i]), "f2")) {
-    paste(first(year(AllDays$results_s1f2$date)),"-",last(year(AllDays$results_s1f1$date)))
+  } else if (str_detect(names(monthSum[i]), "f2")) {
+    paste(first(year(AllDays$results_s1f2$date)),"-",last(year(AllDays$results_s1f2$date)))
   } else {
     paste(first(year(AllDays$results_baseline$date)),"-",last(year(AllDays$results_baseline$date)))
   }
