@@ -46,7 +46,7 @@ If the AFB is managed by the Air Force, set Navy = FALSE
 
 # Is the AFB managed by the Navy?
 
-Navy = FALSE
+Navy = TRUE
 
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
@@ -58,13 +58,13 @@ dir_output_csvs = './Results/Test/'
 
 ```
 
-First, let's select which of the `models` you'd like to run. Highlight the word `models` and click 'Run' at the top right (or use the shortcut *Ctrl + Enter*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
+First, let's select which base (AFB) and which of the `models` you'd like to run. To choose from a list, highlight the word `AFB_name` and/or `models` and click 'Run' at the top right (or use the shortcut *Ctrl + Enter*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
 
 In the code chunk below, enter the number between the brackets ([]) that corresponds with your model of interest. Then let's see what scenarios and variables are available for that model.
 
 ```{r enter-afb-and-model}
 
-AFB_Name <- "Homestead_ARB" # Can create a vector similar to 'models' above if desired
+AFB_Name <- "CNMI_Proxy_v1" # Can create a vector similar to 'models' above if desired
 
 model <- models[2] 
 
