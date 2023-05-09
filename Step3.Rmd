@@ -132,6 +132,12 @@ future1_end_year <- 2031 # End year of interest for the first future time period
 future2_start_year <- 2051 # Start year of interest for the second future time period 
 future2_end_year <- 2061 # End year of interest for the second future time period 
 
+years <- c(baseline_start_year, 
+           baseline_end_year, 
+           future1_start_year, 
+           future1_end_year, 
+           future2_start_year, 
+           future2_end_year)
 ```
 
 ####################################################################################################
@@ -484,7 +490,13 @@ for(i in 1:length(avdf)){
 
 # If for some reason the AllDays object does not work, you can use the script './Code/Misc/MonthSum.R' to run the MonthSum analyses using the csv output files one-by-one
 
-rm(list=setdiff(ls(), c("AllDays", "AFB_Name", "model", "scenario1", "scenario2", "dir_output_csvs")))
+rm(list=setdiff(ls(), c("AllDays", 
+                        "AFB_Name", 
+                        "model", 
+                        "scenario1", 
+                        "scenario2", 
+                        "dir_output_csvs",
+                        "years")))
 
 ```
 
@@ -635,45 +647,51 @@ rm(list=setdiff(ls(), c("monthSum", "AFB_Name", "model", "scenario1", "scenario2
 
 
 
-```{r DiffHist}
+```{r DiffHist, warning=FALSE}
 
-# This chunk uses the monthSum dataframe 
+# input: monthSum dataframe 
+# output: diffHist dataframe
 
 diffHist <- list() # create diffHist dataframe for later use
 
+# Create historical object
+
 hist <- monthSum[[1]] # separate historical values
-monthVect <- hist[,1] # remove first columns to add back in later
 
-histVals <- hist %>%
-  dplyr::select(where(is.numeric)) 
-  
+# Create dataframe
 
-for(i in 2:length(monthSum)){ # starts with 2 because [[1]] is the baseline (historical) to be subtracted
-  df = monthSum[[i]]
-  df = select(df, where(is.numeric))
-  diffHist = map2(histVals, df, ~df-histVals)
-  diffHist[[i]] = diffHist
+for(i in 2:length(monthSum)){ # 2 because [[1]] is historical 
+  diff = hist %>%
+  bind_rows(monthSum[[i]]) %>%
+  group_by(month) %>%
+  summarise_each(funs(diff(.))) %>% # this gives warnings because the function is deprecated, but it still works as of 5/9/23. If this breaks, look here first.
+  #data.frame() %>%
+  slice(1,5:12, 2:4,13:14) # arranges rows in the desired order
   
-  
+  diffHist[[i-1]] = diff # add to DiffHist dataframe for future use
+  names(diffHist)[[i-1]] = names(monthSum[i])
 }
+  
+# Save csv files 
 
+for(i in 1:length(diffHist)){
 
+csv_scenario = if (str_detect(names(diffHist[i]), "s1")){
+    scenario1
+  } else if(str_detect(names(diffHist[i]),"s2")) {
+    scenario2
+  } 
+  
+csv_years = if (str_detect(names(diffHist[i]), "f1")){
+    paste0(years[3], "-", years[4])
+  } else if (str_detect(names(diffHist[i]), "f2")) {
+    paste0(years[5],"-", years[6])
+  } 
+    
+csv_fileName = paste(AFB_Name,csv_scenario,csv_years,"DiffHist",sep = '_')
+write_csv(diffHist[[i]], file = paste(dir_output_csvs,csv_fileName,".csv",sep = ""))
 
-glimpse(hist)
-
-
-hist = monthSum[[1]][,2:ncol(monthSum[[1]])]
-hist = monthSum[[1]][,2:ncol(monthSum[[1]])]
-df = monthSum[[i]][,2:ncol(monthSum[[i]])]
-DiffHist = map2(hist, df, ~.df-.hist)
-DiffHist = map2(hist, df, ~df-hist)
-head(DiffHist)
-i = 2
-hist = monthSum[[1]][,2:ncol(monthSum[[1]])]
-df = monthSum[[i]][,2:ncol(monthSum[[i]])]
-DiffHist = map2(hist, df, ~df-hist)
-glimpse(DiffHist)
-
+}
 
 ```
 
