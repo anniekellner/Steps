@@ -639,25 +639,20 @@ rm(list=setdiff(ls(), c("monthSum", "AFB_Name", "model", "scenario1", "scenario2
 
 # This chunk uses the monthSum dataframe 
 
-hist <- monthSum[[1]]
+diffHist <- list() # create diffHist dataframe for later use
+
+hist <- monthSum[[1]] # separate historical values
+monthVect <- hist[,1] # remove first columns to add back in later
 
 histVals <- hist %>%
   dplyr::select(where(is.numeric)) 
   
-  #replace(is.na(.), 9999) %>%
-  mutate(across(where(as.numeric(is.na(.), 9999))))
-  mutate(across(everything(), ~replace_na(9999)))
-  mutate(across(everything(), ~replace_na(., as.numeric(9999)))) %>%
-  
-  mutate(across(everything(), ~na_if(., 9999)))
-
-
-monthVect <- hist[,1]
 
 for(i in 2:length(monthSum)){ # starts with 2 because [[1]] is the baseline (historical) to be subtracted
   df = monthSum[[i]]
-  df = select(df, where(as.numeric), na.rm = FALSE)
-  diffHist = map2(hist, df, ~df-hist)
+  df = select(df, where(is.numeric))
+  diffHist = map2(histVals, df, ~df-histVals)
+  diffHist[[i]] = diffHist
   
   
 }
