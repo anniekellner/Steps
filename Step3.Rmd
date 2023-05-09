@@ -627,6 +627,27 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 }
 ```
 
+```{r DiffHist}
+
+hist = monthSum[[1]]
+glimpse(hist)
+df = monthSum[[i]]
+DiffHist = hist - df
+DiffHist = map2(hist, df, ~df-hist)
+hist = monthSum[[1]][,2:ncol(monthSum[[1]])]
+hist = monthSum[[1]][,2:ncol(monthSum[[1]])]
+df = monthSum[[i]][,2:ncol(monthSum[[i]])]
+DiffHist = map2(hist, df, ~.df-.hist)
+DiffHist = map2(hist, df, ~df-hist)
+head(DiffHist)
+i = 2
+hist = monthSum[[1]][,2:ncol(monthSum[[1]])]
+df = monthSum[[i]][,2:ncol(monthSum[[i]])]
+DiffHist = map2(hist, df, ~df-hist)
+glimpse(DiffHist)
+
+
+```
 
 
 
