@@ -477,7 +477,7 @@ for(i in 1:length(avdf)){
     paste(baseline_start_year,"-",baseline_end_year)
   }
     csv_fileName = paste(AFB_Name, csv_scenario, csv_years, "AllDays", sep = '_')
-    write_csv(csv, file = paste(dir_output_csvs,csv_fileName,".csv", sep = ""))
+    write_csv(csv, file = paste0(dir_output_csvs,csv_fileName,".csv", sep = ""))
     
     AllDays[[i]] = csv # new df for use with MonthSum
     names(AllDays)[i] = names(avdf[i])
@@ -500,6 +500,7 @@ rm(list=setdiff(ls(), c("AllDays",
 
 ```
 
+## MonthSum
 
 ```{r MonthSum, message=FALSE}
 
@@ -635,17 +636,23 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     paste(first(year(AllDays$results_baseline$date)),"-",last(year(AllDays$results_baseline$date)))
   }
     csv_fileName = paste(AFB_Name,csv_scenario,csv_years,"MonthSum",sep = '_')
-    write_csv(monthSum[[i]], file = paste(dir_output_csvs,csv_fileName,".csv",sep = ""))
+    write_csv(monthSum[[i]], file = paste0(dir_output_csvs,csv_fileName,".csv",sep = ""))
 }
 ```
 
 ```{r remove-objects}
 
-rm(list=setdiff(ls(), c("monthSum", "AFB_Name", "model", "scenario1", "scenario2", "dir_output_csvs")))
+rm(list=setdiff(ls(), c("monthSum", 
+                        "AFB_Name", 
+                        "model", 
+                        "scenario1", 
+                        "scenario2", 
+                        "dir_output_csvs",
+                        "years")))
 
 ```
 
-
+## DiffHist
 
 ```{r DiffHist, warning=FALSE}
 
@@ -683,13 +690,13 @@ csv_scenario = if (str_detect(names(diffHist[i]), "s1")){
   } 
   
 csv_years = if (str_detect(names(diffHist[i]), "f1")){
-    paste0(years[3], "-", years[4])
+    paste0(years[3],"-",years[4])
   } else if (str_detect(names(diffHist[i]), "f2")) {
-    paste0(years[5],"-", years[6])
+    paste0(years[5],"-",years[6])
   } 
     
 csv_fileName = paste(AFB_Name,csv_scenario,csv_years,"DiffHist",sep = '_')
-write_csv(diffHist[[i]], file = paste(dir_output_csvs,csv_fileName,".csv",sep = ""))
+write_csv(diffHist[[i]], file = paste0(dir_output_csvs,csv_fileName,".csv",sep = ""))
 
 }
 

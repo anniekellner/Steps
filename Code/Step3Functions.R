@@ -20,4 +20,3 @@ getMACAcols <- function(AllDaysDF){
                   Avg_RH)
 }
 
-
