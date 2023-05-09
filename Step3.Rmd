@@ -627,13 +627,46 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 }
 ```
 
+```{r remove-objects}
+
+rm(list=setdiff(ls(), c("monthSum", "AFB_Name", "model", "scenario1", "scenario2", "dir_output_csvs")))
+
+```
+
+
+
 ```{r DiffHist}
 
-hist = monthSum[[1]]
+# This chunk uses the monthSum dataframe 
+
+hist <- monthSum[[1]]
+
+histVals <- hist %>%
+  dplyr::select(where(is.numeric)) 
+  
+  #replace(is.na(.), 9999) %>%
+  mutate(across(where(as.numeric(is.na(.), 9999))))
+  mutate(across(everything(), ~replace_na(9999)))
+  mutate(across(everything(), ~replace_na(., as.numeric(9999)))) %>%
+  
+  mutate(across(everything(), ~na_if(., 9999)))
+
+
+monthVect <- hist[,1]
+
+for(i in 2:length(monthSum)){ # starts with 2 because [[1]] is the baseline (historical) to be subtracted
+  df = monthSum[[i]]
+  df = select(df, where(as.numeric), na.rm = FALSE)
+  diffHist = map2(hist, df, ~df-hist)
+  
+  
+}
+
+
+
 glimpse(hist)
-df = monthSum[[i]]
-DiffHist = hist - df
-DiffHist = map2(hist, df, ~df-hist)
+
+
 hist = monthSum[[1]][,2:ncol(monthSum[[1]])]
 hist = monthSum[[1]][,2:ncol(monthSum[[1]])]
 df = monthSum[[i]][,2:ncol(monthSum[[i]])]
