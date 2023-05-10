@@ -24,9 +24,12 @@ library(tmap)
 library(tmaptools)
 library(leaflet)
 
+# The 'source' function reads the following scripts and places associated functions into the global environment
+
 source('./Code/Misc/character_vectors.R')
 source('./Code/CEMML/Functions/Function_General.R')
 source('./Code/Step3Functions.R')
+source('./Code/Stars_HowTo/shift_longitude.R')
 
 ```
 
@@ -54,7 +57,7 @@ dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile 
                                       "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
                                       
 
-dir_output_csvs = './Results/Indianhead_Proxy/' 
+dir_output_csvs = './Results/Test/Indianhead_Proxy/' 
 
 ```
 
@@ -242,11 +245,14 @@ afb_dir <- (paste(dir_installation_boundaries, AFB_Name, sep = '/'))
 afb_filename <- paste(afb_dir, '.shp', sep = "")
 
 afbSF <- st_read(afb_filename) # Because plotting package (tmap) doesn't take terra vectors
-afb <- vect(afb_filename)
+
+afbSF <- if (xmax(rx) == 360 & xmax(afb) < 0) {st_shift_longitude(afbSF)} else afbSF # adjustment in case ncdf lon scale is 0-360
+
+afb <- vect(afbSF)
 
 # Crop single raster to AFB shape
 
-rxCrop <- terra::crop(rx, afb)
+rxCrop <- terra::crop(rx, afb, snap = "out") # snap = "out" shows all cells that overlap AFB polygon
 
 # Quick interactive plot
 
@@ -264,7 +270,7 @@ lf
 
 We should check the size of the AFB to see whether we should use its centroid or spatial extent to extract the data we need. If the AFB fits within a single NetCDF cell, it will be much faster to extract data using a single point.  
 
-If the output of the following code chunk say 'matrix array', the script will use the centroid. If it says "spatVector", it will use the spatial object (afb).
+If the output of the following code chunk says 'numeric', the script will use the centroid. If it says "spatVector", it will use the spatial object (afb).
 
 ```{r decision-to-use-shp-or-centroid-for-extraction, warning=FALSE, results='asis'}
 
