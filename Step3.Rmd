@@ -246,7 +246,7 @@ afb <- vect(afb_filename)
 
 # Crop single raster to AFB shape
 
-rxCrop <- terra::crop(rx, afbSF2_v)
+rxCrop <- terra::crop(rx, afb)
 
 # Quick interactive plot
 
@@ -254,7 +254,7 @@ rxCrop <- terra::crop(rx, afbSF2_v)
 
 map <- tm_shape(as(rxCrop, "Raster")) + 
   tm_raster() + 
-  tm_shape(afbSF2) + 
+  tm_shape(afbSF) + 
   tm_borders()
 
 lf <- tmap_leaflet(map)
