@@ -54,7 +54,7 @@ dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile 
                                       "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
                                       
 
-dir_output_csvs = './Results/Test/' 
+dir_output_csvs = './Results/Indianhead_Proxy/' 
 
 ```
 
@@ -64,7 +64,7 @@ In the code chunk below, enter the number between the brackets ([]) that corresp
 
 ```{r enter-afb-and-model}
 
-AFB_Name <- "CNMI_Proxy_v1" # Can create a vector similar to 'models' above if desired
+AFB_Name <- AFB_Name[4] 
 
 model <- models[6] 
 
@@ -124,13 +124,13 @@ variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin") # an example of
 ```{r enter-years-of-interest}
 
 baseline_start_year <- 1985 # Start year of interest for the historical time period  
-baseline_end_year <- 1995 # End year of interest for the historical time period
+baseline_end_year <- 2014 # End year of interest for the historical time period
 
 future1_start_year <- 2021 # Start year of interest for the first future time period 
-future1_end_year <- 2031 # End year of interest for the first future time period 
+future1_end_year <- 2050 # End year of interest for the first future time period 
 
 future2_start_year <- 2051 # Start year of interest for the second future time period 
-future2_end_year <- 2061 # End year of interest for the second future time period 
+future2_end_year <- 2080 # End year of interest for the second future time period 
 
 years <- c(baseline_start_year, 
            baseline_end_year, 
@@ -246,7 +246,7 @@ afb <- vect(afb_filename)
 
 # Crop single raster to AFB shape
 
-rxCrop <- terra::crop(rx, afb)
+rxCrop <- terra::crop(rx, afbSF2_v)
 
 # Quick interactive plot
 
@@ -254,7 +254,7 @@ rxCrop <- terra::crop(rx, afb)
 
 map <- tm_shape(as(rxCrop, "Raster")) + 
   tm_raster() + 
-  tm_shape(afbSF) + 
+  tm_shape(afbSF2) + 
   tm_borders()
 
 lf <- tmap_leaflet(map)
@@ -317,6 +317,7 @@ results_s2f2 <- list()
 
 
 ```{r extract-values}
+
 for(i in 1:length(files_baseline)){
   r = rast(files_baseline[[i]])
   times = time(r)
