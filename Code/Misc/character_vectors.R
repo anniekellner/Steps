@@ -13,5 +13,7 @@ models <- c("HADGEM2-ES",
                    "MPI-ESM1-2-HR")
 
 AFB_Name <- c("Homestead_ARB", 
-              "Guam_Proxy_v1") # Navy
+              "Guam_Proxy_v1", # Navy
+              "CNMI_Proxy_v1", # Navy
+              "Indianhead_Proxy") # Navy
 
