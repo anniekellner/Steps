@@ -1,7 +1,7 @@
 ---
-title: "Step3_test"
+title: "Step3"
 author: "Annie Kellner"
-date: "2023-02-07"
+date: "2023-05-10"
 output: html_document
 ---
 
@@ -9,9 +9,15 @@ output: html_document
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
+For this script, it is best to run one chunk (box of R code) at a time to make sure each is working properly. Also, some chunks produce output you will want to inspect. Output will appear below the chunk on this screen rather than in the bottom right window (results appear in the bottom right window for regular .R scripts)
+
+*Throughout the script, instructions you need to follow will appear like this. You can ignore code in the same color within code chunks, unless it is part of the code that explicitly requires user input*
+
+The first chunk ('setup') allows you to set options that apply to every chunk in the script)
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE) # 'echo' means R will print the code along with the results. 
+
+knitr::opts_chunk$set(echo = FALSE) # echo = FALSE means R will not print the code along with the results. 
 
 library(terra)
 library(sf)
@@ -24,6 +30,12 @@ library(tmap)
 library(tmaptools)
 library(leaflet)
 
+```
+
+```{r functions}
+
+rm(list = ls()) # clear workspace - this can be commented out as needed
+
 # The 'source' function reads the following scripts and places associated functions into the global environment
 
 source('./Code/Misc/character_vectors.R')
@@ -33,17 +45,12 @@ source('./Code/Stars_HowTo/shift_longitude.R')
 
 ```
 
-```{r clear-workspace}
+###############################################################################################
+### PART ONE: User settings - choose AFB, AFB manager, model, scenarios, years of interest  ###
+###############################################################################################
 
-#rm(list = ls())
-
-```
-
-
-*PART ONE: User settings - choose AFB, AFB manager, model, scenarios, years of interest*
-
-If the AFB is managed by the Navy, set Navy = TRUE
-If the AFB is managed by the Air Force, set Navy = FALSE
+*If the AFB is managed by the Navy, set Navy = TRUE*
+*If the AFB is managed by the Air Force, set Navy = FALSE*
 
 ```{r set-directories}
 
@@ -51,19 +58,17 @@ If the AFB is managed by the Air Force, set Navy = FALSE
 
 Navy = TRUE
 
-
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
                                        "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
                                       "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
                                       
-
 dir_output_csvs = './Results/Test/Indianhead_Proxy/' 
 
 ```
 
-First, let's select which base (AFB) and which of the `models` you'd like to run. To choose from a list, highlight the word `AFB_Name` and/or `models` (including the ``) and click 'Run' at the top right (or use the shortcut *Ctrl + Enter*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
+First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Name` and/or `models` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
 
-In the code chunk below, enter the number between the brackets ([]) that corresponds with your model of interest. Then let's see what scenarios and variables are available for that model.
+In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest.* 
 
 ```{r enter-afb-and-model}
 
@@ -75,23 +80,25 @@ cat(paste("The model you have selected is", model, "and the AFB is", AFB_Name))
 
 ```
 
+Then let's see what scenarios and variables are available for that model.
+
 The next chunk checks what scenarios (subfolders) are contained in the 'Data' folder associated with the model of interest.
 
-```{r results='asis'}
+```{r scenarios, results='asis'}
 
 # Directories
 
 model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "") 
 
-
 scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
 
 cat("The scenarios (subfolders) associated with this model are:", sep = '\n') # cat() basically means 'print' in this context 
+
 cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for readability ('\n' = line)
 
 ```
 
-*Enter the scenarios of interest below:*
+*Enter the scenarios of interest below.* You only need to enter the models between the quotation marks (""). The 'scenarios' vector will populate automatically
 
 ```{r enter-scenarios}
 
@@ -99,9 +106,11 @@ baseline <- "historical"
 scenario1 <- "ssp245"
 scenario2 <- "ssp585"
 
+scenarios <- c(baseline, scenario1, scenario2)
+
 ```
 
-Next, let's see which variables are represented in this dataset
+Next, let's see which variables are represented in this dataset. The variables will appear in a list below the code chunk.
 
 ```{r}
 
@@ -115,7 +124,7 @@ cat(paste("-", variables), sep = "\n")
 
 ```
 
-Of the variables listed, which do you want to include in your analysis? If you want to include all variables, you can skip this step. I have commented this out as a default but if you are choosing among variables, you will need to keep it in. 
+Of the variables listed, which do you want to include in your analysis? *Enter the variables names you want to include between the quotation marks.* 
 
 ```{r}
 
@@ -123,6 +132,7 @@ variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin") # an example of
 
 ```
 
+*Now, enter the years of interest for each time period*
 
 ```{r enter-years-of-interest}
 
@@ -144,12 +154,13 @@ years <- c(baseline_start_year,
 ```
 
 ####################################################################################################
-# THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT
-# The rest of the script should be able to be run as-is...
+###     THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT            ################################
+###     The rest of the script should be able to be run automatically     ################################
+####################################################################################################
 
 # PART TWO: SUBSET FILES OF INTEREST
 
-In this step, we are creating lists of filenames that we will eventually combine into raster stacks. When this chunk is finished running, you can check the objects to make sure 
+In this step, we are creating lists of filenames that will eventually combine into raster stacks. When this chunk is finished running, you can check the objects to make sure the correct number of years have been included. 
 
 ```{r list-filenames}
 
@@ -228,7 +239,7 @@ for(i in 1:length(variables)){
 
 # PART THREE: SPATIAL CHECK
 
-The next chunk checks that the spatial files are where they should be. The map will appear below the code chunk, and you can zoom in as needed to view small AFB's. You can press the 'show in new window' button (the white square with an arrow) to open the map in another page. You may have to wait a few moments for the map to produce. 
+The next chunk checks that the spatial files are aligned and appear in the correct location on the globe. An interactive map will appear below the code chunk, and you can zoom in or out as needed to view the AFB's (the easiest way is to scroll with your mouse). You can press the 'show in new window' button (the white square with an arrow) to open the map in another page if you prefer a larger view. You may have to wait a few moments for the map to produce. *Make sure the installation boundary aligns with one or more raster cells*. If it doesn't, you might have a difference in spatial projections between the installation boundary and the raster/ncdf files.  
 
 ```{r spatial-check}
 
@@ -269,16 +280,16 @@ lf
 
 ```
 
-We should check the size of the AFB to see whether we should use its centroid or spatial extent to extract the data we need. If the AFB fits within a single NetCDF cell, it will be much faster to extract data using a single point.  
+Next, we will check the size of the AFB to see whether we should use its centroid or spatial extent to extract the data we need. If the AFB fits within a single NetCDF cell, it will be much faster to extract data using a single point (the centroid). The script will assume that if the AFB is smaller than the NetCDF cell, you will want to use the centroid, and if it is larger, you will want to use the spatial extent. You can override this by changing the 'extract_obj' object to 'afb' (spatial extent) or 'cell' (centroid).     
 
-If the output of the following code chunk says 'numeric', the script will use the centroid. If it says "spatVector", it will use the spatial object (afb).
+INTERPRETING OUTPUT: If the output of the following code chunk says 'numeric', the script will use the centroid. If it says 'spatVector', it will use the spatial object (afb).
 
 ```{r decision-to-use-shp-or-centroid-for-extraction, warning=FALSE, results='asis'}
 
 # What is the cell size of the ncdf?
 
 rxCellSize <- cellSize(rxCrop, unit = "km") # size of the cropped raster
-ncdf_cellSize <- mean(values(rxCellSize)) # get mean cell size of ncdf
+ncdf_cellSize <- mean(values(rxCellSize)) # get mean cell size of ncdf (all cells are not necessarily equally sized)
 
 # How big is the AFB?
 
@@ -287,10 +298,10 @@ afb_area <- expanse(afb, unit = "km")
 centroid <- geom(centroids(afb, inside = TRUE)) # inside = TRUE guarantees that the centroid is contained within the boundaries of the AFB (in some cases, depending on the shape of the AFB, the true centroid may be outside)
 centroid_matrix <- cbind(centroid[3], centroid[4]) # used to find cell index. [3] and [4] refer to the values in the 'centroid' object. If a downstream error occurs, make sure these values are actually x and y.
 
-# add an if_else statement to tell R whether to extract raster values from matrix or shapefile
-
 extract_obj <- afb
 cell <- terra::cellFromXY(rx, centroid_matrix) # finds the cell (index) in which the centroid is located
+
+# add an if_else statement to tell R whether to extract raster values from matrix or shapefile
 
 extract_obj <- if(afb_area < ncdf_cellSize) cell else (afb)
 
@@ -298,32 +309,29 @@ afbExt <- ext(afb)
 
 cat("The object used for data extraction is ", class(extract_obj)) 
 
-# Interpreting output: 
-  
-  #'numeric' = centroid (cell number) - this means the AFB did not extend beyond a single cell, so the centroid will be used for data extraction
-  
-  #'spatVector' = spatial object (multiple cells) - this means the AFB spanned multiple cells, so the polygon will be used for data extraction
-
 ```
 
+# PART FOUR: DATA EXTRACTION
+
+The following chunk extracts raw data from the ncdf files of interest. 
+
+It assumes the centroid is being used for data extraction. It has not been tested for use with a spatial object. It may still work, but might be quite slow. If you are running several large bases sequentially, it will be worth exploring an alternate coding strategy.
+
+This is the most time-consuming chunk of the entire script. If you will need to refer back to this data, you can save the entire environment (all objects) as an .RData file (save.image()) after the chunk has run. Alternatively, you can save individual objects with the function (saveRDS()). 
 
 ```{r extract-values}
-# Create lists for extracted values and vectors for extracting time (dates) from rasters
 
-# NOTE: when it comes time to run a base that is large enough to span several raster cells, will need to amend this section. 
-  # Will need to write a function into Functions.R that extracts data differently depending on whether we're using the centroid (point) or a spatial object (vect). terra::extract() could do either without writing a separate function, but it takes a lot longer to run for point data
-
-# Historical
+# Create lists to store extracted values from ncdf data
+# s1 = scenario1; s2 = scenario2
+# f1 = future1; f2 = future2
 
 results_baseline <- list()
 results_s1f1 <- list()
 results_s1f2 <- list()
 results_s2f1 <- list()
 results_s2f2 <- list()
-```
 
-
-```{r extract-values}
+# Extract data
 
 for(i in 1:length(files_baseline)){
   r = rast(files_baseline[[i]])
@@ -391,13 +399,13 @@ for(i in 1:length(files_s2f2)){
   rm(r)
 }
 
-rm(list = ls(pattern = "^files")) # remove lists from the environment that aren't results
-
 ```
+
+The next chunk reorganizes the extracted data into a more workable dataframe ("tibble", the the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
 
 ```{r allvaluesdf-dataframes, message=FALSE}
 
-# Equivalent of allvaluesdf (from original script)
+rm(list = ls(pattern = "^files")) # remove lists from the environment that aren't extracted data
 
 lists <- Filter(function(x) is(x, "list"), mget(ls())) # reads in all remaining lists
 nested_tibbles <- as_tibble(lists) # tibbles are tidy objects
@@ -420,10 +428,10 @@ for(i in 1:length(nested_tibbles)){
                   contains("max"), 
                   contains("min"), 
                   contains("pr"),
-                  any_of("hurs"),
-                  any_of("sfcWind"),
+                  any_of("hurs"), # the 'any_of' helper function should ignore variables if they are not of interest
+                  any_of("sfcWind"), # if it does not and you get an error, let me (Annie) know
                   date) %>%
-    rename(c(tmax = tasmax,
+    rename(c(tmax = tasmax, # these names match variable names in the functions that follow
              tmin = tasmin,
              prcp = pr))
   
@@ -433,12 +441,16 @@ for(i in 1:length(nested_tibbles)){
  
 ```
 
+# PART FIVE: ADD DERIVED VARIABLES
+
+NOTE: see comments within code. Functions assume the raw ncdf data does NOT use imperial units. 
+
+The next chunk creates AllDays.csv files
 
 ```{r add-derived-vars, message=FALSE}
 
-# Add derived variables to dataframes
-# All values from from LOCA_summarize.R script
-# write to csv
+# Add derived (recalculated) variables to dataframes
+# All functions are from the original LOCA_summarize.R script
 
 AllDays <- list() # for MonthSum section
 
@@ -463,13 +475,15 @@ for(i in 1:length(avdf)){
       TRUE ~ tmin)) %>% # assuming if temp are not K they are C
     mutate(TMeanF = (TMaxF + TMinF)/2) %>%
     mutate(TmeanC = (TMaxC + TMinC)/2) %>%
-    mutate(GDDF = RasterGDD(TMinF, TMaxF, 50, 86)) %>% 
-    mutate(hotdays = Rasterhotdays(TMaxC, hottemp = 32.2)) %>%
+    mutate(GDDF = RasterGDD(TMinF, TMaxF, 50, 86)) %>% # All hard-coded values are from the original CEMML script
+    mutate(hotdays = Rasterhotdays(TMaxC, hottemp = 32.2)) %>% # Hard-coded values may be changed at user discretion
     mutate(colddays = Rastercolddays(TMinC, coldtemp = 0)) %>%
     mutate(wetdays = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
     mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
     mutate(ftdays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) 
-    
+  
+  # Write output to .csv
+  
   csv_scenario = if (str_detect(names(avdf[i]), "baseline")){
     "historical"
   } else if(str_detect(names(avdf[i]),"s1")) {
@@ -484,19 +498,19 @@ for(i in 1:length(avdf)){
   } else {
     paste(baseline_start_year,"-",baseline_end_year)
   }
-    csv_fileName = paste(AFB_Name, csv_scenario, csv_years, "AllDays", sep = '_')
-    write_csv(csv, file = paste0(dir_output_csvs,csv_fileName,".csv", sep = ""))
+    csv_fileName = paste(AFB_Name, csv_scenario, csv_years,"AllDays",sep = '_')
+    write_csv(csv, file = paste0(dir_output_csvs,csv_fileName,".csv",sep = ""))
     
     AllDays[[i]] = csv # new df for use with MonthSum
     names(AllDays)[i] = names(avdf[i])
 }
 ```
 
+Now that the AllDays.csv files have been created, it is no longer necessary to retain space-intensive objects in the environment. We can routinely remove objects we no longer need.
+
 ```{r remove-extraneous-stuff}
 
-# Remove unnecessary objects from the environment
-
-# If for some reason the AllDays object does not work, you can use the script './Code/Misc/MonthSum.R' to run the MonthSum analyses using the csv output files one-by-one
+# If for some reason the AllDays object does not work, you can use the script './Code/Misc/MonthSum.R' to run the MonthSum analyses using the csv output files one-by-one. This will be the best option for MACA inputs, since this script cannot yet accommodate MACA models. 
 
 rm(list=setdiff(ls(), c("AllDays", 
                         "AFB_Name", 
@@ -510,11 +524,13 @@ rm(list=setdiff(ls(), c("AllDays",
 
 ## MonthSum
 
+The next chunk creates MonthSum.csv files
+
 ```{r MonthSum, message=FALSE}
 
 monthSum <- list()
 
-MACA = if_else(str_detect(model, "MACA"),
+MACA = if_else(str_detect(model, "MACA"), # this code is not yet functional, but does not disrupt the process
                      TRUE,
                      FALSE)
 
@@ -576,15 +592,19 @@ for(i in 1:length(AllDays)){
          Avg_ftdays,
          )
   
+  # As above, MACA-related code is a placeholder for future integration
+  
   macaCols = if(MACA == "TRUE") {getMACAcols(all)} else {NULL} 
   
-  monthAvg = if(MACA == "TRUE") {bind_cols(monthAvg, macaCols)} else {monthAvg}
+  monthAvg = if(MACA == "TRUE") {bind_cols(monthAvg, macaCols)} else {monthAvg} 
+  
+  # End of MACA code
   
   monthSum[[i]] = monthAvg # new df for export and use with DiffHist
   names(monthSum)[i] = names(AllDays[i])
 }
 
-# Create csv
+# Add summary rows (YrAverage and YrTotals)
 
 for(i in 1:length(monthSum)){
   YrAverage = colMeans(monthSum[[i]][,2:ncol(monthSum[[i]])]) # converts columns to characters 
@@ -623,7 +643,7 @@ for(i in 1:length(monthSum)){
   names(monthSum)[i] = names(AllDays[i])
   }
   
-# Save csv files 
+# Write csv files 
 
 for(i in 1:length(monthSum)){
 
@@ -636,7 +656,7 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
   }
   
   csv_years = if (str_detect(names(monthSum[i]), "f1")){
-    paste(first(year(AllDays$results_s1f1$date)), "-", last(year(AllDays$results_s1f1$date)))
+    paste(first(year(AllDays$results_s1f1$date)),"-",last(year(AllDays$results_s1f1$date)))
     
   } else if (str_detect(names(monthSum[i]), "f2")) {
     paste(first(year(AllDays$results_s1f2$date)),"-",last(year(AllDays$results_s1f2$date)))
@@ -646,6 +666,7 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     csv_fileName = paste(AFB_Name,csv_scenario,csv_years,"MonthSum",sep = '_')
     write_csv(monthSum[[i]], file = paste0(dir_output_csvs,csv_fileName,".csv",sep = ""))
 }
+
 ```
 
 ```{r remove-objects}
@@ -662,6 +683,8 @@ rm(list=setdiff(ls(), c("monthSum",
 
 ## DiffHist
 
+The next chunk writes DiffHist.csv files 
+
 ```{r DiffHist, warning=FALSE}
 
 # input: monthSum dataframe 
@@ -671,7 +694,7 @@ diffHist <- list() # create diffHist dataframe for later use
 
 # Create historical object
 
-hist <- monthSum[[1]] # separate historical values
+hist <- monthSum[[1]] # separate historical values for use in calculations
 
 # Create dataframe
 
@@ -680,7 +703,6 @@ for(i in 2:length(monthSum)){ # 2 because [[1]] is historical
   bind_rows(monthSum[[i]]) %>%
   group_by(month) %>%
   summarise_each(funs(diff(.))) %>% # this gives warnings because the function is deprecated, but it still works as of 5/9/23. If this breaks, look here first.
-  #data.frame() %>%
   slice(1,5:12, 2:4,13:14) # arranges rows in the desired order
   
   diffHist[[i-1]] = diff # add to DiffHist dataframe for future use
