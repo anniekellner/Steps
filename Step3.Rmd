@@ -1,5 +1,5 @@
 ---
-title: "Step3"
+title: "Steps"
 author: "Annie Kellner"
 date: "2023-05-10"
 output: html_document
@@ -34,7 +34,7 @@ library(leaflet)
 
 ```{r functions}
 
-rm(list = ls()) # clear workspace - this can be commented out as needed
+#rm(list = ls()) # clear workspace - this can be commented out as needed
 
 # The 'source' function reads the following scripts and places associated functions into the global environment
 
@@ -62,7 +62,7 @@ dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile 
                                        "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
                                       "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
                                       
-dir_output_csvs = './Results/Test/Indianhead_Proxy/' 
+dir_output_csvs = './Results/Test/CMNI_Proxy_v1/' 
 
 ```
 
@@ -72,7 +72,7 @@ In the code chunk below, *enter the number between the brackets ([]) that corres
 
 ```{r enter-afb-and-model}
 
-AFB_Name <- AFB_Name[4] 
+AFB_Name <- AFB_Name[3] 
 
 model <- models[6] 
 
@@ -401,7 +401,7 @@ for(i in 1:length(files_s2f2)){
 
 ```
 
-The next chunk reorganizes the extracted data into a more workable dataframe ("tibble", the the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
+The next chunk reorganizes the extracted data into a more workable dataframe ("tibble", from the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
 
 ```{r allvaluesdf-dataframes, message=FALSE}
 
@@ -506,25 +506,33 @@ for(i in 1:length(avdf)){
 }
 ```
 
-Now that the AllDays.csv files have been created, it is no longer necessary to retain space-intensive objects in the environment. We can routinely remove objects we no longer need.
 
 ```{r remove-extraneous-stuff}
 
-# If for some reason the AllDays object does not work, you can use the script './Code/Misc/MonthSum.R' to run the MonthSum analyses using the csv output files one-by-one. This will be the best option for MACA inputs, since this script cannot yet accommodate MACA models. 
-
-rm(list=setdiff(ls(), c("AllDays", 
-                        "AFB_Name", 
+rm(list=setdiff(ls(), c("AFB_Name", 
                         "model", 
                         "scenario1", 
                         "scenario2", 
-                        "dir_output_csvs",
                         "years")))
 
 ```
 
+## Bioclimatic variables
+
+```{r Step9A-Biolimatic-variables}
+
+
+```
+
+
+
+Now that the AllDays.csv files have been created, it is no longer necessary to retain space-intensive objects in the environment. We can routinely remove objects we no longer need.
+
+
+
 ## MonthSum
 
-The next chunk creates MonthSum.csv files
+The next chunk creates MonthSum.csv files. If for some reason the AllDays object does not work, you can use the script './Code/Misc/MonthSum.R' to run the MonthSum analyses using the csv output files one-by-one. This will be the best option for MACA inputs, since this script cannot yet accommodate MACA models.
 
 ```{r MonthSum, message=FALSE}
 
