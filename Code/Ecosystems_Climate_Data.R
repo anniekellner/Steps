@@ -5,7 +5,24 @@
 ##Trevor Even - 03162023 - changed future scenario year divisors to reflect 30 year scenario window going forward
 
 
-# load data
+# Create function for adding month (e.g., "Jan") to dataframe
+
+rm(list=setdiff(ls(), "AllDays")) # REMOVE THIS AFTER SCRIPT RUNS SUCCESSFULLY
+
+add_month <- function(df){
+  df = df %>%
+    mutate(month = month(df$date, label = TRUE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")))
+}
+
+# loop to add month to dataframes
+
+for(i in 1:length(AllDays)){
+  AllDays[[i]] = add_month(AllDays[[i]])
+  AllDays[[i]]$month = as.character(AllDays[[i]]$month)
+}
+
+# Divide list into separate dataframes
+
 dat.hist <- AllDays[[1]]
 dat.RCP4.5.2030 <- AllDays[[2]]
 dat.RCP4.5.2050 <- AllDays[[3]]
@@ -15,41 +32,21 @@ dat.RCP8.5.2050 <- AllDays[[5]]
 
 ###HISTORICAL###
 
-# Create function for adding month (e.g., "Jan") to dataframe
-
-add_month <- function(df){
-  df = df %>%
-    mutate(month = month(df$date, label = TRUE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")))
-}
-
-AllDays1 <- tibble(AllDays)
-
-AllDays1 <- AllDays1 %>%
-  mutate(month = map(AllDays, ~ mutate(., 
-                                       month = month(date, label = TRUE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")))))
-
-# loop to add to dataframes
-
-for(i in 1:length(AllDays)){
-  add_month(AllDays[[i]])
-}
-
 #setting aside appropriate data
 
-month <-        c(month.abb)
-month           #make sure the data lines up with table dude
-hist.temp.av <- c(dat.hist$TMeanF)
-hist.temp.av   #make sure the data lines up with table dude
-hist.temp.hi <- c(dat.hist$TMaxF)
-hist.temp.hi    #make sure the data lines up with table dude
-hist.temp.lo <- c(dat.hist$TMinF)
-hist.temp.lo    #make sure the data lines up with table dude
-hist.precip <-  c(dat.hist$PPT_in)
-hist.precip     #make sure the data lines up with table dude
+hist.temp.av <- dat.hist %>%
+  select(TMeanF, month)
+
+hist.temp.hi <- dat.hist %>%
+  select(TMaxF, month)
+
+hist.temp.lo <- dat.hist %>%
+  select(TMinF, month)
+
+hist.precip <-  dat.hist %>%
+  select(PPT_in, month)
 
 #subsetting monthly data
-
-
 
 jan.dat <- subset(dat.hist, month=="Jan")
 feb.dat <- subset(dat.hist, month=="Feb")
@@ -66,18 +63,18 @@ dec.dat <- subset(dat.hist, month=="Dec")
 
 #subsetting monthly tav
 
-jan.tav <- mean(jan.dat$taveF)
-feb.tav <- mean(feb.dat$taveF)
-mar.tav <- mean(mar.dat$taveF)
-apr.tav <- mean(apr.dat$taveF)
-may.tav <- mean(may.dat$taveF)
-jun.tav <- mean(jun.dat$taveF)
-jul.tav <- mean(jul.dat$taveF)
-aug.tav <- mean(aug.dat$taveF)
-sep.tav <- mean(sep.dat$taveF)
-oct.tav <- mean(oct.dat$taveF)
-nov.tav <- mean(nov.dat$taveF)
-dec.tav <- mean(dec.dat$taveF)
+jan.tav <- mean(jan.dat$TMeanF)
+feb.tav <- mean(feb.dat$TMeanF)
+mar.tav <- mean(mar.dat$TMeanF)
+apr.tav <- mean(apr.dat$TMeanF)
+may.tav <- mean(may.dat$TMeanF)
+jun.tav <- mean(jun.dat$TMeanF)
+jul.tav <- mean(jul.dat$TMeanF)
+aug.tav <- mean(aug.dat$TMeanF)
+sep.tav <- mean(sep.dat$TMeanF)
+oct.tav <- mean(oct.dat$TMeanF)
+nov.tav <- mean(nov.dat$TMeanF)
+dec.tav <- mean(dec.dat$TMeanF)
 
 #subsetting different quarters
 
@@ -96,58 +93,58 @@ q12.dat <- rbind(dec.dat, jan.dat, feb.dat)
 
 #subsetting precipitation data
 
-jan.prav <- (sum(jan.dat$ppt_in))/30
-feb.prav <- (sum(feb.dat$ppt_in))/30
-mar.prav <- (sum(mar.dat$ppt_in))/30
-apr.prav <- (sum(apr.dat$ppt_in))/30
-may.prav <- (sum(may.dat$ppt_in))/30
-jun.prav <- (sum(jun.dat$ppt_in))/30
-jul.prav <- (sum(jul.dat$ppt_in))/30
-aug.prav <- (sum(aug.dat$ppt_in))/30
-sep.prav <- (sum(sep.dat$ppt_in))/30
-oct.prav <- (sum(oct.dat$ppt_in))/30
-nov.prav <- (sum(nov.dat$ppt_in))/30
-dec.prav <- (sum(dec.dat$ppt_in))/30
+jan.prav <- (sum(jan.dat$PPT_in))/30
+feb.prav <- (sum(feb.dat$PPT_in))/30
+mar.prav <- (sum(mar.dat$PPT_in))/30
+apr.prav <- (sum(apr.dat$PPT_in))/30
+may.prav <- (sum(may.dat$PPT_in))/30
+jun.prav <- (sum(jun.dat$PPT_in))/30
+jul.prav <- (sum(jul.dat$PPT_in))/30
+aug.prav <- (sum(aug.dat$PPT_in))/30
+sep.prav <- (sum(sep.dat$PPT_in))/30
+oct.prav <- (sum(oct.dat$PPT_in))/30
+nov.prav <- (sum(nov.dat$PPT_in))/30
+dec.prav <- (sum(dec.dat$PPT_in))/30
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
 #SUMof(Tmax-Tmin)/12
 
-jan.max <- mean(jan.dat$tmaxF)
-jan.min <- mean(jan.dat$tminF)
+jan.max <- mean(jan.dat$TMaxF)
+jan.min <- mean(jan.dat$TMinF)
 
-feb.max <- mean(feb.dat$tmaxF)
-feb.min <- mean(feb.dat$tminF)
+feb.max <- mean(feb.dat$TMaxF)
+feb.min <- mean(feb.dat$TMinF)
 
-mar.max <- mean(mar.dat$tmaxF)
-mar.min <- mean(mar.dat$tminF)
+mar.max <- mean(mar.dat$TMaxF)
+mar.min <- mean(mar.dat$TMinF)
 
-apr.max <- mean(apr.dat$tmaxF)
-apr.min <- mean(apr.dat$tminF)
+apr.max <- mean(apr.dat$TMaxF)
+apr.min <- mean(apr.dat$TMinF)
 
-may.max <- mean(may.dat$tmaxF)
-may.min <- mean(may.dat$tminF)
+may.max <- mean(may.dat$TMaxF)
+may.min <- mean(may.dat$TMinF)
 
-jun.max <- mean(jun.dat$tmaxF)
-jun.min <- mean(jun.dat$tminF)
+jun.max <- mean(jun.dat$TMaxF)
+jun.min <- mean(jun.dat$TMinF)
 
-jul.max <- mean(jul.dat$tmaxF)
-jul.min <- mean(jul.dat$tminF)
+jul.max <- mean(jul.dat$TMaxF)
+jul.min <- mean(jul.dat$TMinF)
 
-aug.max <- mean(aug.dat$tmaxF)
-aug.min <- mean(aug.dat$tminF)
+aug.max <- mean(aug.dat$TMaxF)
+aug.min <- mean(aug.dat$TMinF)
 
-sep.max <- mean(sep.dat$tmaxF)
-sep.min <- mean(sep.dat$tminF)
+sep.max <- mean(sep.dat$TMaxF)
+sep.min <- mean(sep.dat$TMinF)
 
-oct.max <- mean(oct.dat$tmaxF)
-oct.min <- mean(oct.dat$tminF)
+oct.max <- mean(oct.dat$TMaxF)
+oct.min <- mean(oct.dat$TMinF)
 
-nov.max <- mean(nov.dat$tmaxF)
-nov.min <- mean(nov.dat$tminF)
+nov.max <- mean(nov.dat$TMaxF)
+nov.min <- mean(nov.dat$TMinF)
 
-dec.max <- mean(dec.dat$tmaxF)
-dec.min <- mean(dec.dat$tminF)
+dec.max <- mean(dec.dat$TMaxF)
+dec.min <- mean(dec.dat$TMinF)
 
 #differences
 jan.dif <- jan.max-jan.min
@@ -187,9 +184,9 @@ f.to.c <- function(temp) {
 }
 
 #absolute max and min and converting to celsius
-abs.tmax.f <- max(dat.hist$tmaxF)
+abs.tmax.f <- max(dat.hist$TMaxF)
 abs.max.c <- f.to.c(abs.tmax.f)
-abs.tmin.f <- min(dat.hist$tminF)
+abs.tmin.f <- min(dat.hist$TMinF)
 abs.tmin.c <- f.to.c(abs.tmin.f)
 
 #annual temp range
@@ -255,7 +252,7 @@ names(monthly.means.k)[1]<-paste("kaverage")
 sd.mmk <- sd(monthly.means.k$kaverage)
 
 #determine annual mean temp
-annual.av.f <- mean(dat.hist$taveF)
+annual.av.f <- mean(dat.hist$TMeanF)
 
 #convert it to Kelvin
 annual.av.k. <- f.to.k(annual.av.f)
@@ -269,24 +266,24 @@ cv.temperature.seasonality
 ##Max Temperature of Warmest Month
 #lets first figure out the warmest month
 #saving it in case we need it
-warmest.day.warmest.month <- c(max(jan.dat$tmaxF), max(feb.dat$tmaxF), max(mar.dat$tmaxF), max(apr.dat$tmaxF),
-                               max(may.dat$tmaxF), max(jun.dat$tmaxF), max(jul.dat$tmaxF), max(aug.dat$tmaxF),
-                               max(sep.dat$tmaxF), max(oct.dat$tmaxF), max(nov.dat$tmaxF), max(dec.dat$tmaxF)
-)[which.max(c(mean(jan.dat$tmaxF), mean(feb.dat$tmaxF), mean(mar.dat$tmaxF), mean(apr.dat$tmaxF), 
-              mean(may.dat$tmaxF), mean(jun.dat$tmaxF), mean(jul.dat$tmaxF), mean(aug.dat$tmaxF), 
-              mean(sep.dat$tmaxF), mean(oct.dat$tmaxF), mean(nov.dat$tmaxF), mean(dec.dat$tmaxF)))]
+warmest.day.warmest.month <- c(max(jan.dat$TMaxF), max(feb.dat$TMaxF), max(mar.dat$TMaxF), max(apr.dat$TMaxF),
+                               max(may.dat$TMaxF), max(jun.dat$TMaxF), max(jul.dat$TMaxF), max(aug.dat$TMaxF),
+                               max(sep.dat$TMaxF), max(oct.dat$TMaxF), max(nov.dat$TMaxF), max(dec.dat$TMaxF)
+)[which.max(c(mean(jan.dat$TMaxF), mean(feb.dat$TMaxF), mean(mar.dat$TMaxF), mean(apr.dat$TMaxF), 
+              mean(may.dat$TMaxF), mean(jun.dat$TMaxF), mean(jul.dat$TMaxF), mean(aug.dat$TMaxF), 
+              mean(sep.dat$TMaxF), mean(oct.dat$TMaxF), mean(nov.dat$TMaxF), mean(dec.dat$TMaxF)))]
 
 #value
 warmest.day.warmest.month
 
 ##Min Temperature of Coldest Month
 #saving it in case they want it
-coldest.day.coldest.month <- c(min(jan.dat$tminF), min(feb.dat$tminF), min(mar.dat$tminF), min(apr.dat$tminF),
-                               min(may.dat$tminF), min(jun.dat$tminF), min(jul.dat$tminF), min(aug.dat$tminF),
-                               min(sep.dat$tminF), min(oct.dat$tminF), min(nov.dat$tminF), min(dec.dat$tminF)
-)[which.min(c(mean(jan.dat$tminF), mean(feb.dat$tminF), mean(mar.dat$tminF), mean(apr.dat$tminF), 
-              mean(may.dat$tminF), mean(jun.dat$tminF), mean(jul.dat$tminF), mean(aug.dat$tminF), 
-              mean(sep.dat$tminF), mean(oct.dat$tminF), mean(nov.dat$tminF), mean(dec.dat$tminF)))]
+coldest.day.coldest.month <- c(min(jan.dat$TMinF), min(feb.dat$TMinF), min(mar.dat$TMinF), min(apr.dat$TMinF),
+                               min(may.dat$TMinF), min(jun.dat$TMinF), min(jul.dat$TMinF), min(aug.dat$TMinF),
+                               min(sep.dat$TMinF), min(oct.dat$TMinF), min(nov.dat$TMinF), min(dec.dat$TMinF)
+)[which.min(c(mean(jan.dat$TMinF), mean(feb.dat$TMinF), mean(mar.dat$TMinF), mean(apr.dat$TMinF), 
+              mean(may.dat$TMinF), mean(jun.dat$TMinF), mean(jul.dat$TMinF), mean(aug.dat$TMinF), 
+              mean(sep.dat$TMinF), mean(oct.dat$TMinF), mean(nov.dat$TMinF), mean(dec.dat$TMinF)))]
 
 #value
 coldest.day.coldest.month
@@ -301,48 +298,48 @@ annual.temperature.range
 
 ##Mean Temperature of Wettest Quarter
 
-mean.temp.wettest.quarter <- c(mean(q1.dat$taveF), mean(q2.dat$taveF), mean(q3.dat$taveF), mean(q4.dat$taveF),
-                               mean(q5.dat$taveF), mean(q6.dat$taveF), mean(q7.dat$taveF), mean(q8.dat$taveF),
-                               mean(q9.dat$taveF), mean(q10.dat$taveF), mean(q11.dat$taveF), mean(q12.dat$taveF)
-)[which.max(c(mean(q1.dat$ppt_in)*90.25, mean(q2.dat$ppt_in)*89.25, mean(q3.dat$ppt_in)*92, mean(q4.dat$ppt_in)*91, 
-              mean(q5.dat$ppt_in)*92, mean(q6.dat$ppt_in)*92, mean(q7.dat$ppt_in)*92, mean(q8.dat$ppt_in)*92, 
-              mean(q9.dat$ppt_in)*91, mean(q10.dat$ppt_in)*92, mean(q11.dat$ppt_in)*92, mean(q12.dat$ppt_in)*90.25))]
+mean.temp.wettest.quarter <- c(mean(q1.dat$TMeanF), mean(q2.dat$TMeanF), mean(q3.dat$TMeanF), mean(q4.dat$TMeanF),
+                               mean(q5.dat$TMeanF), mean(q6.dat$TMeanF), mean(q7.dat$TMeanF), mean(q8.dat$TMeanF),
+                               mean(q9.dat$TMeanF), mean(q10.dat$TMeanF), mean(q11.dat$TMeanF), mean(q12.dat$TMeanF)
+)[which.max(c(mean(q1.dat$PPT_in)*90.25, mean(q2.dat$PPT_in)*89.25, mean(q3.dat$PPT_in)*92, mean(q4.dat$PPT_in)*91, 
+              mean(q5.dat$PPT_in)*92, mean(q6.dat$PPT_in)*92, mean(q7.dat$PPT_in)*92, mean(q8.dat$PPT_in)*92, 
+              mean(q9.dat$PPT_in)*91, mean(q10.dat$PPT_in)*92, mean(q11.dat$PPT_in)*92, mean(q12.dat$PPT_in)*90.25))]
 
 #value
 mean.temp.wettest.quarter
 
 ##Mean Temperature of Driest Quarter
 
-mean.temp.driest.quarter <- c(mean(q1.dat$taveF), mean(q2.dat$taveF), mean(q3.dat$taveF), mean(q4.dat$taveF),
-                              mean(q5.dat$taveF), mean(q6.dat$taveF), mean(q7.dat$taveF), mean(q8.dat$taveF),
-                              mean(q9.dat$taveF), mean(q10.dat$taveF), mean(q11.dat$taveF), mean(q12.dat$taveF)
-)[which.min(c(mean(q1.dat$ppt_in)*90.25, mean(q2.dat$ppt_in)*89.25, mean(q3.dat$ppt_in)*92, mean(q4.dat$ppt_in)*91, 
-              mean(q5.dat$ppt_in)*92, mean(q6.dat$ppt_in)*92, mean(q7.dat$ppt_in)*92, mean(q8.dat$ppt_in)*92, 
-              mean(q9.dat$ppt_in)*91, mean(q10.dat$ppt_in)*92, mean(q11.dat$ppt_in)*92, mean(q12.dat$ppt_in)*90.25))]
+mean.temp.driest.quarter <- c(mean(q1.dat$TMeanF), mean(q2.dat$TMeanF), mean(q3.dat$TMeanF), mean(q4.dat$TMeanF),
+                              mean(q5.dat$TMeanF), mean(q6.dat$TMeanF), mean(q7.dat$TMeanF), mean(q8.dat$TMeanF),
+                              mean(q9.dat$TMeanF), mean(q10.dat$TMeanF), mean(q11.dat$TMeanF), mean(q12.dat$TMeanF)
+)[which.min(c(mean(q1.dat$PPT_in)*90.25, mean(q2.dat$PPT_in)*89.25, mean(q3.dat$PPT_in)*92, mean(q4.dat$PPT_in)*91, 
+              mean(q5.dat$PPT_in)*92, mean(q6.dat$PPT_in)*92, mean(q7.dat$PPT_in)*92, mean(q8.dat$PPT_in)*92, 
+              mean(q9.dat$PPT_in)*91, mean(q10.dat$PPT_in)*92, mean(q11.dat$PPT_in)*92, mean(q12.dat$PPT_in)*90.25))]
 
 #value
 mean.temp.driest.quarter
 
 ##Mean Temperature of Warmest Quarter
 
-mean.temp.warmest.quarter <- c(mean(q1.dat$taveF), mean(q2.dat$taveF), mean(q3.dat$taveF), mean(q4.dat$taveF),
-                               mean(q5.dat$taveF), mean(q6.dat$taveF), mean(q7.dat$taveF), mean(q8.dat$taveF),
-                               mean(q9.dat$taveF), mean(q10.dat$taveF), mean(q11.dat$taveF), mean(q12.dat$taveF)
-)[which.max(c(mean(q1.dat$taveF), mean(q2.dat$taveF), mean(q3.dat$taveF), mean(q4.dat$taveF), 
-              mean(q5.dat$taveF), mean(q6.dat$taveF), mean(q7.dat$taveF), mean(q8.dat$taveF), 
-              mean(q9.dat$taveF), mean(q10.dat$taveF), mean(q11.dat$taveF), mean(q12.dat$taveF)))]
+mean.temp.warmest.quarter <- c(mean(q1.dat$TMeanF), mean(q2.dat$TMeanF), mean(q3.dat$TMeanF), mean(q4.dat$TMeanF),
+                               mean(q5.dat$TMeanF), mean(q6.dat$TMeanF), mean(q7.dat$TMeanF), mean(q8.dat$TMeanF),
+                               mean(q9.dat$TMeanF), mean(q10.dat$TMeanF), mean(q11.dat$TMeanF), mean(q12.dat$TMeanF)
+)[which.max(c(mean(q1.dat$TMeanF), mean(q2.dat$TMeanF), mean(q3.dat$TMeanF), mean(q4.dat$TMeanF), 
+              mean(q5.dat$TMeanF), mean(q6.dat$TMeanF), mean(q7.dat$TMeanF), mean(q8.dat$TMeanF), 
+              mean(q9.dat$TMeanF), mean(q10.dat$TMeanF), mean(q11.dat$TMeanF), mean(q12.dat$TMeanF)))]
 
 #value
 mean.temp.warmest.quarter
 
 ##Mean Temperature of Coldest Quarter
 
-mean.temp.coldest.quarter <- c(mean(q1.dat$taveF), mean(q2.dat$taveF), mean(q3.dat$taveF), mean(q4.dat$taveF),
-                               mean(q5.dat$taveF), mean(q6.dat$taveF), mean(q7.dat$taveF), mean(q8.dat$taveF),
-                               mean(q9.dat$taveF), mean(q10.dat$taveF), mean(q11.dat$taveF), mean(q12.dat$taveF)
-)[which.min(c(mean(q1.dat$taveF), mean(q2.dat$taveF), mean(q3.dat$taveF), mean(q4.dat$taveF), 
-              mean(q5.dat$taveF), mean(q6.dat$taveF), mean(q7.dat$taveF), mean(q8.dat$taveF), 
-              mean(q9.dat$taveF), mean(q10.dat$taveF), mean(q11.dat$taveF), mean(q12.dat$taveF)))]
+mean.temp.coldest.quarter <- c(mean(q1.dat$TMeanF), mean(q2.dat$TMeanF), mean(q3.dat$TMeanF), mean(q4.dat$TMeanF),
+                               mean(q5.dat$TMeanF), mean(q6.dat$TMeanF), mean(q7.dat$TMeanF), mean(q8.dat$TMeanF),
+                               mean(q9.dat$TMeanF), mean(q10.dat$TMeanF), mean(q11.dat$TMeanF), mean(q12.dat$TMeanF)
+)[which.min(c(mean(q1.dat$TMeanF), mean(q2.dat$TMeanF), mean(q3.dat$TMeanF), mean(q4.dat$TMeanF), 
+              mean(q5.dat$TMeanF), mean(q6.dat$TMeanF), mean(q7.dat$TMeanF), mean(q8.dat$TMeanF), 
+              mean(q9.dat$TMeanF), mean(q10.dat$TMeanF), mean(q11.dat$TMeanF), mean(q12.dat$TMeanF)))]
 
 #value
 mean.temp.coldest.quarter
@@ -389,7 +386,7 @@ names(monthly.means.precip)[1]<-paste("praverage")
 sd.precip <- sd(monthly.means.precip$praverage)
 
 #annual precipitation / getting the sum of over 30 years then dividing by 30 to get annual average
-an.precip <- (sum(dat.hist$ppt_mm)/30)
+an.precip <- (sum(dat.hist$PPT_mm)/30)
 mo.precip <- an.precip/12
 
 #final calculation
@@ -400,12 +397,12 @@ precip.seasonality.cv
 
 ##Precipitation of Wettest Quarter
 
-precip.wettest.quarter.pre <- c(sum(q1.dat$ppt_in), sum(q2.dat$ppt_in), sum(q3.dat$ppt_in), sum(q4.dat$ppt_in),
-                                sum(q5.dat$ppt_in), sum(q6.dat$ppt_in), sum(q7.dat$ppt_in), sum(q8.dat$ppt_in),
-                                sum(q9.dat$ppt_in), sum(q10.dat$ppt_in), sum(q11.dat$ppt_in), sum(q12.dat$ppt_in)
-)[which.max(c(mean(q1.dat$ppt_in)*90.25, mean(q2.dat$ppt_in)*89.25, mean(q3.dat$ppt_in)*92, mean(q4.dat$ppt_in)*91, 
-              mean(q5.dat$ppt_in)*92, mean(q6.dat$ppt_in)*92, mean(q7.dat$ppt_in)*92, mean(q8.dat$ppt_in)*92, 
-              mean(q9.dat$ppt_in)*91, mean(q10.dat$ppt_in)*92, mean(q11.dat$ppt_in)*92, mean(q12.dat$ppt_in)*90.25))]
+precip.wettest.quarter.pre <- c(sum(q1.dat$PPT_in), sum(q2.dat$PPT_in), sum(q3.dat$PPT_in), sum(q4.dat$PPT_in),
+                                sum(q5.dat$PPT_in), sum(q6.dat$PPT_in), sum(q7.dat$PPT_in), sum(q8.dat$PPT_in),
+                                sum(q9.dat$PPT_in), sum(q10.dat$PPT_in), sum(q11.dat$PPT_in), sum(q12.dat$PPT_in)
+)[which.max(c(mean(q1.dat$PPT_in)*90.25, mean(q2.dat$PPT_in)*89.25, mean(q3.dat$PPT_in)*92, mean(q4.dat$PPT_in)*91, 
+              mean(q5.dat$PPT_in)*92, mean(q6.dat$PPT_in)*92, mean(q7.dat$PPT_in)*92, mean(q8.dat$PPT_in)*92, 
+              mean(q9.dat$PPT_in)*91, mean(q10.dat$PPT_in)*92, mean(q11.dat$PPT_in)*92, mean(q12.dat$PPT_in)*90.25))]
 
 #previous calculation is the sum over 30 year historical period of said quarter
 #divide by 30 to get the annual quarter calculation 
@@ -416,12 +413,12 @@ precip.wettest.quarter
 
 ##Precipitation of Driest Quarter
 
-precip.driest.quarter.pre <- c(sum(q1.dat$ppt_in), sum(q2.dat$ppt_in), sum(q3.dat$ppt_in), sum(q4.dat$ppt_in),
-                               sum(q5.dat$ppt_in), sum(q6.dat$ppt_in), sum(q7.dat$ppt_in), sum(q8.dat$ppt_in),
-                               sum(q9.dat$ppt_in), sum(q10.dat$ppt_in), sum(q11.dat$ppt_in), sum(q12.dat$ppt_in)
-)[which.min(c(mean(q1.dat$ppt_in)*90.25, mean(q2.dat$ppt_in)*89.25, mean(q3.dat$ppt_in)*92, mean(q4.dat$ppt_in)*91, 
-              mean(q5.dat$ppt_in)*92, mean(q6.dat$ppt_in)*92, mean(q7.dat$ppt_in)*92, mean(q8.dat$ppt_in)*92, 
-              mean(q9.dat$ppt_in)*91, mean(q10.dat$ppt_in)*92, mean(q11.dat$ppt_in)*92, mean(q12.dat$ppt_in)*90.25))]
+precip.driest.quarter.pre <- c(sum(q1.dat$PPT_in), sum(q2.dat$PPT_in), sum(q3.dat$PPT_in), sum(q4.dat$PPT_in),
+                               sum(q5.dat$PPT_in), sum(q6.dat$PPT_in), sum(q7.dat$PPT_in), sum(q8.dat$PPT_in),
+                               sum(q9.dat$PPT_in), sum(q10.dat$PPT_in), sum(q11.dat$PPT_in), sum(q12.dat$PPT_in)
+)[which.min(c(mean(q1.dat$PPT_in)*90.25, mean(q2.dat$PPT_in)*89.25, mean(q3.dat$PPT_in)*92, mean(q4.dat$PPT_in)*91, 
+              mean(q5.dat$PPT_in)*92, mean(q6.dat$PPT_in)*92, mean(q7.dat$PPT_in)*92, mean(q8.dat$PPT_in)*92, 
+              mean(q9.dat$PPT_in)*91, mean(q10.dat$PPT_in)*92, mean(q11.dat$PPT_in)*92, mean(q12.dat$PPT_in)*90.25))]
 
 #previous calculation is the sum over 30 year historical period of said quarter
 #divide by 30 to get the annual quarter calculation 
@@ -432,12 +429,12 @@ precip.driest.quarter
 
 ##Precipitation of Coldest Quarter
 
-precip.coldest.quarter.pre <- c(sum(q1.dat$ppt_in), sum(q2.dat$ppt_in), sum(q3.dat$ppt_in), sum(q4.dat$ppt_in),
-                                sum(q5.dat$ppt_in), sum(q6.dat$ppt_in), sum(q7.dat$ppt_in), sum(q8.dat$ppt_in),
-                                sum(q9.dat$ppt_in), sum(q10.dat$ppt_in), sum(q11.dat$ppt_in), sum(q12.dat$ppt_in)
-)[which.min(c(mean(q1.dat$taveF), mean(q2.dat$taveF), mean(q3.dat$taveF), mean(q4.dat$taveF), 
-              mean(q5.dat$taveF), mean(q6.dat$taveF), mean(q7.dat$taveF), mean(q8.dat$taveF), 
-              mean(q9.dat$taveF), mean(q10.dat$taveF), mean(q11.dat$taveF), mean(q12.dat$taveF)))]
+precip.coldest.quarter.pre <- c(sum(q1.dat$PPT_in), sum(q2.dat$PPT_in), sum(q3.dat$PPT_in), sum(q4.dat$PPT_in),
+                                sum(q5.dat$PPT_in), sum(q6.dat$PPT_in), sum(q7.dat$PPT_in), sum(q8.dat$PPT_in),
+                                sum(q9.dat$PPT_in), sum(q10.dat$PPT_in), sum(q11.dat$PPT_in), sum(q12.dat$PPT_in)
+)[which.min(c(mean(q1.dat$TMeanF), mean(q2.dat$TMeanF), mean(q3.dat$TMeanF), mean(q4.dat$TMeanF), 
+              mean(q5.dat$TMeanF), mean(q6.dat$TMeanF), mean(q7.dat$TMeanF), mean(q8.dat$TMeanF), 
+              mean(q9.dat$TMeanF), mean(q10.dat$TMeanF), mean(q11.dat$TMeanF), mean(q12.dat$TMeanF)))]
 
 #previous calculation is the sum over 30 year historical period of said quarter
 #divide by 30 to get the annual quarter calculation 
@@ -448,12 +445,12 @@ precip.coldest.quarter
 
 ##Precipitation of the Warmest Quarter
 
-precip.warmest.quarter.pre <- c(sum(q1.dat$ppt_in), sum(q2.dat$ppt_in), sum(q3.dat$ppt_in), sum(q4.dat$ppt_in),
-                                sum(q5.dat$ppt_in), sum(q6.dat$ppt_in), sum(q7.dat$ppt_in), sum(q8.dat$ppt_in),
-                                sum(q9.dat$ppt_in), sum(q10.dat$ppt_in), sum(q11.dat$ppt_in), sum(q12.dat$ppt_in)
-)[which.max(c(mean(q1.dat$taveF), mean(q2.dat$taveF), mean(q3.dat$taveF), mean(q4.dat$taveF), 
-              mean(q5.dat$taveF), mean(q6.dat$taveF), mean(q7.dat$taveF), mean(q8.dat$taveF), 
-              mean(q9.dat$taveF), mean(q10.dat$taveF), mean(q11.dat$taveF), mean(q12.dat$taveF)))]
+precip.warmest.quarter.pre <- c(sum(q1.dat$PPT_in), sum(q2.dat$PPT_in), sum(q3.dat$PPT_in), sum(q4.dat$PPT_in),
+                                sum(q5.dat$PPT_in), sum(q6.dat$PPT_in), sum(q7.dat$PPT_in), sum(q8.dat$PPT_in),
+                                sum(q9.dat$PPT_in), sum(q10.dat$PPT_in), sum(q11.dat$PPT_in), sum(q12.dat$PPT_in)
+)[which.max(c(mean(q1.dat$TMeanF), mean(q2.dat$TMeanF), mean(q3.dat$TMeanF), mean(q4.dat$TMeanF), 
+              mean(q5.dat$TMeanF), mean(q6.dat$TMeanF), mean(q7.dat$TMeanF), mean(q8.dat$TMeanF), 
+              mean(q9.dat$TMeanF), mean(q10.dat$TMeanF), mean(q11.dat$TMeanF), mean(q12.dat$TMeanF)))]
 
 #previous calculation is the sum over 30 year historical period of said quarter
 #divide by 30 to get the annual quarter calculation 
@@ -469,13 +466,13 @@ precip.warmest.quarter
 
 month <-        c(month.abb)
 month           #make sure the data lines up with table dude
-sc1.temp.av <- c(dat.RCP4.5.2030$taveF)
+sc1.temp.av <- c(dat.RCP4.5.2030$TMeanF)
 sc1.temp.av   #make sure the data lines up with table dude
-sc1.temp.hi <- c(dat.RCP4.5.2030$tmaxF)
+sc1.temp.hi <- c(dat.RCP4.5.2030$TMaxF)
 sc1.temp.hi    #make sure the data lines up with table dude
-sc1.temp.lo <- c(dat.RCP4.5.2030$tminF)
+sc1.temp.lo <- c(dat.RCP4.5.2030$TMinF)
 sc1.temp.lo    #make sure the data lines up with table dude
-sc1.precip <-  c(dat.RCP4.5.2030$ppt_in)
+sc1.precip <-  c(dat.RCP4.5.2030$PPT_in)
 sc1.precip     #make sure the data lines up with table dude
 
 #subsetting monthly data
@@ -495,18 +492,18 @@ dec.dat.sc1 <- subset(dat.RCP4.5.2030, month=="Dec")
 
 #subsetting monthly tav
 
-jan.tav.sc1 <- mean(jan.dat.sc1$taveF)
-feb.tav.sc1 <- mean(feb.dat.sc1$taveF)
-mar.tav.sc1 <- mean(mar.dat.sc1$taveF)
-apr.tav.sc1 <- mean(apr.dat.sc1$taveF)
-may.tav.sc1 <- mean(may.dat.sc1$taveF)
-jun.tav.sc1 <- mean(jun.dat.sc1$taveF)
-jul.tav.sc1 <- mean(jul.dat.sc1$taveF)
-aug.tav.sc1 <- mean(aug.dat.sc1$taveF)
-sep.tav.sc1 <- mean(sep.dat.sc1$taveF)
-oct.tav.sc1 <- mean(oct.dat.sc1$taveF)
-nov.tav.sc1 <- mean(nov.dat.sc1$taveF)
-dec.tav.sc1 <- mean(dec.dat.sc1$taveF)
+jan.tav.sc1 <- mean(jan.dat.sc1$TMeanF)
+feb.tav.sc1 <- mean(feb.dat.sc1$TMeanF)
+mar.tav.sc1 <- mean(mar.dat.sc1$TMeanF)
+apr.tav.sc1 <- mean(apr.dat.sc1$TMeanF)
+may.tav.sc1 <- mean(may.dat.sc1$TMeanF)
+jun.tav.sc1 <- mean(jun.dat.sc1$TMeanF)
+jul.tav.sc1 <- mean(jul.dat.sc1$TMeanF)
+aug.tav.sc1 <- mean(aug.dat.sc1$TMeanF)
+sep.tav.sc1 <- mean(sep.dat.sc1$TMeanF)
+oct.tav.sc1 <- mean(oct.dat.sc1$TMeanF)
+nov.tav.sc1 <- mean(nov.dat.sc1$TMeanF)
+dec.tav.sc1 <- mean(dec.dat.sc1$TMeanF)
 
 #subsetting different quarters
 
@@ -525,58 +522,58 @@ q12.dat.sc1 <- rbind(dec.dat.sc1, jan.dat.sc1, feb.dat.sc1)
 
 #subsetting precipitation data
 
-jan.prav.dat.sc1 <- (sum(jan.dat.sc1$ppt_in))/30
-feb.prav.dat.sc1 <- (sum(feb.dat.sc1$ppt_in))/30
-mar.prav.dat.sc1 <- (sum(mar.dat.sc1$ppt_in))/30
-apr.prav.dat.sc1 <- (sum(apr.dat.sc1$ppt_in))/30
-may.prav.dat.sc1 <- (sum(may.dat.sc1$ppt_in))/30
-jun.prav.dat.sc1 <- (sum(jun.dat.sc1$ppt_in))/30
-jul.prav.dat.sc1 <- (sum(jul.dat.sc1$ppt_in))/30
-aug.prav.dat.sc1 <- (sum(aug.dat.sc1$ppt_in))/30
-sep.prav.dat.sc1 <- (sum(sep.dat.sc1$ppt_in))/30
-oct.prav.dat.sc1 <- (sum(oct.dat.sc1$ppt_in))/30
-nov.prav.dat.sc1 <- (sum(nov.dat.sc1$ppt_in))/30
-dec.prav.dat.sc1 <- (sum(dec.dat.sc1$ppt_in))/30
+jan.prav.dat.sc1 <- (sum(jan.dat.sc1$PPT_in))/30
+feb.prav.dat.sc1 <- (sum(feb.dat.sc1$PPT_in))/30
+mar.prav.dat.sc1 <- (sum(mar.dat.sc1$PPT_in))/30
+apr.prav.dat.sc1 <- (sum(apr.dat.sc1$PPT_in))/30
+may.prav.dat.sc1 <- (sum(may.dat.sc1$PPT_in))/30
+jun.prav.dat.sc1 <- (sum(jun.dat.sc1$PPT_in))/30
+jul.prav.dat.sc1 <- (sum(jul.dat.sc1$PPT_in))/30
+aug.prav.dat.sc1 <- (sum(aug.dat.sc1$PPT_in))/30
+sep.prav.dat.sc1 <- (sum(sep.dat.sc1$PPT_in))/30
+oct.prav.dat.sc1 <- (sum(oct.dat.sc1$PPT_in))/30
+nov.prav.dat.sc1 <- (sum(nov.dat.sc1$PPT_in))/30
+dec.prav.dat.sc1 <- (sum(dec.dat.sc1$PPT_in))/30
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
 #SUMof(Tmax-Tmin)/12
 
-jan.max.sc1 <- mean(jan.dat.sc1$tmaxF)
-jan.min.sc1 <- mean(jan.dat.sc1$tminF)
+jan.max.sc1 <- mean(jan.dat.sc1$TMaxF)
+jan.min.sc1 <- mean(jan.dat.sc1$TMinF)
 
-feb.max.sc1 <- mean(feb.dat.sc1$tmaxF)
-feb.min.sc1 <- mean(feb.dat.sc1$tminF)
+feb.max.sc1 <- mean(feb.dat.sc1$TMaxF)
+feb.min.sc1 <- mean(feb.dat.sc1$TMinF)
 
-mar.max.sc1 <- mean(mar.dat.sc1$tmaxF)
-mar.min.sc1 <- mean(mar.dat.sc1$tminF)
+mar.max.sc1 <- mean(mar.dat.sc1$TMaxF)
+mar.min.sc1 <- mean(mar.dat.sc1$TMinF)
 
-apr.max.sc1 <- mean(apr.dat.sc1$tmaxF)
-apr.min.sc1 <- mean(apr.dat.sc1$tminF)
+apr.max.sc1 <- mean(apr.dat.sc1$TMaxF)
+apr.min.sc1 <- mean(apr.dat.sc1$TMinF)
 
-may.max.sc1 <- mean(may.dat.sc1$tmaxF)
-may.min.sc1 <- mean(may.dat.sc1$tminF)
+may.max.sc1 <- mean(may.dat.sc1$TMaxF)
+may.min.sc1 <- mean(may.dat.sc1$TMinF)
 
-jun.max.sc1 <- mean(jun.dat.sc1$tmaxF)
-jun.min.sc1 <- mean(jun.dat.sc1$tminF)
+jun.max.sc1 <- mean(jun.dat.sc1$TMaxF)
+jun.min.sc1 <- mean(jun.dat.sc1$TMinF)
 
-jul.max.sc1 <- mean(jul.dat.sc1$tmaxF)
-jul.min.sc1 <- mean(jul.dat.sc1$tminF)
+jul.max.sc1 <- mean(jul.dat.sc1$TMaxF)
+jul.min.sc1 <- mean(jul.dat.sc1$TMinF)
 
-aug.max.sc1 <- mean(aug.dat.sc1$tmaxF)
-aug.min.sc1 <- mean(aug.dat.sc1$tminF)
+aug.max.sc1 <- mean(aug.dat.sc1$TMaxF)
+aug.min.sc1 <- mean(aug.dat.sc1$TMinF)
 
-sep.max.sc1 <- mean(sep.dat.sc1$tmaxF)
-sep.min.sc1 <- mean(sep.dat.sc1$tminF)
+sep.max.sc1 <- mean(sep.dat.sc1$TMaxF)
+sep.min.sc1 <- mean(sep.dat.sc1$TMinF)
 
-oct.max.sc1 <- mean(oct.dat.sc1$tmaxF)
-oct.min.sc1 <- mean(oct.dat.sc1$tminF)
+oct.max.sc1 <- mean(oct.dat.sc1$TMaxF)
+oct.min.sc1 <- mean(oct.dat.sc1$TMinF)
 
-nov.max.sc1 <- mean(nov.dat.sc1$tmaxF)
-nov.min.sc1 <- mean(nov.dat.sc1$tminF)
+nov.max.sc1 <- mean(nov.dat.sc1$TMaxF)
+nov.min.sc1 <- mean(nov.dat.sc1$TMinF)
 
-dec.max.sc1 <- mean(dec.dat.sc1$tmaxF)
-dec.min.sc1 <- mean(dec.dat.sc1$tminF)
+dec.max.sc1 <- mean(dec.dat.sc1$TMaxF)
+dec.min.sc1 <- mean(dec.dat.sc1$TMinF)
 
 #differences
 jan.dif.sc1 <- jan.max.sc1-jan.min.sc1
@@ -616,9 +613,9 @@ f.to.c <- function(temp) {
 }
 
 #absolute max and min
-abs.tmax.pre.sc1 <- max(dat.RCP4.5.2030$tmaxF)
+abs.tmax.pre.sc1 <- max(dat.RCP4.5.2030$TMaxF)
 abs.tmax.c.sc1 <- f.to.c(abs.tmax.pre.sc1)
-abs.tmin.pre.sc1 <- min(dat.RCP4.5.2030$tminF)
+abs.tmin.pre.sc1 <- min(dat.RCP4.5.2030$TMinF)
 abs.tmin.c.sc1 <- f.to.c(abs.tmin.pre.sc1)
 
 
@@ -685,7 +682,7 @@ names(monthly.means.k.sc1)[1]<-paste("kaverage")
 sd.mmk.sc1 <- sd(monthly.means.k.sc1$kaverage)
 
 #determine annual mean temp
-annual.av.f.sc1 <- mean(dat.RCP4.5.2030$taveF)
+annual.av.f.sc1 <- mean(dat.RCP4.5.2030$TMeanF)
 
 #convert it to Kelvin
 annual.av.k.sc1. <- f.to.k(annual.av.f.sc1)
@@ -699,24 +696,24 @@ cv.temperature.seasonality.sc1
 ##Max Temperature of Warmest Month
 #lets first figure out the warmest month
 #saving it in case we need it
-warmest.day.warmest.month.sc1 <- c(max(jan.dat.sc1$tmaxF), max(feb.dat.sc1$tmaxF), max(mar.dat.sc1$tmaxF), max(apr.dat.sc1$tmaxF),
-                                   max(may.dat.sc1$tmaxF), max(jun.dat.sc1$tmaxF), max(jul.dat.sc1$tmaxF), max(aug.dat.sc1$tmaxF),
-                                   max(sep.dat.sc1$tmaxF), max(oct.dat.sc1$tmaxF), max(nov.dat.sc1$tmaxF), max(dec.dat.sc1$tmaxF)
-)[which.max(c(mean(jan.dat.sc1$tmaxF), mean(feb.dat.sc1$tmaxF), mean(mar.dat.sc1$tmaxF), mean(apr.dat.sc1$tmaxF), 
-              mean(may.dat.sc1$tmaxF), mean(jun.dat.sc1$tmaxF), mean(jul.dat.sc1$tmaxF), mean(aug.dat.sc1$tmaxF), 
-              mean(sep.dat.sc1$tmaxF), mean(oct.dat.sc1$tmaxF), mean(nov.dat.sc1$tmaxF), mean(dec.dat.sc1$tmaxF)))]
+warmest.day.warmest.month.sc1 <- c(max(jan.dat.sc1$TMaxF), max(feb.dat.sc1$TMaxF), max(mar.dat.sc1$TMaxF), max(apr.dat.sc1$TMaxF),
+                                   max(may.dat.sc1$TMaxF), max(jun.dat.sc1$TMaxF), max(jul.dat.sc1$TMaxF), max(aug.dat.sc1$TMaxF),
+                                   max(sep.dat.sc1$TMaxF), max(oct.dat.sc1$TMaxF), max(nov.dat.sc1$TMaxF), max(dec.dat.sc1$TMaxF)
+)[which.max(c(mean(jan.dat.sc1$TMaxF), mean(feb.dat.sc1$TMaxF), mean(mar.dat.sc1$TMaxF), mean(apr.dat.sc1$TMaxF), 
+              mean(may.dat.sc1$TMaxF), mean(jun.dat.sc1$TMaxF), mean(jul.dat.sc1$TMaxF), mean(aug.dat.sc1$TMaxF), 
+              mean(sep.dat.sc1$TMaxF), mean(oct.dat.sc1$TMaxF), mean(nov.dat.sc1$TMaxF), mean(dec.dat.sc1$TMaxF)))]
 
 #value
 warmest.day.warmest.month.sc1
 
 ##Min Temperature of Coldest Month
 #saving it in case they want it
-coldest.day.coldest.month.sc1 <- c(min(jan.dat.sc1$tminF), min(feb.dat.sc1$tminF), min(mar.dat.sc1$tminF), min(apr.dat.sc1$tminF),
-                                   min(may.dat.sc1$tminF), min(jun.dat.sc1$tminF), min(jul.dat.sc1$tminF), min(aug.dat.sc1$tminF),
-                                   min(sep.dat.sc1$tminF), min(oct.dat.sc1$tminF), min(nov.dat.sc1$tminF), min(dec.dat.sc1$tminF)
-)[which.min(c(mean(jan.dat.sc1$tminF), mean(feb.dat.sc1$tminF), mean(mar.dat.sc1$tminF), mean(apr.dat.sc1$tminF), 
-              mean(may.dat.sc1$tminF), mean(jun.dat.sc1$tminF), mean(jul.dat.sc1$tminF), mean(aug.dat.sc1$tminF), 
-              mean(sep.dat.sc1$tminF), mean(oct.dat.sc1$tminF), mean(nov.dat.sc1$tminF), mean(dec.dat.sc1$tminF)))]
+coldest.day.coldest.month.sc1 <- c(min(jan.dat.sc1$TMinF), min(feb.dat.sc1$TMinF), min(mar.dat.sc1$TMinF), min(apr.dat.sc1$TMinF),
+                                   min(may.dat.sc1$TMinF), min(jun.dat.sc1$TMinF), min(jul.dat.sc1$TMinF), min(aug.dat.sc1$TMinF),
+                                   min(sep.dat.sc1$TMinF), min(oct.dat.sc1$TMinF), min(nov.dat.sc1$TMinF), min(dec.dat.sc1$TMinF)
+)[which.min(c(mean(jan.dat.sc1$TMinF), mean(feb.dat.sc1$TMinF), mean(mar.dat.sc1$TMinF), mean(apr.dat.sc1$TMinF), 
+              mean(may.dat.sc1$TMinF), mean(jun.dat.sc1$TMinF), mean(jul.dat.sc1$TMinF), mean(aug.dat.sc1$TMinF), 
+              mean(sep.dat.sc1$TMinF), mean(oct.dat.sc1$TMinF), mean(nov.dat.sc1$TMinF), mean(dec.dat.sc1$TMinF)))]
 
 #value
 coldest.day.coldest.month.sc1
@@ -731,48 +728,48 @@ annual.temperature.range.sc1
 
 ##Mean Temperature of Wettest Quarter
 
-mean.temp.wettest.quarter.sc1 <- c(mean(q1.dat.sc1$taveF), mean(q2.dat.sc1$taveF), mean(q3.dat.sc1$taveF), mean(q4.dat.sc1$taveF),
-                                   mean(q5.dat.sc1$taveF), mean(q6.dat.sc1$taveF), mean(q7.dat.sc1$taveF), mean(q8.dat.sc1$taveF),
-                                   mean(q9.dat.sc1$taveF), mean(q10.dat.sc1$taveF), mean(q11.dat.sc1$taveF), mean(q12.dat.sc1$taveF)
-)[which.max(c(mean(q1.dat.sc1$ppt_in)*90.25, mean(q2.dat.sc1$ppt_in)*89.25, mean(q3.dat.sc1$ppt_in)*92, mean(q4.dat.sc1$ppt_in)*91, 
-              mean(q5.dat.sc1$ppt_in)*92, mean(q6.dat.sc1$ppt_in)*92, mean(q7.dat.sc1$ppt_in)*92, mean(q8.dat.sc1$ppt_in)*92, 
-              mean(q9.dat.sc1$ppt_in)*91, mean(q10.dat.sc1$ppt_in)*92, mean(q11.dat.sc1$ppt_in)*92, mean(q12.dat.sc1$ppt_in)*90.25))]
+mean.temp.wettest.quarter.sc1 <- c(mean(q1.dat.sc1$TMeanF), mean(q2.dat.sc1$TMeanF), mean(q3.dat.sc1$TMeanF), mean(q4.dat.sc1$TMeanF),
+                                   mean(q5.dat.sc1$TMeanF), mean(q6.dat.sc1$TMeanF), mean(q7.dat.sc1$TMeanF), mean(q8.dat.sc1$TMeanF),
+                                   mean(q9.dat.sc1$TMeanF), mean(q10.dat.sc1$TMeanF), mean(q11.dat.sc1$TMeanF), mean(q12.dat.sc1$TMeanF)
+)[which.max(c(mean(q1.dat.sc1$PPT_in)*90.25, mean(q2.dat.sc1$PPT_in)*89.25, mean(q3.dat.sc1$PPT_in)*92, mean(q4.dat.sc1$PPT_in)*91, 
+              mean(q5.dat.sc1$PPT_in)*92, mean(q6.dat.sc1$PPT_in)*92, mean(q7.dat.sc1$PPT_in)*92, mean(q8.dat.sc1$PPT_in)*92, 
+              mean(q9.dat.sc1$PPT_in)*91, mean(q10.dat.sc1$PPT_in)*92, mean(q11.dat.sc1$PPT_in)*92, mean(q12.dat.sc1$PPT_in)*90.25))]
 
 #value
 mean.temp.wettest.quarter.sc1
 
 ##Mean Temperature of Driest Quarter
 
-mean.temp.driest.quarter.sc1 <- c(mean(q1.dat.sc1$taveF), mean(q2.dat.sc1$taveF), mean(q3.dat.sc1$taveF), mean(q4.dat.sc1$taveF),
-                                  mean(q5.dat.sc1$taveF), mean(q6.dat.sc1$taveF), mean(q7.dat.sc1$taveF), mean(q8.dat.sc1$taveF),
-                                  mean(q9.dat.sc1$taveF), mean(q10.dat.sc1$taveF), mean(q11.dat.sc1$taveF), mean(q12.dat.sc1$taveF)
-)[which.min(c(mean(q1.dat.sc1$ppt_in)*90.25, mean(q2.dat.sc1$ppt_in)*89.25, mean(q3.dat.sc1$ppt_in)*92, mean(q4.dat.sc1$ppt_in)*91, 
-              mean(q5.dat.sc1$ppt_in)*92, mean(q6.dat.sc1$ppt_in)*92, mean(q7.dat.sc1$ppt_in)*92, mean(q8.dat.sc1$ppt_in)*92, 
-              mean(q9.dat.sc1$ppt_in)*91, mean(q10.dat.sc1$ppt_in)*92, mean(q11.dat.sc1$ppt_in)*92, mean(q12.dat.sc1$ppt_in)*90.25))]
+mean.temp.driest.quarter.sc1 <- c(mean(q1.dat.sc1$TMeanF), mean(q2.dat.sc1$TMeanF), mean(q3.dat.sc1$TMeanF), mean(q4.dat.sc1$TMeanF),
+                                  mean(q5.dat.sc1$TMeanF), mean(q6.dat.sc1$TMeanF), mean(q7.dat.sc1$TMeanF), mean(q8.dat.sc1$TMeanF),
+                                  mean(q9.dat.sc1$TMeanF), mean(q10.dat.sc1$TMeanF), mean(q11.dat.sc1$TMeanF), mean(q12.dat.sc1$TMeanF)
+)[which.min(c(mean(q1.dat.sc1$PPT_in)*90.25, mean(q2.dat.sc1$PPT_in)*89.25, mean(q3.dat.sc1$PPT_in)*92, mean(q4.dat.sc1$PPT_in)*91, 
+              mean(q5.dat.sc1$PPT_in)*92, mean(q6.dat.sc1$PPT_in)*92, mean(q7.dat.sc1$PPT_in)*92, mean(q8.dat.sc1$PPT_in)*92, 
+              mean(q9.dat.sc1$PPT_in)*91, mean(q10.dat.sc1$PPT_in)*92, mean(q11.dat.sc1$PPT_in)*92, mean(q12.dat.sc1$PPT_in)*90.25))]
 
 #value
 mean.temp.driest.quarter.sc1
 
 ##Mean Temperature of Warmest Quarter
 
-mean.temp.warmest.quarter.sc1 <- c(mean(q1.dat.sc1$taveF), mean(q2.dat.sc1$taveF), mean(q3.dat.sc1$taveF), mean(q4.dat.sc1$taveF),
-                                   mean(q5.dat.sc1$taveF), mean(q6.dat.sc1$taveF), mean(q7.dat.sc1$taveF), mean(q8.dat.sc1$taveF),
-                                   mean(q9.dat.sc1$taveF), mean(q10.dat.sc1$taveF), mean(q11.dat.sc1$taveF), mean(q12.dat.sc1$taveF)
-)[which.max(c(mean(q1.dat.sc1$taveF), mean(q2.dat.sc1$taveF), mean(q3.dat.sc1$taveF), mean(q4.dat.sc1$taveF), 
-              mean(q5.dat.sc1$taveF), mean(q6.dat.sc1$taveF), mean(q7.dat.sc1$taveF), mean(q8.dat.sc1$taveF), 
-              mean(q9.dat.sc1$taveF), mean(q10.dat.sc1$taveF), mean(q11.dat.sc1$taveF), mean(q12.dat.sc1$taveF)))]
+mean.temp.warmest.quarter.sc1 <- c(mean(q1.dat.sc1$TMeanF), mean(q2.dat.sc1$TMeanF), mean(q3.dat.sc1$TMeanF), mean(q4.dat.sc1$TMeanF),
+                                   mean(q5.dat.sc1$TMeanF), mean(q6.dat.sc1$TMeanF), mean(q7.dat.sc1$TMeanF), mean(q8.dat.sc1$TMeanF),
+                                   mean(q9.dat.sc1$TMeanF), mean(q10.dat.sc1$TMeanF), mean(q11.dat.sc1$TMeanF), mean(q12.dat.sc1$TMeanF)
+)[which.max(c(mean(q1.dat.sc1$TMeanF), mean(q2.dat.sc1$TMeanF), mean(q3.dat.sc1$TMeanF), mean(q4.dat.sc1$TMeanF), 
+              mean(q5.dat.sc1$TMeanF), mean(q6.dat.sc1$TMeanF), mean(q7.dat.sc1$TMeanF), mean(q8.dat.sc1$TMeanF), 
+              mean(q9.dat.sc1$TMeanF), mean(q10.dat.sc1$TMeanF), mean(q11.dat.sc1$TMeanF), mean(q12.dat.sc1$TMeanF)))]
 
 #value
 mean.temp.warmest.quarter.sc1
 
 ##Mean Temperature of Coldest Quarter
 
-mean.temp.coldest.quarter.sc1 <- c(mean(q1.dat.sc1$taveF), mean(q2.dat.sc1$taveF), mean(q3.dat.sc1$taveF), mean(q4.dat.sc1$taveF),
-                                   mean(q5.dat.sc1$taveF), mean(q6.dat.sc1$taveF), mean(q7.dat.sc1$taveF), mean(q8.dat.sc1$taveF),
-                                   mean(q9.dat.sc1$taveF), mean(q10.dat.sc1$taveF), mean(q11.dat.sc1$taveF), mean(q12.dat.sc1$taveF)
-)[which.min(c(mean(q1.dat.sc1$taveF), mean(q2.dat.sc1$taveF), mean(q3.dat.sc1$taveF), mean(q4.dat.sc1$taveF), 
-              mean(q5.dat.sc1$taveF), mean(q6.dat.sc1$taveF), mean(q7.dat.sc1$taveF), mean(q8.dat.sc1$taveF), 
-              mean(q9.dat.sc1$taveF), mean(q10.dat.sc1$taveF), mean(q11.dat.sc1$taveF), mean(q12.dat.sc1$taveF)))]
+mean.temp.coldest.quarter.sc1 <- c(mean(q1.dat.sc1$TMeanF), mean(q2.dat.sc1$TMeanF), mean(q3.dat.sc1$TMeanF), mean(q4.dat.sc1$TMeanF),
+                                   mean(q5.dat.sc1$TMeanF), mean(q6.dat.sc1$TMeanF), mean(q7.dat.sc1$TMeanF), mean(q8.dat.sc1$TMeanF),
+                                   mean(q9.dat.sc1$TMeanF), mean(q10.dat.sc1$TMeanF), mean(q11.dat.sc1$TMeanF), mean(q12.dat.sc1$TMeanF)
+)[which.min(c(mean(q1.dat.sc1$TMeanF), mean(q2.dat.sc1$TMeanF), mean(q3.dat.sc1$TMeanF), mean(q4.dat.sc1$TMeanF), 
+              mean(q5.dat.sc1$TMeanF), mean(q6.dat.sc1$TMeanF), mean(q7.dat.sc1$TMeanF), mean(q8.dat.sc1$TMeanF), 
+              mean(q9.dat.sc1$TMeanF), mean(q10.dat.sc1$TMeanF), mean(q11.dat.sc1$TMeanF), mean(q12.dat.sc1$TMeanF)))]
 
 #value
 mean.temp.coldest.quarter.sc1
@@ -817,7 +814,7 @@ names(monthly.means.precip.sc1)[1]<-paste("praverage")
 sd.precip.sc1 <- sd(monthly.means.precip.sc1$praverage)
 
 #annual precipitation / getting the sum of over 30 years then dividing by 30 to get annual average
-an.precip.sc1 <- (sum(dat.RCP4.5.2030$ppt_mm)/30)
+an.precip.sc1 <- (sum(dat.RCP4.5.2030$PPT_mm)/30)
 mo.precip.sc1 <- an.precip.sc1/12
 
 #final calculation
@@ -828,12 +825,12 @@ precip.seasonality.cv.sc1
 
 ##Precipitation of Wettest Quarter
 
-precip.wettest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$ppt_in), sum(q2.dat.sc1$ppt_in), sum(q3.dat.sc1$ppt_in), sum(q4.dat.sc1$ppt_in),
-                                    sum(q5.dat.sc1$ppt_in), sum(q6.dat.sc1$ppt_in), sum(q7.dat.sc1$ppt_in), sum(q8.dat.sc1$ppt_in),
-                                    sum(q9.dat.sc1$ppt_in), sum(q10.dat.sc1$ppt_in), sum(q11.dat.sc1$ppt_in), sum(q12.dat.sc1$ppt_in)
-)[which.max(c(mean(q1.dat.sc1$ppt_in)*90.25, mean(q2.dat.sc1$ppt_in)*89.25, mean(q3.dat.sc1$ppt_in)*92, mean(q4.dat.sc1$ppt_in)*91, 
-              mean(q5.dat.sc1$ppt_in)*92, mean(q6.dat.sc1$ppt_in)*92, mean(q7.dat.sc1$ppt_in)*92, mean(q8.dat.sc1$ppt_in)*92, 
-              mean(q9.dat.sc1$ppt_in)*91, mean(q10.dat.sc1$ppt_in)*92, mean(q11.dat.sc1$ppt_in)*92, mean(q12.dat.sc1$ppt_in)*90.25))]
+precip.wettest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$PPT_in), sum(q2.dat.sc1$PPT_in), sum(q3.dat.sc1$PPT_in), sum(q4.dat.sc1$PPT_in),
+                                    sum(q5.dat.sc1$PPT_in), sum(q6.dat.sc1$PPT_in), sum(q7.dat.sc1$PPT_in), sum(q8.dat.sc1$PPT_in),
+                                    sum(q9.dat.sc1$PPT_in), sum(q10.dat.sc1$PPT_in), sum(q11.dat.sc1$PPT_in), sum(q12.dat.sc1$PPT_in)
+)[which.max(c(mean(q1.dat.sc1$PPT_in)*90.25, mean(q2.dat.sc1$PPT_in)*89.25, mean(q3.dat.sc1$PPT_in)*92, mean(q4.dat.sc1$PPT_in)*91, 
+              mean(q5.dat.sc1$PPT_in)*92, mean(q6.dat.sc1$PPT_in)*92, mean(q7.dat.sc1$PPT_in)*92, mean(q8.dat.sc1$PPT_in)*92, 
+              mean(q9.dat.sc1$PPT_in)*91, mean(q10.dat.sc1$PPT_in)*92, mean(q11.dat.sc1$PPT_in)*92, mean(q12.dat.sc1$PPT_in)*90.25))]
 
 #previous calculation is the sum over   30 year historical period of said quarter
 #divide by 10 to get the annual quarter calculation
@@ -844,12 +841,12 @@ precip.wettest.quarter.sc1
 
 ##Precipitation of Driest Quarter
 
-precip.driest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$ppt_in), sum(q2.dat.sc1$ppt_in), sum(q3.dat.sc1$ppt_in), sum(q4.dat.sc1$ppt_in),
-                                   sum(q5.dat.sc1$ppt_in), sum(q6.dat.sc1$ppt_in), sum(q7.dat.sc1$ppt_in), sum(q8.dat.sc1$ppt_in),
-                                   sum(q9.dat.sc1$ppt_in), sum(q10.dat.sc1$ppt_in), sum(q11.dat.sc1$ppt_in), sum(q12.dat.sc1$ppt_in)
-)[which.min(c(mean(q1.dat.sc1$ppt_in)*90.25, mean(q2.dat.sc1$ppt_in)*89.25, mean(q3.dat.sc1$ppt_in)*92, mean(q4.dat.sc1$ppt_in)*91, 
-              mean(q5.dat.sc1$ppt_in)*92, mean(q6.dat.sc1$ppt_in)*92, mean(q7.dat.sc1$ppt_in)*92, mean(q8.dat.sc1$ppt_in)*92, 
-              mean(q9.dat.sc1$ppt_in)*91, mean(q10.dat.sc1$ppt_in)*92, mean(q11.dat.sc1$ppt_in)*92, mean(q12.dat.sc1$ppt_in)*90.25))]
+precip.driest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$PPT_in), sum(q2.dat.sc1$PPT_in), sum(q3.dat.sc1$PPT_in), sum(q4.dat.sc1$PPT_in),
+                                   sum(q5.dat.sc1$PPT_in), sum(q6.dat.sc1$PPT_in), sum(q7.dat.sc1$PPT_in), sum(q8.dat.sc1$PPT_in),
+                                   sum(q9.dat.sc1$PPT_in), sum(q10.dat.sc1$PPT_in), sum(q11.dat.sc1$PPT_in), sum(q12.dat.sc1$PPT_in)
+)[which.min(c(mean(q1.dat.sc1$PPT_in)*90.25, mean(q2.dat.sc1$PPT_in)*89.25, mean(q3.dat.sc1$PPT_in)*92, mean(q4.dat.sc1$PPT_in)*91, 
+              mean(q5.dat.sc1$PPT_in)*92, mean(q6.dat.sc1$PPT_in)*92, mean(q7.dat.sc1$PPT_in)*92, mean(q8.dat.sc1$PPT_in)*92, 
+              mean(q9.dat.sc1$PPT_in)*91, mean(q10.dat.sc1$PPT_in)*92, mean(q11.dat.sc1$PPT_in)*92, mean(q12.dat.sc1$PPT_in)*90.25))]
 
 #previous calculation is the sum over   30 year historical period of said quarter
 #divide by 10 to get the annual quarter calculation 
@@ -860,12 +857,12 @@ precip.driest.quarter.sc1
 
 ##Precipitation of Coldest Quarter
 
-precip.coldest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$ppt_in), sum(q2.dat.sc1$ppt_in), sum(q3.dat.sc1$ppt_in), sum(q4.dat.sc1$ppt_in),
-                                    sum(q5.dat.sc1$ppt_in), sum(q6.dat.sc1$ppt_in), sum(q7.dat.sc1$ppt_in), sum(q8.dat.sc1$ppt_in),
-                                    sum(q9.dat.sc1$ppt_in), sum(q10.dat.sc1$ppt_in), sum(q11.dat.sc1$ppt_in), sum(q12.dat.sc1$ppt_in)
-)[which.min(c(mean(q1.dat.sc1$taveF), mean(q2.dat.sc1$taveF), mean(q3.dat.sc1$taveF), mean(q4.dat.sc1$taveF), 
-              mean(q5.dat.sc1$taveF), mean(q6.dat.sc1$taveF), mean(q7.dat.sc1$taveF), mean(q8.dat.sc1$taveF), 
-              mean(q9.dat.sc1$taveF), mean(q10.dat.sc1$taveF), mean(q11.dat.sc1$taveF), mean(q12.dat.sc1$taveF)))]
+precip.coldest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$PPT_in), sum(q2.dat.sc1$PPT_in), sum(q3.dat.sc1$PPT_in), sum(q4.dat.sc1$PPT_in),
+                                    sum(q5.dat.sc1$PPT_in), sum(q6.dat.sc1$PPT_in), sum(q7.dat.sc1$PPT_in), sum(q8.dat.sc1$PPT_in),
+                                    sum(q9.dat.sc1$PPT_in), sum(q10.dat.sc1$PPT_in), sum(q11.dat.sc1$PPT_in), sum(q12.dat.sc1$PPT_in)
+)[which.min(c(mean(q1.dat.sc1$TMeanF), mean(q2.dat.sc1$TMeanF), mean(q3.dat.sc1$TMeanF), mean(q4.dat.sc1$TMeanF), 
+              mean(q5.dat.sc1$TMeanF), mean(q6.dat.sc1$TMeanF), mean(q7.dat.sc1$TMeanF), mean(q8.dat.sc1$TMeanF), 
+              mean(q9.dat.sc1$TMeanF), mean(q10.dat.sc1$TMeanF), mean(q11.dat.sc1$TMeanF), mean(q12.dat.sc1$TMeanF)))]
 
 #previous calculation is the sum over   30 year historical period of said quarter
 #divide by 10 to get the annual quarter calculation 
@@ -876,12 +873,12 @@ precip.coldest.quarter.sc1
 
 ##Precipitation of the Warmest Quarter
 
-precip.warmest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$ppt_in), sum(q2.dat.sc1$ppt_in), sum(q3.dat.sc1$ppt_in), sum(q4.dat.sc1$ppt_in),
-                                    sum(q5.dat.sc1$ppt_in), sum(q6.dat.sc1$ppt_in), sum(q7.dat.sc1$ppt_in), sum(q8.dat.sc1$ppt_in),
-                                    sum(q9.dat.sc1$ppt_in), sum(q10.dat.sc1$ppt_in), sum(q11.dat.sc1$ppt_in), sum(q12.dat.sc1$ppt_in)
-)[which.max(c(mean(q1.dat.sc1$taveF), mean(q2.dat.sc1$taveF), mean(q3.dat.sc1$taveF), mean(q4.dat.sc1$taveF), 
-              mean(q5.dat.sc1$taveF), mean(q6.dat.sc1$taveF), mean(q7.dat.sc1$taveF), mean(q8.dat.sc1$taveF), 
-              mean(q9.dat.sc1$taveF), mean(q10.dat.sc1$taveF), mean(q11.dat.sc1$taveF), mean(q12.dat.sc1$taveF)))]
+precip.warmest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$PPT_in), sum(q2.dat.sc1$PPT_in), sum(q3.dat.sc1$PPT_in), sum(q4.dat.sc1$PPT_in),
+                                    sum(q5.dat.sc1$PPT_in), sum(q6.dat.sc1$PPT_in), sum(q7.dat.sc1$PPT_in), sum(q8.dat.sc1$PPT_in),
+                                    sum(q9.dat.sc1$PPT_in), sum(q10.dat.sc1$PPT_in), sum(q11.dat.sc1$PPT_in), sum(q12.dat.sc1$PPT_in)
+)[which.max(c(mean(q1.dat.sc1$TMeanF), mean(q2.dat.sc1$TMeanF), mean(q3.dat.sc1$TMeanF), mean(q4.dat.sc1$TMeanF), 
+              mean(q5.dat.sc1$TMeanF), mean(q6.dat.sc1$TMeanF), mean(q7.dat.sc1$TMeanF), mean(q8.dat.sc1$TMeanF), 
+              mean(q9.dat.sc1$TMeanF), mean(q10.dat.sc1$TMeanF), mean(q11.dat.sc1$TMeanF), mean(q12.dat.sc1$TMeanF)))]
 
 #previous calculation is the sum over 30 year projected period of said quarter
 #divide by 10 to get the annual quarter calculation 
@@ -896,13 +893,13 @@ precip.warmest.quarter.sc1
 
 month <-        c(month.abb)
 month           #make sure the data lines up with table dude
-sc2.temp.av <- c(dat.RCP4.5.2050$taveF)
+sc2.temp.av <- c(dat.RCP4.5.2050$TMeanF)
 sc2.temp.av   #make sure the data lines up with table dude
-sc2.temp.hi <- c(dat.RCP4.5.2050$tmaxF)
+sc2.temp.hi <- c(dat.RCP4.5.2050$TMaxF)
 sc2.temp.hi    #make sure the data lines up with table dude
-sc2.temp.lo <- c(dat.RCP4.5.2050$tminF)
+sc2.temp.lo <- c(dat.RCP4.5.2050$TMinF)
 sc2.temp.lo    #make sure the data lines up with table dude
-sc2.precip <-  c(dat.RCP4.5.2050$ppt_in)
+sc2.precip <-  c(dat.RCP4.5.2050$PPT_in)
 sc2.precip     #make sure the data lines up with table dude
 
 #subsetting monthly data
@@ -922,18 +919,18 @@ dec.dat.sc2 <- subset(dat.RCP4.5.2050, month=="Dec")
 
 #subsetting monthly tav
 
-jan.tav.sc2 <- mean(jan.dat.sc2$taveF)
-feb.tav.sc2 <- mean(feb.dat.sc2$taveF)
-mar.tav.sc2 <- mean(mar.dat.sc2$taveF)
-apr.tav.sc2 <- mean(apr.dat.sc2$taveF)
-may.tav.sc2 <- mean(may.dat.sc2$taveF)
-jun.tav.sc2 <- mean(jun.dat.sc2$taveF)
-jul.tav.sc2 <- mean(jul.dat.sc2$taveF)
-aug.tav.sc2 <- mean(aug.dat.sc2$taveF)
-sep.tav.sc2 <- mean(sep.dat.sc2$taveF)
-oct.tav.sc2 <- mean(oct.dat.sc2$taveF)
-nov.tav.sc2 <- mean(nov.dat.sc2$taveF)
-dec.tav.sc2 <- mean(dec.dat.sc2$taveF)
+jan.tav.sc2 <- mean(jan.dat.sc2$TMeanF)
+feb.tav.sc2 <- mean(feb.dat.sc2$TMeanF)
+mar.tav.sc2 <- mean(mar.dat.sc2$TMeanF)
+apr.tav.sc2 <- mean(apr.dat.sc2$TMeanF)
+may.tav.sc2 <- mean(may.dat.sc2$TMeanF)
+jun.tav.sc2 <- mean(jun.dat.sc2$TMeanF)
+jul.tav.sc2 <- mean(jul.dat.sc2$TMeanF)
+aug.tav.sc2 <- mean(aug.dat.sc2$TMeanF)
+sep.tav.sc2 <- mean(sep.dat.sc2$TMeanF)
+oct.tav.sc2 <- mean(oct.dat.sc2$TMeanF)
+nov.tav.sc2 <- mean(nov.dat.sc2$TMeanF)
+dec.tav.sc2 <- mean(dec.dat.sc2$TMeanF)
 
 #subsetting different quarters
 
@@ -952,58 +949,58 @@ q12.dat.sc2 <- rbind(dec.dat.sc2, jan.dat.sc2, feb.dat.sc2)
 
 #subsetting precipitation data
 
-jan.prav.dat.sc2 <- (sum(jan.dat.sc2$ppt_in))/30
-feb.prav.dat.sc2 <- (sum(feb.dat.sc2$ppt_in))/30
-mar.prav.dat.sc2 <- (sum(mar.dat.sc2$ppt_in))/30
-apr.prav.dat.sc2 <- (sum(apr.dat.sc2$ppt_in))/30
-may.prav.dat.sc2 <- (sum(may.dat.sc2$ppt_in))/30
-jun.prav.dat.sc2 <- (sum(jun.dat.sc2$ppt_in))/30
-jul.prav.dat.sc2 <- (sum(jul.dat.sc2$ppt_in))/30
-aug.prav.dat.sc2 <- (sum(aug.dat.sc2$ppt_in))/30
-sep.prav.dat.sc2 <- (sum(sep.dat.sc2$ppt_in))/30
-oct.prav.dat.sc2 <- (sum(oct.dat.sc2$ppt_in))/30
-nov.prav.dat.sc2 <- (sum(nov.dat.sc2$ppt_in))/30
-dec.prav.dat.sc2 <- (sum(dec.dat.sc2$ppt_in))/30
+jan.prav.dat.sc2 <- (sum(jan.dat.sc2$PPT_in))/30
+feb.prav.dat.sc2 <- (sum(feb.dat.sc2$PPT_in))/30
+mar.prav.dat.sc2 <- (sum(mar.dat.sc2$PPT_in))/30
+apr.prav.dat.sc2 <- (sum(apr.dat.sc2$PPT_in))/30
+may.prav.dat.sc2 <- (sum(may.dat.sc2$PPT_in))/30
+jun.prav.dat.sc2 <- (sum(jun.dat.sc2$PPT_in))/30
+jul.prav.dat.sc2 <- (sum(jul.dat.sc2$PPT_in))/30
+aug.prav.dat.sc2 <- (sum(aug.dat.sc2$PPT_in))/30
+sep.prav.dat.sc2 <- (sum(sep.dat.sc2$PPT_in))/30
+oct.prav.dat.sc2 <- (sum(oct.dat.sc2$PPT_in))/30
+nov.prav.dat.sc2 <- (sum(nov.dat.sc2$PPT_in))/30
+dec.prav.dat.sc2 <- (sum(dec.dat.sc2$PPT_in))/30
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
 #SUMof(Tmax-Tmin)/12
 
-jan.max.sc2 <- mean(jan.dat.sc2$tmaxF)
-jan.min.sc2 <- mean(jan.dat.sc2$tminF)
+jan.max.sc2 <- mean(jan.dat.sc2$TMaxF)
+jan.min.sc2 <- mean(jan.dat.sc2$TMinF)
 
-feb.max.sc2 <- mean(feb.dat.sc2$tmaxF)
-feb.min.sc2 <- mean(feb.dat.sc2$tminF)
+feb.max.sc2 <- mean(feb.dat.sc2$TMaxF)
+feb.min.sc2 <- mean(feb.dat.sc2$TMinF)
 
-mar.max.sc2 <- mean(mar.dat.sc2$tmaxF)
-mar.min.sc2 <- mean(mar.dat.sc2$tminF)
+mar.max.sc2 <- mean(mar.dat.sc2$TMaxF)
+mar.min.sc2 <- mean(mar.dat.sc2$TMinF)
 
-apr.max.sc2 <- mean(apr.dat.sc2$tmaxF)
-apr.min.sc2 <- mean(apr.dat.sc2$tminF)
+apr.max.sc2 <- mean(apr.dat.sc2$TMaxF)
+apr.min.sc2 <- mean(apr.dat.sc2$TMinF)
 
-may.max.sc2 <- mean(may.dat.sc2$tmaxF)
-may.min.sc2 <- mean(may.dat.sc2$tminF)
+may.max.sc2 <- mean(may.dat.sc2$TMaxF)
+may.min.sc2 <- mean(may.dat.sc2$TMinF)
 
-jun.max.sc2 <- mean(jun.dat.sc2$tmaxF)
-jun.min.sc2 <- mean(jun.dat.sc2$tminF)
+jun.max.sc2 <- mean(jun.dat.sc2$TMaxF)
+jun.min.sc2 <- mean(jun.dat.sc2$TMinF)
 
-jul.max.sc2 <- mean(jul.dat.sc2$tmaxF)
-jul.min.sc2 <- mean(jul.dat.sc2$tminF)
+jul.max.sc2 <- mean(jul.dat.sc2$TMaxF)
+jul.min.sc2 <- mean(jul.dat.sc2$TMinF)
 
-aug.max.sc2 <- mean(aug.dat.sc2$tmaxF)
-aug.min.sc2 <- mean(aug.dat.sc2$tminF)
+aug.max.sc2 <- mean(aug.dat.sc2$TMaxF)
+aug.min.sc2 <- mean(aug.dat.sc2$TMinF)
 
-sep.max.sc2 <- mean(sep.dat.sc2$tmaxF)
-sep.min.sc2 <- mean(sep.dat.sc2$tminF)
+sep.max.sc2 <- mean(sep.dat.sc2$TMaxF)
+sep.min.sc2 <- mean(sep.dat.sc2$TMinF)
 
-oct.max.sc2 <- mean(oct.dat.sc2$tmaxF)
-oct.min.sc2 <- mean(oct.dat.sc2$tminF)
+oct.max.sc2 <- mean(oct.dat.sc2$TMaxF)
+oct.min.sc2 <- mean(oct.dat.sc2$TMinF)
 
-nov.max.sc2 <- mean(nov.dat.sc2$tmaxF)
-nov.min.sc2 <- mean(nov.dat.sc2$tminF)
+nov.max.sc2 <- mean(nov.dat.sc2$TMaxF)
+nov.min.sc2 <- mean(nov.dat.sc2$TMinF)
 
-dec.max.sc2 <- mean(dec.dat.sc2$tmaxF)
-dec.min.sc2 <- mean(dec.dat.sc2$tminF)
+dec.max.sc2 <- mean(dec.dat.sc2$TMaxF)
+dec.min.sc2 <- mean(dec.dat.sc2$TMinF)
 
 #differences
 jan.dif.sc2 <- jan.max.sc2-jan.min.sc2
@@ -1043,9 +1040,9 @@ f.to.c <- function(temp) {
 }
 
 #absolute max and min
-abs.tmax.pre.sc2 <- max(dat.RCP4.5.2050$tmaxF)
+abs.tmax.pre.sc2 <- max(dat.RCP4.5.2050$TMaxF)
 abs.tmax.c.sc2 <- f.to.c(abs.tmax.pre.sc2)
-abs.tmin.pre.sc2 <- min(dat.RCP4.5.2050$tminF)
+abs.tmin.pre.sc2 <- min(dat.RCP4.5.2050$TMinF)
 abs.tmin.c.sc2 <- f.to.c(abs.tmin.pre.sc2)
 
 
@@ -1112,7 +1109,7 @@ names(monthly.means.k.sc2)[1]<-paste("kaverage")
 sd.mmk.sc2 <- sd(monthly.means.k.sc2$kaverage)
 
 #determine annual mean temp
-annual.av.f.sc2 <- mean(dat.RCP4.5.2050$taveF)
+annual.av.f.sc2 <- mean(dat.RCP4.5.2050$TMeanF)
 
 #convert it to Kelvin
 annual.av.k.sc2. <- f.to.k(annual.av.f.sc2)
@@ -1126,24 +1123,24 @@ cv.temperature.seasonality.sc2
 ##Max Temperature of Warmest Month
 #lets first figure out the warmest month
 #saving it in case we need it
-warmest.day.warmest.month.sc2 <- c(max(jan.dat.sc2$tmaxF), max(feb.dat.sc2$tmaxF), max(mar.dat.sc2$tmaxF), max(apr.dat.sc2$tmaxF),
-                                   max(may.dat.sc2$tmaxF), max(jun.dat.sc2$tmaxF), max(jul.dat.sc2$tmaxF), max(aug.dat.sc2$tmaxF),
-                                   max(sep.dat.sc2$tmaxF), max(oct.dat.sc2$tmaxF), max(nov.dat.sc2$tmaxF), max(dec.dat.sc2$tmaxF)
-)[which.max(c(mean(jan.dat.sc2$tmaxF), mean(feb.dat.sc2$tmaxF), mean(mar.dat.sc2$tmaxF), mean(apr.dat.sc2$tmaxF), 
-              mean(may.dat.sc2$tmaxF), mean(jun.dat.sc2$tmaxF), mean(jul.dat.sc2$tmaxF), mean(aug.dat.sc2$tmaxF), 
-              mean(sep.dat.sc2$tmaxF), mean(oct.dat.sc2$tmaxF), mean(nov.dat.sc2$tmaxF), mean(dec.dat.sc2$tmaxF)))]
+warmest.day.warmest.month.sc2 <- c(max(jan.dat.sc2$TMaxF), max(feb.dat.sc2$TMaxF), max(mar.dat.sc2$TMaxF), max(apr.dat.sc2$TMaxF),
+                                   max(may.dat.sc2$TMaxF), max(jun.dat.sc2$TMaxF), max(jul.dat.sc2$TMaxF), max(aug.dat.sc2$TMaxF),
+                                   max(sep.dat.sc2$TMaxF), max(oct.dat.sc2$TMaxF), max(nov.dat.sc2$TMaxF), max(dec.dat.sc2$TMaxF)
+)[which.max(c(mean(jan.dat.sc2$TMaxF), mean(feb.dat.sc2$TMaxF), mean(mar.dat.sc2$TMaxF), mean(apr.dat.sc2$TMaxF), 
+              mean(may.dat.sc2$TMaxF), mean(jun.dat.sc2$TMaxF), mean(jul.dat.sc2$TMaxF), mean(aug.dat.sc2$TMaxF), 
+              mean(sep.dat.sc2$TMaxF), mean(oct.dat.sc2$TMaxF), mean(nov.dat.sc2$TMaxF), mean(dec.dat.sc2$TMaxF)))]
 
 #value
 warmest.day.warmest.month.sc2
 
 ##Min Temperature of Coldest Month
 #saving it in case they want it
-coldest.day.coldest.month.sc2 <- c(min(jan.dat.sc2$tminF), min(feb.dat.sc2$tminF), min(mar.dat.sc2$tminF), min(apr.dat.sc2$tminF),
-                                   min(may.dat.sc2$tminF), min(jun.dat.sc2$tminF), min(jul.dat.sc2$tminF), min(aug.dat.sc2$tminF),
-                                   min(sep.dat.sc2$tminF), min(oct.dat.sc2$tminF), min(nov.dat.sc2$tminF), min(dec.dat.sc2$tminF)
-)[which.min(c(mean(jan.dat.sc2$tminF), mean(feb.dat.sc2$tminF), mean(mar.dat.sc2$tminF), mean(apr.dat.sc2$tminF), 
-              mean(may.dat.sc2$tminF), mean(jun.dat.sc2$tminF), mean(jul.dat.sc2$tminF), mean(aug.dat.sc2$tminF), 
-              mean(sep.dat.sc2$tminF), mean(oct.dat.sc2$tminF), mean(nov.dat.sc2$tminF), mean(dec.dat.sc2$tminF)))]
+coldest.day.coldest.month.sc2 <- c(min(jan.dat.sc2$TMinF), min(feb.dat.sc2$TMinF), min(mar.dat.sc2$TMinF), min(apr.dat.sc2$TMinF),
+                                   min(may.dat.sc2$TMinF), min(jun.dat.sc2$TMinF), min(jul.dat.sc2$TMinF), min(aug.dat.sc2$TMinF),
+                                   min(sep.dat.sc2$TMinF), min(oct.dat.sc2$TMinF), min(nov.dat.sc2$TMinF), min(dec.dat.sc2$TMinF)
+)[which.min(c(mean(jan.dat.sc2$TMinF), mean(feb.dat.sc2$TMinF), mean(mar.dat.sc2$TMinF), mean(apr.dat.sc2$TMinF), 
+              mean(may.dat.sc2$TMinF), mean(jun.dat.sc2$TMinF), mean(jul.dat.sc2$TMinF), mean(aug.dat.sc2$TMinF), 
+              mean(sep.dat.sc2$TMinF), mean(oct.dat.sc2$TMinF), mean(nov.dat.sc2$TMinF), mean(dec.dat.sc2$TMinF)))]
 
 #value
 coldest.day.coldest.month.sc2
@@ -1158,48 +1155,48 @@ annual.temperature.range.sc2
 
 ##Mean Temperature of Wettest Quarter
 
-mean.temp.wettest.quarter.sc2 <- c(mean(q1.dat.sc2$taveF), mean(q2.dat.sc2$taveF), mean(q3.dat.sc2$taveF), mean(q4.dat.sc2$taveF),
-                                   mean(q5.dat.sc2$taveF), mean(q6.dat.sc2$taveF), mean(q7.dat.sc2$taveF), mean(q8.dat.sc2$taveF),
-                                   mean(q9.dat.sc2$taveF), mean(q10.dat.sc2$taveF), mean(q11.dat.sc2$taveF), mean(q12.dat.sc2$taveF)
-)[which.max(c(mean(q1.dat.sc2$ppt_in)*90.25, mean(q2.dat.sc2$ppt_in)*89.25, mean(q3.dat.sc2$ppt_in)*92, mean(q4.dat.sc2$ppt_in)*91, 
-              mean(q5.dat.sc2$ppt_in)*92, mean(q6.dat.sc2$ppt_in)*92, mean(q7.dat.sc2$ppt_in)*92, mean(q8.dat.sc2$ppt_in)*92, 
-              mean(q9.dat.sc2$ppt_in)*91, mean(q10.dat.sc2$ppt_in)*92, mean(q11.dat.sc2$ppt_in)*92, mean(q12.dat.sc2$ppt_in)*90.25))]
+mean.temp.wettest.quarter.sc2 <- c(mean(q1.dat.sc2$TMeanF), mean(q2.dat.sc2$TMeanF), mean(q3.dat.sc2$TMeanF), mean(q4.dat.sc2$TMeanF),
+                                   mean(q5.dat.sc2$TMeanF), mean(q6.dat.sc2$TMeanF), mean(q7.dat.sc2$TMeanF), mean(q8.dat.sc2$TMeanF),
+                                   mean(q9.dat.sc2$TMeanF), mean(q10.dat.sc2$TMeanF), mean(q11.dat.sc2$TMeanF), mean(q12.dat.sc2$TMeanF)
+)[which.max(c(mean(q1.dat.sc2$PPT_in)*90.25, mean(q2.dat.sc2$PPT_in)*89.25, mean(q3.dat.sc2$PPT_in)*92, mean(q4.dat.sc2$PPT_in)*91, 
+              mean(q5.dat.sc2$PPT_in)*92, mean(q6.dat.sc2$PPT_in)*92, mean(q7.dat.sc2$PPT_in)*92, mean(q8.dat.sc2$PPT_in)*92, 
+              mean(q9.dat.sc2$PPT_in)*91, mean(q10.dat.sc2$PPT_in)*92, mean(q11.dat.sc2$PPT_in)*92, mean(q12.dat.sc2$PPT_in)*90.25))]
 
 #value
 mean.temp.wettest.quarter.sc2
 
 ##Mean Temperature of Driest Quarter
 
-mean.temp.driest.quarter.sc2 <- c(mean(q1.dat.sc2$taveF), mean(q2.dat.sc2$taveF), mean(q3.dat.sc2$taveF), mean(q4.dat.sc2$taveF),
-                                  mean(q5.dat.sc2$taveF), mean(q6.dat.sc2$taveF), mean(q7.dat.sc2$taveF), mean(q8.dat.sc2$taveF),
-                                  mean(q9.dat.sc2$taveF), mean(q10.dat.sc2$taveF), mean(q11.dat.sc2$taveF), mean(q12.dat.sc2$taveF)
-)[which.min(c(mean(q1.dat.sc2$ppt_in)*90.25, mean(q2.dat.sc2$ppt_in)*89.25, mean(q3.dat.sc2$ppt_in)*92, mean(q4.dat.sc2$ppt_in)*91, 
-              mean(q5.dat.sc2$ppt_in)*92, mean(q6.dat.sc2$ppt_in)*92, mean(q7.dat.sc2$ppt_in)*92, mean(q8.dat.sc2$ppt_in)*92, 
-              mean(q9.dat.sc2$ppt_in)*91, mean(q10.dat.sc2$ppt_in)*92, mean(q11.dat.sc2$ppt_in)*92, mean(q12.dat.sc2$ppt_in)*90.25))]
+mean.temp.driest.quarter.sc2 <- c(mean(q1.dat.sc2$TMeanF), mean(q2.dat.sc2$TMeanF), mean(q3.dat.sc2$TMeanF), mean(q4.dat.sc2$TMeanF),
+                                  mean(q5.dat.sc2$TMeanF), mean(q6.dat.sc2$TMeanF), mean(q7.dat.sc2$TMeanF), mean(q8.dat.sc2$TMeanF),
+                                  mean(q9.dat.sc2$TMeanF), mean(q10.dat.sc2$TMeanF), mean(q11.dat.sc2$TMeanF), mean(q12.dat.sc2$TMeanF)
+)[which.min(c(mean(q1.dat.sc2$PPT_in)*90.25, mean(q2.dat.sc2$PPT_in)*89.25, mean(q3.dat.sc2$PPT_in)*92, mean(q4.dat.sc2$PPT_in)*91, 
+              mean(q5.dat.sc2$PPT_in)*92, mean(q6.dat.sc2$PPT_in)*92, mean(q7.dat.sc2$PPT_in)*92, mean(q8.dat.sc2$PPT_in)*92, 
+              mean(q9.dat.sc2$PPT_in)*91, mean(q10.dat.sc2$PPT_in)*92, mean(q11.dat.sc2$PPT_in)*92, mean(q12.dat.sc2$PPT_in)*90.25))]
 
 #value
 mean.temp.driest.quarter.sc2
 
 ##Mean Temperature of Warmest Quarter
 
-mean.temp.warmest.quarter.sc2 <- c(mean(q1.dat.sc2$taveF), mean(q2.dat.sc2$taveF), mean(q3.dat.sc2$taveF), mean(q4.dat.sc2$taveF),
-                                   mean(q5.dat.sc2$taveF), mean(q6.dat.sc2$taveF), mean(q7.dat.sc2$taveF), mean(q8.dat.sc2$taveF),
-                                   mean(q9.dat.sc2$taveF), mean(q10.dat.sc2$taveF), mean(q11.dat.sc2$taveF), mean(q12.dat.sc2$taveF)
-)[which.max(c(mean(q1.dat.sc2$taveF), mean(q2.dat.sc2$taveF), mean(q3.dat.sc2$taveF), mean(q4.dat.sc2$taveF), 
-              mean(q5.dat.sc2$taveF), mean(q6.dat.sc2$taveF), mean(q7.dat.sc2$taveF), mean(q8.dat.sc2$taveF), 
-              mean(q9.dat.sc2$taveF), mean(q10.dat.sc2$taveF), mean(q11.dat.sc2$taveF), mean(q12.dat.sc2$taveF)))]
+mean.temp.warmest.quarter.sc2 <- c(mean(q1.dat.sc2$TMeanF), mean(q2.dat.sc2$TMeanF), mean(q3.dat.sc2$TMeanF), mean(q4.dat.sc2$TMeanF),
+                                   mean(q5.dat.sc2$TMeanF), mean(q6.dat.sc2$TMeanF), mean(q7.dat.sc2$TMeanF), mean(q8.dat.sc2$TMeanF),
+                                   mean(q9.dat.sc2$TMeanF), mean(q10.dat.sc2$TMeanF), mean(q11.dat.sc2$TMeanF), mean(q12.dat.sc2$TMeanF)
+)[which.max(c(mean(q1.dat.sc2$TMeanF), mean(q2.dat.sc2$TMeanF), mean(q3.dat.sc2$TMeanF), mean(q4.dat.sc2$TMeanF), 
+              mean(q5.dat.sc2$TMeanF), mean(q6.dat.sc2$TMeanF), mean(q7.dat.sc2$TMeanF), mean(q8.dat.sc2$TMeanF), 
+              mean(q9.dat.sc2$TMeanF), mean(q10.dat.sc2$TMeanF), mean(q11.dat.sc2$TMeanF), mean(q12.dat.sc2$TMeanF)))]
 
 #value
 mean.temp.warmest.quarter.sc2
 
 ##Mean Temperature of Coldest Quarter
 
-mean.temp.coldest.quarter.sc2 <- c(mean(q1.dat.sc2$taveF), mean(q2.dat.sc2$taveF), mean(q3.dat.sc2$taveF), mean(q4.dat.sc2$taveF),
-                                   mean(q5.dat.sc2$taveF), mean(q6.dat.sc2$taveF), mean(q7.dat.sc2$taveF), mean(q8.dat.sc2$taveF),
-                                   mean(q9.dat.sc2$taveF), mean(q10.dat.sc2$taveF), mean(q11.dat.sc2$taveF), mean(q12.dat.sc2$taveF)
-)[which.min(c(mean(q1.dat.sc2$taveF), mean(q2.dat.sc2$taveF), mean(q3.dat.sc2$taveF), mean(q4.dat.sc2$taveF), 
-              mean(q5.dat.sc2$taveF), mean(q6.dat.sc2$taveF), mean(q7.dat.sc2$taveF), mean(q8.dat.sc2$taveF), 
-              mean(q9.dat.sc2$taveF), mean(q10.dat.sc2$taveF), mean(q11.dat.sc2$taveF), mean(q12.dat.sc2$taveF)))]
+mean.temp.coldest.quarter.sc2 <- c(mean(q1.dat.sc2$TMeanF), mean(q2.dat.sc2$TMeanF), mean(q3.dat.sc2$TMeanF), mean(q4.dat.sc2$TMeanF),
+                                   mean(q5.dat.sc2$TMeanF), mean(q6.dat.sc2$TMeanF), mean(q7.dat.sc2$TMeanF), mean(q8.dat.sc2$TMeanF),
+                                   mean(q9.dat.sc2$TMeanF), mean(q10.dat.sc2$TMeanF), mean(q11.dat.sc2$TMeanF), mean(q12.dat.sc2$TMeanF)
+)[which.min(c(mean(q1.dat.sc2$TMeanF), mean(q2.dat.sc2$TMeanF), mean(q3.dat.sc2$TMeanF), mean(q4.dat.sc2$TMeanF), 
+              mean(q5.dat.sc2$TMeanF), mean(q6.dat.sc2$TMeanF), mean(q7.dat.sc2$TMeanF), mean(q8.dat.sc2$TMeanF), 
+              mean(q9.dat.sc2$TMeanF), mean(q10.dat.sc2$TMeanF), mean(q11.dat.sc2$TMeanF), mean(q12.dat.sc2$TMeanF)))]
 
 #value
 mean.temp.coldest.quarter.sc2
@@ -1242,7 +1239,7 @@ names(monthly.means.precip.sc2)[1]<-paste("praverage")
 sd.precip.sc2 <- sd(monthly.means.precip.sc2$praverage)
 
 #annual precipitation / getting the sum of over 30 years then dividing by 10 to get annual average
-an.precip.sc2 <- (sum(dat.RCP4.5.2050$ppt_mm)/30)
+an.precip.sc2 <- (sum(dat.RCP4.5.2050$PPT_mm)/30)
 mo.precip.sc2 <- an.precip.sc2/12
 
 #final calculation
@@ -1253,12 +1250,12 @@ precip.seasonality.cv.sc2
 
 ##Precipitation of Wettest Quarter
 
-precip.wettest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$ppt_in), sum(q2.dat.sc2$ppt_in), sum(q3.dat.sc2$ppt_in), sum(q4.dat.sc2$ppt_in),
-                                    sum(q5.dat.sc2$ppt_in), sum(q6.dat.sc2$ppt_in), sum(q7.dat.sc2$ppt_in), sum(q8.dat.sc2$ppt_in),
-                                    sum(q9.dat.sc2$ppt_in), sum(q10.dat.sc2$ppt_in), sum(q11.dat.sc2$ppt_in), sum(q12.dat.sc2$ppt_in)
-)[which.max(c(mean(q1.dat.sc2$ppt_in)*90.25, mean(q2.dat.sc2$ppt_in)*89.25, mean(q3.dat.sc2$ppt_in)*92, mean(q4.dat.sc2$ppt_in)*91, 
-              mean(q5.dat.sc2$ppt_in)*92, mean(q6.dat.sc2$ppt_in)*92, mean(q7.dat.sc2$ppt_in)*92, mean(q8.dat.sc2$ppt_in)*92, 
-              mean(q9.dat.sc2$ppt_in)*91, mean(q10.dat.sc2$ppt_in)*92, mean(q11.dat.sc2$ppt_in)*92, mean(q12.dat.sc2$ppt_in)*90.25))]
+precip.wettest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$PPT_in), sum(q2.dat.sc2$PPT_in), sum(q3.dat.sc2$PPT_in), sum(q4.dat.sc2$PPT_in),
+                                    sum(q5.dat.sc2$PPT_in), sum(q6.dat.sc2$PPT_in), sum(q7.dat.sc2$PPT_in), sum(q8.dat.sc2$PPT_in),
+                                    sum(q9.dat.sc2$PPT_in), sum(q10.dat.sc2$PPT_in), sum(q11.dat.sc2$PPT_in), sum(q12.dat.sc2$PPT_in)
+)[which.max(c(mean(q1.dat.sc2$PPT_in)*90.25, mean(q2.dat.sc2$PPT_in)*89.25, mean(q3.dat.sc2$PPT_in)*92, mean(q4.dat.sc2$PPT_in)*91, 
+              mean(q5.dat.sc2$PPT_in)*92, mean(q6.dat.sc2$PPT_in)*92, mean(q7.dat.sc2$PPT_in)*92, mean(q8.dat.sc2$PPT_in)*92, 
+              mean(q9.dat.sc2$PPT_in)*91, mean(q10.dat.sc2$PPT_in)*92, mean(q11.dat.sc2$PPT_in)*92, mean(q12.dat.sc2$PPT_in)*90.25))]
 
 #previous calculation is the sum over 30 year projected period of said quarter
 #divide by 10 to get the annual quarter calculation 
@@ -1269,12 +1266,12 @@ precip.wettest.quarter.sc2
 
 ##Precipitation of Driest Quarter
 
-precip.driest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$ppt_in), sum(q2.dat.sc2$ppt_in), sum(q3.dat.sc2$ppt_in), sum(q4.dat.sc2$ppt_in),
-                                   sum(q5.dat.sc2$ppt_in), sum(q6.dat.sc2$ppt_in), sum(q7.dat.sc2$ppt_in), sum(q8.dat.sc2$ppt_in),
-                                   sum(q9.dat.sc2$ppt_in), sum(q10.dat.sc2$ppt_in), sum(q11.dat.sc2$ppt_in), sum(q12.dat.sc2$ppt_in)
-)[which.min(c(mean(q1.dat.sc2$ppt_in)*90.25, mean(q2.dat.sc2$ppt_in)*89.25, mean(q3.dat.sc2$ppt_in)*92, mean(q4.dat.sc2$ppt_in)*91, 
-              mean(q5.dat.sc2$ppt_in)*92, mean(q6.dat.sc2$ppt_in)*92, mean(q7.dat.sc2$ppt_in)*92, mean(q8.dat.sc2$ppt_in)*92, 
-              mean(q9.dat.sc2$ppt_in)*91, mean(q10.dat.sc2$ppt_in)*92, mean(q11.dat.sc2$ppt_in)*92, mean(q12.dat.sc2$ppt_in)*90.25))]
+precip.driest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$PPT_in), sum(q2.dat.sc2$PPT_in), sum(q3.dat.sc2$PPT_in), sum(q4.dat.sc2$PPT_in),
+                                   sum(q5.dat.sc2$PPT_in), sum(q6.dat.sc2$PPT_in), sum(q7.dat.sc2$PPT_in), sum(q8.dat.sc2$PPT_in),
+                                   sum(q9.dat.sc2$PPT_in), sum(q10.dat.sc2$PPT_in), sum(q11.dat.sc2$PPT_in), sum(q12.dat.sc2$PPT_in)
+)[which.min(c(mean(q1.dat.sc2$PPT_in)*90.25, mean(q2.dat.sc2$PPT_in)*89.25, mean(q3.dat.sc2$PPT_in)*92, mean(q4.dat.sc2$PPT_in)*91, 
+              mean(q5.dat.sc2$PPT_in)*92, mean(q6.dat.sc2$PPT_in)*92, mean(q7.dat.sc2$PPT_in)*92, mean(q8.dat.sc2$PPT_in)*92, 
+              mean(q9.dat.sc2$PPT_in)*91, mean(q10.dat.sc2$PPT_in)*92, mean(q11.dat.sc2$PPT_in)*92, mean(q12.dat.sc2$PPT_in)*90.25))]
 
 
 precip.driest.quarter.sc2 <- precip.driest.quarter.pre.sc2/30
@@ -1284,12 +1281,12 @@ precip.driest.quarter.sc2
 
 ##Precipitation of Coldest Quarter
 
-precip.coldest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$ppt_in), sum(q2.dat.sc2$ppt_in), sum(q3.dat.sc2$ppt_in), sum(q4.dat.sc2$ppt_in),
-                                    sum(q5.dat.sc2$ppt_in), sum(q6.dat.sc2$ppt_in), sum(q7.dat.sc2$ppt_in), sum(q8.dat.sc2$ppt_in),
-                                    sum(q9.dat.sc2$ppt_in), sum(q10.dat.sc2$ppt_in), sum(q11.dat.sc2$ppt_in), sum(q12.dat.sc2$ppt_in)
-)[which.min(c(mean(q1.dat.sc2$taveF), mean(q2.dat.sc2$taveF), mean(q3.dat.sc2$taveF), mean(q4.dat.sc2$taveF), 
-              mean(q5.dat.sc2$taveF), mean(q6.dat.sc2$taveF), mean(q7.dat.sc2$taveF), mean(q8.dat.sc2$taveF), 
-              mean(q9.dat.sc2$taveF), mean(q10.dat.sc2$taveF), mean(q11.dat.sc2$taveF), mean(q12.dat.sc2$taveF)))]
+precip.coldest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$PPT_in), sum(q2.dat.sc2$PPT_in), sum(q3.dat.sc2$PPT_in), sum(q4.dat.sc2$PPT_in),
+                                    sum(q5.dat.sc2$PPT_in), sum(q6.dat.sc2$PPT_in), sum(q7.dat.sc2$PPT_in), sum(q8.dat.sc2$PPT_in),
+                                    sum(q9.dat.sc2$PPT_in), sum(q10.dat.sc2$PPT_in), sum(q11.dat.sc2$PPT_in), sum(q12.dat.sc2$PPT_in)
+)[which.min(c(mean(q1.dat.sc2$TMeanF), mean(q2.dat.sc2$TMeanF), mean(q3.dat.sc2$TMeanF), mean(q4.dat.sc2$TMeanF), 
+              mean(q5.dat.sc2$TMeanF), mean(q6.dat.sc2$TMeanF), mean(q7.dat.sc2$TMeanF), mean(q8.dat.sc2$TMeanF), 
+              mean(q9.dat.sc2$TMeanF), mean(q10.dat.sc2$TMeanF), mean(q11.dat.sc2$TMeanF), mean(q12.dat.sc2$TMeanF)))]
 
 #previous calculation is the sum over   30 year historical period of said quarter
 #divide by 10 to get the annual quarter calculation 
@@ -1300,12 +1297,12 @@ precip.coldest.quarter.sc2
 
 ##Precipitation of the Warmest Quarter
 
-precip.warmest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$ppt_in), sum(q2.dat.sc2$ppt_in), sum(q3.dat.sc2$ppt_in), sum(q4.dat.sc2$ppt_in),
-                                    sum(q5.dat.sc2$ppt_in), sum(q6.dat.sc2$ppt_in), sum(q7.dat.sc2$ppt_in), sum(q8.dat.sc2$ppt_in),
-                                    sum(q9.dat.sc2$ppt_in), sum(q10.dat.sc2$ppt_in), sum(q11.dat.sc2$ppt_in), sum(q12.dat.sc2$ppt_in)
-)[which.max(c(mean(q1.dat.sc2$taveF), mean(q2.dat.sc2$taveF), mean(q3.dat.sc2$taveF), mean(q4.dat.sc2$taveF), 
-              mean(q5.dat.sc2$taveF), mean(q6.dat.sc2$taveF), mean(q7.dat.sc2$taveF), mean(q8.dat.sc2$taveF), 
-              mean(q9.dat.sc2$taveF), mean(q10.dat.sc2$taveF), mean(q11.dat.sc2$taveF), mean(q12.dat.sc2$taveF)))]
+precip.warmest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$PPT_in), sum(q2.dat.sc2$PPT_in), sum(q3.dat.sc2$PPT_in), sum(q4.dat.sc2$PPT_in),
+                                    sum(q5.dat.sc2$PPT_in), sum(q6.dat.sc2$PPT_in), sum(q7.dat.sc2$PPT_in), sum(q8.dat.sc2$PPT_in),
+                                    sum(q9.dat.sc2$PPT_in), sum(q10.dat.sc2$PPT_in), sum(q11.dat.sc2$PPT_in), sum(q12.dat.sc2$PPT_in)
+)[which.max(c(mean(q1.dat.sc2$TMeanF), mean(q2.dat.sc2$TMeanF), mean(q3.dat.sc2$TMeanF), mean(q4.dat.sc2$TMeanF), 
+              mean(q5.dat.sc2$TMeanF), mean(q6.dat.sc2$TMeanF), mean(q7.dat.sc2$TMeanF), mean(q8.dat.sc2$TMeanF), 
+              mean(q9.dat.sc2$TMeanF), mean(q10.dat.sc2$TMeanF), mean(q11.dat.sc2$TMeanF), mean(q12.dat.sc2$TMeanF)))]
 
 #previous calculation is the sum over 30 year projected period of said quarter
 #divide by 10 to get the annual quarter calculation 
@@ -1320,13 +1317,13 @@ precip.warmest.quarter.sc2
 
 month <-        c(month.abb)
 month           #make sure the data lines up with table dude
-sc3.temp.av <- c(dat.RCP8.5.2030$taveF)
+sc3.temp.av <- c(dat.RCP8.5.2030$TMeanF)
 sc3.temp.av   #make sure the data lines up with table dude
-sc3.temp.hi <- c(dat.RCP8.5.2030$tmaxF)
+sc3.temp.hi <- c(dat.RCP8.5.2030$TMaxF)
 sc3.temp.hi    #make sure the data lines up with table dude
-sc3.temp.lo <- c(dat.RCP8.5.2030$tminF)
+sc3.temp.lo <- c(dat.RCP8.5.2030$TMinF)
 sc3.temp.lo    #make sure the data lines up with table dude
-sc3.precip <-  c(dat.RCP8.5.2030$ppt_in)
+sc3.precip <-  c(dat.RCP8.5.2030$PPT_in)
 sc3.precip     #make sure the data lines up with table dude
 
 #subsetting monthly data
@@ -1346,18 +1343,18 @@ dec.dat.sc3 <- subset(dat.RCP8.5.2030, month=="Dec")
 
 #subsetting monthly tav
 
-jan.tav.sc3 <- mean(jan.dat.sc3$taveF)
-feb.tav.sc3 <- mean(feb.dat.sc3$taveF)
-mar.tav.sc3 <- mean(mar.dat.sc3$taveF)
-apr.tav.sc3 <- mean(apr.dat.sc3$taveF)
-may.tav.sc3 <- mean(may.dat.sc3$taveF)
-jun.tav.sc3 <- mean(jun.dat.sc3$taveF)
-jul.tav.sc3 <- mean(jul.dat.sc3$taveF)
-aug.tav.sc3 <- mean(aug.dat.sc3$taveF)
-sep.tav.sc3 <- mean(sep.dat.sc3$taveF)
-oct.tav.sc3 <- mean(oct.dat.sc3$taveF)
-nov.tav.sc3 <- mean(nov.dat.sc3$taveF)
-dec.tav.sc3 <- mean(dec.dat.sc3$taveF)
+jan.tav.sc3 <- mean(jan.dat.sc3$TMeanF)
+feb.tav.sc3 <- mean(feb.dat.sc3$TMeanF)
+mar.tav.sc3 <- mean(mar.dat.sc3$TMeanF)
+apr.tav.sc3 <- mean(apr.dat.sc3$TMeanF)
+may.tav.sc3 <- mean(may.dat.sc3$TMeanF)
+jun.tav.sc3 <- mean(jun.dat.sc3$TMeanF)
+jul.tav.sc3 <- mean(jul.dat.sc3$TMeanF)
+aug.tav.sc3 <- mean(aug.dat.sc3$TMeanF)
+sep.tav.sc3 <- mean(sep.dat.sc3$TMeanF)
+oct.tav.sc3 <- mean(oct.dat.sc3$TMeanF)
+nov.tav.sc3 <- mean(nov.dat.sc3$TMeanF)
+dec.tav.sc3 <- mean(dec.dat.sc3$TMeanF)
 
 #subsetting different quarters
 
@@ -1376,58 +1373,58 @@ q12.dat.sc3 <- rbind(dec.dat.sc3, jan.dat.sc3, feb.dat.sc3)
 
 #subsetting precipitation data
 
-jan.prav.dat.sc3 <- (sum(jan.dat.sc3$ppt_in))/30
-feb.prav.dat.sc3 <- (sum(feb.dat.sc3$ppt_in))/30
-mar.prav.dat.sc3 <- (sum(mar.dat.sc3$ppt_in))/30
-apr.prav.dat.sc3 <- (sum(apr.dat.sc3$ppt_in))/30
-may.prav.dat.sc3 <- (sum(may.dat.sc3$ppt_in))/30
-jun.prav.dat.sc3 <- (sum(jun.dat.sc3$ppt_in))/30
-jul.prav.dat.sc3 <- (sum(jul.dat.sc3$ppt_in))/30
-aug.prav.dat.sc3 <- (sum(aug.dat.sc3$ppt_in))/30
-sep.prav.dat.sc3 <- (sum(sep.dat.sc3$ppt_in))/30
-oct.prav.dat.sc3 <- (sum(oct.dat.sc3$ppt_in))/30
-nov.prav.dat.sc3 <- (sum(nov.dat.sc3$ppt_in))/30
-dec.prav.dat.sc3 <- (sum(dec.dat.sc3$ppt_in))/30
+jan.prav.dat.sc3 <- (sum(jan.dat.sc3$PPT_in))/30
+feb.prav.dat.sc3 <- (sum(feb.dat.sc3$PPT_in))/30
+mar.prav.dat.sc3 <- (sum(mar.dat.sc3$PPT_in))/30
+apr.prav.dat.sc3 <- (sum(apr.dat.sc3$PPT_in))/30
+may.prav.dat.sc3 <- (sum(may.dat.sc3$PPT_in))/30
+jun.prav.dat.sc3 <- (sum(jun.dat.sc3$PPT_in))/30
+jul.prav.dat.sc3 <- (sum(jul.dat.sc3$PPT_in))/30
+aug.prav.dat.sc3 <- (sum(aug.dat.sc3$PPT_in))/30
+sep.prav.dat.sc3 <- (sum(sep.dat.sc3$PPT_in))/30
+oct.prav.dat.sc3 <- (sum(oct.dat.sc3$PPT_in))/30
+nov.prav.dat.sc3 <- (sum(nov.dat.sc3$PPT_in))/30
+dec.prav.dat.sc3 <- (sum(dec.dat.sc3$PPT_in))/30
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
 #SUMof(Tmax-Tmin)/12
 
-jan.max.sc3 <- mean(jan.dat.sc3$tmaxF)
-jan.min.sc3 <- mean(jan.dat.sc3$tminF)
+jan.max.sc3 <- mean(jan.dat.sc3$TMaxF)
+jan.min.sc3 <- mean(jan.dat.sc3$TMinF)
 
-feb.max.sc3 <- mean(feb.dat.sc3$tmaxF)
-feb.min.sc3 <- mean(feb.dat.sc3$tminF)
+feb.max.sc3 <- mean(feb.dat.sc3$TMaxF)
+feb.min.sc3 <- mean(feb.dat.sc3$TMinF)
 
-mar.max.sc3 <- mean(mar.dat.sc3$tmaxF)
-mar.min.sc3 <- mean(mar.dat.sc3$tminF)
+mar.max.sc3 <- mean(mar.dat.sc3$TMaxF)
+mar.min.sc3 <- mean(mar.dat.sc3$TMinF)
 
-apr.max.sc3 <- mean(apr.dat.sc3$tmaxF)
-apr.min.sc3 <- mean(apr.dat.sc3$tminF)
+apr.max.sc3 <- mean(apr.dat.sc3$TMaxF)
+apr.min.sc3 <- mean(apr.dat.sc3$TMinF)
 
-may.max.sc3 <- mean(may.dat.sc3$tmaxF)
-may.min.sc3 <- mean(may.dat.sc3$tminF)
+may.max.sc3 <- mean(may.dat.sc3$TMaxF)
+may.min.sc3 <- mean(may.dat.sc3$TMinF)
 
-jun.max.sc3 <- mean(jun.dat.sc3$tmaxF)
-jun.min.sc3 <- mean(jun.dat.sc3$tminF)
+jun.max.sc3 <- mean(jun.dat.sc3$TMaxF)
+jun.min.sc3 <- mean(jun.dat.sc3$TMinF)
 
-jul.max.sc3 <- mean(jul.dat.sc3$tmaxF)
-jul.min.sc3 <- mean(jul.dat.sc3$tminF)
+jul.max.sc3 <- mean(jul.dat.sc3$TMaxF)
+jul.min.sc3 <- mean(jul.dat.sc3$TMinF)
 
-aug.max.sc3 <- mean(aug.dat.sc3$tmaxF)
-aug.min.sc3 <- mean(aug.dat.sc3$tminF)
+aug.max.sc3 <- mean(aug.dat.sc3$TMaxF)
+aug.min.sc3 <- mean(aug.dat.sc3$TMinF)
 
-sep.max.sc3 <- mean(sep.dat.sc3$tmaxF)
-sep.min.sc3 <- mean(sep.dat.sc3$tminF)
+sep.max.sc3 <- mean(sep.dat.sc3$TMaxF)
+sep.min.sc3 <- mean(sep.dat.sc3$TMinF)
 
-oct.max.sc3 <- mean(oct.dat.sc3$tmaxF)
-oct.min.sc3 <- mean(oct.dat.sc3$tminF)
+oct.max.sc3 <- mean(oct.dat.sc3$TMaxF)
+oct.min.sc3 <- mean(oct.dat.sc3$TMinF)
 
-nov.max.sc3 <- mean(nov.dat.sc3$tmaxF)
-nov.min.sc3 <- mean(nov.dat.sc3$tminF)
+nov.max.sc3 <- mean(nov.dat.sc3$TMaxF)
+nov.min.sc3 <- mean(nov.dat.sc3$TMinF)
 
-dec.max.sc3 <- mean(dec.dat.sc3$tmaxF)
-dec.min.sc3 <- mean(dec.dat.sc3$tminF)
+dec.max.sc3 <- mean(dec.dat.sc3$TMaxF)
+dec.min.sc3 <- mean(dec.dat.sc3$TMinF)
 
 #differences
 jan.dif.sc3 <- jan.max.sc3-jan.min.sc3
@@ -1467,9 +1464,9 @@ f.to.c <- function(temp) {
 }
 
 #absolute max and min
-abs.tmax.pre.sc3 <- max(dat.RCP8.5.2030$tmaxF)
+abs.tmax.pre.sc3 <- max(dat.RCP8.5.2030$TMaxF)
 abs.tmax.c.sc3 <- f.to.c(abs.tmax.pre.sc3)
-abs.tmin.pre.sc3 <- min(dat.RCP8.5.2030$tminF)
+abs.tmin.pre.sc3 <- min(dat.RCP8.5.2030$TMinF)
 abs.tmin.c.sc3 <- f.to.c(abs.tmin.pre.sc3)
 
 
@@ -1536,7 +1533,7 @@ names(monthly.means.k.sc3)[1]<-paste("kaverage")
 sd.mmk.sc3 <- sd(monthly.means.k.sc3$kaverage)
 
 #determine annual mean temp
-annual.av.f.sc3 <- mean(dat.RCP8.5.2030$taveF)
+annual.av.f.sc3 <- mean(dat.RCP8.5.2030$TMeanF)
 
 #convert it to Kelvin
 annual.av.k.sc3. <- f.to.k(annual.av.f.sc3)
@@ -1550,24 +1547,24 @@ cv.temperature.seasonality.sc3
 ##Max Temperature of Warmest Month
 #lets first figure out the warmest month
 #saving it in case we need it
-warmest.day.warmest.month.sc3 <- c(max(jan.dat.sc3$tmaxF), max(feb.dat.sc3$tmaxF), max(mar.dat.sc3$tmaxF), max(apr.dat.sc3$tmaxF),
-                                   max(may.dat.sc3$tmaxF), max(jun.dat.sc3$tmaxF), max(jul.dat.sc3$tmaxF), max(aug.dat.sc3$tmaxF),
-                                   max(sep.dat.sc3$tmaxF), max(oct.dat.sc3$tmaxF), max(nov.dat.sc3$tmaxF), max(dec.dat.sc3$tmaxF)
-)[which.max(c(mean(jan.dat.sc3$tmaxF), mean(feb.dat.sc3$tmaxF), mean(mar.dat.sc3$tmaxF), mean(apr.dat.sc3$tmaxF), 
-              mean(may.dat.sc3$tmaxF), mean(jun.dat.sc3$tmaxF), mean(jul.dat.sc3$tmaxF), mean(aug.dat.sc3$tmaxF), 
-              mean(sep.dat.sc3$tmaxF), mean(oct.dat.sc3$tmaxF), mean(nov.dat.sc3$tmaxF), mean(dec.dat.sc3$tmaxF)))]
+warmest.day.warmest.month.sc3 <- c(max(jan.dat.sc3$TMaxF), max(feb.dat.sc3$TMaxF), max(mar.dat.sc3$TMaxF), max(apr.dat.sc3$TMaxF),
+                                   max(may.dat.sc3$TMaxF), max(jun.dat.sc3$TMaxF), max(jul.dat.sc3$TMaxF), max(aug.dat.sc3$TMaxF),
+                                   max(sep.dat.sc3$TMaxF), max(oct.dat.sc3$TMaxF), max(nov.dat.sc3$TMaxF), max(dec.dat.sc3$TMaxF)
+)[which.max(c(mean(jan.dat.sc3$TMaxF), mean(feb.dat.sc3$TMaxF), mean(mar.dat.sc3$TMaxF), mean(apr.dat.sc3$TMaxF), 
+              mean(may.dat.sc3$TMaxF), mean(jun.dat.sc3$TMaxF), mean(jul.dat.sc3$TMaxF), mean(aug.dat.sc3$TMaxF), 
+              mean(sep.dat.sc3$TMaxF), mean(oct.dat.sc3$TMaxF), mean(nov.dat.sc3$TMaxF), mean(dec.dat.sc3$TMaxF)))]
 
 #value
 warmest.day.warmest.month.sc3
 
 ##Min Temperature of Coldest Month
 #saving it in case they want it
-coldest.day.coldest.month.sc3 <- c(min(jan.dat.sc3$tminF), min(feb.dat.sc3$tminF), min(mar.dat.sc3$tminF), min(apr.dat.sc3$tminF),
-                                   min(may.dat.sc3$tminF), min(jun.dat.sc3$tminF), min(jul.dat.sc3$tminF), min(aug.dat.sc3$tminF),
-                                   min(sep.dat.sc3$tminF), min(oct.dat.sc3$tminF), min(nov.dat.sc3$tminF), min(dec.dat.sc3$tminF)
-)[which.min(c(mean(jan.dat.sc3$tminF), mean(feb.dat.sc3$tminF), mean(mar.dat.sc3$tminF), mean(apr.dat.sc3$tminF), 
-              mean(may.dat.sc3$tminF), mean(jun.dat.sc3$tminF), mean(jul.dat.sc3$tminF), mean(aug.dat.sc3$tminF), 
-              mean(sep.dat.sc3$tminF), mean(oct.dat.sc3$tminF), mean(nov.dat.sc3$tminF), mean(dec.dat.sc3$tminF)))]
+coldest.day.coldest.month.sc3 <- c(min(jan.dat.sc3$TMinF), min(feb.dat.sc3$TMinF), min(mar.dat.sc3$TMinF), min(apr.dat.sc3$TMinF),
+                                   min(may.dat.sc3$TMinF), min(jun.dat.sc3$TMinF), min(jul.dat.sc3$TMinF), min(aug.dat.sc3$TMinF),
+                                   min(sep.dat.sc3$TMinF), min(oct.dat.sc3$TMinF), min(nov.dat.sc3$TMinF), min(dec.dat.sc3$TMinF)
+)[which.min(c(mean(jan.dat.sc3$TMinF), mean(feb.dat.sc3$TMinF), mean(mar.dat.sc3$TMinF), mean(apr.dat.sc3$TMinF), 
+              mean(may.dat.sc3$TMinF), mean(jun.dat.sc3$TMinF), mean(jul.dat.sc3$TMinF), mean(aug.dat.sc3$TMinF), 
+              mean(sep.dat.sc3$TMinF), mean(oct.dat.sc3$TMinF), mean(nov.dat.sc3$TMinF), mean(dec.dat.sc3$TMinF)))]
 
 #value
 coldest.day.coldest.month.sc3
@@ -1582,12 +1579,12 @@ annual.temperature.range.sc3
 
 ##Mean Temperature of Wettest Quarter
 
-mean.temp.wettest.quarter.sc3 <- c(mean(q1.dat.sc3$taveF), mean(q2.dat.sc3$taveF), mean(q3.dat.sc3$taveF), mean(q4.dat.sc3$taveF),
-                                   mean(q5.dat.sc3$taveF), mean(q6.dat.sc3$taveF), mean(q7.dat.sc3$taveF), mean(q8.dat.sc3$taveF),
-                                   mean(q9.dat.sc3$taveF), mean(q10.dat.sc3$taveF), mean(q11.dat.sc3$taveF), mean(q12.dat.sc3$taveF)
-)[which.max(c(mean(q1.dat.sc3$ppt_in)*90.25, mean(q2.dat.sc3$ppt_in)*89.25, mean(q3.dat.sc3$ppt_in)*92, mean(q4.dat.sc3$ppt_in)*91, 
-              mean(q5.dat.sc3$ppt_in)*92, mean(q6.dat.sc3$ppt_in)*92, mean(q7.dat.sc3$ppt_in)*92, mean(q8.dat.sc3$ppt_in)*92, 
-              mean(q9.dat.sc3$ppt_in)*91, mean(q10.dat.sc3$ppt_in)*92, mean(q11.dat.sc3$ppt_in)*92, mean(q12.dat.sc3$ppt_in)*90.25))]
+mean.temp.wettest.quarter.sc3 <- c(mean(q1.dat.sc3$TMeanF), mean(q2.dat.sc3$TMeanF), mean(q3.dat.sc3$TMeanF), mean(q4.dat.sc3$TMeanF),
+                                   mean(q5.dat.sc3$TMeanF), mean(q6.dat.sc3$TMeanF), mean(q7.dat.sc3$TMeanF), mean(q8.dat.sc3$TMeanF),
+                                   mean(q9.dat.sc3$TMeanF), mean(q10.dat.sc3$TMeanF), mean(q11.dat.sc3$TMeanF), mean(q12.dat.sc3$TMeanF)
+)[which.max(c(mean(q1.dat.sc3$PPT_in)*90.25, mean(q2.dat.sc3$PPT_in)*89.25, mean(q3.dat.sc3$PPT_in)*92, mean(q4.dat.sc3$PPT_in)*91, 
+              mean(q5.dat.sc3$PPT_in)*92, mean(q6.dat.sc3$PPT_in)*92, mean(q7.dat.sc3$PPT_in)*92, mean(q8.dat.sc3$PPT_in)*92, 
+              mean(q9.dat.sc3$PPT_in)*91, mean(q10.dat.sc3$PPT_in)*92, mean(q11.dat.sc3$PPT_in)*92, mean(q12.dat.sc3$PPT_in)*90.25))]
 
 
 #value
@@ -1595,36 +1592,36 @@ mean.temp.wettest.quarter.sc3
 
 ##Mean Temperature of Driest Quarter
 
-mean.temp.driest.quarter.sc3 <- c(mean(q1.dat.sc3$taveF), mean(q2.dat.sc3$taveF), mean(q3.dat.sc3$taveF), mean(q4.dat.sc3$taveF),
-                                  mean(q5.dat.sc3$taveF), mean(q6.dat.sc3$taveF), mean(q7.dat.sc3$taveF), mean(q8.dat.sc3$taveF),
-                                  mean(q9.dat.sc3$taveF), mean(q10.dat.sc3$taveF), mean(q11.dat.sc3$taveF), mean(q12.dat.sc3$taveF)
-)[which.min(c(mean(q1.dat.sc3$ppt_in)*90.25, mean(q2.dat.sc3$ppt_in)*89.25, mean(q3.dat.sc3$ppt_in)*92, mean(q4.dat.sc3$ppt_in)*91, 
-              mean(q5.dat.sc3$ppt_in)*92, mean(q6.dat.sc3$ppt_in)*92, mean(q7.dat.sc3$ppt_in)*92, mean(q8.dat.sc3$ppt_in)*92, 
-              mean(q9.dat.sc3$ppt_in)*91, mean(q10.dat.sc3$ppt_in)*92, mean(q11.dat.sc3$ppt_in)*92, mean(q12.dat.sc3$ppt_in)*90.25))]
+mean.temp.driest.quarter.sc3 <- c(mean(q1.dat.sc3$TMeanF), mean(q2.dat.sc3$TMeanF), mean(q3.dat.sc3$TMeanF), mean(q4.dat.sc3$TMeanF),
+                                  mean(q5.dat.sc3$TMeanF), mean(q6.dat.sc3$TMeanF), mean(q7.dat.sc3$TMeanF), mean(q8.dat.sc3$TMeanF),
+                                  mean(q9.dat.sc3$TMeanF), mean(q10.dat.sc3$TMeanF), mean(q11.dat.sc3$TMeanF), mean(q12.dat.sc3$TMeanF)
+)[which.min(c(mean(q1.dat.sc3$PPT_in)*90.25, mean(q2.dat.sc3$PPT_in)*89.25, mean(q3.dat.sc3$PPT_in)*92, mean(q4.dat.sc3$PPT_in)*91, 
+              mean(q5.dat.sc3$PPT_in)*92, mean(q6.dat.sc3$PPT_in)*92, mean(q7.dat.sc3$PPT_in)*92, mean(q8.dat.sc3$PPT_in)*92, 
+              mean(q9.dat.sc3$PPT_in)*91, mean(q10.dat.sc3$PPT_in)*92, mean(q11.dat.sc3$PPT_in)*92, mean(q12.dat.sc3$PPT_in)*90.25))]
 
 #value
 mean.temp.driest.quarter.sc3
 
 ##Mean Temperature of Warmest Quarter
 
-mean.temp.warmest.quarter.sc3 <- c(mean(q1.dat.sc3$taveF), mean(q2.dat.sc3$taveF), mean(q3.dat.sc3$taveF), mean(q4.dat.sc3$taveF),
-                                   mean(q5.dat.sc3$taveF), mean(q6.dat.sc3$taveF), mean(q7.dat.sc3$taveF), mean(q8.dat.sc3$taveF),
-                                   mean(q9.dat.sc3$taveF), mean(q10.dat.sc3$taveF), mean(q11.dat.sc3$taveF), mean(q12.dat.sc3$taveF)
-)[which.max(c(mean(q1.dat.sc3$taveF), mean(q2.dat.sc3$taveF), mean(q3.dat.sc3$taveF), mean(q4.dat.sc3$taveF), 
-              mean(q5.dat.sc3$taveF), mean(q6.dat.sc3$taveF), mean(q7.dat.sc3$taveF), mean(q8.dat.sc3$taveF), 
-              mean(q9.dat.sc3$taveF), mean(q10.dat.sc3$taveF), mean(q11.dat.sc3$taveF), mean(q12.dat.sc3$taveF)))]
+mean.temp.warmest.quarter.sc3 <- c(mean(q1.dat.sc3$TMeanF), mean(q2.dat.sc3$TMeanF), mean(q3.dat.sc3$TMeanF), mean(q4.dat.sc3$TMeanF),
+                                   mean(q5.dat.sc3$TMeanF), mean(q6.dat.sc3$TMeanF), mean(q7.dat.sc3$TMeanF), mean(q8.dat.sc3$TMeanF),
+                                   mean(q9.dat.sc3$TMeanF), mean(q10.dat.sc3$TMeanF), mean(q11.dat.sc3$TMeanF), mean(q12.dat.sc3$TMeanF)
+)[which.max(c(mean(q1.dat.sc3$TMeanF), mean(q2.dat.sc3$TMeanF), mean(q3.dat.sc3$TMeanF), mean(q4.dat.sc3$TMeanF), 
+              mean(q5.dat.sc3$TMeanF), mean(q6.dat.sc3$TMeanF), mean(q7.dat.sc3$TMeanF), mean(q8.dat.sc3$TMeanF), 
+              mean(q9.dat.sc3$TMeanF), mean(q10.dat.sc3$TMeanF), mean(q11.dat.sc3$TMeanF), mean(q12.dat.sc3$TMeanF)))]
 
 #value
 mean.temp.warmest.quarter.sc3
 
 ##Mean Temperature of Coldest Quarter
 
-mean.temp.coldest.quarter.sc3 <- c(mean(q1.dat.sc3$taveF), mean(q2.dat.sc3$taveF), mean(q3.dat.sc3$taveF), mean(q4.dat.sc3$taveF),
-                                   mean(q5.dat.sc3$taveF), mean(q6.dat.sc3$taveF), mean(q7.dat.sc3$taveF), mean(q8.dat.sc3$taveF),
-                                   mean(q9.dat.sc3$taveF), mean(q10.dat.sc3$taveF), mean(q11.dat.sc3$taveF), mean(q12.dat.sc3$taveF)
-)[which.min(c(mean(q1.dat.sc3$taveF), mean(q2.dat.sc3$taveF), mean(q3.dat.sc3$taveF), mean(q4.dat.sc3$taveF), 
-              mean(q5.dat.sc3$taveF), mean(q6.dat.sc3$taveF), mean(q7.dat.sc3$taveF), mean(q8.dat.sc3$taveF), 
-              mean(q9.dat.sc3$taveF), mean(q10.dat.sc3$taveF), mean(q11.dat.sc3$taveF), mean(q12.dat.sc3$taveF)))]
+mean.temp.coldest.quarter.sc3 <- c(mean(q1.dat.sc3$TMeanF), mean(q2.dat.sc3$TMeanF), mean(q3.dat.sc3$TMeanF), mean(q4.dat.sc3$TMeanF),
+                                   mean(q5.dat.sc3$TMeanF), mean(q6.dat.sc3$TMeanF), mean(q7.dat.sc3$TMeanF), mean(q8.dat.sc3$TMeanF),
+                                   mean(q9.dat.sc3$TMeanF), mean(q10.dat.sc3$TMeanF), mean(q11.dat.sc3$TMeanF), mean(q12.dat.sc3$TMeanF)
+)[which.min(c(mean(q1.dat.sc3$TMeanF), mean(q2.dat.sc3$TMeanF), mean(q3.dat.sc3$TMeanF), mean(q4.dat.sc3$TMeanF), 
+              mean(q5.dat.sc3$TMeanF), mean(q6.dat.sc3$TMeanF), mean(q7.dat.sc3$TMeanF), mean(q8.dat.sc3$TMeanF), 
+              mean(q9.dat.sc3$TMeanF), mean(q10.dat.sc3$TMeanF), mean(q11.dat.sc3$TMeanF), mean(q12.dat.sc3$TMeanF)))]
 
 #value
 mean.temp.coldest.quarter.sc3
@@ -1669,7 +1666,7 @@ names(monthly.means.precip.sc3)[1]<-paste("praverage")
 sd.precip.sc3 <- sd(monthly.means.precip.sc3$praverage)
 
 #annual precipitation / getting the sum of over 30 years then dividing by 10 to get annual average
-an.precip.sc3 <- (sum(dat.RCP8.5.2030$ppt_mm)/30)
+an.precip.sc3 <- (sum(dat.RCP8.5.2030$PPT_mm)/30)
 mo.precip.sc3 <- an.precip.sc3/12
 
 #final calculation
@@ -1680,12 +1677,12 @@ precip.seasonality.cv.sc3
 
 ##Precipitation of Wettest Quarter
 
-precip.wettest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$ppt_in), sum(q2.dat.sc3$ppt_in), sum(q3.dat.sc3$ppt_in), sum(q4.dat.sc3$ppt_in),
-                                    sum(q5.dat.sc3$ppt_in), sum(q6.dat.sc3$ppt_in), sum(q7.dat.sc3$ppt_in), sum(q8.dat.sc3$ppt_in),
-                                    sum(q9.dat.sc3$ppt_in), sum(q10.dat.sc3$ppt_in), sum(q11.dat.sc3$ppt_in), sum(q12.dat.sc3$ppt_in)
-)[which.max(c(mean(q1.dat.sc3$ppt_in)*90.25, mean(q2.dat.sc3$ppt_in)*89.25, mean(q3.dat.sc3$ppt_in)*92, mean(q4.dat.sc3$ppt_in)*91, 
-              mean(q5.dat.sc3$ppt_in)*92, mean(q6.dat.sc3$ppt_in)*92, mean(q7.dat.sc3$ppt_in)*92, mean(q8.dat.sc3$ppt_in)*92, 
-              mean(q9.dat.sc3$ppt_in)*91, mean(q10.dat.sc3$ppt_in)*92, mean(q11.dat.sc3$ppt_in)*92, mean(q12.dat.sc3$ppt_in)*90.25))]
+precip.wettest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$PPT_in), sum(q2.dat.sc3$PPT_in), sum(q3.dat.sc3$PPT_in), sum(q4.dat.sc3$PPT_in),
+                                    sum(q5.dat.sc3$PPT_in), sum(q6.dat.sc3$PPT_in), sum(q7.dat.sc3$PPT_in), sum(q8.dat.sc3$PPT_in),
+                                    sum(q9.dat.sc3$PPT_in), sum(q10.dat.sc3$PPT_in), sum(q11.dat.sc3$PPT_in), sum(q12.dat.sc3$PPT_in)
+)[which.max(c(mean(q1.dat.sc3$PPT_in)*90.25, mean(q2.dat.sc3$PPT_in)*89.25, mean(q3.dat.sc3$PPT_in)*92, mean(q4.dat.sc3$PPT_in)*91, 
+              mean(q5.dat.sc3$PPT_in)*92, mean(q6.dat.sc3$PPT_in)*92, mean(q7.dat.sc3$PPT_in)*92, mean(q8.dat.sc3$PPT_in)*92, 
+              mean(q9.dat.sc3$PPT_in)*91, mean(q10.dat.sc3$PPT_in)*92, mean(q11.dat.sc3$PPT_in)*92, mean(q12.dat.sc3$PPT_in)*90.25))]
 
 precip.wettest.quarter.sc3 <- precip.wettest.quarter.pre.sc3/30
 
@@ -1694,12 +1691,12 @@ precip.wettest.quarter.sc3
 
 ##Precipitation of Driest Quarter
 
-precip.driest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$ppt_in), sum(q2.dat.sc3$ppt_in), sum(q3.dat.sc3$ppt_in), sum(q4.dat.sc3$ppt_in),
-                                   sum(q5.dat.sc3$ppt_in), sum(q6.dat.sc3$ppt_in), sum(q7.dat.sc3$ppt_in), sum(q8.dat.sc3$ppt_in),
-                                   sum(q9.dat.sc3$ppt_in), sum(q10.dat.sc3$ppt_in), sum(q11.dat.sc3$ppt_in), sum(q12.dat.sc3$ppt_in)
-)[which.min(c(mean(q1.dat.sc3$ppt_in)*90.25, mean(q2.dat.sc3$ppt_in)*89.25, mean(q3.dat.sc3$ppt_in)*92, mean(q4.dat.sc3$ppt_in)*91, 
-              mean(q5.dat.sc3$ppt_in)*92, mean(q6.dat.sc3$ppt_in)*92, mean(q7.dat.sc3$ppt_in)*92, mean(q8.dat.sc3$ppt_in)*92, 
-              mean(q9.dat.sc3$ppt_in)*91, mean(q10.dat.sc3$ppt_in)*92, mean(q11.dat.sc3$ppt_in)*92, mean(q12.dat.sc3$ppt_in)*90.25))]
+precip.driest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$PPT_in), sum(q2.dat.sc3$PPT_in), sum(q3.dat.sc3$PPT_in), sum(q4.dat.sc3$PPT_in),
+                                   sum(q5.dat.sc3$PPT_in), sum(q6.dat.sc3$PPT_in), sum(q7.dat.sc3$PPT_in), sum(q8.dat.sc3$PPT_in),
+                                   sum(q9.dat.sc3$PPT_in), sum(q10.dat.sc3$PPT_in), sum(q11.dat.sc3$PPT_in), sum(q12.dat.sc3$PPT_in)
+)[which.min(c(mean(q1.dat.sc3$PPT_in)*90.25, mean(q2.dat.sc3$PPT_in)*89.25, mean(q3.dat.sc3$PPT_in)*92, mean(q4.dat.sc3$PPT_in)*91, 
+              mean(q5.dat.sc3$PPT_in)*92, mean(q6.dat.sc3$PPT_in)*92, mean(q7.dat.sc3$PPT_in)*92, mean(q8.dat.sc3$PPT_in)*92, 
+              mean(q9.dat.sc3$PPT_in)*91, mean(q10.dat.sc3$PPT_in)*92, mean(q11.dat.sc3$PPT_in)*92, mean(q12.dat.sc3$PPT_in)*90.25))]
 
 
 precip.driest.quarter.sc3 <- precip.driest.quarter.pre.sc3/30
@@ -1709,12 +1706,12 @@ precip.driest.quarter.sc3
 
 ##Precipitation of Coldest Quarter
 
-precip.coldest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$ppt_in), sum(q2.dat.sc3$ppt_in), sum(q3.dat.sc3$ppt_in), sum(q4.dat.sc3$ppt_in),
-                                    sum(q5.dat.sc3$ppt_in), sum(q6.dat.sc3$ppt_in), sum(q7.dat.sc3$ppt_in), sum(q8.dat.sc3$ppt_in),
-                                    sum(q9.dat.sc3$ppt_in), sum(q10.dat.sc3$ppt_in), sum(q11.dat.sc3$ppt_in), sum(q12.dat.sc3$ppt_in)
-)[which.min(c(mean(q1.dat.sc3$taveF), mean(q2.dat.sc3$taveF), mean(q3.dat.sc3$taveF), mean(q4.dat.sc3$taveF), 
-              mean(q5.dat.sc3$taveF), mean(q6.dat.sc3$taveF), mean(q7.dat.sc3$taveF), mean(q8.dat.sc3$taveF), 
-              mean(q9.dat.sc3$taveF), mean(q10.dat.sc3$taveF), mean(q11.dat.sc3$taveF), mean(q12.dat.sc3$taveF)))]
+precip.coldest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$PPT_in), sum(q2.dat.sc3$PPT_in), sum(q3.dat.sc3$PPT_in), sum(q4.dat.sc3$PPT_in),
+                                    sum(q5.dat.sc3$PPT_in), sum(q6.dat.sc3$PPT_in), sum(q7.dat.sc3$PPT_in), sum(q8.dat.sc3$PPT_in),
+                                    sum(q9.dat.sc3$PPT_in), sum(q10.dat.sc3$PPT_in), sum(q11.dat.sc3$PPT_in), sum(q12.dat.sc3$PPT_in)
+)[which.min(c(mean(q1.dat.sc3$TMeanF), mean(q2.dat.sc3$TMeanF), mean(q3.dat.sc3$TMeanF), mean(q4.dat.sc3$TMeanF), 
+              mean(q5.dat.sc3$TMeanF), mean(q6.dat.sc3$TMeanF), mean(q7.dat.sc3$TMeanF), mean(q8.dat.sc3$TMeanF), 
+              mean(q9.dat.sc3$TMeanF), mean(q10.dat.sc3$TMeanF), mean(q11.dat.sc3$TMeanF), mean(q12.dat.sc3$TMeanF)))]
 
 #previous calculation is the sum over   30 year historical period of said quarter
 #divide by 10 to get the annual quarter calculation 
@@ -1725,12 +1722,12 @@ precip.coldest.quarter.sc3
 
 ##Precipitation of the Warmest Quarter
 
-precip.warmest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$ppt_in), sum(q2.dat.sc3$ppt_in), sum(q3.dat.sc3$ppt_in), sum(q4.dat.sc3$ppt_in),
-                                    sum(q5.dat.sc3$ppt_in), sum(q6.dat.sc3$ppt_in), sum(q7.dat.sc3$ppt_in), sum(q8.dat.sc3$ppt_in),
-                                    sum(q9.dat.sc3$ppt_in), sum(q10.dat.sc3$ppt_in), sum(q11.dat.sc3$ppt_in), sum(q12.dat.sc3$ppt_in)
-)[which.max(c(mean(q1.dat.sc3$taveF), mean(q2.dat.sc3$taveF), mean(q3.dat.sc3$taveF), mean(q4.dat.sc3$taveF), 
-              mean(q5.dat.sc3$taveF), mean(q6.dat.sc3$taveF), mean(q7.dat.sc3$taveF), mean(q8.dat.sc3$taveF), 
-              mean(q9.dat.sc3$taveF), mean(q10.dat.sc3$taveF), mean(q11.dat.sc3$taveF), mean(q12.dat.sc3$taveF)))]
+precip.warmest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$PPT_in), sum(q2.dat.sc3$PPT_in), sum(q3.dat.sc3$PPT_in), sum(q4.dat.sc3$PPT_in),
+                                    sum(q5.dat.sc3$PPT_in), sum(q6.dat.sc3$PPT_in), sum(q7.dat.sc3$PPT_in), sum(q8.dat.sc3$PPT_in),
+                                    sum(q9.dat.sc3$PPT_in), sum(q10.dat.sc3$PPT_in), sum(q11.dat.sc3$PPT_in), sum(q12.dat.sc3$PPT_in)
+)[which.max(c(mean(q1.dat.sc3$TMeanF), mean(q2.dat.sc3$TMeanF), mean(q3.dat.sc3$TMeanF), mean(q4.dat.sc3$TMeanF), 
+              mean(q5.dat.sc3$TMeanF), mean(q6.dat.sc3$TMeanF), mean(q7.dat.sc3$TMeanF), mean(q8.dat.sc3$TMeanF), 
+              mean(q9.dat.sc3$TMeanF), mean(q10.dat.sc3$TMeanF), mean(q11.dat.sc3$TMeanF), mean(q12.dat.sc3$TMeanF)))]
 
 #previous calculation is the sum over 30 year projected period of said quarter
 #divide by 10 to get the annual quarter calculation 
@@ -1746,13 +1743,13 @@ precip.warmest.quarter.sc3
 
 month <-        c(month.abb)
 month           #make sure the data lines up with table dude
-sc4.temp.av <- c(dat.RCP8.5.2050$taveF)
+sc4.temp.av <- c(dat.RCP8.5.2050$TMeanF)
 sc4.temp.av   #make sure the data lines up with table dude
-sc4.temp.hi <- c(dat.RCP8.5.2050$tmaxF)
+sc4.temp.hi <- c(dat.RCP8.5.2050$TMaxF)
 sc4.temp.hi    #make sure the data lines up with table dude
-sc4.temp.lo <- c(dat.RCP8.5.2050$tminF)
+sc4.temp.lo <- c(dat.RCP8.5.2050$TMinF)
 sc4.temp.lo    #make sure the data lines up with table dude
-sc4.precip <-  c(dat.RCP8.5.2050$ppt_in)
+sc4.precip <-  c(dat.RCP8.5.2050$PPT_in)
 sc4.precip     #make sure the data lines up with table dude
 
 #subsetting monthly data
@@ -1772,18 +1769,18 @@ dec.dat.sc4 <- subset(dat.RCP8.5.2050, month=="Dec")
 
 #subsetting monthly tav
 
-jan.tav.sc4 <- mean(jan.dat.sc4$taveF)
-feb.tav.sc4 <- mean(feb.dat.sc4$taveF)
-mar.tav.sc4 <- mean(mar.dat.sc4$taveF)
-apr.tav.sc4 <- mean(apr.dat.sc4$taveF)
-may.tav.sc4 <- mean(may.dat.sc4$taveF)
-jun.tav.sc4 <- mean(jun.dat.sc4$taveF)
-jul.tav.sc4 <- mean(jul.dat.sc4$taveF)
-aug.tav.sc4 <- mean(aug.dat.sc4$taveF)
-sep.tav.sc4 <- mean(sep.dat.sc4$taveF)
-oct.tav.sc4 <- mean(oct.dat.sc4$taveF)
-nov.tav.sc4 <- mean(nov.dat.sc4$taveF)
-dec.tav.sc4 <- mean(dec.dat.sc4$taveF)
+jan.tav.sc4 <- mean(jan.dat.sc4$TMeanF)
+feb.tav.sc4 <- mean(feb.dat.sc4$TMeanF)
+mar.tav.sc4 <- mean(mar.dat.sc4$TMeanF)
+apr.tav.sc4 <- mean(apr.dat.sc4$TMeanF)
+may.tav.sc4 <- mean(may.dat.sc4$TMeanF)
+jun.tav.sc4 <- mean(jun.dat.sc4$TMeanF)
+jul.tav.sc4 <- mean(jul.dat.sc4$TMeanF)
+aug.tav.sc4 <- mean(aug.dat.sc4$TMeanF)
+sep.tav.sc4 <- mean(sep.dat.sc4$TMeanF)
+oct.tav.sc4 <- mean(oct.dat.sc4$TMeanF)
+nov.tav.sc4 <- mean(nov.dat.sc4$TMeanF)
+dec.tav.sc4 <- mean(dec.dat.sc4$TMeanF)
 
 #subsetting different quarters
 
@@ -1802,58 +1799,58 @@ q12.dat.sc4 <- rbind(dec.dat.sc4, jan.dat.sc4, feb.dat.sc4)
 
 #subsetting precipitation data
 
-jan.prav.dat.sc4 <- (sum(jan.dat.sc4$ppt_in))/30
-feb.prav.dat.sc4 <- (sum(feb.dat.sc4$ppt_in))/30
-mar.prav.dat.sc4 <- (sum(mar.dat.sc4$ppt_in))/30
-apr.prav.dat.sc4 <- (sum(apr.dat.sc4$ppt_in))/30
-may.prav.dat.sc4 <- (sum(may.dat.sc4$ppt_in))/30
-jun.prav.dat.sc4 <- (sum(jun.dat.sc4$ppt_in))/30
-jul.prav.dat.sc4 <- (sum(jul.dat.sc4$ppt_in))/30
-aug.prav.dat.sc4 <- (sum(aug.dat.sc4$ppt_in))/30
-sep.prav.dat.sc4 <- (sum(sep.dat.sc4$ppt_in))/30
-oct.prav.dat.sc4 <- (sum(oct.dat.sc4$ppt_in))/30
-nov.prav.dat.sc4 <- (sum(nov.dat.sc4$ppt_in))/30
-dec.prav.dat.sc4 <- (sum(dec.dat.sc4$ppt_in))/30
+jan.prav.dat.sc4 <- (sum(jan.dat.sc4$PPT_in))/30
+feb.prav.dat.sc4 <- (sum(feb.dat.sc4$PPT_in))/30
+mar.prav.dat.sc4 <- (sum(mar.dat.sc4$PPT_in))/30
+apr.prav.dat.sc4 <- (sum(apr.dat.sc4$PPT_in))/30
+may.prav.dat.sc4 <- (sum(may.dat.sc4$PPT_in))/30
+jun.prav.dat.sc4 <- (sum(jun.dat.sc4$PPT_in))/30
+jul.prav.dat.sc4 <- (sum(jul.dat.sc4$PPT_in))/30
+aug.prav.dat.sc4 <- (sum(aug.dat.sc4$PPT_in))/30
+sep.prav.dat.sc4 <- (sum(sep.dat.sc4$PPT_in))/30
+oct.prav.dat.sc4 <- (sum(oct.dat.sc4$PPT_in))/30
+nov.prav.dat.sc4 <- (sum(nov.dat.sc4$PPT_in))/30
+dec.prav.dat.sc4 <- (sum(dec.dat.sc4$PPT_in))/30
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
 #SUMof(Tmax-Tmin)/12
 
-jan.max.sc4 <- mean(jan.dat.sc4$tmaxF)
-jan.min.sc4 <- mean(jan.dat.sc4$tminF)
+jan.max.sc4 <- mean(jan.dat.sc4$TMaxF)
+jan.min.sc4 <- mean(jan.dat.sc4$TMinF)
 
-feb.max.sc4 <- mean(feb.dat.sc4$tmaxF)
-feb.min.sc4 <- mean(feb.dat.sc4$tminF)
+feb.max.sc4 <- mean(feb.dat.sc4$TMaxF)
+feb.min.sc4 <- mean(feb.dat.sc4$TMinF)
 
-mar.max.sc4 <- mean(mar.dat.sc4$tmaxF)
-mar.min.sc4 <- mean(mar.dat.sc4$tminF)
+mar.max.sc4 <- mean(mar.dat.sc4$TMaxF)
+mar.min.sc4 <- mean(mar.dat.sc4$TMinF)
 
-apr.max.sc4 <- mean(apr.dat.sc4$tmaxF)
-apr.min.sc4 <- mean(apr.dat.sc4$tminF)
+apr.max.sc4 <- mean(apr.dat.sc4$TMaxF)
+apr.min.sc4 <- mean(apr.dat.sc4$TMinF)
 
-may.max.sc4 <- mean(may.dat.sc4$tmaxF)
-may.min.sc4 <- mean(may.dat.sc4$tminF)
+may.max.sc4 <- mean(may.dat.sc4$TMaxF)
+may.min.sc4 <- mean(may.dat.sc4$TMinF)
 
-jun.max.sc4 <- mean(jun.dat.sc4$tmaxF)
-jun.min.sc4 <- mean(jun.dat.sc4$tminF)
+jun.max.sc4 <- mean(jun.dat.sc4$TMaxF)
+jun.min.sc4 <- mean(jun.dat.sc4$TMinF)
 
-jul.max.sc4 <- mean(jul.dat.sc4$tmaxF)
-jul.min.sc4 <- mean(jul.dat.sc4$tminF)
+jul.max.sc4 <- mean(jul.dat.sc4$TMaxF)
+jul.min.sc4 <- mean(jul.dat.sc4$TMinF)
 
-aug.max.sc4 <- mean(aug.dat.sc4$tmaxF)
-aug.min.sc4 <- mean(aug.dat.sc4$tminF)
+aug.max.sc4 <- mean(aug.dat.sc4$TMaxF)
+aug.min.sc4 <- mean(aug.dat.sc4$TMinF)
 
-sep.max.sc4 <- mean(sep.dat.sc4$tmaxF)
-sep.min.sc4 <- mean(sep.dat.sc4$tminF)
+sep.max.sc4 <- mean(sep.dat.sc4$TMaxF)
+sep.min.sc4 <- mean(sep.dat.sc4$TMinF)
 
-oct.max.sc4 <- mean(oct.dat.sc4$tmaxF)
-oct.min.sc4 <- mean(oct.dat.sc4$tminF)
+oct.max.sc4 <- mean(oct.dat.sc4$TMaxF)
+oct.min.sc4 <- mean(oct.dat.sc4$TMinF)
 
-nov.max.sc4 <- mean(nov.dat.sc4$tmaxF)
-nov.min.sc4 <- mean(nov.dat.sc4$tminF)
+nov.max.sc4 <- mean(nov.dat.sc4$TMaxF)
+nov.min.sc4 <- mean(nov.dat.sc4$TMinF)
 
-dec.max.sc4 <- mean(dec.dat.sc4$tmaxF)
-dec.min.sc4 <- mean(dec.dat.sc4$tminF)
+dec.max.sc4 <- mean(dec.dat.sc4$TMaxF)
+dec.min.sc4 <- mean(dec.dat.sc4$TMinF)
 
 #differences
 jan.dif.sc4 <- jan.max.sc4-jan.min.sc4
@@ -1893,9 +1890,9 @@ f.to.c <- function(temp) {
 }
 
 #absolute max and min
-abs.tmax.pre.sc4 <- max(dat.RCP8.5.2050$tmaxF)
+abs.tmax.pre.sc4 <- max(dat.RCP8.5.2050$TMaxF)
 abs.tmax.c.sc4 <- f.to.c(abs.tmax.pre.sc4)
-abs.tmin.pre.sc4 <- min(dat.RCP8.5.2050$tminF)
+abs.tmin.pre.sc4 <- min(dat.RCP8.5.2050$TMinF)
 abs.tmin.c.sc4 <- f.to.c(abs.tmin.pre.sc4)
 
 
@@ -1962,7 +1959,7 @@ names(monthly.means.k.sc4)[1]<-paste("kaverage")
 sd.mmk.sc4 <- sd(monthly.means.k.sc4$kaverage)
 
 #determine annual mean temp
-annual.av.f.sc4 <- mean(dat.RCP8.5.2050$taveF)
+annual.av.f.sc4 <- mean(dat.RCP8.5.2050$TMeanF)
 
 #convert it to Kelvin
 annual.av.k.sc4. <- f.to.k(annual.av.f.sc4)
@@ -1976,24 +1973,24 @@ cv.temperature.seasonality.sc4
 ##Max Temperature of Warmest Month
 #lets first figure out the warmest month
 #saving it in case we need it
-warmest.day.warmest.month.sc4 <- c(max(jan.dat.sc4$tmaxF), max(feb.dat.sc4$tmaxF), max(mar.dat.sc4$tmaxF), max(apr.dat.sc4$tmaxF),
-                                   max(may.dat.sc4$tmaxF), max(jun.dat.sc4$tmaxF), max(jul.dat.sc4$tmaxF), max(aug.dat.sc4$tmaxF),
-                                   max(sep.dat.sc4$tmaxF), max(oct.dat.sc4$tmaxF), max(nov.dat.sc4$tmaxF), max(dec.dat.sc4$tmaxF)
-)[which.max(c(mean(jan.dat.sc4$tmaxF), mean(feb.dat.sc4$tmaxF), mean(mar.dat.sc4$tmaxF), mean(apr.dat.sc4$tmaxF), 
-              mean(may.dat.sc4$tmaxF), mean(jun.dat.sc4$tmaxF), mean(jul.dat.sc4$tmaxF), mean(aug.dat.sc4$tmaxF), 
-              mean(sep.dat.sc4$tmaxF), mean(oct.dat.sc4$tmaxF), mean(nov.dat.sc4$tmaxF), mean(dec.dat.sc4$tmaxF)))]
+warmest.day.warmest.month.sc4 <- c(max(jan.dat.sc4$TMaxF), max(feb.dat.sc4$TMaxF), max(mar.dat.sc4$TMaxF), max(apr.dat.sc4$TMaxF),
+                                   max(may.dat.sc4$TMaxF), max(jun.dat.sc4$TMaxF), max(jul.dat.sc4$TMaxF), max(aug.dat.sc4$TMaxF),
+                                   max(sep.dat.sc4$TMaxF), max(oct.dat.sc4$TMaxF), max(nov.dat.sc4$TMaxF), max(dec.dat.sc4$TMaxF)
+)[which.max(c(mean(jan.dat.sc4$TMaxF), mean(feb.dat.sc4$TMaxF), mean(mar.dat.sc4$TMaxF), mean(apr.dat.sc4$TMaxF), 
+              mean(may.dat.sc4$TMaxF), mean(jun.dat.sc4$TMaxF), mean(jul.dat.sc4$TMaxF), mean(aug.dat.sc4$TMaxF), 
+              mean(sep.dat.sc4$TMaxF), mean(oct.dat.sc4$TMaxF), mean(nov.dat.sc4$TMaxF), mean(dec.dat.sc4$TMaxF)))]
 
 #value
 warmest.day.warmest.month.sc4
 
 ##Min Temperature of Coldest Month
 #saving it in case they want it
-coldest.day.coldest.month.sc4 <- c(min(jan.dat.sc4$tminF), min(feb.dat.sc4$tminF), min(mar.dat.sc4$tminF), min(apr.dat.sc4$tminF),
-                                   min(may.dat.sc4$tminF), min(jun.dat.sc4$tminF), min(jul.dat.sc4$tminF), min(aug.dat.sc4$tminF),
-                                   min(sep.dat.sc4$tminF), min(oct.dat.sc4$tminF), min(nov.dat.sc4$tminF), min(dec.dat.sc4$tminF)
-)[which.min(c(mean(jan.dat.sc4$tminF), mean(feb.dat.sc4$tminF), mean(mar.dat.sc4$tminF), mean(apr.dat.sc4$tminF), 
-              mean(may.dat.sc4$tminF), mean(jun.dat.sc4$tminF), mean(jul.dat.sc4$tminF), mean(aug.dat.sc4$tminF), 
-              mean(sep.dat.sc4$tminF), mean(oct.dat.sc4$tminF), mean(nov.dat.sc4$tminF), mean(dec.dat.sc4$tminF)))]
+coldest.day.coldest.month.sc4 <- c(min(jan.dat.sc4$TMinF), min(feb.dat.sc4$TMinF), min(mar.dat.sc4$TMinF), min(apr.dat.sc4$TMinF),
+                                   min(may.dat.sc4$TMinF), min(jun.dat.sc4$TMinF), min(jul.dat.sc4$TMinF), min(aug.dat.sc4$TMinF),
+                                   min(sep.dat.sc4$TMinF), min(oct.dat.sc4$TMinF), min(nov.dat.sc4$TMinF), min(dec.dat.sc4$TMinF)
+)[which.min(c(mean(jan.dat.sc4$TMinF), mean(feb.dat.sc4$TMinF), mean(mar.dat.sc4$TMinF), mean(apr.dat.sc4$TMinF), 
+              mean(may.dat.sc4$TMinF), mean(jun.dat.sc4$TMinF), mean(jul.dat.sc4$TMinF), mean(aug.dat.sc4$TMinF), 
+              mean(sep.dat.sc4$TMinF), mean(oct.dat.sc4$TMinF), mean(nov.dat.sc4$TMinF), mean(dec.dat.sc4$TMinF)))]
 
 #value
 coldest.day.coldest.month.sc4
@@ -2008,48 +2005,48 @@ annual.temperature.range.sc4
 
 ##Mean Temperature of Wettest Quarter
 
-mean.temp.wettest.quarter.sc4 <- c(mean(q1.dat.sc4$taveF), mean(q2.dat.sc4$taveF), mean(q3.dat.sc4$taveF), mean(q4.dat.sc4$taveF),
-                                   mean(q5.dat.sc4$taveF), mean(q6.dat.sc4$taveF), mean(q7.dat.sc4$taveF), mean(q8.dat.sc4$taveF),
-                                   mean(q9.dat.sc4$taveF), mean(q10.dat.sc4$taveF), mean(q11.dat.sc4$taveF), mean(q12.dat.sc4$taveF)
-)[which.max(c(mean(q1.dat.sc4$ppt_in)*90.25, mean(q2.dat.sc4$ppt_in)*89.25, mean(q3.dat.sc4$ppt_in)*92, mean(q4.dat.sc4$ppt_in)*91, 
-              mean(q5.dat.sc4$ppt_in)*92, mean(q6.dat.sc4$ppt_in)*92, mean(q7.dat.sc4$ppt_in)*92, mean(q8.dat.sc4$ppt_in)*92, 
-              mean(q9.dat.sc4$ppt_in)*91, mean(q10.dat.sc4$ppt_in)*92, mean(q11.dat.sc4$ppt_in)*92, mean(q12.dat.sc4$ppt_in)*90.25))]
+mean.temp.wettest.quarter.sc4 <- c(mean(q1.dat.sc4$TMeanF), mean(q2.dat.sc4$TMeanF), mean(q3.dat.sc4$TMeanF), mean(q4.dat.sc4$TMeanF),
+                                   mean(q5.dat.sc4$TMeanF), mean(q6.dat.sc4$TMeanF), mean(q7.dat.sc4$TMeanF), mean(q8.dat.sc4$TMeanF),
+                                   mean(q9.dat.sc4$TMeanF), mean(q10.dat.sc4$TMeanF), mean(q11.dat.sc4$TMeanF), mean(q12.dat.sc4$TMeanF)
+)[which.max(c(mean(q1.dat.sc4$PPT_in)*90.25, mean(q2.dat.sc4$PPT_in)*89.25, mean(q3.dat.sc4$PPT_in)*92, mean(q4.dat.sc4$PPT_in)*91, 
+              mean(q5.dat.sc4$PPT_in)*92, mean(q6.dat.sc4$PPT_in)*92, mean(q7.dat.sc4$PPT_in)*92, mean(q8.dat.sc4$PPT_in)*92, 
+              mean(q9.dat.sc4$PPT_in)*91, mean(q10.dat.sc4$PPT_in)*92, mean(q11.dat.sc4$PPT_in)*92, mean(q12.dat.sc4$PPT_in)*90.25))]
 
 #value
 mean.temp.wettest.quarter.sc4
 
 ##Mean Temperature of Driest Quarter
 
-mean.temp.driest.quarter.sc4 <- c(mean(q1.dat.sc4$taveF), mean(q2.dat.sc4$taveF), mean(q3.dat.sc4$taveF), mean(q4.dat.sc4$taveF),
-                                  mean(q5.dat.sc4$taveF), mean(q6.dat.sc4$taveF), mean(q7.dat.sc4$taveF), mean(q8.dat.sc4$taveF),
-                                  mean(q9.dat.sc4$taveF), mean(q10.dat.sc4$taveF), mean(q11.dat.sc4$taveF), mean(q12.dat.sc4$taveF)
-)[which.min(c(mean(q1.dat.sc4$ppt_in)*90.25, mean(q2.dat.sc4$ppt_in)*89.25, mean(q3.dat.sc4$ppt_in)*92, mean(q4.dat.sc4$ppt_in)*91, 
-              mean(q5.dat.sc4$ppt_in)*92, mean(q6.dat.sc4$ppt_in)*92, mean(q7.dat.sc4$ppt_in)*92, mean(q8.dat.sc4$ppt_in)*92, 
-              mean(q9.dat.sc4$ppt_in)*91, mean(q10.dat.sc4$ppt_in)*92, mean(q11.dat.sc4$ppt_in)*92, mean(q12.dat.sc4$ppt_in)*90.25))]
+mean.temp.driest.quarter.sc4 <- c(mean(q1.dat.sc4$TMeanF), mean(q2.dat.sc4$TMeanF), mean(q3.dat.sc4$TMeanF), mean(q4.dat.sc4$TMeanF),
+                                  mean(q5.dat.sc4$TMeanF), mean(q6.dat.sc4$TMeanF), mean(q7.dat.sc4$TMeanF), mean(q8.dat.sc4$TMeanF),
+                                  mean(q9.dat.sc4$TMeanF), mean(q10.dat.sc4$TMeanF), mean(q11.dat.sc4$TMeanF), mean(q12.dat.sc4$TMeanF)
+)[which.min(c(mean(q1.dat.sc4$PPT_in)*90.25, mean(q2.dat.sc4$PPT_in)*89.25, mean(q3.dat.sc4$PPT_in)*92, mean(q4.dat.sc4$PPT_in)*91, 
+              mean(q5.dat.sc4$PPT_in)*92, mean(q6.dat.sc4$PPT_in)*92, mean(q7.dat.sc4$PPT_in)*92, mean(q8.dat.sc4$PPT_in)*92, 
+              mean(q9.dat.sc4$PPT_in)*91, mean(q10.dat.sc4$PPT_in)*92, mean(q11.dat.sc4$PPT_in)*92, mean(q12.dat.sc4$PPT_in)*90.25))]
 
 #value
 mean.temp.driest.quarter.sc4
 
 ##Mean Temperature of Warmest Quarter
 
-mean.temp.warmest.quarter.sc4 <- c(mean(q1.dat.sc4$taveF), mean(q2.dat.sc4$taveF), mean(q3.dat.sc4$taveF), mean(q4.dat.sc4$taveF),
-                                   mean(q5.dat.sc4$taveF), mean(q6.dat.sc4$taveF), mean(q7.dat.sc4$taveF), mean(q8.dat.sc4$taveF),
-                                   mean(q9.dat.sc4$taveF), mean(q10.dat.sc4$taveF), mean(q11.dat.sc4$taveF), mean(q12.dat.sc4$taveF)
-)[which.max(c(mean(q1.dat.sc4$taveF), mean(q2.dat.sc4$taveF), mean(q3.dat.sc4$taveF), mean(q4.dat.sc4$taveF), 
-              mean(q5.dat.sc4$taveF), mean(q6.dat.sc4$taveF), mean(q7.dat.sc4$taveF), mean(q8.dat.sc4$taveF), 
-              mean(q9.dat.sc4$taveF), mean(q10.dat.sc4$taveF), mean(q11.dat.sc4$taveF), mean(q12.dat.sc4$taveF)))]
+mean.temp.warmest.quarter.sc4 <- c(mean(q1.dat.sc4$TMeanF), mean(q2.dat.sc4$TMeanF), mean(q3.dat.sc4$TMeanF), mean(q4.dat.sc4$TMeanF),
+                                   mean(q5.dat.sc4$TMeanF), mean(q6.dat.sc4$TMeanF), mean(q7.dat.sc4$TMeanF), mean(q8.dat.sc4$TMeanF),
+                                   mean(q9.dat.sc4$TMeanF), mean(q10.dat.sc4$TMeanF), mean(q11.dat.sc4$TMeanF), mean(q12.dat.sc4$TMeanF)
+)[which.max(c(mean(q1.dat.sc4$TMeanF), mean(q2.dat.sc4$TMeanF), mean(q3.dat.sc4$TMeanF), mean(q4.dat.sc4$TMeanF), 
+              mean(q5.dat.sc4$TMeanF), mean(q6.dat.sc4$TMeanF), mean(q7.dat.sc4$TMeanF), mean(q8.dat.sc4$TMeanF), 
+              mean(q9.dat.sc4$TMeanF), mean(q10.dat.sc4$TMeanF), mean(q11.dat.sc4$TMeanF), mean(q12.dat.sc4$TMeanF)))]
 
 #value
 mean.temp.warmest.quarter.sc4
 
 ##Mean Temperature of Coldest Quarter
 
-mean.temp.coldest.quarter.sc4 <- c(mean(q1.dat.sc4$taveF), mean(q2.dat.sc4$taveF), mean(q3.dat.sc4$taveF), mean(q4.dat.sc4$taveF),
-                                   mean(q5.dat.sc4$taveF), mean(q6.dat.sc4$taveF), mean(q7.dat.sc4$taveF), mean(q8.dat.sc4$taveF),
-                                   mean(q9.dat.sc4$taveF), mean(q10.dat.sc4$taveF), mean(q11.dat.sc4$taveF), mean(q12.dat.sc4$taveF)
-)[which.min(c(mean(q1.dat.sc4$taveF), mean(q2.dat.sc4$taveF), mean(q3.dat.sc4$taveF), mean(q4.dat.sc4$taveF), 
-              mean(q5.dat.sc4$taveF), mean(q6.dat.sc4$taveF), mean(q7.dat.sc4$taveF), mean(q8.dat.sc4$taveF), 
-              mean(q9.dat.sc4$taveF), mean(q10.dat.sc4$taveF), mean(q11.dat.sc4$taveF), mean(q12.dat.sc4$taveF)))]
+mean.temp.coldest.quarter.sc4 <- c(mean(q1.dat.sc4$TMeanF), mean(q2.dat.sc4$TMeanF), mean(q3.dat.sc4$TMeanF), mean(q4.dat.sc4$TMeanF),
+                                   mean(q5.dat.sc4$TMeanF), mean(q6.dat.sc4$TMeanF), mean(q7.dat.sc4$TMeanF), mean(q8.dat.sc4$TMeanF),
+                                   mean(q9.dat.sc4$TMeanF), mean(q10.dat.sc4$TMeanF), mean(q11.dat.sc4$TMeanF), mean(q12.dat.sc4$TMeanF)
+)[which.min(c(mean(q1.dat.sc4$TMeanF), mean(q2.dat.sc4$TMeanF), mean(q3.dat.sc4$TMeanF), mean(q4.dat.sc4$TMeanF), 
+              mean(q5.dat.sc4$TMeanF), mean(q6.dat.sc4$TMeanF), mean(q7.dat.sc4$TMeanF), mean(q8.dat.sc4$TMeanF), 
+              mean(q9.dat.sc4$TMeanF), mean(q10.dat.sc4$TMeanF), mean(q11.dat.sc4$TMeanF), mean(q12.dat.sc4$TMeanF)))]
 
 #value
 mean.temp.coldest.quarter.sc4
@@ -2091,7 +2088,7 @@ names(monthly.means.precip.sc4)[1]<-paste("praverage")
 sd.precip.sc4 <- sd(monthly.means.precip.sc4$praverage)
 
 #annual precipitation / getting the sum of over 30 years then dividing by 10 to get annual average
-an.precip.sc4 <- (sum(dat.RCP8.5.2050$ppt_mm)/30)
+an.precip.sc4 <- (sum(dat.RCP8.5.2050$PPT_mm)/30)
 mo.precip.sc4 <- an.precip.sc4/12
 
 #final calculation
@@ -2102,12 +2099,12 @@ precip.seasonality.cv.sc4
 
 ##Precipitation of Wettest Quarter
 
-precip.wettest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$ppt_in), sum(q2.dat.sc4$ppt_in), sum(q3.dat.sc4$ppt_in), sum(q4.dat.sc4$ppt_in),
-                                    sum(q5.dat.sc4$ppt_in), sum(q6.dat.sc4$ppt_in), sum(q7.dat.sc4$ppt_in), sum(q8.dat.sc4$ppt_in),
-                                    sum(q9.dat.sc4$ppt_in), sum(q10.dat.sc4$ppt_in), sum(q11.dat.sc4$ppt_in), sum(q12.dat.sc4$ppt_in)
-)[which.max(c(mean(q1.dat.sc4$ppt_in)*90.25, mean(q2.dat.sc4$ppt_in)*89.25, mean(q3.dat.sc4$ppt_in)*92, mean(q4.dat.sc4$ppt_in)*91, 
-              mean(q5.dat.sc4$ppt_in)*92, mean(q6.dat.sc4$ppt_in)*92, mean(q7.dat.sc4$ppt_in)*92, mean(q8.dat.sc4$ppt_in)*92, 
-              mean(q9.dat.sc4$ppt_in)*91, mean(q10.dat.sc4$ppt_in)*92, mean(q11.dat.sc4$ppt_in)*92, mean(q12.dat.sc4$ppt_in)*90.25))]
+precip.wettest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$PPT_in), sum(q2.dat.sc4$PPT_in), sum(q3.dat.sc4$PPT_in), sum(q4.dat.sc4$PPT_in),
+                                    sum(q5.dat.sc4$PPT_in), sum(q6.dat.sc4$PPT_in), sum(q7.dat.sc4$PPT_in), sum(q8.dat.sc4$PPT_in),
+                                    sum(q9.dat.sc4$PPT_in), sum(q10.dat.sc4$PPT_in), sum(q11.dat.sc4$PPT_in), sum(q12.dat.sc4$PPT_in)
+)[which.max(c(mean(q1.dat.sc4$PPT_in)*90.25, mean(q2.dat.sc4$PPT_in)*89.25, mean(q3.dat.sc4$PPT_in)*92, mean(q4.dat.sc4$PPT_in)*91, 
+              mean(q5.dat.sc4$PPT_in)*92, mean(q6.dat.sc4$PPT_in)*92, mean(q7.dat.sc4$PPT_in)*92, mean(q8.dat.sc4$PPT_in)*92, 
+              mean(q9.dat.sc4$PPT_in)*91, mean(q10.dat.sc4$PPT_in)*92, mean(q11.dat.sc4$PPT_in)*92, mean(q12.dat.sc4$PPT_in)*90.25))]
 
 precip.wettest.quarter.sc4 <- precip.wettest.quarter.pre.sc4/30
 
@@ -2116,12 +2113,12 @@ precip.wettest.quarter.sc4
 
 ##Precipitation of Driest Quarter
 
-precip.driest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$ppt_in), sum(q2.dat.sc4$ppt_in), sum(q3.dat.sc4$ppt_in), sum(q4.dat.sc4$ppt_in),
-                                   sum(q5.dat.sc4$ppt_in), sum(q6.dat.sc4$ppt_in), sum(q7.dat.sc4$ppt_in), sum(q8.dat.sc4$ppt_in),
-                                   sum(q9.dat.sc4$ppt_in), sum(q10.dat.sc4$ppt_in), sum(q11.dat.sc4$ppt_in), sum(q12.dat.sc4$ppt_in)
-)[which.min(c(mean(q1.dat.sc4$ppt_in)*90.25, mean(q2.dat.sc4$ppt_in)*89.25, mean(q3.dat.sc4$ppt_in)*92, mean(q4.dat.sc4$ppt_in)*91, 
-              mean(q5.dat.sc4$ppt_in)*92, mean(q6.dat.sc4$ppt_in)*92, mean(q7.dat.sc4$ppt_in)*92, mean(q8.dat.sc4$ppt_in)*92, 
-              mean(q9.dat.sc4$ppt_in)*91, mean(q10.dat.sc4$ppt_in)*92, mean(q11.dat.sc4$ppt_in)*92, mean(q12.dat.sc4$ppt_in)*90.25))]
+precip.driest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$PPT_in), sum(q2.dat.sc4$PPT_in), sum(q3.dat.sc4$PPT_in), sum(q4.dat.sc4$PPT_in),
+                                   sum(q5.dat.sc4$PPT_in), sum(q6.dat.sc4$PPT_in), sum(q7.dat.sc4$PPT_in), sum(q8.dat.sc4$PPT_in),
+                                   sum(q9.dat.sc4$PPT_in), sum(q10.dat.sc4$PPT_in), sum(q11.dat.sc4$PPT_in), sum(q12.dat.sc4$PPT_in)
+)[which.min(c(mean(q1.dat.sc4$PPT_in)*90.25, mean(q2.dat.sc4$PPT_in)*89.25, mean(q3.dat.sc4$PPT_in)*92, mean(q4.dat.sc4$PPT_in)*91, 
+              mean(q5.dat.sc4$PPT_in)*92, mean(q6.dat.sc4$PPT_in)*92, mean(q7.dat.sc4$PPT_in)*92, mean(q8.dat.sc4$PPT_in)*92, 
+              mean(q9.dat.sc4$PPT_in)*91, mean(q10.dat.sc4$PPT_in)*92, mean(q11.dat.sc4$PPT_in)*92, mean(q12.dat.sc4$PPT_in)*90.25))]
 
 precip.driest.quarter.sc4 <- precip.driest.quarter.pre.sc4/30
 
@@ -2130,12 +2127,12 @@ precip.driest.quarter.sc4
 
 ##Precipitation of Coldest Quarter
 
-precip.coldest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$ppt_in), sum(q2.dat.sc4$ppt_in), sum(q3.dat.sc4$ppt_in), sum(q4.dat.sc4$ppt_in),
-                                    sum(q5.dat.sc4$ppt_in), sum(q6.dat.sc4$ppt_in), sum(q7.dat.sc4$ppt_in), sum(q8.dat.sc4$ppt_in),
-                                    sum(q9.dat.sc4$ppt_in), sum(q10.dat.sc4$ppt_in), sum(q11.dat.sc4$ppt_in), sum(q12.dat.sc4$ppt_in)
-)[which.min(c(mean(q1.dat.sc4$taveF), mean(q2.dat.sc4$taveF), mean(q3.dat.sc4$taveF), mean(q4.dat.sc4$taveF), 
-              mean(q5.dat.sc4$taveF), mean(q6.dat.sc4$taveF), mean(q7.dat.sc4$taveF), mean(q8.dat.sc4$taveF), 
-              mean(q9.dat.sc4$taveF), mean(q10.dat.sc4$taveF), mean(q11.dat.sc4$taveF), mean(q12.dat.sc4$taveF)))]
+precip.coldest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$PPT_in), sum(q2.dat.sc4$PPT_in), sum(q3.dat.sc4$PPT_in), sum(q4.dat.sc4$PPT_in),
+                                    sum(q5.dat.sc4$PPT_in), sum(q6.dat.sc4$PPT_in), sum(q7.dat.sc4$PPT_in), sum(q8.dat.sc4$PPT_in),
+                                    sum(q9.dat.sc4$PPT_in), sum(q10.dat.sc4$PPT_in), sum(q11.dat.sc4$PPT_in), sum(q12.dat.sc4$PPT_in)
+)[which.min(c(mean(q1.dat.sc4$TMeanF), mean(q2.dat.sc4$TMeanF), mean(q3.dat.sc4$TMeanF), mean(q4.dat.sc4$TMeanF), 
+              mean(q5.dat.sc4$TMeanF), mean(q6.dat.sc4$TMeanF), mean(q7.dat.sc4$TMeanF), mean(q8.dat.sc4$TMeanF), 
+              mean(q9.dat.sc4$TMeanF), mean(q10.dat.sc4$TMeanF), mean(q11.dat.sc4$TMeanF), mean(q12.dat.sc4$TMeanF)))]
 
 #previous calculation is the sum over   30 year historical period of said quarter
 #divide by 10 to get the annual quarter calculation 
@@ -2146,12 +2143,12 @@ precip.coldest.quarter.sc4
 
 ##Precipitation of Warmest Quarter
 
-precip.warmest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$ppt_in), sum(q2.dat.sc4$ppt_in), sum(q3.dat.sc4$ppt_in), sum(q4.dat.sc4$ppt_in),
-                                    sum(q5.dat.sc4$ppt_in), sum(q6.dat.sc4$ppt_in), sum(q7.dat.sc4$ppt_in), sum(q8.dat.sc4$ppt_in),
-                                    sum(q9.dat.sc4$ppt_in), sum(q10.dat.sc4$ppt_in), sum(q11.dat.sc4$ppt_in), sum(q12.dat.sc4$ppt_in)
-)[which.max(c(mean(q1.dat.sc4$taveF), mean(q2.dat.sc4$taveF), mean(q3.dat.sc4$taveF), mean(q4.dat.sc4$taveF), 
-              mean(q5.dat.sc4$taveF), mean(q6.dat.sc4$taveF), mean(q7.dat.sc4$taveF), mean(q8.dat.sc4$taveF), 
-              mean(q9.dat.sc4$taveF), mean(q10.dat.sc4$taveF), mean(q11.dat.sc4$taveF), mean(q12.dat.sc4$taveF)))]
+precip.warmest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$PPT_in), sum(q2.dat.sc4$PPT_in), sum(q3.dat.sc4$PPT_in), sum(q4.dat.sc4$PPT_in),
+                                    sum(q5.dat.sc4$PPT_in), sum(q6.dat.sc4$PPT_in), sum(q7.dat.sc4$PPT_in), sum(q8.dat.sc4$PPT_in),
+                                    sum(q9.dat.sc4$PPT_in), sum(q10.dat.sc4$PPT_in), sum(q11.dat.sc4$PPT_in), sum(q12.dat.sc4$PPT_in)
+)[which.max(c(mean(q1.dat.sc4$TMeanF), mean(q2.dat.sc4$TMeanF), mean(q3.dat.sc4$TMeanF), mean(q4.dat.sc4$TMeanF), 
+              mean(q5.dat.sc4$TMeanF), mean(q6.dat.sc4$TMeanF), mean(q7.dat.sc4$TMeanF), mean(q8.dat.sc4$TMeanF), 
+              mean(q9.dat.sc4$TMeanF), mean(q10.dat.sc4$TMeanF), mean(q11.dat.sc4$TMeanF), mean(q12.dat.sc4$TMeanF)))]
 
 #previous calculation is the sum over 30 year projected period of said quarter
 #divide by 10 to get the annual quarter calculation 
