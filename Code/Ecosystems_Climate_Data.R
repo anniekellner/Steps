@@ -1,13 +1,16 @@
-##THINGS TO CHECK FIRST##
-##MAKE SURE ALL 5 DATA BASES ARE CORRECT
-##MAKE SURE THE PATHWAY FOR OUTPUT IS CORRECT
-##Trevor Even - 01252022 - changed precip for driest/wettest/coldest/hottest quarter value calculation to be consistent when there are overlaps on these categories
-##Trevor Even - 03162023 - changed future scenario year divisors to reflect 30 year scenario window going forward
+#######################################################
+########  Ecosystems Climate Data (Bioclimatics)  #####
+#######################################################
 
+# Adapted from Step9a_Ecosystems Climate Data - CMIP6Updated.R by Annie Kellner 6/13/23
+
+# Objects from Step3.Rmd needed to run this script include 
+  #AllDays (list), model, AFB_Name, and start_year and end_year for the historical and future time periods
+
+
+# --------------------  Begin  --------------------------------- #
 
 # Create function for adding month (e.g., "Jan") to dataframe
-
-rm(list=setdiff(ls(), "AllDays")) # REMOVE THIS AFTER SCRIPT RUNS SUCCESSFULLY
 
 add_month <- function(df){
   df = df %>%
@@ -93,18 +96,18 @@ q12.dat <- rbind(dec.dat, jan.dat, feb.dat)
 
 #subsetting precipitation data
 
-jan.prav <- (sum(jan.dat$PPT_in))/30
-feb.prav <- (sum(feb.dat$PPT_in))/30
-mar.prav <- (sum(mar.dat$PPT_in))/30
-apr.prav <- (sum(apr.dat$PPT_in))/30
-may.prav <- (sum(may.dat$PPT_in))/30
-jun.prav <- (sum(jun.dat$PPT_in))/30
-jul.prav <- (sum(jul.dat$PPT_in))/30
-aug.prav <- (sum(aug.dat$PPT_in))/30
-sep.prav <- (sum(sep.dat$PPT_in))/30
-oct.prav <- (sum(oct.dat$PPT_in))/30
-nov.prav <- (sum(nov.dat$PPT_in))/30
-dec.prav <- (sum(dec.dat$PPT_in))/30
+jan.prav <- (sum(jan.dat$PPT_in))/(baseline_end_year - baseline_start_year)
+feb.prav <- (sum(feb.dat$PPT_in))/(baseline_end_year - baseline_start_year)
+mar.prav <- (sum(mar.dat$PPT_in))/(baseline_end_year - baseline_start_year)
+apr.prav <- (sum(apr.dat$PPT_in))/(baseline_end_year - baseline_start_year)
+may.prav <- (sum(may.dat$PPT_in))/(baseline_end_year - baseline_start_year)
+jun.prav <- (sum(jun.dat$PPT_in))/(baseline_end_year - baseline_start_year)
+jul.prav <- (sum(jul.dat$PPT_in))/(baseline_end_year - baseline_start_year)
+aug.prav <- (sum(aug.dat$PPT_in))/(baseline_end_year - baseline_start_year)
+sep.prav <- (sum(sep.dat$PPT_in))/(baseline_end_year - baseline_start_year)
+oct.prav <- (sum(oct.dat$PPT_in))/(baseline_end_year - baseline_start_year)
+nov.prav <- (sum(nov.dat$PPT_in))/(baseline_end_year - baseline_start_year)
+dec.prav <- (sum(dec.dat$PPT_in))/(baseline_end_year - baseline_start_year)
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
@@ -365,8 +368,8 @@ precip.driest.month.pre <- c(jan.prav, feb.prav, mar.prav, apr.prav, may.prav, j
 )[which.min(c(jan.prav, feb.prav, mar.prav, apr.prav, may.prav, jun.prav,
               jul.prav, aug.prav, sep.prav, oct.prav, nov.prav, dec.prav))]
 
-#since we are using sums of precip for a given month over a 30 year historical period we need to divide
-#by 30 to get the sum of ones months precip
+#since we are using sums of precip for a given month over a historical period we need to divide
+#by the number of years in the period to get the sum of one month's precip
 
 precip.driest.month <- precip.driest.month.pre
 
@@ -385,8 +388,8 @@ names(monthly.means.precip)[1]<-paste("praverage")
 #now get the standard deviation of all twelve months
 sd.precip <- sd(monthly.means.precip$praverage)
 
-#annual precipitation / getting the sum of over 30 years then dividing by 30 to get annual average
-an.precip <- (sum(dat.hist$PPT_mm)/30)
+#annual precipitation / getting the sum of over historical period then dividing by the number of years to get annual average
+an.precip <- (sum(dat.hist$PPT_mm)/(baseline_end_year - baseline_start_year))
 mo.precip <- an.precip/12
 
 #final calculation
@@ -404,9 +407,10 @@ precip.wettest.quarter.pre <- c(sum(q1.dat$PPT_in), sum(q2.dat$PPT_in), sum(q3.d
               mean(q5.dat$PPT_in)*92, mean(q6.dat$PPT_in)*92, mean(q7.dat$PPT_in)*92, mean(q8.dat$PPT_in)*92, 
               mean(q9.dat$PPT_in)*91, mean(q10.dat$PPT_in)*92, mean(q11.dat$PPT_in)*92, mean(q12.dat$PPT_in)*90.25))]
 
-#previous calculation is the sum over 30 year historical period of said quarter
-#divide by 30 to get the annual quarter calculation 
-precip.wettest.quarter <- precip.wettest.quarter.pre/30
+#previous calculation is the sum over historical period of said quarter
+#divide to get the annual quarter calculation 
+precip.wettest.quarter <- precip.wettest.quarter.pre/(baseline_end_year - baseline_start_year)
+                                                      
 
 #value
 precip.wettest.quarter
@@ -420,9 +424,9 @@ precip.driest.quarter.pre <- c(sum(q1.dat$PPT_in), sum(q2.dat$PPT_in), sum(q3.da
               mean(q5.dat$PPT_in)*92, mean(q6.dat$PPT_in)*92, mean(q7.dat$PPT_in)*92, mean(q8.dat$PPT_in)*92, 
               mean(q9.dat$PPT_in)*91, mean(q10.dat$PPT_in)*92, mean(q11.dat$PPT_in)*92, mean(q12.dat$PPT_in)*90.25))]
 
-#previous calculation is the sum over 30 year historical period of said quarter
-#divide by 30 to get the annual quarter calculation 
-precip.driest.quarter <- precip.driest.quarter.pre/30
+#previous calculation is the sum over historical period of said quarter
+#divide by number of years to get the annual quarter calculation 
+precip.driest.quarter <- precip.driest.quarter.pre/(baseline_end_year - baseline_start_year)
 
 #value
 precip.driest.quarter
@@ -436,9 +440,9 @@ precip.coldest.quarter.pre <- c(sum(q1.dat$PPT_in), sum(q2.dat$PPT_in), sum(q3.d
               mean(q5.dat$TMeanF), mean(q6.dat$TMeanF), mean(q7.dat$TMeanF), mean(q8.dat$TMeanF), 
               mean(q9.dat$TMeanF), mean(q10.dat$TMeanF), mean(q11.dat$TMeanF), mean(q12.dat$TMeanF)))]
 
-#previous calculation is the sum over 30 year historical period of said quarter
-#divide by 30 to get the annual quarter calculation 
-precip.coldest.quarter <- precip.coldest.quarter.pre/30
+#previous calculation is the sum over the historical period of said quarter
+#divide by number of years to get the annual quarter calculation 
+precip.coldest.quarter <- precip.coldest.quarter.pre/(baseline_end_year - baseline_start_year)
 
 #value
 precip.coldest.quarter
@@ -452,9 +456,9 @@ precip.warmest.quarter.pre <- c(sum(q1.dat$PPT_in), sum(q2.dat$PPT_in), sum(q3.d
               mean(q5.dat$TMeanF), mean(q6.dat$TMeanF), mean(q7.dat$TMeanF), mean(q8.dat$TMeanF), 
               mean(q9.dat$TMeanF), mean(q10.dat$TMeanF), mean(q11.dat$TMeanF), mean(q12.dat$TMeanF)))]
 
-#previous calculation is the sum over 30 year historical period of said quarter
-#divide by 30 to get the annual quarter calculation 
-precip.warmest.quarter <- precip.warmest.quarter.pre/30
+#previous calculation is the sum over historical period of said quarter
+#divide to get the annual quarter calculation 
+precip.warmest.quarter <- precip.warmest.quarter.pre/(baseline_end_year - baseline_start_year)
 
 
 #value
@@ -464,16 +468,10 @@ precip.warmest.quarter
 
 #setting aside appropriate data
 
-month <-        c(month.abb)
-month           #make sure the data lines up with table dude
 sc1.temp.av <- c(dat.RCP4.5.2030$TMeanF)
-sc1.temp.av   #make sure the data lines up with table dude
 sc1.temp.hi <- c(dat.RCP4.5.2030$TMaxF)
-sc1.temp.hi    #make sure the data lines up with table dude
 sc1.temp.lo <- c(dat.RCP4.5.2030$TMinF)
-sc1.temp.lo    #make sure the data lines up with table dude
 sc1.precip <-  c(dat.RCP4.5.2030$PPT_in)
-sc1.precip     #make sure the data lines up with table dude
 
 #subsetting monthly data
 
@@ -522,18 +520,18 @@ q12.dat.sc1 <- rbind(dec.dat.sc1, jan.dat.sc1, feb.dat.sc1)
 
 #subsetting precipitation data
 
-jan.prav.dat.sc1 <- (sum(jan.dat.sc1$PPT_in))/30
-feb.prav.dat.sc1 <- (sum(feb.dat.sc1$PPT_in))/30
-mar.prav.dat.sc1 <- (sum(mar.dat.sc1$PPT_in))/30
-apr.prav.dat.sc1 <- (sum(apr.dat.sc1$PPT_in))/30
-may.prav.dat.sc1 <- (sum(may.dat.sc1$PPT_in))/30
-jun.prav.dat.sc1 <- (sum(jun.dat.sc1$PPT_in))/30
-jul.prav.dat.sc1 <- (sum(jul.dat.sc1$PPT_in))/30
-aug.prav.dat.sc1 <- (sum(aug.dat.sc1$PPT_in))/30
-sep.prav.dat.sc1 <- (sum(sep.dat.sc1$PPT_in))/30
-oct.prav.dat.sc1 <- (sum(oct.dat.sc1$PPT_in))/30
-nov.prav.dat.sc1 <- (sum(nov.dat.sc1$PPT_in))/30
-dec.prav.dat.sc1 <- (sum(dec.dat.sc1$PPT_in))/30
+jan.prav.dat.sc1 <- (sum(jan.dat.sc1$PPT_in))/(future1_end_year - future1_start_year)
+feb.prav.dat.sc1 <- (sum(feb.dat.sc1$PPT_in))/(future1_end_year - future1_start_year)
+mar.prav.dat.sc1 <- (sum(mar.dat.sc1$PPT_in))/(future1_end_year - future1_start_year)
+apr.prav.dat.sc1 <- (sum(apr.dat.sc1$PPT_in))/(future1_end_year - future1_start_year)
+may.prav.dat.sc1 <- (sum(may.dat.sc1$PPT_in))/(future1_end_year - future1_start_year)
+jun.prav.dat.sc1 <- (sum(jun.dat.sc1$PPT_in))/(future1_end_year - future1_start_year)
+jul.prav.dat.sc1 <- (sum(jul.dat.sc1$PPT_in))/(future1_end_year - future1_start_year)
+aug.prav.dat.sc1 <- (sum(aug.dat.sc1$PPT_in))/(future1_end_year - future1_start_year)
+sep.prav.dat.sc1 <- (sum(sep.dat.sc1$PPT_in))/(future1_end_year - future1_start_year)
+oct.prav.dat.sc1 <- (sum(oct.dat.sc1$PPT_in))/(future1_end_year - future1_start_year)
+nov.prav.dat.sc1 <- (sum(nov.dat.sc1$PPT_in))/(future1_end_year - future1_start_year)
+dec.prav.dat.sc1 <- (sum(dec.dat.sc1$PPT_in))/(future1_end_year - future1_start_year)
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
@@ -813,8 +811,8 @@ names(monthly.means.precip.sc1)[1]<-paste("praverage")
 #now get the standard deviation of all twelve months
 sd.precip.sc1 <- sd(monthly.means.precip.sc1$praverage)
 
-#annual precipitation / getting the sum of over 30 years then dividing by 30 to get annual average
-an.precip.sc1 <- (sum(dat.RCP4.5.2030$PPT_mm)/30)
+#annual precipitation / getting the sum of over x years then dividing by x to get annual average
+an.precip.sc1 <- (sum(dat.RCP4.5.2030$PPT_mm)/(future1_end_year - future1_start_year))
 mo.precip.sc1 <- an.precip.sc1/12
 
 #final calculation
@@ -832,9 +830,9 @@ precip.wettest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$PPT_in), sum(q2.dat.sc1$PPT_i
               mean(q5.dat.sc1$PPT_in)*92, mean(q6.dat.sc1$PPT_in)*92, mean(q7.dat.sc1$PPT_in)*92, mean(q8.dat.sc1$PPT_in)*92, 
               mean(q9.dat.sc1$PPT_in)*91, mean(q10.dat.sc1$PPT_in)*92, mean(q11.dat.sc1$PPT_in)*92, mean(q12.dat.sc1$PPT_in)*90.25))]
 
-#previous calculation is the sum over   30 year historical period of said quarter
+#previous calculation is the sum over the historical period of said quarter
 #divide by 10 to get the annual quarter calculation
-precip.wettest.quarter.sc1 <- precip.wettest.quarter.pre.sc1/30
+precip.wettest.quarter.sc1 <- precip.wettest.quarter.pre.sc1/(future1_end_year - future1_start_year)
 
 #value
 precip.wettest.quarter.sc1
@@ -848,9 +846,9 @@ precip.driest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$PPT_in), sum(q2.dat.sc1$PPT_in
               mean(q5.dat.sc1$PPT_in)*92, mean(q6.dat.sc1$PPT_in)*92, mean(q7.dat.sc1$PPT_in)*92, mean(q8.dat.sc1$PPT_in)*92, 
               mean(q9.dat.sc1$PPT_in)*91, mean(q10.dat.sc1$PPT_in)*92, mean(q11.dat.sc1$PPT_in)*92, mean(q12.dat.sc1$PPT_in)*90.25))]
 
-#previous calculation is the sum over   30 year historical period of said quarter
+#previous calculation is the sum over historical period of said quarter
 #divide by 10 to get the annual quarter calculation 
-precip.driest.quarter.sc1 <- precip.driest.quarter.pre.sc1/30
+precip.driest.quarter.sc1 <- precip.driest.quarter.pre.sc1/(baseline_end_year - baseline_start_year)
 
 #value
 precip.driest.quarter.sc1
@@ -864,9 +862,9 @@ precip.coldest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$PPT_in), sum(q2.dat.sc1$PPT_i
               mean(q5.dat.sc1$TMeanF), mean(q6.dat.sc1$TMeanF), mean(q7.dat.sc1$TMeanF), mean(q8.dat.sc1$TMeanF), 
               mean(q9.dat.sc1$TMeanF), mean(q10.dat.sc1$TMeanF), mean(q11.dat.sc1$TMeanF), mean(q12.dat.sc1$TMeanF)))]
 
-#previous calculation is the sum over   30 year historical period of said quarter
+#previous calculation is the sum over historical period of said quarter
 #divide by 10 to get the annual quarter calculation 
-precip.coldest.quarter.sc1 <- precip.coldest.quarter.pre.sc1/30
+precip.coldest.quarter.sc1 <- precip.coldest.quarter.pre.sc1/(future1_end_year - future1_start_year)
 
 #value
 precip.coldest.quarter.sc1
@@ -880,9 +878,9 @@ precip.warmest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$PPT_in), sum(q2.dat.sc1$PPT_i
               mean(q5.dat.sc1$TMeanF), mean(q6.dat.sc1$TMeanF), mean(q7.dat.sc1$TMeanF), mean(q8.dat.sc1$TMeanF), 
               mean(q9.dat.sc1$TMeanF), mean(q10.dat.sc1$TMeanF), mean(q11.dat.sc1$TMeanF), mean(q12.dat.sc1$TMeanF)))]
 
-#previous calculation is the sum over 30 year projected period of said quarter
-#divide by 10 to get the annual quarter calculation 
-precip.warmest.quarter.sc1 <- precip.warmest.quarter.pre.sc1/30
+#previous calculation is the sum over projected period of said quarter
+#divide to get the annual quarter calculation 
+precip.warmest.quarter.sc1 <- precip.warmest.quarter.pre.sc1/(future1_end_year - future1_start_year)
 
 #value
 precip.warmest.quarter.sc1
@@ -891,16 +889,10 @@ precip.warmest.quarter.sc1
 
 #setting aside appropriate data
 
-month <-        c(month.abb)
-month           #make sure the data lines up with table dude
 sc2.temp.av <- c(dat.RCP4.5.2050$TMeanF)
-sc2.temp.av   #make sure the data lines up with table dude
 sc2.temp.hi <- c(dat.RCP4.5.2050$TMaxF)
-sc2.temp.hi    #make sure the data lines up with table dude
 sc2.temp.lo <- c(dat.RCP4.5.2050$TMinF)
-sc2.temp.lo    #make sure the data lines up with table dude
 sc2.precip <-  c(dat.RCP4.5.2050$PPT_in)
-sc2.precip     #make sure the data lines up with table dude
 
 #subsetting monthly data
 
@@ -949,18 +941,18 @@ q12.dat.sc2 <- rbind(dec.dat.sc2, jan.dat.sc2, feb.dat.sc2)
 
 #subsetting precipitation data
 
-jan.prav.dat.sc2 <- (sum(jan.dat.sc2$PPT_in))/30
-feb.prav.dat.sc2 <- (sum(feb.dat.sc2$PPT_in))/30
-mar.prav.dat.sc2 <- (sum(mar.dat.sc2$PPT_in))/30
-apr.prav.dat.sc2 <- (sum(apr.dat.sc2$PPT_in))/30
-may.prav.dat.sc2 <- (sum(may.dat.sc2$PPT_in))/30
-jun.prav.dat.sc2 <- (sum(jun.dat.sc2$PPT_in))/30
-jul.prav.dat.sc2 <- (sum(jul.dat.sc2$PPT_in))/30
-aug.prav.dat.sc2 <- (sum(aug.dat.sc2$PPT_in))/30
-sep.prav.dat.sc2 <- (sum(sep.dat.sc2$PPT_in))/30
-oct.prav.dat.sc2 <- (sum(oct.dat.sc2$PPT_in))/30
-nov.prav.dat.sc2 <- (sum(nov.dat.sc2$PPT_in))/30
-dec.prav.dat.sc2 <- (sum(dec.dat.sc2$PPT_in))/30
+jan.prav.dat.sc2 <- (sum(jan.dat.sc2$PPT_in))/(future2_end_year - future2_start_year)
+feb.prav.dat.sc2 <- (sum(feb.dat.sc2$PPT_in))/(future2_end_year - future2_start_year)
+mar.prav.dat.sc2 <- (sum(mar.dat.sc2$PPT_in))/(future2_end_year - future2_start_year)
+apr.prav.dat.sc2 <- (sum(apr.dat.sc2$PPT_in))/(future2_end_year - future2_start_year)
+may.prav.dat.sc2 <- (sum(may.dat.sc2$PPT_in))/(future2_end_year - future2_start_year)
+jun.prav.dat.sc2 <- (sum(jun.dat.sc2$PPT_in))/(future2_end_year - future2_start_year)
+jul.prav.dat.sc2 <- (sum(jul.dat.sc2$PPT_in))/(future2_end_year - future2_start_year)
+aug.prav.dat.sc2 <- (sum(aug.dat.sc2$PPT_in))/(future2_end_year - future2_start_year)
+sep.prav.dat.sc2 <- (sum(sep.dat.sc2$PPT_in))/(future2_end_year - future2_start_year)
+oct.prav.dat.sc2 <- (sum(oct.dat.sc2$PPT_in))/(future2_end_year - future2_start_year)
+nov.prav.dat.sc2 <- (sum(nov.dat.sc2$PPT_in))/(future2_end_year - future2_start_year)
+dec.prav.dat.sc2 <- (sum(dec.dat.sc2$PPT_in))/(future2_end_year - future2_start_year)
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
@@ -1238,8 +1230,8 @@ names(monthly.means.precip.sc2)[1]<-paste("praverage")
 #now get the standard deviation of all twelve months
 sd.precip.sc2 <- sd(monthly.means.precip.sc2$praverage)
 
-#annual precipitation / getting the sum of over 30 years then dividing by 10 to get annual average
-an.precip.sc2 <- (sum(dat.RCP4.5.2050$PPT_mm)/30)
+#annual precipitation / getting the sum of years then dividing by 12 to get annual average
+an.precip.sc2 <- (sum(dat.RCP4.5.2050$PPT_mm)/(future2_end_year - future2_start_year))
 mo.precip.sc2 <- an.precip.sc2/12
 
 #final calculation
@@ -1257,9 +1249,9 @@ precip.wettest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$PPT_in), sum(q2.dat.sc2$PPT_i
               mean(q5.dat.sc2$PPT_in)*92, mean(q6.dat.sc2$PPT_in)*92, mean(q7.dat.sc2$PPT_in)*92, mean(q8.dat.sc2$PPT_in)*92, 
               mean(q9.dat.sc2$PPT_in)*91, mean(q10.dat.sc2$PPT_in)*92, mean(q11.dat.sc2$PPT_in)*92, mean(q12.dat.sc2$PPT_in)*90.25))]
 
-#previous calculation is the sum over 30 year projected period of said quarter
-#divide by 10 to get the annual quarter calculation 
-precip.wettest.quarter.sc2 <- precip.wettest.quarter.pre.sc2/30
+#previous calculation is the sum over projected period of said quarter
+#divide by number of years to get the annual quarter calculation 
+precip.wettest.quarter.sc2 <- precip.wettest.quarter.pre.sc2/(future2_end_year - future2_start_year)
 
 #value
 precip.wettest.quarter.sc2
@@ -1274,7 +1266,7 @@ precip.driest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$PPT_in), sum(q2.dat.sc2$PPT_in
               mean(q9.dat.sc2$PPT_in)*91, mean(q10.dat.sc2$PPT_in)*92, mean(q11.dat.sc2$PPT_in)*92, mean(q12.dat.sc2$PPT_in)*90.25))]
 
 
-precip.driest.quarter.sc2 <- precip.driest.quarter.pre.sc2/30
+precip.driest.quarter.sc2 <- precip.driest.quarter.pre.sc2/(future2_end_year - future2_start_year)
 
 #value
 precip.driest.quarter.sc2
@@ -1288,9 +1280,9 @@ precip.coldest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$PPT_in), sum(q2.dat.sc2$PPT_i
               mean(q5.dat.sc2$TMeanF), mean(q6.dat.sc2$TMeanF), mean(q7.dat.sc2$TMeanF), mean(q8.dat.sc2$TMeanF), 
               mean(q9.dat.sc2$TMeanF), mean(q10.dat.sc2$TMeanF), mean(q11.dat.sc2$TMeanF), mean(q12.dat.sc2$TMeanF)))]
 
-#previous calculation is the sum over   30 year historical period of said quarter
-#divide by 10 to get the annual quarter calculation 
-precip.coldest.quarter.sc2 <- precip.coldest.quarter.pre.sc2/30
+#previous calculation is the sum over historical period of said quarter
+#divide to get the annual quarter calculation 
+precip.coldest.quarter.sc2 <- precip.coldest.quarter.pre.sc2/(future2_end_year - future2_start_year)
 
 #value
 precip.coldest.quarter.sc2
@@ -1304,9 +1296,9 @@ precip.warmest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$PPT_in), sum(q2.dat.sc2$PPT_i
               mean(q5.dat.sc2$TMeanF), mean(q6.dat.sc2$TMeanF), mean(q7.dat.sc2$TMeanF), mean(q8.dat.sc2$TMeanF), 
               mean(q9.dat.sc2$TMeanF), mean(q10.dat.sc2$TMeanF), mean(q11.dat.sc2$TMeanF), mean(q12.dat.sc2$TMeanF)))]
 
-#previous calculation is the sum over 30 year projected period of said quarter
-#divide by 10 to get the annual quarter calculation 
-precip.warmest.quarter.sc2 <- precip.warmest.quarter.pre.sc2/30
+#previous calculation is the sum over projected period of said quarter
+#divide to get the annual quarter calculation 
+precip.warmest.quarter.sc2 <- precip.warmest.quarter.pre.sc2/(future2_end_year - future2_start_year)
 
 #value
 precip.warmest.quarter.sc2
@@ -1315,16 +1307,10 @@ precip.warmest.quarter.sc2
 
 #setting aside appropriate data
 
-month <-        c(month.abb)
-month           #make sure the data lines up with table dude
 sc3.temp.av <- c(dat.RCP8.5.2030$TMeanF)
-sc3.temp.av   #make sure the data lines up with table dude
 sc3.temp.hi <- c(dat.RCP8.5.2030$TMaxF)
-sc3.temp.hi    #make sure the data lines up with table dude
 sc3.temp.lo <- c(dat.RCP8.5.2030$TMinF)
-sc3.temp.lo    #make sure the data lines up with table dude
 sc3.precip <-  c(dat.RCP8.5.2030$PPT_in)
-sc3.precip     #make sure the data lines up with table dude
 
 #subsetting monthly data
 
@@ -1373,18 +1359,18 @@ q12.dat.sc3 <- rbind(dec.dat.sc3, jan.dat.sc3, feb.dat.sc3)
 
 #subsetting precipitation data
 
-jan.prav.dat.sc3 <- (sum(jan.dat.sc3$PPT_in))/30
-feb.prav.dat.sc3 <- (sum(feb.dat.sc3$PPT_in))/30
-mar.prav.dat.sc3 <- (sum(mar.dat.sc3$PPT_in))/30
-apr.prav.dat.sc3 <- (sum(apr.dat.sc3$PPT_in))/30
-may.prav.dat.sc3 <- (sum(may.dat.sc3$PPT_in))/30
-jun.prav.dat.sc3 <- (sum(jun.dat.sc3$PPT_in))/30
-jul.prav.dat.sc3 <- (sum(jul.dat.sc3$PPT_in))/30
-aug.prav.dat.sc3 <- (sum(aug.dat.sc3$PPT_in))/30
-sep.prav.dat.sc3 <- (sum(sep.dat.sc3$PPT_in))/30
-oct.prav.dat.sc3 <- (sum(oct.dat.sc3$PPT_in))/30
-nov.prav.dat.sc3 <- (sum(nov.dat.sc3$PPT_in))/30
-dec.prav.dat.sc3 <- (sum(dec.dat.sc3$PPT_in))/30
+jan.prav.dat.sc3 <- (sum(jan.dat.sc3$PPT_in))/(future1_end_year - future1_start_year)
+feb.prav.dat.sc3 <- (sum(feb.dat.sc3$PPT_in))/(future1_end_year - future1_start_year)
+mar.prav.dat.sc3 <- (sum(mar.dat.sc3$PPT_in))/(future1_end_year - future1_start_year)
+apr.prav.dat.sc3 <- (sum(apr.dat.sc3$PPT_in))/(future1_end_year - future1_start_year)
+may.prav.dat.sc3 <- (sum(may.dat.sc3$PPT_in))/(future1_end_year - future1_start_year)
+jun.prav.dat.sc3 <- (sum(jun.dat.sc3$PPT_in))/(future1_end_year - future1_start_year)
+jul.prav.dat.sc3 <- (sum(jul.dat.sc3$PPT_in))/(future1_end_year - future1_start_year)
+aug.prav.dat.sc3 <- (sum(aug.dat.sc3$PPT_in))/(future1_end_year - future1_start_year)
+sep.prav.dat.sc3 <- (sum(sep.dat.sc3$PPT_in))/(future1_end_year - future1_start_year)
+oct.prav.dat.sc3 <- (sum(oct.dat.sc3$PPT_in))/(future1_end_year - future1_start_year)
+nov.prav.dat.sc3 <- (sum(nov.dat.sc3$PPT_in))/(future1_end_year - future1_start_year)
+dec.prav.dat.sc3 <- (sum(dec.dat.sc3$PPT_in))/(future1_end_year - future1_start_year)
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
@@ -1633,8 +1619,8 @@ precip.wettest.month.pre.sc3 <- c(jan.prav.dat.sc3, feb.prav.dat.sc3, mar.prav.d
 )[which.max(c(jan.prav.dat.sc3, feb.prav.dat.sc3, mar.prav.dat.sc3, apr.prav.dat.sc3, may.prav.dat.sc3, jun.prav.dat.sc3,
               jul.prav.dat.sc3, aug.prav.dat.sc3, sep.prav.dat.sc3, oct.prav.dat.sc3, nov.prav.dat.sc3, dec.prav.dat.sc3))]
 
-#since we are using sums of precip for a given month over a 30 year projected period we need to divide
-#by 10 to get the sum of ones months precip
+#since we are using sums of precip for a given month over a projected period we need to divide
+#to get the sum of one month's precip
 
 precip.wettest.month.sc3 <- precip.wettest.month.pre.sc3
 
@@ -1665,8 +1651,8 @@ names(monthly.means.precip.sc3)[1]<-paste("praverage")
 #now get the standard deviation of all twelve months
 sd.precip.sc3 <- sd(monthly.means.precip.sc3$praverage)
 
-#annual precipitation / getting the sum of over 30 years then dividing by 10 to get annual average
-an.precip.sc3 <- (sum(dat.RCP8.5.2030$PPT_mm)/30)
+#annual precipitation / getting the sum of period then dividing by 12 to get annual average
+an.precip.sc3 <- (sum(dat.RCP8.5.2030$PPT_mm)/(future1_end_year - future1_start_year))
 mo.precip.sc3 <- an.precip.sc3/12
 
 #final calculation
@@ -1684,7 +1670,7 @@ precip.wettest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$PPT_in), sum(q2.dat.sc3$PPT_i
               mean(q5.dat.sc3$PPT_in)*92, mean(q6.dat.sc3$PPT_in)*92, mean(q7.dat.sc3$PPT_in)*92, mean(q8.dat.sc3$PPT_in)*92, 
               mean(q9.dat.sc3$PPT_in)*91, mean(q10.dat.sc3$PPT_in)*92, mean(q11.dat.sc3$PPT_in)*92, mean(q12.dat.sc3$PPT_in)*90.25))]
 
-precip.wettest.quarter.sc3 <- precip.wettest.quarter.pre.sc3/30
+precip.wettest.quarter.sc3 <- precip.wettest.quarter.pre.sc3/(future1_end_year - future1_start_year)
 
 #value
 precip.wettest.quarter.sc3
@@ -1699,7 +1685,7 @@ precip.driest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$PPT_in), sum(q2.dat.sc3$PPT_in
               mean(q9.dat.sc3$PPT_in)*91, mean(q10.dat.sc3$PPT_in)*92, mean(q11.dat.sc3$PPT_in)*92, mean(q12.dat.sc3$PPT_in)*90.25))]
 
 
-precip.driest.quarter.sc3 <- precip.driest.quarter.pre.sc3/30
+precip.driest.quarter.sc3 <- precip.driest.quarter.pre.sc3/(future1_end_year - future1_start_year)
 
 #value
 precip.driest.quarter.sc3
@@ -1713,9 +1699,9 @@ precip.coldest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$PPT_in), sum(q2.dat.sc3$PPT_i
               mean(q5.dat.sc3$TMeanF), mean(q6.dat.sc3$TMeanF), mean(q7.dat.sc3$TMeanF), mean(q8.dat.sc3$TMeanF), 
               mean(q9.dat.sc3$TMeanF), mean(q10.dat.sc3$TMeanF), mean(q11.dat.sc3$TMeanF), mean(q12.dat.sc3$TMeanF)))]
 
-#previous calculation is the sum over   30 year historical period of said quarter
-#divide by 10 to get the annual quarter calculation 
-precip.coldest.quarter.sc3 <- precip.coldest.quarter.pre.sc3/30
+#previous calculation is the sum over historical period of said quarter
+#divide to get the annual quarter calculation 
+precip.coldest.quarter.sc3 <- precip.coldest.quarter.pre.sc3/(future1_end_year - future1_start_year)
 
 #value
 precip.coldest.quarter.sc3
@@ -1729,9 +1715,9 @@ precip.warmest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$PPT_in), sum(q2.dat.sc3$PPT_i
               mean(q5.dat.sc3$TMeanF), mean(q6.dat.sc3$TMeanF), mean(q7.dat.sc3$TMeanF), mean(q8.dat.sc3$TMeanF), 
               mean(q9.dat.sc3$TMeanF), mean(q10.dat.sc3$TMeanF), mean(q11.dat.sc3$TMeanF), mean(q12.dat.sc3$TMeanF)))]
 
-#previous calculation is the sum over 30 year projected period of said quarter
-#divide by 10 to get the annual quarter calculation 
-precip.warmest.quarter.sc3 <- precip.warmest.quarter.pre.sc3/30
+#previous calculation is the sum over projected period of said quarter
+#divide to get the annual quarter calculation 
+precip.warmest.quarter.sc3 <- precip.warmest.quarter.pre.sc3/(future1_end_year - future1_start_year)
 
 #value
 precip.warmest.quarter.sc3
@@ -1741,16 +1727,10 @@ precip.warmest.quarter.sc3
 
 #setting aside appropriate data
 
-month <-        c(month.abb)
-month           #make sure the data lines up with table dude
 sc4.temp.av <- c(dat.RCP8.5.2050$TMeanF)
-sc4.temp.av   #make sure the data lines up with table dude
 sc4.temp.hi <- c(dat.RCP8.5.2050$TMaxF)
-sc4.temp.hi    #make sure the data lines up with table dude
 sc4.temp.lo <- c(dat.RCP8.5.2050$TMinF)
-sc4.temp.lo    #make sure the data lines up with table dude
 sc4.precip <-  c(dat.RCP8.5.2050$PPT_in)
-sc4.precip     #make sure the data lines up with table dude
 
 #subsetting monthly data
 
@@ -1799,18 +1779,18 @@ q12.dat.sc4 <- rbind(dec.dat.sc4, jan.dat.sc4, feb.dat.sc4)
 
 #subsetting precipitation data
 
-jan.prav.dat.sc4 <- (sum(jan.dat.sc4$PPT_in))/30
-feb.prav.dat.sc4 <- (sum(feb.dat.sc4$PPT_in))/30
-mar.prav.dat.sc4 <- (sum(mar.dat.sc4$PPT_in))/30
-apr.prav.dat.sc4 <- (sum(apr.dat.sc4$PPT_in))/30
-may.prav.dat.sc4 <- (sum(may.dat.sc4$PPT_in))/30
-jun.prav.dat.sc4 <- (sum(jun.dat.sc4$PPT_in))/30
-jul.prav.dat.sc4 <- (sum(jul.dat.sc4$PPT_in))/30
-aug.prav.dat.sc4 <- (sum(aug.dat.sc4$PPT_in))/30
-sep.prav.dat.sc4 <- (sum(sep.dat.sc4$PPT_in))/30
-oct.prav.dat.sc4 <- (sum(oct.dat.sc4$PPT_in))/30
-nov.prav.dat.sc4 <- (sum(nov.dat.sc4$PPT_in))/30
-dec.prav.dat.sc4 <- (sum(dec.dat.sc4$PPT_in))/30
+jan.prav.dat.sc4 <- (sum(jan.dat.sc4$PPT_in))/(future2_end_year - future2_start_year)
+feb.prav.dat.sc4 <- (sum(feb.dat.sc4$PPT_in))/(future2_end_year - future2_start_year)
+mar.prav.dat.sc4 <- (sum(mar.dat.sc4$PPT_in))/(future2_end_year - future2_start_year)
+apr.prav.dat.sc4 <- (sum(apr.dat.sc4$PPT_in))/(future2_end_year - future2_start_year)
+may.prav.dat.sc4 <- (sum(may.dat.sc4$PPT_in))/(future2_end_year - future2_start_year)
+jun.prav.dat.sc4 <- (sum(jun.dat.sc4$PPT_in))/(future2_end_year - future2_start_year)
+jul.prav.dat.sc4 <- (sum(jul.dat.sc4$PPT_in))/(future2_end_year - future2_start_year)
+aug.prav.dat.sc4 <- (sum(aug.dat.sc4$PPT_in))/(future2_end_year - future2_start_year)
+sep.prav.dat.sc4 <- (sum(sep.dat.sc4$PPT_in))/(future2_end_year - future2_start_year)
+oct.prav.dat.sc4 <- (sum(oct.dat.sc4$PPT_in))/(future2_end_year - future2_start_year)
+nov.prav.dat.sc4 <- (sum(nov.dat.sc4$PPT_in))/(future2_end_year - future2_start_year)
+dec.prav.dat.sc4 <- (sum(dec.dat.sc4$PPT_in))/(future2_end_year - future2_start_year)
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
@@ -2087,8 +2067,8 @@ names(monthly.means.precip.sc4)[1]<-paste("praverage")
 #now get the standard deviation of all twelve months
 sd.precip.sc4 <- sd(monthly.means.precip.sc4$praverage)
 
-#annual precipitation / getting the sum of over 30 years then dividing by 10 to get annual average
-an.precip.sc4 <- (sum(dat.RCP8.5.2050$PPT_mm)/30)
+#annual precipitation / getting the sum of years then dividing by 12 to get annual average
+an.precip.sc4 <- (sum(dat.RCP8.5.2050$PPT_mm)/(future2_end_year - future2_start_year))
 mo.precip.sc4 <- an.precip.sc4/12
 
 #final calculation
@@ -2106,7 +2086,7 @@ precip.wettest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$PPT_in), sum(q2.dat.sc4$PPT_i
               mean(q5.dat.sc4$PPT_in)*92, mean(q6.dat.sc4$PPT_in)*92, mean(q7.dat.sc4$PPT_in)*92, mean(q8.dat.sc4$PPT_in)*92, 
               mean(q9.dat.sc4$PPT_in)*91, mean(q10.dat.sc4$PPT_in)*92, mean(q11.dat.sc4$PPT_in)*92, mean(q12.dat.sc4$PPT_in)*90.25))]
 
-precip.wettest.quarter.sc4 <- precip.wettest.quarter.pre.sc4/30
+precip.wettest.quarter.sc4 <- precip.wettest.quarter.pre.sc4/(future2_end_year - future2_start_year)
 
 #value
 precip.wettest.quarter.sc4
@@ -2120,7 +2100,7 @@ precip.driest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$PPT_in), sum(q2.dat.sc4$PPT_in
               mean(q5.dat.sc4$PPT_in)*92, mean(q6.dat.sc4$PPT_in)*92, mean(q7.dat.sc4$PPT_in)*92, mean(q8.dat.sc4$PPT_in)*92, 
               mean(q9.dat.sc4$PPT_in)*91, mean(q10.dat.sc4$PPT_in)*92, mean(q11.dat.sc4$PPT_in)*92, mean(q12.dat.sc4$PPT_in)*90.25))]
 
-precip.driest.quarter.sc4 <- precip.driest.quarter.pre.sc4/30
+precip.driest.quarter.sc4 <- precip.driest.quarter.pre.sc4/(future2_end_year - future2_start_year)
 
 #value
 precip.driest.quarter.sc4
@@ -2134,9 +2114,9 @@ precip.coldest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$PPT_in), sum(q2.dat.sc4$PPT_i
               mean(q5.dat.sc4$TMeanF), mean(q6.dat.sc4$TMeanF), mean(q7.dat.sc4$TMeanF), mean(q8.dat.sc4$TMeanF), 
               mean(q9.dat.sc4$TMeanF), mean(q10.dat.sc4$TMeanF), mean(q11.dat.sc4$TMeanF), mean(q12.dat.sc4$TMeanF)))]
 
-#previous calculation is the sum over   30 year historical period of said quarter
-#divide by 10 to get the annual quarter calculation 
-precip.coldest.quarter.sc4 <- precip.coldest.quarter.pre.sc4/30
+#previous calculation is the sum over historical period of said quarter
+#divide to get the annual quarter calculation 
+precip.coldest.quarter.sc4 <- precip.coldest.quarter.pre.sc4/(future2_end_year - future2_start_year)
 
 #value
 precip.coldest.quarter.sc4
@@ -2150,9 +2130,9 @@ precip.warmest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$PPT_in), sum(q2.dat.sc4$PPT_i
               mean(q5.dat.sc4$TMeanF), mean(q6.dat.sc4$TMeanF), mean(q7.dat.sc4$TMeanF), mean(q8.dat.sc4$TMeanF), 
               mean(q9.dat.sc4$TMeanF), mean(q10.dat.sc4$TMeanF), mean(q11.dat.sc4$TMeanF), mean(q12.dat.sc4$TMeanF)))]
 
-#previous calculation is the sum over 30 year projected period of said quarter
-#divide by 10 to get the annual quarter calculation 
-precip.warmest.quarter.sc4 <- precip.warmest.quarter.pre.sc4/30
+#previous calculation is the sum over projected period of said quarter
+#divide to get the annual quarter calculation 
+precip.warmest.quarter.sc4 <- precip.warmest.quarter.pre.sc4/(future2_end_year - future2_start_year)
 
 #value
 precip.warmest.quarter.sc4
@@ -2281,10 +2261,13 @@ rownames(env.var) <- c("Annual Mean Diurnal Range, ?F",
 env.var
 
 #change WD to the appropriate output
-setwd("N://RStor//mindyc//afccm//Climate Modeling//Results_MPI-ESM1-2-HR//CNMI_Proxy_v1//Bioclimatics")
+#setwd("N://RStor//mindyc//afccm//Climate Modeling//Results_MPI-ESM1-2-HR//CNMI_Proxy_v1//Bioclimatics")
 
-#export/save file, and give it a name
-write.csv(env.var, "CNMI_Proxy_v1_Bioclimatic_Variables_fix.csv")
+# Name the file and save it
+
+csv_fileName1 <- paste(model,AFB_Name,"Bioclimatics.csv", sep = '/')
+csv_fileName2 <- paste0("N://RStor//mindyc//afccm//Climate Modeling//Results_",csv_fileName1)
+
+write_excel_csv(env.var, file = csv_fileName2)
 
 #the end
-#AMATO
