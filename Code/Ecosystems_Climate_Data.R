@@ -12,6 +12,8 @@
 
 # Create function for adding month (e.g., "Jan") to dataframe
 
+conflicts_prefer(month::lubridate) # set conflict preferences
+
 add_month <- function(df){
   df = df %>%
     mutate(month = month(df$date, label = TRUE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")))
@@ -2257,17 +2259,20 @@ rownames(env.var) <- c("Annual Mean Diurnal Range, ?F",
                        "Precipitation of Coldest Quarter, inches",
                        "Precipitation of Warmest Quarter, inches")
 
-#check out that beautiful table                    
-env.var
+# convert to dataframe                   
+env.var <- as.data.frame(env.var)
 
 #change WD to the appropriate output
 #setwd("N://RStor//mindyc//afccm//Climate Modeling//Results_MPI-ESM1-2-HR//CNMI_Proxy_v1//Bioclimatics")
 
 # Name the file and save it
 
-csv_fileName1 <- paste(model,AFB_Name,"Bioclimatics.csv", sep = '/')
-csv_fileName2 <- paste0("N://RStor//mindyc//afccm//Climate Modeling//Results_",csv_fileName1)
+spreadsheetName <- paste(AFB_Name,"Bioclimatics.csv", sep = "_")
+fileName <- paste(model,AFB_Name,spreadsheetName, sep = '/')
+#csv_fileName <- paste0("N://RStor//mindyc//afccm//Climate Modeling//Results_",fileName)
 
-write_excel_csv(env.var, file = csv_fileName2)
+test_file <- paste0('./Results/Test/CNMI_Proxy_v1/Results_', fileName) ## DELETE
+
+write_csv(env.var, file = test_file) ## CHANGE TO CORRECT LOCATION
 
 #the end
