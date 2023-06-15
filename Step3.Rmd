@@ -29,6 +29,11 @@ library(lubridate)
 library(tmap)
 library(tmaptools)
 library(leaflet)
+library(conflicted)
+
+conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
+  lubridate::month()
+) 
 
 ```
 
@@ -499,7 +504,7 @@ for(i in 1:length(avdf)){
     paste(baseline_start_year,"-",baseline_end_year)
   }
     csv_fileName = paste(AFB_Name, csv_scenario, csv_years,"AllDays",sep = '_')
-    write_csv(csv, file = paste0(dir_output_csvs,csv_fileName,".csv",sep = ""))
+    write_excel_csv(csv, file = paste0(dir_output_csvs,csv_fileName,".csv",sep = ""))
     
     AllDays[[i]] = csv # new df for use with MonthSum
     names(AllDays)[i] = names(avdf[i])
@@ -519,7 +524,10 @@ rm(list=setdiff(ls(), c("AFB_Name",
 
 ## Bioclimatic variables
 
-```{r Step9A-Biolimatic-variables}
+```{r Biolimatic-variables}
+
+# Formerly Step 9A
+
 
 
 ```
