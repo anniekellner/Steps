@@ -31,10 +31,10 @@ library(tmaptools)
 library(leaflet)
 library(conflicted)
 
-conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
-  lubridate::month()
-) 
-
+conflicts_prefer(
+  lubridate::month(),# this ensures that the correct package is used when multiple packages contain the same function
+  dplyr::last()
+)
 ```
 
 ```{r functions}
@@ -487,6 +487,10 @@ for(i in 1:length(avdf)){
     mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
     mutate(ftdays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) 
   
+    AllDays[[i]] = csv # new df for use with MonthSum
+    names(AllDays)[i] = names(avdf[i])
+}
+  
   # Write output to .csv
   
   csv_scenario = if (str_detect(names(avdf[i]), "baseline")){
@@ -504,7 +508,7 @@ for(i in 1:length(avdf)){
     paste(baseline_start_year,"-",baseline_end_year)
   }
     csv_fileName = paste(AFB_Name, csv_scenario, csv_years,"AllDays",sep = '_')
-    write_excel_csv(csv, file = paste0(dir_output_csvs,csv_fileName,".csv",sep = ""))
+    write_csv(csv, file = paste0(dir_output_csvs,csv_fileName,".csv",sep = ""))
     
     AllDays[[i]] = csv # new df for use with MonthSum
     names(AllDays)[i] = names(avdf[i])
