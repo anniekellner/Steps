@@ -7,6 +7,7 @@
 # Objects from Step3.Rmd needed to run this script include 
   #AllDays (list), model, AFB_Name, and start_year and end_year for the historical and future time periods
 
+AllDays <- readRDS('./Results/Test/AllDaysdf_bioclimatics.Rds')
 
 # --------------------  Begin  --------------------------------- #
 
@@ -2259,12 +2260,6 @@ rownames(env.var) <- c("Annual Mean Diurnal Range, ?F",
                        "Precipitation of Coldest Quarter, inches",
                        "Precipitation of Warmest Quarter, inches")
 
-# convert to dataframe                   
-env.var <- as.data.frame(env.var)
-
-#change WD to the appropriate output
-#setwd("N://RStor//mindyc//afccm//Climate Modeling//Results_MPI-ESM1-2-HR//CNMI_Proxy_v1//Bioclimatics")
-
 # Name the file and save it
 
 spreadsheetName <- paste(AFB_Name,"Bioclimatics.csv", sep = "_")
@@ -2273,6 +2268,6 @@ fileName <- paste(model,AFB_Name,spreadsheetName, sep = '/')
 
 test_file <- paste0('./Results/Test/CNMI_Proxy_v1/Results_', fileName) ## DELETE
 
-write_csv(env.var, file = test_file) ## CHANGE TO CORRECT LOCATION
+write.csv(env.var, file = test_file) ## CHANGE TO CORRECT LOCATION
 
 #the end
