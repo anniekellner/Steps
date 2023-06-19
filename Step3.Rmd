@@ -255,8 +255,13 @@ The next chunk checks that the spatial files are aligned and appear in the corre
 
 stackX <- read_stars(files_s1f1[[1]]) # creates raster stack for first variable in s1f1 list (using s1f1 because has fewer files than baseline)
 
-random_raster <- as.numeric(sample(1:nlyr(stackX), 1)) # get a random raster layer from StackX to use as an example
-rx <- stackX[[random_raster]]
+dims <- dim(stackX) # get dimensions for example stack
+
+random_raster <- as.numeric(sample(1:dims[3], 1)) # get a random raster layer from StackX to use as an example
+
+rx <- stackX[, random_raster,]
+
+rx <- slice(stackX[[random_raster]]
 stackXstars <- st_as_stars(stackX)
 # AFB 
 
