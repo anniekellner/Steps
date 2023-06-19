@@ -29,12 +29,19 @@ library(lubridate)
 library(tmap)
 library(tmaptools)
 library(leaflet)
+library(conflicted)
+
+conflicts_prefer(
+  lubridate::month(),
+  dplyr::filter(),
+  dplyr::select()
+)
 
 ```
 
 ```{r functions}
 
-rm(list = ls()) # clear workspace - this can be commented out as needed
+#rm(list = ls()) # clear workspace - this can be commented out as needed
 
 # The 'source' function reads the following scripts and places associated functions into the global environment
 
@@ -52,17 +59,18 @@ source('./Code/Stars_HowTo/shift_longitude.R')
 *If the AFB is managed by the Navy, set Navy = TRUE*
 *If the AFB is managed by the Air Force, set Navy = FALSE*
 
+
 ```{r set-directories}
 
 # Is the AFB managed by the Navy?
 
-Navy = TRUE
+Navy = FALSE
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
                                        "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
                                       "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
                                       
-dir_output_csvs = './Results/Test/Indianhead_Proxy/' 
+dir_output_csvs = './Results/Test/JBER/' 
 
 ```
 
@@ -72,7 +80,7 @@ In the code chunk below, *enter the number between the brackets ([]) that corres
 
 ```{r enter-afb-and-model}
 
-AFB_Name <- AFB_Name[4] 
+AFB_Name <- AFB_Name[5] 
 
 model <- models[6] 
 
@@ -245,11 +253,11 @@ The next chunk checks that the spatial files are aligned and appear in the corre
 
 # Raster
 
-stackX <- rast(files_s1f1[[1]]) # creates raster stack for first variable in s1f1 list (using s1f1 because has fewer files than baseline)
+stackX <- read_stars(files_s1f1[[1]]) # creates raster stack for first variable in s1f1 list (using s1f1 because has fewer files than baseline)
 
 random_raster <- as.numeric(sample(1:nlyr(stackX), 1)) # get a random raster layer from StackX to use as an example
 rx <- stackX[[random_raster]]
-
+stackXstars <- st_as_stars(stackX)
 # AFB 
 
 afb_dir <- (paste(dir_installation_boundaries, AFB_Name, sep = '/'))
@@ -257,6 +265,7 @@ afb_filename <- paste(afb_dir, '.shp', sep = "")
 
 afbSF <- st_read(afb_filename) # Because plotting package (tmap) doesn't take terra vectors
 afb <- vect(afbSF)
+afb <- aggregate(afb) # dissolves boundaries in shp
 
 afbSF <- if (xmax(rx) == 360 & xmax(afb) < 0) {st_shift_longitude(afbSF)} else afbSF # adjustment in case ncdf lon scale is 0-360
 
@@ -264,8 +273,9 @@ afb <- vect(afbSF)
 
 # Crop single raster to AFB shape
 
-rxCrop <- terra::crop(rx, afb, snap = "out") # snap = "out" shows all cells that overlap AFB polygon
+rxCrop <- terra::crop(rx, afb, mask = TRUE) # snap = "out" shows all cells that overlap AFB polygon
 
+rxCrop2 <- extend(rxCrop, afb)
 # Quick interactive plot
 
 #tmap_mode('view')
@@ -284,6 +294,8 @@ Next, we will check the size of the AFB to see whether we should use its centroi
 
 INTERPRETING OUTPUT: If the output of the following code chunk says 'numeric', the script will use the centroid. If it says 'spatVector', it will use the spatial object (afb).
 
+*NOTE TO SELF: CONSIDER CONDITION IF AFB OVERLAPS MULTIPLE CELLS RATHER THAN SIZE)*
+
 ```{r decision-to-use-shp-or-centroid-for-extraction, warning=FALSE, results='asis'}
 
 # What is the cell size of the ncdf?
@@ -294,6 +306,7 @@ ncdf_cellSize <- mean(values(rxCellSize)) # get mean cell size of ncdf (all cell
 # How big is the AFB?
 
 afb_area <- expanse(afb, unit = "km")
+afb_area <- sum(afb_area)
 
 centroid <- geom(centroids(afb, inside = TRUE)) # inside = TRUE guarantees that the centroid is contained within the boundaries of the AFB (in some cases, depending on the shape of the AFB, the true centroid may be outside)
 centroid_matrix <- cbind(centroid[3], centroid[4]) # used to find cell index. [3] and [4] refer to the values in the 'centroid' object. If a downstream error occurs, make sure these values are actually x and y.
