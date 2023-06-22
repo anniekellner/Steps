@@ -61,13 +61,11 @@ source('./Code/Stars_HowTo/shift_longitude.R')
 
 # Is the AFB managed by the Navy?
 
-Navy = TRUE
+Navy = FALSE
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
                                        "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
                                       "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
-                                      
-dir_output_csvs = './Results/Test/CMNI_Proxy_v1/' 
 
 ```
 
@@ -77,7 +75,7 @@ In the code chunk below, *enter the number between the brackets ([]) that corres
 
 ```{r enter-afb-and-model}
 
-AFB_Name <- AFB_Name[3] 
+AFB_Name <- AFB_Name[5] 
 
 model <- models[6] 
 
@@ -163,7 +161,15 @@ years <- c(baseline_start_year,
 ###     The rest of the script should be able to be run automatically     ################################
 ####################################################################################################
 
-# PART TWO: SUBSET FILES OF INTEREST
+## SET DIRECTORY FOR RESULTS
+
+```{r set-output-directory}
+
+results_folder = paste0('N:/RStor/mindyc/afccm/Climate Modeling/Results_',model,"/",AFB_Name,"/") 
+```
+
+
+## SUBSET FILES OF INTEREST
 
 In this step, we are creating lists of filenames that will eventually combine into raster stacks. When this chunk is finished running, you can check the objects to make sure the correct number of years have been included. 
 
@@ -242,7 +248,7 @@ for(i in 1:length(variables)){
 
 ```
 
-# PART THREE: SPATIAL CHECK
+## SPATIAL CHECK
 
 The next chunk checks that the spatial files are aligned and appear in the correct location on the globe. An interactive map will appear below the code chunk, and you can zoom in or out as needed to view the AFB's (the easiest way is to scroll with your mouse). You can press the 'show in new window' button (the white square with an arrow) to open the map in another page if you prefer a larger view. You may have to wait a few moments for the map to produce. *Make sure the installation boundary aligns with one or more raster cells*. If it doesn't, you might have a difference in spatial projections between the installation boundary and the raster/ncdf files.  
 
@@ -266,6 +272,7 @@ afb <- vect(afbSF)
 afbSF <- if (xmax(rx) == 360 & xmax(afb) < 0) {st_shift_longitude(afbSF)} else afbSF # adjustment in case ncdf lon scale is 0-360
 
 afb <- vect(afbSF)
+afb <- terra::aggregate(afb)
 
 # Crop single raster to AFB shape
 
@@ -316,7 +323,7 @@ cat("The object used for data extraction is ", class(extract_obj))
 
 ```
 
-# PART FOUR: DATA EXTRACTION
+## DATA EXTRACTION
 
 The following chunk extracts raw data from the ncdf files of interest. 
 
@@ -446,7 +453,7 @@ for(i in 1:length(nested_tibbles)){
  
 ```
 
-# PART FIVE: ADD DERIVED VARIABLES
+## ADD DERIVED VARIABLES
 
 NOTE: see comments within code. Functions assume the raw ncdf data does NOT use imperial units. 
 
@@ -487,10 +494,6 @@ for(i in 1:length(avdf)){
     mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
     mutate(ftdays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) 
   
-    AllDays[[i]] = csv # new df for use with MonthSum
-    names(AllDays)[i] = names(avdf[i])
-}
-  
   # Write output to .csv
   
   csv_scenario = if (str_detect(names(avdf[i]), "baseline")){
@@ -508,21 +511,24 @@ for(i in 1:length(avdf)){
     paste(baseline_start_year,"-",baseline_end_year)
   }
     csv_fileName = paste(AFB_Name, csv_scenario, csv_years,"AllDays",sep = '_')
-    write_csv(csv, file = paste0(dir_output_csvs,csv_fileName,".csv",sep = ""))
+    write_csv(csv, file = paste0(results_folder,csv_fileName,".csv"))
     
     AllDays[[i]] = csv # new df for use with MonthSum
     names(AllDays)[i] = names(avdf[i])
 }
 ```
 
+Now that the AllDays.csv files have been created, it is no longer necessary to retain space-intensive objects in the environment. We can routinely remove objects we no longer need.
 
 ```{r remove-extraneous-stuff}
 
-rm(list=setdiff(ls(), c("AFB_Name", 
+rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
                         "model", 
                         "scenario1", 
                         "scenario2", 
-                        "years")))
+                        "years",
+                        "results_folder"
+                        "AllDays")))
 
 ```
 
@@ -531,16 +537,11 @@ rm(list=setdiff(ls(), c("AFB_Name",
 ```{r Biolimatic-variables}
 
 # Formerly Step 9A
+# Writes Bioclimatics csv directly into appropriate results folder on N: drive
 
-
+source('Code/Ecosystems_Climate_Data.R')
 
 ```
-
-
-
-Now that the AllDays.csv files have been created, it is no longer necessary to retain space-intensive objects in the environment. We can routinely remove objects we no longer need.
-
-
 
 ## MonthSum
 
@@ -684,7 +685,7 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     paste(first(year(AllDays$results_baseline$date)),"-",last(year(AllDays$results_baseline$date)))
   }
     csv_fileName = paste(AFB_Name,csv_scenario,csv_years,"MonthSum",sep = '_')
-    write_csv(monthSum[[i]], file = paste0(dir_output_csvs,csv_fileName,".csv",sep = ""))
+    write_csv(monthSum[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = ""))
 }
 
 ```
@@ -696,7 +697,7 @@ rm(list=setdiff(ls(), c("monthSum",
                         "model", 
                         "scenario1", 
                         "scenario2", 
-                        "dir_output_csvs",
+                        "results_folder",
                         "years")))
 
 ```
@@ -746,7 +747,7 @@ csv_years = if (str_detect(names(diffHist[i]), "f1")){
   } 
     
 csv_fileName = paste(AFB_Name,csv_scenario,csv_years,"DiffHist",sep = '_')
-write_csv(diffHist[[i]], file = paste0(dir_output_csvs,csv_fileName,".csv",sep = ""))
+write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = ""))
 
 }
 
