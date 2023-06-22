@@ -7,13 +7,11 @@
 # Objects from Step3.Rmd needed to run this script include 
   #AllDays (list), model, AFB_Name, and start_year and end_year for the historical and future time periods
 
-AllDays <- readRDS('./Results/Test/AllDaysdf_bioclimatics.Rds')
+conflicts_prefer(month::lubridate) # set conflict preferences
 
 # --------------------  Begin  --------------------------------- #
 
 # Create function for adding month (e.g., "Jan") to dataframe
-
-conflicts_prefer(month::lubridate) # set conflict preferences
 
 add_month <- function(df){
   df = df %>%
@@ -2243,15 +2241,15 @@ env.var <- matrix(c(annual.mean.diurnal.range,
 colnames(env.var) <- c("Historical", "SSP2-4.5 2035", "SSP2-4.5 2065", "SSP5-8.5 2035", "SSP5-8.5 2065")
 rownames(env.var) <- c("Annual Mean Diurnal Range, ?F", 
                        "Isothermality, %", 
-                       "Temperature Seasonality (Standard Deviation), ?F",
+                       "Temperature Seasonality (Standard Deviation), °F",
                        "Temperature Seasonality (Coefficient of Variation), %", 
-                       "Max Temperature of Warmest Month, ?F", 
-                       "Min Temperature of Coldest Month, ?F",
+                       "Max Temperature of Warmest Month, °F", 
+                       "Min Temperature of Coldest Month, °F",
                        "Annual Temperature Range, ?F", 
-                       "Mean Temperature of Wettest Quarter, ?F", 
-                       "Mean Temperature of Driest Quarter, ?F",
-                       "Mean Temperature of Warmest Quarter, ?F",
-                       "Mean Temperature of Coldest Quarter, ?F",
+                       "Mean Temperature of Wettest Quarter, °F", 
+                       "Mean Temperature of Driest Quarter, °F",
+                       "Mean Temperature of Warmest Quarter, °F",
+                       "Mean Temperature of Coldest Quarter, °F",
                        "Precipitation of Wettest Month, inches",
                        "Precipitation of Driest Month, inches",
                        "Precipitation Seasonality (Coefficient of Variation), %",
@@ -2262,12 +2260,13 @@ rownames(env.var) <- c("Annual Mean Diurnal Range, ?F",
 
 # Name the file and save it
 
+bioclim_results_folder <- paste0(results_folder,"Bioclimatics")
+dir.create(path = bioclim_results_folder)
+
 spreadsheetName <- paste(AFB_Name,"Bioclimatics.csv", sep = "_")
-fileName <- paste(model,AFB_Name,spreadsheetName, sep = '/')
-#csv_fileName <- paste0("N://RStor//mindyc//afccm//Climate Modeling//Results_",fileName)
 
-test_file <- paste0('./Results/Test/CNMI_Proxy_v1/Results_', fileName) ## DELETE
+filePath <- paste(bioclim_results_folder,spreadsheetName, sep = "/")
 
-write.csv(env.var, file = test_file) ## CHANGE TO CORRECT LOCATION
+write.csv(env.var, file = filePath) 
 
 #the end
