@@ -16,6 +16,7 @@ AFB_Name <- c("Homestead_ARB",
               "Guam_Proxy_v1", # Navy
               "CNMI_Proxy_v1", # Navy
               "Indianhead_Proxy", # Navy
-              "JBER") 
+              "JBER",
+              "Dugway_Proving_Grounds") 
 
 
