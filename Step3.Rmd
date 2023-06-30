@@ -33,7 +33,8 @@ library(conflicted)
 
 conflicts_prefer(
   lubridate::month(),# this ensures that the correct package is used when multiple packages contain the same function
-  dplyr::last()
+  dplyr::last(),
+  dplyr::filter()
 )
 ```
 
@@ -75,9 +76,9 @@ In the code chunk below, *enter the number between the brackets ([]) that corres
 
 ```{r enter-afb-and-model}
 
-AFB_Name <- AFB_Name[5] 
+AFB_Name <- AFB_Name[6] 
 
-model <- models[6] 
+model <- models[2] 
 
 cat(paste("The model you have selected is", model, "and the AFB is", AFB_Name))
 
@@ -106,8 +107,8 @@ cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for reada
 ```{r enter-scenarios}
 
 baseline <- "historical"
-scenario1 <- "ssp245"
-scenario2 <- "ssp585"
+scenario1 <- "rcp45"
+scenario2 <- "rcp85"
 
 scenarios <- c(baseline, scenario1, scenario2)
 
@@ -131,7 +132,7 @@ Of the variables listed, which do you want to include in your analysis? *Enter t
 
 ```{r}
 
-variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin") # an example of how you would choose among the variables if desired
+variables <- c("pr_day", "tasmax", "tasmin") # an example of how you would choose among the variables if desired
 
 ```
 
@@ -139,14 +140,14 @@ variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin") # an example of
 
 ```{r enter-years-of-interest}
 
-baseline_start_year <- 1985 # Start year of interest for the historical time period  
-baseline_end_year <- 2014 # End year of interest for the historical time period
+baseline_start_year <- 1976 # Start year of interest for the historical time period  
+baseline_end_year <- 2005 # End year of interest for the historical time period
 
-future1_start_year <- 2021 # Start year of interest for the first future time period 
-future1_end_year <- 2050 # End year of interest for the first future time period 
+future1_start_year <- 2026 # Start year of interest for the first future time period 
+future1_end_year <- 2045 # End year of interest for the first future time period 
 
-future2_start_year <- 2051 # Start year of interest for the second future time period 
-future2_end_year <- 2080 # End year of interest for the second future time period 
+future2_start_year <- 2056 # Start year of interest for the second future time period 
+future2_end_year <- 2075 # End year of interest for the second future time period 
 
 years <- c(baseline_start_year, 
            baseline_end_year, 
@@ -292,9 +293,10 @@ lf
 
 ```
 
-Next, we will check the size of the AFB to see whether we should use its centroid or spatial extent to extract the data we need. If the AFB fits within a single NetCDF cell, it will be much faster to extract data using a single point (the centroid). The script will assume that if the AFB is smaller than the NetCDF cell, you will want to use the centroid, and if it is larger, you will want to use the spatial extent. You can override this by changing the 'extract_obj' object to 'afb' (spatial extent) or 'cell' (centroid).     
+Next, we will check the size of the AFB to see whether we should use its centroid or spatial extent to extract the data we need. If the AFB fits within a single NetCDF cell, it will be much faster to extract data using a single point (the centroid). The script will assume that if the AFB is smaller than the NetCDF cell, you will want to use the centroid, and if it is larger, you will want to use the spatial extent. 
 
-INTERPRETING OUTPUT: If the output of the following code chunk says 'numeric', the script will use the centroid. If it says 'spatVector', it will use the spatial object (afb).
+You can override the automatic by changing the 'extract_obj' object to 'afb' (spatial extent) or 'cell' (centroid). See the text below the code chunk for additional comments about interpreting and manually altering the output.      
+
 
 ```{r decision-to-use-shp-or-centroid-for-extraction, warning=FALSE, results='asis'}
 
@@ -322,6 +324,16 @@ afbExt <- ext(afb)
 cat("The object used for data extraction is ", class(extract_obj)) 
 
 ```
+
+INTERPRETING THE OUTPUT ABOVE: If the output of the following code chunk says 'numeric', the script will use the centroid. If it says 'spatVector', it will use the spatial object (afb). 
+
+*If you want to override the automatic choice, manually enter either of the following options into the CONSOLE:* (if you enter it into the code chunk it will remain there and you risk overriding future choices you may not want to)
+
+**extract_obj <- cell** to use the centroid  -OR-
+**extract_obj <- afb** to use the entire shapefile
+
+(Do not include the **; I inserted those to change the color of the text to highlight what is code vs. text for readability)
+
 
 ## DATA EXTRACTION
 
@@ -753,9 +765,6 @@ write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = 
 
 ```
 
-```{r climographs}
-
-```
 
 
 
