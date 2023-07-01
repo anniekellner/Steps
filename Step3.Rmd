@@ -34,7 +34,8 @@ library(conflicted)
 conflicts_prefer(
   lubridate::month(),# this ensures that the correct package is used when multiple packages contain the same function
   dplyr::last(),
-  dplyr::filter()
+  dplyr::filter(),
+  dplyr::select()
 )
 ```
 
@@ -71,6 +72,7 @@ dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile 
 ```
 
 First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Name` and/or `models` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
+
 
 In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest.* 
 
@@ -164,9 +166,15 @@ years <- c(baseline_start_year,
 
 ## SET DIRECTORY FOR RESULTS
 
+*NOTE: Folder names may differ between the 'Data' and 'Results' folders within the Climate Modeling folder. This was the case for LOCA and may be the case for others.* 
+
 ```{r set-output-directory}
 
-results_folder = paste0('N:/RStor/mindyc/afccm/Climate Modeling/Results_',model,"/",AFB_Name,"/") 
+results_folder <- if(model == "LOCA_CCSM4") {
+  paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2',"/",AFB_Name,"/")
+  } else {
+  paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_',model,"/",AFB_Name,"/")
+  }
 ```
 
 
@@ -327,12 +335,10 @@ cat("The object used for data extraction is ", class(extract_obj))
 
 INTERPRETING THE OUTPUT ABOVE: If the output of the following code chunk says 'numeric', the script will use the centroid. If it says 'spatVector', it will use the spatial object (afb). 
 
-*If you want to override the automatic choice, manually enter either of the following options into the CONSOLE:* (if you enter it into the code chunk it will remain there and you risk overriding future choices you may not want to)
+*If you want to override the automatic choice, manually highlight and run either of the following options:* (if you enter it into the code chunk it will remain there and you risk overriding future choices you may not want to, so just do it here. Do not include the **; I inserted those to change the color of the text to highlight what is code vs. text for readability.
 
 **extract_obj <- cell** to use the centroid  -OR-
 **extract_obj <- afb** to use the entire shapefile
-
-(Do not include the **; I inserted those to change the color of the text to highlight what is code vs. text for readability)
 
 
 ## DATA EXTRACTION
@@ -471,7 +477,7 @@ NOTE: see comments within code. Functions assume the raw ncdf data does NOT use 
 
 The next chunk creates AllDays.csv files
 
-```{r add-derived-vars, message=FALSE}
+```{r add-derived-vars, message=FALSE, warning=FALSE}
 
 # Add derived (recalculated) variables to dataframes
 # All functions are from the original LOCA_summarize.R script
@@ -506,28 +512,43 @@ for(i in 1:length(avdf)){
     mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
     mutate(ftdays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) 
   
-  # Write output to .csv
+  AllDays[[i]] = csv # new df for use with MonthSum
+    names(AllDays)[i] = names(avdf[i])
+
+    } # end creation of AllDays dataframe
   
-  csv_scenario = if (str_detect(names(avdf[i]), "baseline")){
+  # Write output to .csv
+
+for(i in 1:length(AllDays)){
+  
+  csv_scenario = if (str_detect(names(AllDays[i]), "baseline")){
     "historical"
-  } else if(str_detect(names(avdf[i]),"s1")) {
+  } else if(str_detect(names(AllDays[i]),"s1")) {
     scenario1
   } else {
     scenario2
   }
-  csv_years = if (str_detect(names(avdf[i]), "f1")){
+  csv_years = if (str_detect(names(AllDays[i]), "f1")){
     paste(future1_start_year, "-",future1_end_year)
-  } else if (str_detect(names(avdf[i]), "f2")) {
+  } else if (str_detect(names(AllDays[i]), "f2")) {
     paste(future2_start_year,"-",future2_end_year)
   } else {
     paste(baseline_start_year,"-",baseline_end_year)
   }
     csv_fileName = paste(AFB_Name, csv_scenario, csv_years,"AllDays",sep = '_')
-    write_csv(csv, file = paste0(results_folder,csv_fileName,".csv"))
     
-    AllDays[[i]] = csv # new df for use with MonthSum
-    names(AllDays)[i] = names(avdf[i])
-}
+    # Create directory for files if it does not already exist
+    
+    if(!dir.exists(results_folder)){
+      dir.create(results_folder)
+    } else {
+      dir.create(results_folder)
+    }
+    
+    # Write csv to folder
+    write_csv(csv, file = paste0(results_folder,csv_fileName,".csv"))
+
+    } # end write to csv
 ```
 
 Now that the AllDays.csv files have been created, it is no longer necessary to retain space-intensive objects in the environment. We can routinely remove objects we no longer need.
