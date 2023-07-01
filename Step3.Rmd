@@ -33,9 +33,11 @@ library(conflicted)
 
 conflicts_prefer(
   lubridate::month(),# this ensures that the correct package is used when multiple packages contain the same function
+  dplyr::first(),
   dplyr::last(),
   dplyr::filter(),
-  dplyr::select()
+  dplyr::select(),
+  lubridate::year(),
 )
 ```
 
@@ -560,7 +562,7 @@ rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
                         "scenario1", 
                         "scenario2", 
                         "years",
-                        "results_folder"
+                        "results_folder",
                         "AllDays")))
 
 ```
