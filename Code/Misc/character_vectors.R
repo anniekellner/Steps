@@ -6,7 +6,7 @@
 # It is used with the 'steps' script to enable easy variable naming
 
 models <- c("HADGEM2-ES",
-                   "LOCA_CCSM4",
+                   "LOCA_CCSM4", 
                    "MACA_CCSM4",
                    "MACA_CCSM4_Monthly",
                    "MIROC6",
