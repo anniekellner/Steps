@@ -4,7 +4,11 @@
 
 # Adapted from Steps 10-14 to RMarkdown script by Annie Kellner 6/29/2023
 
-# This script uses data from the AllDays object
+# Inputs: 
+  # AllDays dataframe
+  # AFB_Name
+  # scenarios
+  # years
 
 #################################################
 
@@ -259,8 +263,33 @@ names(tmax) <- col_headings
 
 #set up data frame
 
+month <- unique(clim.dat$month)
+
 hist.df <- data.frame(month, precip, tmin, quan.min.25, quan.min.75, tmax, quan.max.25, quan.max.75) 
 
+# Create plot subtitle
+
+plot_subtitles <- c(paste("Historical",years[1],"-",years[2], sep = " "),
+                    paste(scenarios[2],years[3],"-",years[4], sep = " "),
+                    paste(scenarios[2],years[5],"-",years[6], sep = " "),
+                    paste(scenarios[3],years[3],"-",years[4], sep = " "),
+                    paste(scenarios[3],years[5],"-",years[5], sep = " "))
+
+
+pick_substitle <- function(df){
+  case_when(
+    names(df) == "results_baseline" ~ plot_subtitles[1],
+    names(df) == "results_s1f1" ~ plot_subtitles[2],
+    names(df) == "results_s1f2" ~ plot_subtitles[3],
+    names(df) == "results_s2f1" ~ plot_subtitles[4],
+    names(df) == "results_s2f2" ~ plot_subtitles[5]
+  )}
+
+# Determine title and subtitle of plot
+
+title = str_replace_all(AFB_Name, "_", " ")  
+subtitle = pick_substitle(AllDays[i])  
+  
 #phit that G
 
 ggplot(hist.df) +
@@ -271,10 +300,10 @@ ggplot(hist.df) +
   geom_line(aes(x=factor(month, level =c(month.abb)), tmax), size=1, linetype=1, color="red4", group=4) +
   geom_line(aes(x=factor(month, level =c(month.abb)), quan.max.25), size=.5, linetype=2, color="red4", group=5) +
   geom_line(aes(x=factor(month, level =c(month.abb)), quan.max.75), size=.5, linetype=2, color="red4", group=6) +
-  labs(title = "Andersen AFB", 
-       subtitle = "Historical 1985-2014")+
+  labs(title = title, 
+       subtitle = subtitle) +
   xlab("Month")                       +
-  ylab("Average Temperature (?F)")    +
+  ylab("Average Temperature (°F)")    +
   theme_minimal() +
   theme(text=element_text(family="Times New Roman")) +
   theme(title=element_text(size=17)) +
