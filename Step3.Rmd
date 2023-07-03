@@ -1,5 +1,5 @@
 ---
-title: "Step3"
+title: "Steps"
 author: "Annie Kellner"
 date: "2023-05-10"
 output: html_document
@@ -29,12 +29,21 @@ library(lubridate)
 library(tmap)
 library(tmaptools)
 library(leaflet)
+library(conflicted)
 
+conflicts_prefer(
+  lubridate::month(),# this ensures that the correct package is used when multiple packages contain the same function
+  dplyr::first(),
+  dplyr::last(),
+  dplyr::filter(),
+  dplyr::select(),
+  lubridate::year(),
+)
 ```
 
 ```{r functions}
 
-rm(list = ls()) # clear workspace - this can be commented out as needed
+#rm(list = ls()) # clear workspace - this can be commented out as needed
 
 # The 'source' function reads the following scripts and places associated functions into the global environment
 
@@ -56,25 +65,24 @@ source('./Code/Stars_HowTo/shift_longitude.R')
 
 # Is the AFB managed by the Navy?
 
-Navy = TRUE
+Navy = FALSE
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
                                        "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
                                       "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
-                                      
-dir_output_csvs = './Results/Test/Indianhead_Proxy/' 
 
 ```
 
 First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Name` and/or `models` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
 
+
 In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest.* 
 
 ```{r enter-afb-and-model}
 
-AFB_Name <- AFB_Name[4] 
+AFB_Name <- AFB_Name[6] 
 
-model <- models[6] 
+model <- models[2] 
 
 cat(paste("The model you have selected is", model, "and the AFB is", AFB_Name))
 
@@ -103,8 +111,8 @@ cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for reada
 ```{r enter-scenarios}
 
 baseline <- "historical"
-scenario1 <- "ssp245"
-scenario2 <- "ssp585"
+scenario1 <- "rcp45"
+scenario2 <- "rcp85"
 
 scenarios <- c(baseline, scenario1, scenario2)
 
@@ -128,7 +136,7 @@ Of the variables listed, which do you want to include in your analysis? *Enter t
 
 ```{r}
 
-variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin") # an example of how you would choose among the variables if desired
+variables <- c("pr_day", "tasmax", "tasmin") # an example of how you would choose among the variables if desired
 
 ```
 
@@ -136,14 +144,14 @@ variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin") # an example of
 
 ```{r enter-years-of-interest}
 
-baseline_start_year <- 1985 # Start year of interest for the historical time period  
-baseline_end_year <- 2014 # End year of interest for the historical time period
+baseline_start_year <- 1976 # Start year of interest for the historical time period  
+baseline_end_year <- 2005 # End year of interest for the historical time period
 
-future1_start_year <- 2021 # Start year of interest for the first future time period 
-future1_end_year <- 2050 # End year of interest for the first future time period 
+future1_start_year <- 2026 # Start year of interest for the first future time period 
+future1_end_year <- 2045 # End year of interest for the first future time period 
 
-future2_start_year <- 2051 # Start year of interest for the second future time period 
-future2_end_year <- 2080 # End year of interest for the second future time period 
+future2_start_year <- 2056 # Start year of interest for the second future time period 
+future2_end_year <- 2075 # End year of interest for the second future time period 
 
 years <- c(baseline_start_year, 
            baseline_end_year, 
@@ -158,7 +166,21 @@ years <- c(baseline_start_year,
 ###     The rest of the script should be able to be run automatically     ################################
 ####################################################################################################
 
-# PART TWO: SUBSET FILES OF INTEREST
+## SET DIRECTORY FOR RESULTS
+
+*NOTE: Folder names may differ between the 'Data' and 'Results' folders within the Climate Modeling folder. This was the case for LOCA and may be the case for others.* 
+
+```{r set-output-directory}
+
+results_folder <- if(model == "LOCA_CCSM4") {
+  paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2',"/",AFB_Name,"/")
+  } else {
+  paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_',model,"/",AFB_Name,"/")
+  }
+```
+
+
+## SUBSET FILES OF INTEREST
 
 In this step, we are creating lists of filenames that will eventually combine into raster stacks. When this chunk is finished running, you can check the objects to make sure the correct number of years have been included. 
 
@@ -237,7 +259,7 @@ for(i in 1:length(variables)){
 
 ```
 
-# PART THREE: SPATIAL CHECK
+## SPATIAL CHECK
 
 The next chunk checks that the spatial files are aligned and appear in the correct location on the globe. An interactive map will appear below the code chunk, and you can zoom in or out as needed to view the AFB's (the easiest way is to scroll with your mouse). You can press the 'show in new window' button (the white square with an arrow) to open the map in another page if you prefer a larger view. You may have to wait a few moments for the map to produce. *Make sure the installation boundary aligns with one or more raster cells*. If it doesn't, you might have a difference in spatial projections between the installation boundary and the raster/ncdf files.  
 
@@ -261,6 +283,7 @@ afb <- vect(afbSF)
 afbSF <- if (xmax(rx) == 360 & xmax(afb) < 0) {st_shift_longitude(afbSF)} else afbSF # adjustment in case ncdf lon scale is 0-360
 
 afb <- vect(afbSF)
+afb <- terra::aggregate(afb)
 
 # Crop single raster to AFB shape
 
@@ -280,9 +303,10 @@ lf
 
 ```
 
-Next, we will check the size of the AFB to see whether we should use its centroid or spatial extent to extract the data we need. If the AFB fits within a single NetCDF cell, it will be much faster to extract data using a single point (the centroid). The script will assume that if the AFB is smaller than the NetCDF cell, you will want to use the centroid, and if it is larger, you will want to use the spatial extent. You can override this by changing the 'extract_obj' object to 'afb' (spatial extent) or 'cell' (centroid).     
+Next, we will check the size of the AFB to see whether we should use its centroid or spatial extent to extract the data we need. If the AFB fits within a single NetCDF cell, it will be much faster to extract data using a single point (the centroid). The script will assume that if the AFB is smaller than the NetCDF cell, you will want to use the centroid, and if it is larger, you will want to use the spatial extent. 
 
-INTERPRETING OUTPUT: If the output of the following code chunk says 'numeric', the script will use the centroid. If it says 'spatVector', it will use the spatial object (afb).
+You can override the automatic by changing the 'extract_obj' object to 'afb' (spatial extent) or 'cell' (centroid). See the text below the code chunk for additional comments about interpreting and manually altering the output.      
+
 
 ```{r decision-to-use-shp-or-centroid-for-extraction, warning=FALSE, results='asis'}
 
@@ -311,7 +335,15 @@ cat("The object used for data extraction is ", class(extract_obj))
 
 ```
 
-# PART FOUR: DATA EXTRACTION
+INTERPRETING THE OUTPUT ABOVE: If the output of the following code chunk says 'numeric', the script will use the centroid. If it says 'spatVector', it will use the spatial object (afb). 
+
+*If you want to override the automatic choice, manually highlight and run either of the following options:* (if you enter it into the code chunk it will remain there and you risk overriding future choices you may not want to, so just do it here. Do not include the **; I inserted those to change the color of the text to highlight what is code vs. text for readability.
+
+**extract_obj <- cell** to use the centroid  -OR-
+**extract_obj <- afb** to use the entire shapefile
+
+
+## DATA EXTRACTION
 
 The following chunk extracts raw data from the ncdf files of interest. 
 
@@ -401,7 +433,7 @@ for(i in 1:length(files_s2f2)){
 
 ```
 
-The next chunk reorganizes the extracted data into a more workable dataframe ("tibble", the the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
+The next chunk reorganizes the extracted data into a more workable dataframe ("tibble", from the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
 
 ```{r allvaluesdf-dataframes, message=FALSE}
 
@@ -441,13 +473,13 @@ for(i in 1:length(nested_tibbles)){
  
 ```
 
-# PART FIVE: ADD DERIVED VARIABLES
+## ADD DERIVED VARIABLES
 
 NOTE: see comments within code. Functions assume the raw ncdf data does NOT use imperial units. 
 
 The next chunk creates AllDays.csv files
 
-```{r add-derived-vars, message=FALSE}
+```{r add-derived-vars, message=FALSE, warning=FALSE}
 
 # Add derived (recalculated) variables to dataframes
 # All functions are from the original LOCA_summarize.R script
@@ -482,49 +514,73 @@ for(i in 1:length(avdf)){
     mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
     mutate(ftdays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) 
   
-  # Write output to .csv
+  AllDays[[i]] = csv # new df for use with MonthSum
+    names(AllDays)[i] = names(avdf[i])
+
+    } # end creation of AllDays dataframe
   
-  csv_scenario = if (str_detect(names(avdf[i]), "baseline")){
+  # Write output to .csv
+
+for(i in 1:length(AllDays)){
+  
+  csv_scenario = if (str_detect(names(AllDays[i]), "baseline")){
     "historical"
-  } else if(str_detect(names(avdf[i]),"s1")) {
+  } else if(str_detect(names(AllDays[i]),"s1")) {
     scenario1
   } else {
     scenario2
   }
-  csv_years = if (str_detect(names(avdf[i]), "f1")){
+  csv_years = if (str_detect(names(AllDays[i]), "f1")){
     paste(future1_start_year, "-",future1_end_year)
-  } else if (str_detect(names(avdf[i]), "f2")) {
+  } else if (str_detect(names(AllDays[i]), "f2")) {
     paste(future2_start_year,"-",future2_end_year)
   } else {
     paste(baseline_start_year,"-",baseline_end_year)
   }
     csv_fileName = paste(AFB_Name, csv_scenario, csv_years,"AllDays",sep = '_')
-    write_csv(csv, file = paste0(dir_output_csvs,csv_fileName,".csv",sep = ""))
     
-    AllDays[[i]] = csv # new df for use with MonthSum
-    names(AllDays)[i] = names(avdf[i])
-}
+    # Create directory for files if it does not already exist
+    
+    if(!dir.exists(results_folder)){
+      dir.create(results_folder)
+    } else {
+      dir.create(results_folder)
+    }
+    
+    # Write csv to folder
+    write_csv(csv, file = paste0(results_folder,csv_fileName,".csv"))
+
+    } # end write to csv
 ```
 
 Now that the AllDays.csv files have been created, it is no longer necessary to retain space-intensive objects in the environment. We can routinely remove objects we no longer need.
 
 ```{r remove-extraneous-stuff}
 
-# If for some reason the AllDays object does not work, you can use the script './Code/Misc/MonthSum.R' to run the MonthSum analyses using the csv output files one-by-one. This will be the best option for MACA inputs, since this script cannot yet accommodate MACA models. 
-
-rm(list=setdiff(ls(), c("AllDays", 
-                        "AFB_Name", 
+rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
                         "model", 
                         "scenario1", 
                         "scenario2", 
-                        "dir_output_csvs",
-                        "years")))
+                        "years",
+                        "results_folder",
+                        "AllDays")))
+
+```
+
+## Bioclimatic variables
+
+```{r Biolimatic-variables}
+
+# Formerly Step 9A
+# Writes Bioclimatics csv directly into appropriate results folder on N: drive
+
+source('Code/Ecosystems_Climate_Data.R')
 
 ```
 
 ## MonthSum
 
-The next chunk creates MonthSum.csv files
+The next chunk creates MonthSum.csv files. If for some reason the AllDays object does not work, you can use the script './Code/Misc/MonthSum.R' to run the MonthSum analyses using the csv output files one-by-one. This will be the best option for MACA inputs, since this script cannot yet accommodate MACA models.
 
 ```{r MonthSum, message=FALSE}
 
@@ -664,7 +720,7 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     paste(first(year(AllDays$results_baseline$date)),"-",last(year(AllDays$results_baseline$date)))
   }
     csv_fileName = paste(AFB_Name,csv_scenario,csv_years,"MonthSum",sep = '_')
-    write_csv(monthSum[[i]], file = paste0(dir_output_csvs,csv_fileName,".csv",sep = ""))
+    write_csv(monthSum[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = ""))
 }
 
 ```
@@ -676,7 +732,7 @@ rm(list=setdiff(ls(), c("monthSum",
                         "model", 
                         "scenario1", 
                         "scenario2", 
-                        "dir_output_csvs",
+                        "results_folder",
                         "years")))
 
 ```
@@ -726,7 +782,7 @@ csv_years = if (str_detect(names(diffHist[i]), "f1")){
   } 
     
 csv_fileName = paste(AFB_Name,csv_scenario,csv_years,"DiffHist",sep = '_')
-write_csv(diffHist[[i]], file = paste0(dir_output_csvs,csv_fileName,".csv",sep = ""))
+write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = ""))
 
 }
 

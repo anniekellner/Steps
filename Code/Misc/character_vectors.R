@@ -6,7 +6,7 @@
 # It is used with the 'steps' script to enable easy variable naming
 
 models <- c("HADGEM2-ES",
-                   "LOCA_CCSM4",
+                   "LOCA_CCSM4", 
                    "MACA_CCSM4",
                    "MACA_CCSM4_Monthly",
                    "MIROC6",
@@ -15,5 +15,8 @@ models <- c("HADGEM2-ES",
 AFB_Name <- c("Homestead_ARB", 
               "Guam_Proxy_v1", # Navy
               "CNMI_Proxy_v1", # Navy
-              "Indianhead_Proxy") # Navy
+              "Indianhead_Proxy", # Navy
+              "JBER",
+              "Dugway_Proving_Grounds") 
+
 
