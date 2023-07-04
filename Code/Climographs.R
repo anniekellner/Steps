@@ -9,12 +9,18 @@
   # AFB_Name
   # scenarios
   # years
+  # results_folder
 
 #################################################
 
 library(extrafont)
 
 conflicts_prefer(month::lubridate) # set conflict preferences
+
+## Create directory for Climographs
+
+path_to_climographs <- paste(plots_dir,"Climographs", sep = "/")
+dir.create(path_to_climographs)
 
 ### The following code can probably be deleted once integrated into the RMarkdown script
 
@@ -314,4 +320,7 @@ ggplot(hist.df) +
   theme(axis.title.y.right = element_text(margin = margin(t = 0, r = 0, b = 0, l = 15))) +
   scale_y_continuous(sec.axis = sec_axis(~./5, name = "Average Precip (in/month)")) +
   theme(legend.position = "right")
+
+plot1 <- "Monthly_Means_Historical.png"
+ggsave(filename = paste(path_to_climographs,plot1, sep = "/"))
 
