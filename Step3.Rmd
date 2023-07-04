@@ -30,8 +30,8 @@ library(tmaptools)
 library(leaflet)
 library(conflicted)
 
-conflicts_prefer(
-  lubridate::month(),# this ensures that the correct package is used when multiple packages contain the same function
+conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
+  lubridate::month(),
   dplyr::first(),
   dplyr::last(),
   dplyr::filter(),
@@ -152,7 +152,7 @@ future1_end_year <- 2045 # End year of interest for the first future time period
 future2_start_year <- 2056 # Start year of interest for the second future time period 
 future2_end_year <- 2075 # End year of interest for the second future time period 
 
-years <- c(baseline_start_year, 
+years <- c(baseline_start_year, # vector for easy reference
            baseline_end_year, 
            future1_start_year, 
            future1_end_year, 
@@ -558,8 +558,7 @@ Now that the AllDays.csv files have been created, it is no longer necessary to r
 
 rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
                         "model", 
-                        "scenario1", 
-                        "scenario2", 
+                        "scenarios",
                         "years",
                         "results_folder",
                         "AllDays")))
@@ -577,12 +576,11 @@ source('Code/Ecosystems_Climate_Data.R')
 
 ```
 
-```{r remove-extraneous-stuff}
+```{r remove-extraneous-stuff, warning=FALSE}
 
 rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
                         "model", 
-                        "scenario1", 
-                        "scenario2", 
+                        "scenarios",
                         "years",
                         "results_folder",
                         "AllDays")))
@@ -591,21 +589,33 @@ rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
 
 ## Climographs
 
-```{r climographs}
+This chunk creates all climograph plots and places them within the results folder under Plots/Climographs
+
+```{r climographs, message=FALSE}
 
 plots_dir <- paste0(results_folder,"Plots")
-dir.create(plots_dir)
 
-#source("Climographs.R")
+if (!dir.exists(plots_dir)){
+  dir.create(plots_dir)}
+
+source("./Code/Climographs.R")
 
 ```
 
+```{r remove-extraneous-stuff}
 
+rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
+                        "model", 
+                        "scenarios",
+                        "years",
+                        "results_folder",
+                        "AllDays")))
 
+```
 
 ## MonthSum
 
-The next chunk creates MonthSum.csv files. If for some reason the AllDays object does not work, you can use the script './Code/Misc/MonthSum.R' to run the MonthSum analyses using the csv output files one-by-one. This will be the best option for MACA inputs, since this script cannot yet accommodate MACA models.
+The next chunk creates MonthSum.csv files
 
 ```{r MonthSum, message=FALSE}
 
@@ -734,9 +744,9 @@ for(i in 1:length(monthSum)){
 csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     "historical"
   } else if(str_detect(names(monthSum[i]),"s1")) {
-    scenario1
+    scenarios[2]
   } else {
-    scenario2
+    scenarios[3]
   }
   
   csv_years = if (str_detect(names(monthSum[i]), "f1")){
@@ -758,8 +768,7 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 rm(list=setdiff(ls(), c("monthSum", 
                         "AFB_Name", 
                         "model", 
-                        "scenario1", 
-                        "scenario2", 
+                        "scenarios",
                         "results_folder",
                         "years")))
 
@@ -798,9 +807,9 @@ for(i in 2:length(monthSum)){ # 2 because [[1]] is historical
 for(i in 1:length(diffHist)){
 
 csv_scenario = if (str_detect(names(diffHist[i]), "s1")){
-    scenario1
+    scenarios[2]
   } else if(str_detect(names(diffHist[i]),"s2")) {
-    scenario2
+    scenarios[3]
   } 
   
 csv_years = if (str_detect(names(diffHist[i]), "f1")){

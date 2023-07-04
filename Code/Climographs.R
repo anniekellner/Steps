@@ -15,18 +15,12 @@
 
 library(extrafont)
 
-conflicts_prefer(month::lubridate) # set conflict preferences
-
 ## Create directory for Climographs
 
 path_to_climographs <- paste(plots_dir,"Climographs", sep = "/")
-dir.create(path_to_climographs)
 
-### The following code can probably be deleted once integrated into the RMarkdown script
-
-# Load example AllDays object (JBER)
-
-AllDays <- readRDS('./Results/Test/Dugway_Proving_Grounds/AllDays_CMIP6_070323.Rds') # this can be deleted bc AllDays object will be used directly
+if (!dir.exists(path_to_climographs)){
+  dir.create(path_to_climographs)}
 
 # This part might also be redundant, as AllDays df already had months added in the Bioclimatics script.
 # Check that the addition transfers when source() is used
@@ -48,9 +42,12 @@ for(i in 1:length(AllDays)){
 # Ultimately will put the entire script into a loop so that 10-14 are consolidated
 # For now, run historical script only 
 
-clim.dat <- AllDays[[1]]
+for(i in 1:length(AllDays)){
+
+clim.dat <- AllDays[[i]]
 
 #subsetting monthly data
+
 jan.dat <- subset(clim.dat, month=="Jan")
 feb.dat <- subset(clim.dat, month=="Feb")
 mar.dat <- subset(clim.dat, month=="Mar")
@@ -271,18 +268,25 @@ names(tmax) <- col_headings
 
 month <- unique(clim.dat$month)
 
-hist.df <- data.frame(month, precip, tmin, quan.min.25, quan.min.75, tmax, quan.max.25, quan.max.75) 
+df <- data.frame(month, precip, tmin, quan.min.25, quan.min.75, tmax, quan.max.25, quan.max.75) 
 
-# Create plot subtitle
+# Create plot names and subtitles
 
 plot_subtitles <- c(paste("Historical",years[1],"-",years[2], sep = " "),
                     paste(scenarios[2],years[3],"-",years[4], sep = " "),
                     paste(scenarios[2],years[5],"-",years[6], sep = " "),
                     paste(scenarios[3],years[3],"-",years[4], sep = " "),
-                    paste(scenarios[3],years[5],"-",years[5], sep = " "))
+                    paste(scenarios[3],years[5],"-",years[6], sep = " "))
 
+# Plot names include "Monthly Means", scenario, and center year (e.g., 2030)
+plot_names <- c("Monthly_Means_Historical.png",
+                paste0("Monthly_Means_",scenarios[2],"_",floor((years[3]+years[4])/2),".png"), # floor() rounds down to the nearest integer
+                paste0("Monthly_Means_",scenarios[2],"_",floor((years[5]+years[6])/2),".png"),
+                paste0("Monthly_Means_",scenarios[3],"_",floor((years[3]+years[4])/2),".png"),
+                paste0("Monthly_Means_",scenarios[3],"_",floor((years[5]+years[6])/2),".png"))
 
-pick_substitle <- function(df){
+# Plot subtitles include scenario and year span (e.g., 2026 - 2035)
+pick_subtitle <- function(df){
   case_when(
     names(df) == "results_baseline" ~ plot_subtitles[1],
     names(df) == "results_s1f1" ~ plot_subtitles[2],
@@ -291,21 +295,33 @@ pick_substitle <- function(df){
     names(df) == "results_s2f2" ~ plot_subtitles[5]
   )}
 
-# Determine title and subtitle of plot
+pick_plotname <- function(df){
+  case_when(
+    names(df) == "results_baseline" ~ plot_names[1],
+    names(df) == "results_s1f1" ~ plot_names[2],
+    names(df) == "results_s1f2" ~ plot_names[3],
+    names(df) == "results_s2f1" ~ plot_names[4],
+    names(df) == "results_s2f2" ~ plot_names[5]
+  )
+}
 
-title = str_replace_all(AFB_Name, "_", " ")  
-subtitle = pick_substitle(AllDays[i])  
-  
+# Determine title, subtitle, and name of plot
+
+title <- str_replace_all(AFB_Name, "_", " ")  
+subtitle <- pick_subtitle(AllDays[i])  
+plot_name <- pick_plotname(AllDays[i])
+
+
 #phit that G
 
-ggplot(hist.df) +
+ggplot(df) +
   geom_bar(aes(x=factor(month, level =c(month.abb)), precip*5), color="lightblue", fill="lightblue", stat = "identity") +
   geom_line(aes(x=factor(month, level =c(month.abb)), tmin), size=1, linetype=1, color="goldenrod3", group=1) +
-  geom_line(aes(x=factor(month, level =c(month.abb)), quan.min.25), size=.5, linetype=2, color="goldenrod3", group=2) +
-  geom_line(aes(x=factor(month, level =c(month.abb)), quan.min.75), size=.5, linetype=2, color="goldenrod3", group=3) +
-  geom_line(aes(x=factor(month, level =c(month.abb)), tmax), size=1, linetype=1, color="red4", group=4) +
-  geom_line(aes(x=factor(month, level =c(month.abb)), quan.max.25), size=.5, linetype=2, color="red4", group=5) +
-  geom_line(aes(x=factor(month, level =c(month.abb)), quan.max.75), size=.5, linetype=2, color="red4", group=6) +
+  geom_line(aes(x=factor(month, level =c(month.abb)), quan.min.25), linewidth=.5, linetype=2, color="goldenrod3", group=2) +
+  geom_line(aes(x=factor(month, level =c(month.abb)), quan.min.75), linewidth=.5, linetype=2, color="goldenrod3", group=3) +
+  geom_line(aes(x=factor(month, level =c(month.abb)), tmax), linewidth=1, linetype=1, color="red4", group=4) +
+  geom_line(aes(x=factor(month, level =c(month.abb)), quan.max.25), linewidth=.5, linetype=2, color="red4", group=5) +
+  geom_line(aes(x=factor(month, level =c(month.abb)), quan.max.75), linewidth=.5, linetype=2, color="red4", group=6) +
   labs(title = title, 
        subtitle = subtitle) +
   xlab("Month")                       +
@@ -321,6 +337,10 @@ ggplot(hist.df) +
   scale_y_continuous(sec.axis = sec_axis(~./5, name = "Average Precip (in/month)")) +
   theme(legend.position = "right")
 
-plot1 <- "Monthly_Means_Historical.png"
-ggsave(filename = paste(path_to_climographs,plot1, sep = "/"))
+ggsave(filename = paste(path_to_climographs,plot_name,sep = "/"), dpi = 200)
+
+}
+
+
+## end script
 
