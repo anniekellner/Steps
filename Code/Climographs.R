@@ -9,7 +9,7 @@
   # AFB_Name
   # scenarios
   # years
-  # results_folder
+  # plots_dir
 
 #################################################
 

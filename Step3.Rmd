@@ -25,7 +25,6 @@ library(tidyverse)
 library(data.table)
 library(viridis)
 library(mapview)
-library(lubridate)
 library(tmap)
 library(tmaptools)
 library(leaflet)
@@ -589,6 +588,19 @@ rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
                         "AllDays")))
 
 ```
+
+## Climographs
+
+```{r climographs}
+
+plots_dir <- paste0(results_folder,"Plots")
+dir.create(plots_dir)
+
+#source("Climographs.R")
+
+```
+
+
 
 
 ## MonthSum
