@@ -1,22 +1,23 @@
 #------------------------------------------------------------------------------------------------------------
-# file:   Test_WLDiagram.R
-# about:  Test of plot class WLDiagram.
-# usage:  HDF5_DISABLE_VERSION_CHECK=2 Rscript Test_WLDiagram.R
 # author: Thomas E. Hilinski <tom.hilinski@colostate.edu>
+# adapted by: Annie Kellner <annie.kellner@colostate.edu> 7/12/23
 # license:      See LICENSE.md or https://unlicense.org
-#------------------------------------------------------------------------------------------------------------
 
-message( "\nTest of class WLDiagram to draw a Walter and Lieth (1963) diagram.\n" )
+# This script creates Walter-Leith diagrams (1963). It is meant to be used in conjunction with
+# Step3.Rmd as part of a simplified workflow
+
+#------------------------------------------------------------------------------------------------------------
 
 library(devtools)
 library(grid)
 library(gridExtra)
-suppressWarnings( source("MiscUtils.R") )
-suppressWarnings( source("TextProcessing.R") )
-suppressWarnings( source("Units.R") )
-suppressWarnings( source("ClimateVars.R") )
-suppressWarnings( source("PlotBase.R") )
-suppressWarnings( source("WLDiagram.R") )
+
+source("MiscUtils.R") 
+source("TextProcessing.R") 
+source("Units.R") 
+source("ClimateVars.R") 
+source("PlotBase.R") 
+source("WLDiagram.R") 
 
 #--------------------------------------------------------------------
 # configuration

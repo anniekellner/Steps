@@ -17,7 +17,8 @@ The first chunk ('setup') allows you to set options that apply to every chunk in
 
 ```{r setup, include=FALSE}
 
-knitr::opts_chunk$set(echo = FALSE) # echo = FALSE means R will not print the code along with the results. 
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+ # echo = FALSE means R will not print the code along with the results. 
 
 library(terra)
 library(sf)
