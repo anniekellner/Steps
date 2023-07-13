@@ -12,16 +12,15 @@ library(devtools)
 library(grid)
 library(gridExtra)
 
-source("MiscUtils.R") 
-source("TextProcessing.R") 
-source("Units.R") 
-source("ClimateVars.R") 
-source("PlotBase.R") 
-source("WLDiagram.R") 
+source("./Code/CEMML/WalterLeith/MiscUtils.R") 
+source("./Code/CEMML/WalterLeith/TextProcessing.R") 
+source("./Code/CEMML/WalterLeith/Units.R") 
+source("./Code/CEMML/WalterLeith/ClimateVars.R") 
+source("./Code/CEMML/WalterLeith/PlotBase.R") 
+source("./Code/CEMML/WalterLeith/WLDiagram.R") 
 
 #--------------------------------------------------------------------
 # configuration
-setwd("N:/RStor/mindyc/afccm/Climate Modeling/Software Apps/R scripts/Trevor/WLDiagram-master/WLDiagram-master/")
 config <- list ( width  = 2000,
                  height = 2000,
                  orientation = "portrait" )	# valid orientation: portrait, landscape

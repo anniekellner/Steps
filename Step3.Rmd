@@ -562,7 +562,8 @@ rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
                         "scenarios",
                         "years",
                         "results_folder",
-                        "AllDays")))
+                        "AllDays",
+                        "RasterUnitConvert")))
 
 ```
 
@@ -771,7 +772,8 @@ rm(list=setdiff(ls(), c("monthSum",
                         "model", 
                         "scenarios",
                         "results_folder",
-                        "years")))
+                        "years",
+                        "RasterUnitConvert")))
 
 ```
 
@@ -826,6 +828,11 @@ write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = 
 
 ```
 
+## Walter and Leith Diagrams
+
+```{r}
+#
+```
 
 
 
