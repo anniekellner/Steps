@@ -25,8 +25,9 @@ config <- list ( width  = 2000,
                  height = 2000,
                  orientation = "portrait" )	# valid orientation: portrait, landscape
 
-experiment  <- "historical"
-yearRange   <- c( 1976, 2005 )
+experiment  <- scenarios[1] # ultimately will change to i
+yearRange   <- c(years[1], years[2])
+
 #  or
 #experiment  <- "rcp45"
 #experiment  <- "rcp85"
@@ -34,9 +35,9 @@ yearRange   <- c( 1976, 2005 )
 #yearRange   <- c( 2046, 2055 )
 
 # load per-month data
-regionName  <- "Homestead ARB"
-pm.df <- read.csv("Homestead_ARB_dataPerMonth.csv")	# units are SI
-#write.csv(pm.df,"data_PerMonth.csv")
+regionName  <- AFB_Name
+pm.df <- read.csv("./Data/Raw/Homestead_ARB_dataPerMonth.csv")	# units are SI
+
 
 # names(pm.df)
 #   [1] "month"                  "Temp_historical"        "Temp_rcp45_2026_2035"
@@ -61,7 +62,7 @@ stopifnot( length(i) > 0 )
 pm.df <- pm.df[,i]
 iTmin <- grep( "Tmin", names(pm.df) )
 iTmax <- grep( "Tmax", names(pm.df) )
-iATmn <- grep( "ATmn", names(pm.df) )
+iATmn <- grep( "ATmn", names(pm.df) ) # AbsTMinF
 iPrec <- grep( "Precip", names(pm.df) )
 # iTmin; iTmax; iATmn; iPrec ==  3  2  4  5
 
