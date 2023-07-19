@@ -17,6 +17,15 @@ AFB_Name <- c("Homestead_ARB",
               "CNMI_Proxy_v1", # Navy
               "Indianhead_Proxy", # Navy
               "JBER",
-              "Dugway_Proving_Grounds") 
+              "Dugway_Proving_Grounds",
+              "Hill_AFB_Boundary",
+              "LMTF_Boundary",
+              "HAMOTS_Boundary",
+              "Park_City_Property_Boundary",
+              "PSRF_Boundary",
+              "South_Range_Boundary",
+              "Carter_Creek_Recreation_Center_Boundary",
+              "JBLE",
+              "Edwards") 
 
 

@@ -80,7 +80,7 @@ In the code chunk below, *enter the number between the brackets ([]) that corres
 
 ```{r enter-afb-and-model}
 
-AFB_Name <- AFB_Name[6] 
+AFB_Name <- AFB_Name[15] 
 
 model <- models[6] 
 
@@ -136,7 +136,7 @@ Of the variables listed, which do you want to include in your analysis? *Enter t
 
 ```{r}
 
-variables <- c("pr_day", "tasmax", "tasmin") # an example of how you would choose among the variables if desired
+variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin") # an example of how you would choose among the variables if desired
 
 ```
 
@@ -144,8 +144,8 @@ variables <- c("pr_day", "tasmax", "tasmin") # an example of how you would choos
 
 ```{r enter-years-of-interest}
 
-baseline_start_year <- 1976 # Start year of interest for the historical time period  
-baseline_end_year <- 2005 # End year of interest for the historical time period
+baseline_start_year <- 1985 # Start year of interest for the historical time period  
+baseline_end_year <- 2014 # End year of interest for the historical time period
 
 future1_start_year <- 2026 # Start year of interest for the first future time period 
 future1_end_year <- 2045 # End year of interest for the first future time period 
