@@ -6,17 +6,24 @@
 # It is used with the 'steps' script to enable easy variable naming
 
 models <- c("HADGEM2-ES",
-                   "LOCA_CCSM4", 
-                   "MACA_CCSM4",
-                   "MACA_CCSM4_Monthly",
-                   "MIROC6",
-                   "MPI-ESM1-2-HR")
+            "LOCA_CCSM4", 
+            "MACA_CCSM4",
+            "MACA_CCSM4_Monthly",
+            "MIROC6",
+            "MPI-ESM1-2-HR")
 
 AFB_Name <- c("Homestead_ARB", 
               "Guam_Proxy_v1", # Navy
               "CNMI_Proxy_v1", # Navy
               "Indianhead_Proxy", # Navy
               "JBER",
-              "Dugway_Proving_Grounds") 
-
-
+              "Dugway_Proving_Grounds",
+              "Hill_AFB_Boundary",
+              "LMTF_Boundary",
+              "HAMOTS_Boundary",
+              "Park_City_Property_Boundary",
+              "PSRF_Boundary",
+              "South_Range_Boundary",
+              "Carter_Creek_Recreation_Center_Boundary",
+              "JBLE",
+              "Edwards") 
