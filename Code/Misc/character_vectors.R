@@ -26,4 +26,5 @@ AFB_Name <- c("Homestead_ARB",
               "South_Range_Boundary",
               "Carter_Creek_Recreation_Center_Boundary",
               "JBLE",
-              "Edwards") 
+              "Edwards_AFB",
+              "Malmstrom_AFB_Proxy") 
