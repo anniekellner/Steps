@@ -784,6 +784,39 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 
 ```
 
+## Walter and Leith Diagrams
+
+```{r}
+
+library(climatol)
+
+source('./Code/Functions/Walter_Lieth_Diagram.r') # Downloaded 09-14-23 by Annie Kellner. https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R
+
+wl <- monthSum[[1]] %>%
+  mutate(Avg_TMaxC = RasterUnitConvert(Avg_TMaxF, "FtoC")) %>%
+  mutate(Avg_TMinC = RasterUnitConvert(Avg_TMinF, "FtoC")) %>%
+  mutate(Abs_TminC = RasterUnitConvert(Abs_TminF, "FtoC")) %>%
+  select(Avg_PPT_mm, Avg_TMaxC, Avg_TMinC, Abs_TminC) 
+           
+wl <- wl[1:12,]
+
+wl <- data.table::transpose(wl)
+
+ggclimat_walter_lieth(wl, 
+                      est = "Malmstron AFB", 
+                      per = "1985 - 2014", 
+                      mlab = "en", 
+                      pcol = "blue", 
+                      tcol = "red", 
+                      pfcol = "lightblue", 
+                      sfcol = "steelblue"
+  
+)
+  
+
+```
+
+
 ```{r remove-objects}
 
 rm(list=setdiff(ls(), c("monthSum", 
@@ -847,11 +880,7 @@ write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = 
 
 ```
 
-## Walter and Leith Diagrams
 
-```{r}
-#
-```
 
 
 
