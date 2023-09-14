@@ -107,7 +107,15 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 
 # Directories
 
-model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "") 
+model_dir <- paste('/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Data/', model, sep = "") # Mac location
+
+####### Attempting to use a UNC address for cross-platform compatibility. So far not working. 
+# model_dir <- paste('smb:\\acns.colostate.edu\\wcnr-network\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\', model, sep = "")
+# model_dir <- '//mindyc/afccm/Climate Modeling/Data/'
+
+
+# Uniform naming convention (UNC) for cross-platform compatibility
+# model_dir <- file.path(model_dir) # can possibly ensure that directory is a filepath on all OS's
 
 scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
 
