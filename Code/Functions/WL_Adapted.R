@@ -435,7 +435,21 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   range_prec[range_tm > 50] <- range_tm[range_tm > 50] * 20 - 900
   preclabs <- paste0(range_prec)
   preclabs[range_tm < 0] <- ""
+
+  ## ADAPTED FOR CEMML 09-14-23 ##
   
+  preclabs2 <- as.numeric(preclabs)
+  preclabs2 <- preclabs2[2:8]
+  preclabsCEMML <- as.numeric() 
+  
+  for(i in 1:length(preclabs2)){
+    preclabsCEMML[i] = preclabs2[i]/25.4
+  }
+
+assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) 
+
+  ## END ADAPTATION ##
+   
   ## Titles and additional labels----
   title <- est
   
@@ -777,4 +791,5 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   
   return(wandlplot)
 }
+
 
