@@ -33,7 +33,7 @@ library(mapview)
 library(tmap)
 library(tmaptools)
 library(leaflet)
-library()
+library(climatol) # for Walter-Lieth Diagrams
 library(conflicted)
 
 conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
@@ -108,6 +108,9 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 # Directories
 
 model_dir <- paste('/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Data/', model, sep = "") # Mac location
+ # See if this works:
+
+#odel_dir <- paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data',"/",model, sep = "")
 
 ####### Attempting to use a UNC address for cross-platform compatibility. So far not working. 
 # model_dir <- paste('smb:\\acns.colostate.edu\\wcnr-network\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\', model, sep = "")
@@ -787,8 +790,6 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 ## Walter and Leith Diagrams
 
 ```{r}
-
-library(climatol)
 
 source('./Code/Functions/WL_Adapted.R') # Adapted from https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R by Annie Kellner 09-14-23 
 
