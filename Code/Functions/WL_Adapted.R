@@ -334,6 +334,8 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   names(dat_long) <- c("p_mes", "tm_max", "tm_min", "ta_min")
   
   dat_long <- dplyr::bind_cols(label = mlab, dat_long)
+  assign("WLData", dat_long, envir = .GlobalEnv)
+
   
   # Southern hemisphere
   if (shem) {
@@ -446,7 +448,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
     preclabsCEMML[i] = preclabs2[i]/25.4
   }
 
-assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) 
+assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) # assigns variable to global environment so can be accessed by .Rmd script
 
   ## END ADAPTATION ##
    
@@ -478,6 +480,10 @@ assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv)
           sep = ""
     )
   
+  #######. ALTERED FOR CEMML  ##########
+  # Annie Kellner 09-20-23 #
+  
+  subF <- 
   # Vertical tags
   maxtm <- prettyNum(round(max(dat_long_end$tm_max), 1))
   mintm <- prettyNum(round(min(dat_long_end$tm_min), 1))
@@ -721,7 +727,7 @@ assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv)
   
   # Add lines and scales to chart
   wandlplot <- wandlplot +
-    geom_hline(yintercept = c(0, 50)) + # removed 'size' argument
+    geom_hline(yintercept = c(0, 50)) + # removed 'size' argument (CEMML/AK 09-14-23)
     geom_segment(data = ticks, aes(
       x = x,
       xend = x,
