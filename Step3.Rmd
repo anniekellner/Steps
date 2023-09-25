@@ -110,7 +110,7 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 model_dir <- paste('/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Data/', model, sep = "") # Mac location
  # See if this works:
 
-#odel_dir <- paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data',"/",model, sep = "")
+# model_dir <- paste0('\\RStor\\mindyc\\afccm\\Climate Modeling\\Data',"/",model, sep = "") # nope
 
 ####### Attempting to use a UNC address for cross-platform compatibility. So far not working. 
 # model_dir <- paste('smb:\\acns.colostate.edu\\wcnr-network\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\', model, sep = "")
@@ -789,9 +789,12 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 
 ## Walter and Leith Diagrams
 
+This section creates WL Diagrams for both F and C and places the results in the results_folder
+
 ```{r}
 
 source('./Code/Functions/WL_Adapted.R') # Adapted from https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R by Annie Kellner 09-14-23 
+
 
 wlC <- monthSum[[1]] %>%
   mutate(Avg_TMaxC = RasterUnitConvert(Avg_TMaxF, "FtoC")) %>%
@@ -802,6 +805,8 @@ wlC <- monthSum[[1]] %>%
 wlC <- wlC[1:12,]
 wlC <- data.table::transpose(wlC)
 
+# Celsius plot
+
 wlCplot <- ggclimat_walter_lieth(wlC, 
                       est = "Malmstron AFB", 
                       per = "1985 - 2014", 
@@ -811,11 +816,47 @@ wlCplot <- ggclimat_walter_lieth(wlC,
                       pfcol = "lightblue", 
                       sfcol = "steelblue")
 
+
+# Fahrenheit Plot
+
 wlCplot + scale_y_continuous(
   "°F",
   labels = function(x) x* (9/5) + 32,
   sec.axis = dup_axis(name = "in",
                       labels = round(preclabsCEMML, digits = 1)))
+
+  wandlplot <- wandlplot +
+    ggplot2::labs(
+      title = title,
+      subtitle = sub,
+      tag = tags
+    )
+  
+  # Subtitles
+  sub <-
+    paste(round(mean(dat_long_end[dat_long_end$interpolate == FALSE, ]$tm), 1),
+          "C        ",
+          prettyNum(
+            round(sum(
+              dat_long_end[dat_long_end$interpolate == FALSE, ]$p_mes
+            )),
+            big.mark = ","
+          ),
+          " mm",
+          sep = ""
+    )
+  
+  # Vertical tags
+  maxtm <- prettyNum(round(max(dat_long_end$tm_max), 1))
+  mintm <- prettyNum(round(min(dat_long_end$tm_min), 1))
+  
+  tags <- paste0(
+    paste0(rep(" \n", 6), collapse = ""),
+    maxtm,
+    paste0(rep(" \n", 10), collapse = ""),
+    mintm
+  )
+  
 
 
 ```

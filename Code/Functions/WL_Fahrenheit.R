@@ -1,3 +1,9 @@
+########################################################
+###   WALTER-LIETH DIAGRAM: FAHRENHEIT  ################
+########################################################
+
+# Adapted 09-20-23 by Annie Kellner for CEMML
+
 #' Walter & Lieth climatic diagram from normal climatology values
 #'
 #' @description
@@ -32,7 +38,7 @@
 #'   package version 4.0.0, <https://climatol.eu>.
 #'
 #' @return A plot.
-#'
+#' #'
 #' @examplesIf aemet_detect_api_key()
 #' climatogram_normal("9434")
 #' @export
@@ -210,8 +216,6 @@ climatogram_period <- function(station = NULL, start = 1990, end = 2020,
 }
 
 
-
-
 #' Walter and Lieth climatic diagram on `ggplot2`
 #'
 #' @description
@@ -334,8 +338,14 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   names(dat_long) <- c("p_mes", "tm_max", "tm_min", "ta_min")
   
   dat_long <- dplyr::bind_cols(label = mlab, dat_long)
-  assign("dat_long", dat_long, envir = .GlobalEnv)
+  
+  ## CONVERT VALUES TO IMPERIAL SYSTEM ##
 
+dat_long$p_mesIN <- dat_long$p_mes/25.4
+dat_long$tm_maxF <- (dat_long$tm_max)*(9/5) + 32
+dat_long$tm_minF <- (dat_long$tm_min)*(9/5) + 32
+dat_long$ta_minF <- (dat_long$ta_min)*(9/5) + 32
+  
   
   # Southern hemisphere
   if (shem) {
@@ -437,7 +447,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   range_prec[range_tm > 50] <- range_tm[range_tm > 50] * 20 - 900
   preclabs <- paste0(range_prec)
   preclabs[range_tm < 0] <- ""
-
+  
   ## ADAPTED FOR CEMML 09-14-23 ##
   
   preclabs2 <- as.numeric(preclabs)
@@ -447,11 +457,11 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   for(i in 1:length(preclabs2)){
     preclabsCEMML[i] = preclabs2[i]/25.4
   }
-
-assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) # assigns variable to global environment so can be accessed by .Rmd script
-
+  
+  assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) # assigns variable to global environment so can be accessed by .Rmd script
+  
   ## END ADAPTATION ##
-   
+  
   ## Titles and additional labels----
   title <- est
   
@@ -484,8 +494,8 @@ assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) # assigns variable to
   # Annie Kellner 09-20-23 #
   
   subF <- 
-  # Vertical tags
-  maxtm <- prettyNum(round(max(dat_long_end$tm_max), 1))
+    # Vertical tags
+    maxtm <- prettyNum(round(max(dat_long_end$tm_max), 1))
   mintm <- prettyNum(round(min(dat_long_end$tm_min), 1))
   
   tags <- paste0(
