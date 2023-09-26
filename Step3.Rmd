@@ -33,7 +33,7 @@ library(mapview)
 library(tmap)
 library(tmaptools)
 library(leaflet)
-library()
+library(climatol) # for Walter-Lieth Diagrams
 library(conflicted)
 
 conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
@@ -108,6 +108,9 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 # Directories
 
 model_dir <- paste('/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Data/', model, sep = "") # Mac location
+ # See if this works:
+
+# model_dir <- paste0('\\RStor\\mindyc\\afccm\\Climate Modeling\\Data',"/",model, sep = "") # nope
 
 ####### Attempting to use a UNC address for cross-platform compatibility. So far not working. 
 # model_dir <- paste('smb:\\acns.colostate.edu\\wcnr-network\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\', model, sep = "")
@@ -784,6 +787,81 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 
 ```
 
+## Walter and Leith Diagrams
+
+This section creates WL Diagrams for both F and C and places the results in the results_folder
+
+```{r}
+
+source('./Code/Functions/WL_Adapted.R') # Adapted from https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R by Annie Kellner 09-14-23 
+
+
+wlC <- monthSum[[1]] %>%
+  mutate(Avg_TMaxC = RasterUnitConvert(Avg_TMaxF, "FtoC")) %>%
+  mutate(Avg_TMinC = RasterUnitConvert(Avg_TMinF, "FtoC")) %>%
+  mutate(Abs_TminC = RasterUnitConvert(Abs_TminF, "FtoC")) %>%
+  select(Avg_PPT_mm, Avg_TMaxC, Avg_TMinC, Abs_TminC) 
+
+wlC <- wlC[1:12,]
+wlC <- data.table::transpose(wlC)
+
+# Celsius plot
+
+wlCplot <- ggclimat_walter_lieth(wlC, 
+                      est = "Malmstron AFB", 
+                      per = "1985 - 2014", 
+                      mlab = "en", 
+                      pcol = "blue", 
+                      tcol = "red", 
+                      pfcol = "lightblue", 
+                      sfcol = "steelblue")
+
+
+# Fahrenheit Plot
+
+wlCplot + scale_y_continuous(
+  "°F",
+  labels = function(x) x* (9/5) + 32,
+  sec.axis = dup_axis(name = "in",
+                      labels = round(preclabsCEMML, digits = 1)))
+
+  wandlplot <- wandlplot +
+    ggplot2::labs(
+      title = title,
+      subtitle = sub,
+      tag = tags
+    )
+  
+  # Subtitles
+  sub <-
+    paste(round(mean(dat_long_end[dat_long_end$interpolate == FALSE, ]$tm), 1),
+          "C        ",
+          prettyNum(
+            round(sum(
+              dat_long_end[dat_long_end$interpolate == FALSE, ]$p_mes
+            )),
+            big.mark = ","
+          ),
+          " mm",
+          sep = ""
+    )
+  
+  # Vertical tags
+  maxtm <- prettyNum(round(max(dat_long_end$tm_max), 1))
+  mintm <- prettyNum(round(min(dat_long_end$tm_min), 1))
+  
+  tags <- paste0(
+    paste0(rep(" \n", 6), collapse = ""),
+    maxtm,
+    paste0(rep(" \n", 10), collapse = ""),
+    mintm
+  )
+  
+
+
+```
+
+
 ```{r remove-objects}
 
 rm(list=setdiff(ls(), c("monthSum", 
@@ -847,11 +925,7 @@ write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = 
 
 ```
 
-## Walter and Leith Diagrams
 
-```{r}
-#
-```
 
 
 
