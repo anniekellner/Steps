@@ -19,6 +19,11 @@ The first chunk ('setup') allows you to set options that apply to every chunk in
 
 knitr::opts_chunk$set(echo = FALSE) # echo = FALSE means R will not print the code along with the results. 
 
+```
+
+
+```{r load-libraries, include=FALSE}
+
 library(terra)
 library(sf)
 library(tidyverse)
@@ -40,9 +45,16 @@ conflicts_prefer( # this ensures that the correct package is used when multiple 
 )
 ```
 
-```{r functions}
+**NOTE: Only run the next chunk (clear-workspace) if necessary. Code is commented out to avoid accidentally clearing the workspace. 
 
-#rm(list = ls()) # clear workspace - this can be commented out as needed
+```{r clear-workspace}
+
+#rm(list = ls()) 
+
+```
+
+
+```{r functions}
 
 # The 'source' function reads the following scripts and places associated functions into the global environment
 
