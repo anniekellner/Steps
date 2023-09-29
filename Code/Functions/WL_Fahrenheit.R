@@ -338,25 +338,17 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   names(dat_long) <- c("p_mes", "tm_max", "tm_min", "ta_min")
   
   dat_long <- dplyr::bind_cols(label = mlab, dat_long)
-  
-  ## CONVERT VALUES TO IMPERIAL SYSTEM ##
 
-dat_long$p_mesIN <- dat_long$p_mes/25.4
-dat_long$tm_maxF <- (dat_long$tm_max)*(9/5) + 32
-dat_long$tm_minF <- (dat_long$tm_min)*(9/5) + 32
-dat_long$ta_minF <- (dat_long$ta_min)*(9/5) + 32
-  
-  
   # Southern hemisphere
   if (shem) {
     dat_long <- rbind(dat_long[7:12, ], dat_long[1:6, ])
   }
   
   # Mean temp
-  dat_long$tm <- (dat_long[[3]] + dat_long[[4]]) / 2
+  dat_long$tm <- (dat_long[[3]] + dat_long[[4]]) / 2 
   
   # Reescalate p_mes
-  dat_long$pm_reesc <- ifelse(dat_long$p_mes < 100,
+  dat_long$pm_reesc <- ifelse(dat_long$p_mes < 100, # could possibly change this here, but might be better to do later
                               dat_long$p_mes * 0.5,
                               dat_long$p_mes * 0.05 + 45
   )
@@ -417,6 +409,9 @@ dat_long$ta_minF <- (dat_long$ta_min)*(9/5) + 32
   dat_long_end <- tibble::as_tibble(dat_long_end)
   # Final tibble with normalized and helper values
   
+  ## Added for CEMML by Annie Kellner 09-29-23
+  ## assigns final dataframe to global environment so values can be converted to F
+  assign("dat_long_end", dat_long_end, envir = .GlobalEnv) 
   
   
   # Labels and axis----
@@ -425,11 +420,12 @@ dat_long$ta_minF <- (dat_long$ta_min)*(9/5) + 32
   month_breaks <- dat_long_end[dat_long_end$label != "", ]$indrow
   month_labs <- dat_long_end[dat_long_end$label != "", ]$label
   
+  
   ## Vert. Axis range - temp ----
   ymax <- max(60, 10 * floor(max(dat_long_end$pm_reesc) / 10) + 10)
   
-  # Min range
-  ymin <- min(-3, min(dat_long_end$tm)) # min Temp
+  # Min range - Celsius
+  ymin <- min(-3, min(dat_long_end$tm)) # min Temp Celsius
   range_tm <- seq(0, ymax, 10)
   
   if (ymin < -3) {
@@ -475,43 +471,40 @@ dat_long$ta_minF <- (dat_long$ta_min)*(9/5) + 32
   if (!is.na(per)) {
     title <- paste0(title, "\n", per)
   }
+
+  ## ADAPTED - commented out subtitles in order to use Fahrenheit values instead 09-29-23
+  #sub <-
+    #paste(round(mean(dat_long_end[dat_long_end$interpolate == FALSE, ]$tm), 1),
+          #"C        ",
+          #prettyNum(
+            #round(sum(
+              #dat_long_end[dat_long_end$interpolate == FALSE, ]$p_mes
+            #)),
+            #big.mark = ","
+          #),
+          #" mm",
+          #sep = ""
+    #)
   
-  # Subtitles
-  sub <-
-    paste(round(mean(dat_long_end[dat_long_end$interpolate == FALSE, ]$tm), 1),
-          "C        ",
-          prettyNum(
-            round(sum(
-              dat_long_end[dat_long_end$interpolate == FALSE, ]$p_mes
-            )),
-            big.mark = ","
-          ),
-          " mm",
-          sep = ""
-    )
-  
-  #######. ALTERED FOR CEMML  ##########
-  # Annie Kellner 09-20-23 #
-  
-  subF <- 
+
     # Vertical tags
-    maxtm <- prettyNum(round(max(dat_long_end$tm_max), 1))
-  mintm <- prettyNum(round(min(dat_long_end$tm_min), 1))
+  #maxtm <- prettyNum(round(max(dat_long_end$tm_maxF), 1))
+  #mintm <- prettyNum(round(min(dat_long_end$tm_minF), 1))
   
-  tags <- paste0(
-    paste0(rep(" \n", 6), collapse = ""),
-    maxtm,
-    paste0(rep(" \n", 10), collapse = ""),
-    mintm
-  )
+  #tags <- paste0(
+    #paste0(rep(" \n", 6), collapse = ""),
+    #maxtm,
+    #paste0(rep(" \n", 10), collapse = ""),
+    #mintm
+  #)
   
   # Helper for ticks
   
-  ticks <- data.frame(
-    x = seq(0, 12),
-    ymin = -3,
-    ymax = 0
-  )
+  #ticks <- data.frame(
+    #x = seq(0, 12),
+    #ymin = -3,
+    #ymax = 0
+  #)
   
   
   

@@ -798,8 +798,6 @@ This section creates WL Diagrams for both F and C and places the results in the 
 ```{r}
 
 source('./Code/Functions/WL_Adapted.R') # Adapted from https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R by Annie Kellner 09-14-23 
-source('./Code/Functions/WL_Fahrenheit.R')
-
 
 wlC <- monthSum[[1]] %>%
   mutate(Avg_TMaxC = RasterUnitConvert(Avg_TMaxF, "FtoC")) %>%
@@ -824,30 +822,26 @@ wlCplot <- ggclimat_walter_lieth(wlC,
 
 # Fahrenheit Plot
 
-wlCplot + scale_y_continuous(
-  "°F",
-  labels = function(x) x* (9/5) + 32,
-  sec.axis = dup_axis(name = "in",
-                      labels = round(preclabsCEMML, digits = 1)))
+source('./Code/Functions/WL_Fahrenheit.R')
 
-  wandlplot <- wandlplot +
-    ggplot2::labs(
-      title = title,
-      subtitle = sub,
-      tag = tags
-    )
-  
+dat_long_end$p_mesIN <- dat_long$p_mes/25.4
+dat_long_end$tm_maxF <- (dat_long$tm_max)*(9/5) + 32
+dat_long_end$tm_minF <- (dat_long$tm_min)*(9/5) + 32
+dat_long_end$ta_minF <- (dat_long$ta_min)*(9/5) + 32
+
+  #dat_long_end$tmF <- (dat_long[[7]] + dat_long[[8]]) / 2 # Fahr Tmax and Tmin
+
   # Subtitles
   sub <-
-    paste(round(mean(dat_long_end[dat_long_end$interpolate == FALSE, ]$tm), 1),
-          "C        ",
+    paste(round(mean(dat_long_end[dat_long_end$interpolate == FALSE, ]$tmF), 1),
+          "F        ",
           prettyNum(
             round(sum(
-              dat_long_end[dat_long_end$interpolate == FALSE, ]$p_mes
+              dat_long_end[dat_long_end$interpolate == FALSE, ]$p_mesIN
             )),
             big.mark = ","
           ),
-          " mm",
+          " in",
           sep = ""
     )
   
@@ -861,6 +855,30 @@ wlCplot + scale_y_continuous(
     paste0(rep(" \n", 10), collapse = ""),
     mintm
   )
+
+  # Helper for ticks - check if this is needed
+  
+  ticks <- data.frame(
+    x = seq(0, 12),
+    ymin = -3,
+    ymax = 0
+  )
+  
+wlCplot + scale_y_continuous(
+  "°F",
+  labels = function(x) x* (9/5) + 32,
+  sec.axis = dup_axis(name = "in",
+                      labels = round(preclabsCEMML, digits = 1)))
+
+  wandlplot <- wandlplot +
+    ggplot2::labs(
+      title = title,
+      subtitle = sub,
+      tag = tags
+    )
+  
+
+
   
 
 
