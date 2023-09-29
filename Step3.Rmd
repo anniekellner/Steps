@@ -69,6 +69,23 @@ source('./Code/Stars_HowTo/shift_longitude.R')
 ### PART ONE: User settings - choose AFB, AFB manager, model, scenarios, years of interest  ###
 ###############################################################################################
 
+First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Name` and/or `models` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
+
+
+In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest.* 
+
+```{r enter-afb-and-model}
+
+AFB_Name <- AFB_Names[16] 
+
+model <- models[5] 
+
+cat(paste("The model you have selected is", model, "and the AFB is", AFB_Name))
+
+```
+
+We use the next chunk to set the path to the correct directory for the installation boundary (shapefile).
+
 *If the AFB is managed by the Navy, set Navy = TRUE*
 *If the AFB is managed by the Air Force, set Navy = FALSE*
 
@@ -84,20 +101,7 @@ dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile 
 
 ```
 
-First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Name` and/or `models` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
 
-
-In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest.* 
-
-```{r enter-afb-and-model}
-
-AFB_Name <- AFB_Name[16] 
-
-model <- models[5] 
-
-cat(paste("The model you have selected is", model, "and the AFB is", AFB_Name))
-
-```
 
 Then let's see what scenarios and variables are available for that model.
 
@@ -794,6 +798,7 @@ This section creates WL Diagrams for both F and C and places the results in the 
 ```{r}
 
 source('./Code/Functions/WL_Adapted.R') # Adapted from https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R by Annie Kellner 09-14-23 
+source('./Code/Functions/WL_Fahrenheit.R')
 
 
 wlC <- monthSum[[1]] %>%
