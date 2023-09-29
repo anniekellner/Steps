@@ -78,7 +78,7 @@ In the code chunk below, *enter the number between the brackets ([]) that corres
 
 AFB_Name <- AFB_Names[6] 
 
-model <- models[6] 
+model <- models[5] 
 
 cat(paste("The model you have selected is", model, "and the AFB is", AFB_Name))
 
@@ -151,22 +151,23 @@ Of the variables listed, which do you want to include in your analysis? *Enter t
 
 ```{r}
 
-variables <- c("pr_day", "tasmax", "tasmin") # an example of how you would choose among the variables if desired
+variables <- c("pr_day", "tasmax", "tasmin", "tas_da", "hurs_d", "sfcWin") # an example of how you would choose among the variables if desired
 
 ```
 
 *Now, enter the years of interest for each time period*
+1985-2014 (or 1976-2005 if it is LOCAv2 or MACA), 2021-2050, and 2051-2080
 
 ```{r enter-years-of-interest}
 
-baseline_start_year <- 1976 # Start year of interest for the historical time period  
-baseline_end_year <- 2005 # End year of interest for the historical time period
+baseline_start_year <- 1985 # Start year of interest for the historical time period  
+baseline_end_year <- 2014 # End year of interest for the historical time period
 
-future1_start_year <- 2026 # Start year of interest for the first future time period 
-future1_end_year <- 2045 # End year of interest for the first future time period 
+future1_start_year <- 2021 # Start year of interest for the first future time period 
+future1_end_year <- 2050 # End year of interest for the first future time period 
 
-future2_start_year <- 2056 # Start year of interest for the second future time period 
-future2_end_year <- 2075 # End year of interest for the second future time period 
+future2_start_year <- 2051 # Start year of interest for the second future time period 
+future2_end_year <- 2080 # End year of interest for the second future time period 
 
 years <- c(baseline_start_year, # vector for easy reference
            baseline_end_year, 
@@ -352,10 +353,10 @@ cat("The object used for data extraction is ", class(extract_obj))
 
 INTERPRETING THE OUTPUT ABOVE: If the output of the following code chunk says 'numeric', the script will use the centroid. If it says 'spatVector', it will use the spatial object (afb). 
 
-*If you want to override the automatic choice, manually highlight and run either of the options below:* (if you enter it into the code chunk it will remain there and you risk overriding future choices you may not want to, so just do it here in the main text.) Do not include the **; I inserted those to change the color of the text to highlight what is code vs. text for readability.
+*If you want to override the automatic choice, manually highlight and run either of the options below:* (if you enter it into the code chunk it will remain there and you risk overriding future choices you may not want to, so just do it here in the main text.) 
 
-**extract_obj <- cell** to use the centroid  -OR-
-**extract_obj <- afb** to use the entire shapefile
+```extract_obj <- cell``` to use the centroid  -OR-
+```extract_obj <- afb``` to use the entire shapefile
 
 
 ## DATA EXTRACTION
@@ -534,7 +535,7 @@ for(i in 1:length(avdf)){
 
     } # end creation of AllDays dataframe
   
-  # Write output to .csv
+# Write output to .csv
 
 for(i in 1:length(AllDays)){
   csv = AllDays[[i]]
