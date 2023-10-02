@@ -724,6 +724,7 @@ assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) # assigns variable to
       )
   }
   
+  assign("wandlplot", wandlplot, envir = .GlobalEnv) # Added by Annie Kellner 10-02-23
   
   # Add lines and scales to chart
   wandlplot <- wandlplot +
