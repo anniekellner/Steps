@@ -365,8 +365,8 @@ INTERPRETING THE OUTPUT ABOVE: If the output of the following code chunk says 'n
 
 *If you want to override the automatic choice, manually highlight and run either of the options below:* (if you enter it into the code chunk it will remain there and you risk overriding future choices you may not want to, so just do it here in the main text.) Do not include the **; I inserted those to change the color of the text to highlight what is code vs. text for readability.
 
-**extract_obj <- cell** to use the centroid  -OR-
-**extract_obj <- afb** to use the entire shapefile
+`extract_obj <- cell` to use the centroid  -OR-
+`extract_obj <- afb` to use the entire shapefile
 
 
 ## DATA EXTRACTION
