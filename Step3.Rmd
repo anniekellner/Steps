@@ -808,7 +808,7 @@ wlC <- monthSum[[1]] %>%
 wlC <- wlC[1:12,]
 wlC <- data.table::transpose(wlC)
 
-# Celsius plot
+# ----------  Celsius plot  ----------------- #
 
 wlCplot <- ggclimat_walter_lieth(wlC, 
                       est = "Malmstron AFB", 
@@ -820,41 +820,131 @@ wlCplot <- ggclimat_walter_lieth(wlC,
                       sfcol = "steelblue")
 
 
-# Fahrenheit Plot
+# ----------   Fahrenheit Plot  --------------  #
 
-source('./Code/Functions/WL_Fahrenheit.R')
+# Add Fahrenheit values to final dataframe created by WL_Adapted script
 
-dat_long_end$p_mesIN <- dat_long$p_mes/25.4
-dat_long_end$tm_maxF <- (dat_long$tm_max)*(9/5) + 32
-dat_long_end$tm_minF <- (dat_long$tm_min)*(9/5) + 32
-dat_long_end$ta_minF <- (dat_long$ta_min)*(9/5) + 32
+dat_long_endF <- dat_long_end %>%
+  mutate(p_mesIN = p_mes/25.4) %>%
+  mutate(tm_maxF = tm_max*(9/5) + 32) %>%
+  mutate(tm_minF = tm_min *(9/5) + 32) %>%
+  mutate(ta_minF = ta_min*(9/5) + 32) %>%
+  mutate(tmF = (tm_maxF + tm_minF) / 2)
 
-  #dat_long_end$tmF <- (dat_long[[7]] + dat_long[[8]]) / 2 # Fahr Tmax and Tmin
-
-  # Subtitles
-  sub <-
-    paste(round(mean(dat_long_end[dat_long_end$interpolate == FALSE, ]$tmF), 1),
+# Subtitles
+sub <- paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
           "F        ",
           prettyNum(
             round(sum(
-              dat_long_end[dat_long_end$interpolate == FALSE, ]$p_mesIN
+              dat_long_endF[dat_long_endF$interpolate == FALSE, ]$p_mesIN
             )),
             big.mark = ","
           ),
           " in",
           sep = ""
     )
-  
-  # Vertical tags
-  maxtm <- prettyNum(round(max(dat_long_end$tm_max), 1))
-  mintm <- prettyNum(round(min(dat_long_end$tm_min), 1))
+
+# Vertical tags
+  maxtmF <- prettyNum(round(max(dat_long_endF$tm_maxF), 1))
+  mintmF <- prettyNum(round(min(dat_long_endF$tm_minF), 1))
   
   tags <- paste0(
     paste0(rep(" \n", 6), collapse = ""),
-    maxtm,
+    maxtmF,
     paste0(rep(" \n", 10), collapse = ""),
-    mintm
+    mintmF
   )
+
+#### START HERE ##########
+  # assigned wandlplot from original script - finish Fahrenheit plot using this code
+  # can probably delete Fahrenheit-specific function, but make sure nothing critical is in there
+  
+ wandlplot <- wandlplot +
+    geom_hline(yintercept = c(0, 50)) + # removed 'size' argument (CEMML/AK 09-14-23)
+    geom_segment(data = ticks, aes(
+      x = x,
+      xend = x,
+      y = ymin,
+      yend = ymax
+    )) +
+    scale_x_continuous(
+      breaks = month_breaks,
+      name = "",
+      labels = month_labs,
+      expand = c(0, 0)
+    ) +
+    scale_y_continuous(
+      "C",
+      limits = c(ymin, ymax),
+      labels = templabs,
+      breaks = range_tm,
+      sec.axis = dup_axis(
+        name = "mm",
+        labels = preclabs
+      )
+    )
+  
+  
+  # Add tags and theme
+  wandlplot <- wandlplot +
+    ggplot2::labs(
+      title = title,
+      subtitle = sub,
+      tag = tags
+    ) +
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      plot.title = element_text(
+        lineheight = 1,
+        size = 14,
+        face = "bold"
+      ),
+      plot.subtitle = element_text(
+        hjust = 1,
+        vjust = 1,
+        size = 14
+      ),
+      plot.tag = element_text(size = 10),
+      plot.tag.position = "left",
+      axis.ticks.length.x.bottom = unit(0, "pt"),
+      axis.line.x.bottom = element_blank(),
+      axis.title.y.left = element_text(
+        angle = 0,
+        vjust = 0.9,
+        size = 10,
+        colour = tcol,
+        margin = unit(rep(10, 4), "pt")
+      ),
+      axis.text.x.bottom = element_text(size = 10),
+      axis.text.y.left = element_text(colour = tcol, size = 10),
+      axis.title.y.right = element_text(
+        angle = 0,
+        vjust = 0.9,
+        size = 10,
+        colour = pcol,
+        margin = unit(rep(10, 4), "pt")
+      ),
+      axis.text.y.right = element_text(colour = pcol, size = 10)
+    )
+  
+  
+  return(wandlplot)
+}
+#source('./Code/Functions/WL_Fahrenheit.R')
+
+wlFplot <- ggclimat_walter_lieth(wlC, 
+                      est = "Malmstron AFB", 
+                      per = "1985 - 2014", 
+                      mlab = "en", 
+                      pcol = "blue", 
+                      tcol = "red", 
+                      pfcol = "lightblue", 
+                      sfcol = "steelblue")
+
+
+
+
+  
 
   # Helper for ticks - check if this is needed
   

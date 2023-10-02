@@ -334,7 +334,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   names(dat_long) <- c("p_mes", "tm_max", "tm_min", "ta_min")
   
   dat_long <- dplyr::bind_cols(label = mlab, dat_long)
-  assign("dat_long", dat_long, envir = .GlobalEnv)
+
 
   
   # Southern hemisphere
@@ -407,7 +407,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   dat_long_end <- tibble::as_tibble(dat_long_end)
   # Final tibble with normalized and helper values
   
-  
+  assign("dat_long_end", dat_long_end, envir = .GlobalEnv)
   
   # Labels and axis----
   
@@ -483,7 +483,7 @@ assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) # assigns variable to
   #######. ALTERED FOR CEMML  ##########
   # Annie Kellner 09-20-23 #
   
-  subF <- 
+
   # Vertical tags
   maxtm <- prettyNum(round(max(dat_long_end$tm_max), 1))
   mintm <- prettyNum(round(min(dat_long_end$tm_min), 1))
