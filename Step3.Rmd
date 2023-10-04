@@ -831,6 +831,20 @@ dat_long_endF <- dat_long_end %>%
   mutate(ta_minF = ta_min*(9/5) + 32) %>%
   mutate(tmF = (tm_maxF + tm_minF) / 2)
 
+## Vert. Axis range - temp ----
+  ymaxF <- 140
+  
+  # Min range
+  yminF <- min(dat_long_endF$tmF) # min Temp
+  range_tmF <- seq(25, ymax, 10)
+  
+  if (yminF < 25) {
+    yminF <- floor(yminF / 10) * 10 # min Temp rounded
+    # Labels
+    range_tmF <- seq(yminF, ymaxF, 10)
+  } 
+  
+
 # Subtitles
 sub <- paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
           "F        ",
@@ -854,13 +868,20 @@ sub <- paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF)
     paste0(rep(" \n", 10), collapse = ""),
     mintmF
   )
+  
+    
+  ticks <- data.frame(
+    x = seq(0, 12),
+    ymin = 25, # changed to reflect Fahrenheit values (originally ymin = -3, ymax = 0)
+    ymax = 32
+  )
 
 #### START HERE ##########
   # assigned wandlplot from original script - finish Fahrenheit plot using this code
   # can probably delete Fahrenheit-specific function, but make sure nothing critical is in there
   
- wandlplot <- wandlplot +
-    geom_hline(yintercept = c(0, 50)) + # removed 'size' argument (CEMML/AK 09-14-23)
+ wandlplotF <- wlCplot +
+    geom_hline(yintercept = c(0, 122)) + # removed 'size' argument and changed 50(C) to 122(F) 
     geom_segment(data = ticks, aes(
       x = x,
       xend = x,
@@ -874,19 +895,18 @@ sub <- paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF)
       expand = c(0, 0)
     ) +
     scale_y_continuous(
-      "C",
+      "F",
       limits = c(ymin, ymax),
-      labels = templabs,
-      breaks = range_tm,
+      labels = function(x) x* (9/5) + 32,
+      breaks = range_tmF,
       sec.axis = dup_axis(
-        name = "mm",
-        labels = preclabs
+        name = "in",
+        labels = round(preclabsCEMML, digits = 1)
       )
     )
-  
-  
+
   # Add tags and theme
-  wandlplot <- wandlplot +
+  wandlplotF <- wandlplotF +
     ggplot2::labs(
       title = title,
       subtitle = sub,
@@ -912,19 +932,19 @@ sub <- paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF)
         angle = 0,
         vjust = 0.9,
         size = 10,
-        colour = tcol,
+        colour = "red",
         margin = unit(rep(10, 4), "pt")
       ),
       axis.text.x.bottom = element_text(size = 10),
-      axis.text.y.left = element_text(colour = tcol, size = 10),
+      axis.text.y.left = element_text(colour = "red", size = 10),
       axis.title.y.right = element_text(
         angle = 0,
         vjust = 0.9,
         size = 10,
-        colour = pcol,
+        colour = "blue",
         margin = unit(rep(10, 4), "pt")
       ),
-      axis.text.y.right = element_text(colour = pcol, size = 10)
+      axis.text.y.right = element_text(colour = "blue", size = 10)
     )
   
   

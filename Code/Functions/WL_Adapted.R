@@ -415,6 +415,9 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   month_breaks <- dat_long_end[dat_long_end$label != "", ]$indrow
   month_labs <- dat_long_end[dat_long_end$label != "", ]$label
   
+  assign("month_breaks", month_breaks, envir = .GlobalEnv)
+  assign("month_labs", month_labs, envir = .GlobalEnv)
+  
   ## Vert. Axis range - temp ----
   ymax <- max(60, 10 * floor(max(dat_long_end$pm_reesc) / 10) + 10)
   
@@ -725,8 +728,7 @@ assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) # assigns variable to
   }
   
   assign("wandlplot", wandlplot, envir = .GlobalEnv) # Added by Annie Kellner 10-02-23
-  assign("month_breaks", month_breaks)
-  assign("month_labs", month_labs)
+ 
   
   
   # Add lines and scales to chart
