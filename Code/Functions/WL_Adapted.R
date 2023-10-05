@@ -407,7 +407,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   dat_long_end <- tibble::as_tibble(dat_long_end)
   # Final tibble with normalized and helper values
   
-  assign("dat_long_end", dat_long_end, envir = .GlobalEnv)
+  #assign("dat_long_end", dat_long_end, envir = .GlobalEnv)
   
   # Labels and axis----
   
