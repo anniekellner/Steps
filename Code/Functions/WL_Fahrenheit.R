@@ -457,7 +457,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
     preclabsCEMML[i] = preclabs2[i]/25.4
   }
   
-  
+
   ## Titles and additional labels----
   title <- est
   
@@ -740,8 +740,8 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
       expand = c(0, 0)
     ) +
     scale_y_continuous(
-      "F",
-      limits = c(ymin, ymax),
+      "°F",
+      limits = c(yminF, ymaxF),
       labels = function(x) x* (9/5) + 32,
       breaks = range_tmF,
       sec.axis = dup_axis(
