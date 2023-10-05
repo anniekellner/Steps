@@ -409,10 +409,16 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   dat_long_end <- tibble::as_tibble(dat_long_end)
   # Final tibble with normalized and helper values
   
-  ## Added for CEMML by Annie Kellner 09-29-23
-  ## assigns final dataframe to global environment so values can be converted to F
-  assign("dat_long_end", dat_long_end, envir = .GlobalEnv) 
+  ####  -----  Added for CEMML by Annie Kellner 10-05-23  ----------  #
+
+  #assign("dat_long_end", dat_long_end, envir = .GlobalEnv) 
   
+  dat_long_endF <- dat_long_end %>%
+    mutate(p_mesIN = p_mes/25.4) %>%
+    mutate(tm_maxF = tm_max*(9/5) + 32) %>%
+    mutate(tm_minF = tm_min *(9/5) + 32) %>%
+    mutate(ta_minF = ta_min*(9/5) + 32) %>%
+    mutate(tmF = (tm_maxF + tm_minF) / 2)
   
   # Labels and axis----
   
@@ -420,31 +426,28 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   month_breaks <- dat_long_end[dat_long_end$label != "", ]$indrow
   month_labs <- dat_long_end[dat_long_end$label != "", ]$label
   
-  
   ## Vert. Axis range - temp ----
-  ymax <- max(60, 10 * floor(max(dat_long_end$pm_reesc) / 10) + 10)
+  ymaxF <- 140
   
-  # Min range - Celsius
-  ymin <- min(-3, min(dat_long_end$tm)) # min Temp Celsius
-  range_tm <- seq(0, ymax, 10)
+  # Min range
+  yminF <- min(dat_long_endF$tmF) # min Temp
+  range_tmF <- seq(25, ymax, 10)
   
-  if (ymin < -3) {
-    ymin <- floor(ymin / 10) * 10 # min Temp rounded
+  if (yminF < 25) {
+    yminF <- floor(yminF / 10) * 10 # min Temp rounded
     # Labels
-    range_tm <- seq(ymin, ymax, 10)
-  }
+    range_tmF <- seq(yminF, ymaxF, 10)
+  } 
   
   # Labels
   templabs <- paste0(range_tm)
-  templabs[range_tm > 50] <- ""
+  templabs[range_tm > 120] <- ""
   
   # Vert. Axis range - prec
   range_prec <- range_tm * 2
   range_prec[range_tm > 50] <- range_tm[range_tm > 50] * 20 - 900
   preclabs <- paste0(range_prec)
   preclabs[range_tm < 0] <- ""
-  
-  ## ADAPTED FOR CEMML 09-14-23 ##
   
   preclabs2 <- as.numeric(preclabs)
   preclabs2 <- preclabs2[2:8]
@@ -454,9 +457,6 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
     preclabsCEMML[i] = preclabs2[i]/25.4
   }
   
-  assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) # assigns variable to global environment so can be accessed by .Rmd script
-  
-  ## END ADAPTATION ##
   
   ## Titles and additional labels----
   title <- est
@@ -472,41 +472,37 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
     title <- paste0(title, "\n", per)
   }
 
-  ## ADAPTED - commented out subtitles in order to use Fahrenheit values instead 09-29-23
-  #sub <-
-    #paste(round(mean(dat_long_end[dat_long_end$interpolate == FALSE, ]$tm), 1),
-          #"C        ",
-          #prettyNum(
-            #round(sum(
-              #dat_long_end[dat_long_end$interpolate == FALSE, ]$p_mes
-            #)),
-            #big.mark = ","
-          #),
-          #" mm",
-          #sep = ""
-    #)
+  # Subtitles
+  sub <- paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
+               "F        ",
+               prettyNum(
+                 round(sum(
+                   dat_long_endF[dat_long_endF$interpolate == FALSE, ]$p_mesIN
+                 )),
+                 big.mark = ","
+               ),
+               " in",
+               sep = ""
+  )
   
-
-    # Vertical tags
-  #maxtm <- prettyNum(round(max(dat_long_end$tm_maxF), 1))
-  #mintm <- prettyNum(round(min(dat_long_end$tm_minF), 1))
+  # Vertical tags 
   
-  #tags <- paste0(
-    #paste0(rep(" \n", 6), collapse = ""),
-    #maxtm,
-    #paste0(rep(" \n", 10), collapse = ""),
-    #mintm
-  #)
+  maxtmF <- prettyNum(round(max(dat_long_endF$tm_maxF), 1))
+  mintmF <- prettyNum(round(min(dat_long_endF$tm_minF), 1))
+  
+  tags <- paste0(
+    paste0(rep(" \n", 6), collapse = ""),
+    maxtmF,
+    paste0(rep(" \n", 10), collapse = ""),
+    mintmF
+  )
   
   # Helper for ticks
   
-  #ticks <- data.frame(
-    #x = seq(0, 12),
-    #ymin = -3,
-    #ymax = 0
-  #)
-  
-  
+  ticks <- data.frame(
+    x = seq(0, 12),
+    ymin = -3,
+    ymax = 0)
   
   
   # Lines and additional areas----
@@ -730,7 +726,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   
   # Add lines and scales to chart
   wandlplot <- wandlplot +
-    geom_hline(yintercept = c(0, 50)) + # removed 'size' argument (CEMML/AK 09-14-23)
+    geom_hline(yintercept = c(0, 122)) + # removed 'size' argument and changed 50(C) to 122(F) 
     geom_segment(data = ticks, aes(
       x = x,
       xend = x,
@@ -744,16 +740,17 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
       expand = c(0, 0)
     ) +
     scale_y_continuous(
-      "C",
+      "F",
       limits = c(ymin, ymax),
-      labels = templabs,
-      breaks = range_tm,
+      labels = function(x) x* (9/5) + 32,
+      breaks = range_tmF,
       sec.axis = dup_axis(
-        name = "mm",
-        labels = preclabs
+        name = "in",
+        labels = round(preclabsCEMML, digits = 1)
       )
     )
   
+  ###   -----   END CEMML ADAPTATION  ------------- #
   
   # Add tags and theme
   wandlplot <- wandlplot +
