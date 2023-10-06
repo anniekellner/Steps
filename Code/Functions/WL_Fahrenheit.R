@@ -216,6 +216,8 @@ climatogram_period <- function(station = NULL, start = 1990, end = 2020,
 }
 
 
+
+
 #' Walter and Lieth climatic diagram on `ggplot2`
 #'
 #' @description
@@ -338,11 +340,13 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   names(dat_long) <- c("p_mes", "tm_max", "tm_min", "ta_min")
   
   dat_long <- dplyr::bind_cols(label = mlab, dat_long)
+  
+  
 
   # Southern hemisphere
-  #if (shem) {
-    #dat_long <- rbind(dat_long[7:12, ], dat_long[1:6, ])
-  #}
+  if (shem) {
+    dat_long <- rbind(dat_long[7:12, ], dat_long[1:6, ])
+  }
   
   # Mean temp
   dat_long$tm <- (dat_long[[3]] + dat_long[[4]]) / 2 
@@ -427,11 +431,28 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   month_labs <- dat_long_end[dat_long_end$label != "", ]$label
   
   ## Vert. Axis range - temp ----
+  
+  ## Celsius - keeping because needed to create precip axis
+  ymax <- max(60, 10 * floor(max(dat_long_end$pm_reesc) / 10) + 10)
+  
+  # Min range
+  ymin <- min(-3, min(dat_long_end$tm)) # min Temp
+  range_tm <- seq(0, ymax, 10)
+  
+  if (ymin < -3) {
+    ymin <- floor(ymin / 10) * 10 # min Temp rounded
+    # Labels
+    range_tm <- seq(ymin, ymax, 10)
+  }
+  
+  ## END CELSIUS
+
   ymaxF <- 140
   
   # Min range
   yminF <- min(dat_long_endF$tmF) # min Temp
-  range_tmF <- seq(25, ymax, 10)
+  range_tm <- 
+  range_tmF <- seq(25, ymaxF, 10)
   
   if (yminF < 25) {
     yminF <- floor(yminF / 10) * 10 # min Temp rounded
@@ -440,8 +461,8 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   } 
   
   # Labels
-  templabs <- paste0(range_tm)
-  templabs[range_tm > 120] <- ""
+  templabs <- paste0(range_tmF)
+  #templabs[range_tmF > 122] <- ""
   
   # Vert. Axis range - prec
   range_prec <- range_tm * 2
@@ -743,7 +764,6 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
       "°F",
       limits = c(yminF, ymaxF),
       labels = function(x) x* (9/5) + 32,
-      breaks = range_tmF,
       sec.axis = dup_axis(
         name = "in",
         labels = round(preclabsCEMML, digits = 1)
