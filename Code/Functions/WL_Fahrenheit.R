@@ -762,7 +762,6 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
     ) +
     scale_y_continuous(
       "°F",
-      limits = c(yminF, ymaxF),
       labels = function(x) x* (9/5) + 32,
       sec.axis = dup_axis(
         name = "in",
