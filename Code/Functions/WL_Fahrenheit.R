@@ -38,7 +38,7 @@
 #'   package version 4.0.0, <https://climatol.eu>.
 #'
 #' @return A plot.
-#' #'
+#' 
 #' @examplesIf aemet_detect_api_key()
 #' climatogram_normal("9434")
 #' @export
@@ -340,15 +340,15 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   dat_long <- dplyr::bind_cols(label = mlab, dat_long)
 
   # Southern hemisphere
-  if (shem) {
-    dat_long <- rbind(dat_long[7:12, ], dat_long[1:6, ])
-  }
+  #if (shem) {
+    #dat_long <- rbind(dat_long[7:12, ], dat_long[1:6, ])
+  #}
   
   # Mean temp
   dat_long$tm <- (dat_long[[3]] + dat_long[[4]]) / 2 
   
   # Reescalate p_mes
-  dat_long$pm_reesc <- ifelse(dat_long$p_mes < 100, # could possibly change this here, but might be better to do later
+  dat_long$pm_reesc <- ifelse(dat_long$p_mes < 100, 
                               dat_long$p_mes * 0.5,
                               dat_long$p_mes * 0.05 + 45
   )
