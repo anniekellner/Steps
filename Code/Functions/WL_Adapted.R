@@ -298,6 +298,8 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
                                   sfcol = "#3C6FC4", shem = FALSE,
                                   p3line = FALSE,
                                   ...) {
+
+  
   ## Validate inputs----
   
   if (!all(dim(dat) == c(4, 12))) {
@@ -407,7 +409,20 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   dat_long_end <- tibble::as_tibble(dat_long_end)
   # Final tibble with normalized and helper values
   
-  #assign("dat_long_end", dat_long_end, envir = .GlobalEnv)
+  ## ADAPTED FOR CEMML ###
+  
+  # Add function inputs to global environment so can be retrieved for Fahrenheit plot
+  
+  assign("dat_long_end", dat_long_end, envir = .GlobalEnv)
+  assign("est", est, envir = .GlobalEnv)
+  assign("alt", alt, envir = .GlobalEnv)
+  assign("per", per, envir = .GlobalEnv)
+  assign("tcol", tcol, envir = .GlobalEnv)
+  assign("pcol", pcol, envir = .GlobalEnv)
+  assign("sfcol", sfcol, envir = .GlobalEnv)
+  assign("shem", shem, envir = .GlobalEnv)
+  assign("p3line", p3line, envir = .GlobalEnv)
+  
   
   # Labels and axis----
   
@@ -443,15 +458,15 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
 
   ## ADAPTED FOR CEMML 09-14-23 ##
   
-  #preclabs2 <- as.numeric(preclabs)
-  #preclabs2 <- preclabs2[2:8]
-  #preclabsCEMML <- as.numeric() 
+  preclabs2 <- as.numeric(preclabs)
+  preclabs2 <- preclabs2[2:8]
+  preclabsCEMML <- as.numeric() 
   
-  #for(i in 1:length(preclabs2)){
-    #preclabsCEMML[i] = preclabs2[i]/25.4
-  #}
+  for(i in 1:length(preclabs2)){
+    preclabsCEMML[i] = preclabs2[i]/25.4
+  }
 
-#assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) # assigns variable to global environment so can be accessed by .Rmd script
+assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) # assigns variable to global environment so can be accessed by .Rmd script
 
   ## END ADAPTATION ##
    
@@ -727,7 +742,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
       )
   }
   
-  #assign("wandlplot", wandlplot, envir = .GlobalEnv) # Added by Annie Kellner 10-02-23
+  assign("wandlplot", wandlplot, envir = .GlobalEnv) # Added by Annie Kellner 10-02-23
  
   
   

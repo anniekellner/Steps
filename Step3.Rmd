@@ -822,66 +822,19 @@ wlCplot <- ggclimat_walter_lieth(wlC,
 
 # ----------   Fahrenheit Plot  --------------  #
 
-# Add Fahrenheit values to final dataframe created by WL_Adapted script
+#source('./Code/Functions/WL_Fahrenheit.R')
 
-dat_long_endF <- dat_long_end %>%
-  mutate(p_mesIN = p_mes/25.4) %>%
-  mutate(tm_maxF = tm_max*(9/5) + 32) %>%
-  mutate(tm_minF = tm_min *(9/5) + 32) %>%
-  mutate(ta_minF = ta_min*(9/5) + 32) %>%
-  mutate(tmF = (tm_maxF + tm_minF) / 2)
-
-## Vert. Axis range - temp ----
-  ymaxF <- 140
+# Helper for ticks
   
-  # Min range
-  yminF <- min(dat_long_endF$tmF) # min Temp
-  range_tmF <- seq(25, ymax, 10)
-  
-  if (yminF < 25) {
-    yminF <- floor(yminF / 10) * 10 # min Temp rounded
-    # Labels
-    range_tmF <- seq(yminF, ymaxF, 10)
-  } 
-  
-
-# Subtitles
-sub <- paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
-          "F        ",
-          prettyNum(
-            round(sum(
-              dat_long_endF[dat_long_endF$interpolate == FALSE, ]$p_mesIN
-            )),
-            big.mark = ","
-          ),
-          " in",
-          sep = ""
-    )
-
-# Vertical tags
-  maxtmF <- prettyNum(round(max(dat_long_endF$tm_maxF), 1))
-  mintmF <- prettyNum(round(min(dat_long_endF$tm_minF), 1))
-  
-  tags <- paste0(
-    paste0(rep(" \n", 6), collapse = ""),
-    maxtmF,
-    paste0(rep(" \n", 10), collapse = ""),
-    mintmF
-  )
-  
-    
-  ticks <- data.frame(
+ticks <- data.frame(
     x = seq(0, 12),
-    ymin = 25, # changed to reflect Fahrenheit values (originally ymin = -3, ymax = 0)
-    ymax = 32
+    ymin = -3,
+    ymax = 0
   )
 
-#### START HERE ##########
-  # assigned wandlplot from original script - finish Fahrenheit plot using this code
-  # can probably delete Fahrenheit-specific function, but make sure nothing critical is in there
-  
- wandlplotF <- wlCplot +
-    geom_hline(yintercept = c(0, 122)) + # removed 'size' argument and changed 50(C) to 122(F) 
+
+wlFplot <- wandlplot + 
+    geom_hline(yintercept = c(0, 50)) + # removed 'size' argument (CEMML/AK 09-14-23)
     geom_segment(data = ticks, aes(
       x = x,
       xend = x,
@@ -895,18 +848,65 @@ sub <- paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF)
       expand = c(0, 0)
     ) +
     scale_y_continuous(
-      "F",
-      limits = c(ymin, ymax),
-      labels = function(x) x* (9/5) + 32,
-      breaks = range_tmF,
-      sec.axis = dup_axis(
-        name = "in",
-        labels = round(preclabsCEMML, digits = 1)
-      )
-    )
+    "°F",
+    labels = function(x) x* (9/5) + 32,
+    sec.axis = dup_axis(name = "in",
+                        labels = round(preclabsCEMML, digits = 1)))
+  
 
+# Create Fahrenheit dataframe for plot tags
+
+dat_long_endF <- dat_long_end %>%
+    mutate(p_mesIN = p_mes/25.4) %>%
+    mutate(tm_maxF = tm_max*(9/5) + 32) %>%
+    mutate(tm_minF = tm_min *(9/5) + 32) %>%
+    mutate(ta_minF = ta_min*(9/5) + 32) %>%
+    mutate(tmF = (tm_maxF + tm_minF) / 2)
+
+## Titles and additional labels----
+  title <- est
+  
+  if (!is.na(alt)) {
+    title <- paste0(
+      title, " (",
+      prettyNum(alt, big.mark = ",", decimal.mark = "."), " m)"
+    )
+  }
+  
+  if (!is.na(per)) {
+    title <- paste0(title, "\n", per)
+  }
+
+  # Subtitles
+  sub <- paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
+               "F        ",
+               prettyNum(
+                 round(sum(
+                   dat_long_endF[dat_long_endF$interpolate == FALSE, ]$p_mesIN
+                 )),
+                 big.mark = ","
+               ),
+               " in",
+               sep = ""
+  )
+  
+  # Vertical tags 
+  
+  maxtmF <- prettyNum(round(max(dat_long_endF$tm_maxF), 1))
+  mintmF <- prettyNum(round(min(dat_long_endF$tm_minF), 1))
+  
+  tags <- paste0(
+    paste0(rep(" \n", 6), collapse = ""),
+    maxtmF,
+    paste0(rep(" \n", 10), collapse = ""),
+    mintmF
+  )
+
+  
+  
+  
   # Add tags and theme
-  wandlplotF <- wandlplotF +
+wlFplot <- wlFplot +
     ggplot2::labs(
       title = title,
       subtitle = sub,
@@ -932,65 +932,22 @@ sub <- paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF)
         angle = 0,
         vjust = 0.9,
         size = 10,
-        colour = "red",
+        colour = tcol,
         margin = unit(rep(10, 4), "pt")
       ),
       axis.text.x.bottom = element_text(size = 10),
-      axis.text.y.left = element_text(colour = "red", size = 10),
+      axis.text.y.left = element_text(colour = tcol, size = 10),
       axis.title.y.right = element_text(
         angle = 0,
         vjust = 0.9,
         size = 10,
-        colour = "blue",
+        colour = pcol,
         margin = unit(rep(10, 4), "pt")
       ),
-      axis.text.y.right = element_text(colour = "blue", size = 10)
+      axis.text.y.right = element_text(colour = pcol, size = 10)
     )
-  
-  
-  return(wandlplot)
-}
-#source('./Code/Functions/WL_Fahrenheit.R')
 
-wlFplot <- ggclimat_walter_lieth(wlC, 
-                      est = "Malmstron AFB", 
-                      per = "1985 - 2014", 
-                      mlab = "en", 
-                      pcol = "blue", 
-                      tcol = "red", 
-                      pfcol = "lightblue", 
-                      sfcol = "steelblue")
-
-
-
-
-  
-
-  # Helper for ticks - check if this is needed
-  
-  ticks <- data.frame(
-    x = seq(0, 12),
-    ymin = -3,
-    ymax = 0
-  )
-  
-wlCplot + scale_y_continuous(
-  "°F",
-  labels = function(x) x* (9/5) + 32,
-  sec.axis = dup_axis(name = "in",
-                      labels = round(preclabsCEMML, digits = 1)))
-
-  wandlplot <- wandlplot +
-    ggplot2::labs(
-      title = title,
-      subtitle = sub,
-      tag = tags
-    )
-  
-
-
-  
-
+wlFplot  
 
 ```
 

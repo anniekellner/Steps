@@ -415,7 +415,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   
   ####  -----  Added for CEMML by Annie Kellner 10-05-23  ----------  #
 
-  #assign("dat_long_end", dat_long_end, envir = .GlobalEnv) 
+  assign("dat_long_end", dat_long_end, envir = .GlobalEnv) 
   
   dat_long_endF <- dat_long_end %>%
     mutate(p_mesIN = p_mes/25.4) %>%
@@ -429,6 +429,9 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   ## Horizontal axis ----
   month_breaks <- dat_long_end[dat_long_end$label != "", ]$indrow
   month_labs <- dat_long_end[dat_long_end$label != "", ]$label
+  
+  assign("month_breaks", month_breaks, envir = .GlobalEnv)
+  assign("month_labs", month_labs, envir = .GlobalEnv)
   
   ## Vert. Axis range - temp ----
   
@@ -447,22 +450,22 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   
   ## END CELSIUS
 
-  ymaxF <- 140
+  #ymaxF <- 140
   
   # Min range
-  yminF <- min(dat_long_endF$tmF) # min Temp
-  range_tm <- 
-  range_tmF <- seq(25, ymaxF, 10)
+  #yminF <- min(dat_long_endF$tmF) # min Temp
+  #range_tm <- seq(0, ymax, 10)
+  #range_tmF <- seq(25, ymaxF, 10)
   
-  if (yminF < 25) {
-    yminF <- floor(yminF / 10) * 10 # min Temp rounded
+  #if (yminF < 25) {
+    #yminF <- floor(yminF / 10) * 10 # min Temp rounded
     # Labels
-    range_tmF <- seq(yminF, ymaxF, 10)
-  } 
+    #range_tmF <- seq(yminF, ymaxF, 10)
+  #} 
   
   # Labels
-  templabs <- paste0(range_tmF)
-  #templabs[range_tmF > 122] <- ""
+  templabs <- paste0(range_tm)
+  templabs[range_tm > 50] <- ""
   
   # Vert. Axis range - prec
   range_prec <- range_tm * 2
@@ -747,7 +750,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   
   # Add lines and scales to chart
   wandlplot <- wandlplot +
-    geom_hline(yintercept = c(0, 122)) + # removed 'size' argument and changed 50(C) to 122(F) 
+    #geom_hline(yintercept = c(0, 50)) + # Move to last line or different section
     geom_segment(data = ticks, aes(
       x = x,
       xend = x,
