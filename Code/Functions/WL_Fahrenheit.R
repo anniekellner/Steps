@@ -430,9 +430,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   month_breaks <- dat_long_end[dat_long_end$label != "", ]$indrow
   month_labs <- dat_long_end[dat_long_end$label != "", ]$label
   
-  assign("month_breaks", month_breaks, envir = .GlobalEnv)
-  assign("month_labs", month_labs, envir = .GlobalEnv)
-  
+
   ## Vert. Axis range - temp ----
   
   ## Celsius - keeping because needed to create precip axis
