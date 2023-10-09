@@ -34,7 +34,6 @@ library(tmap)
 library(tmaptools)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
-library(fs) # for cross-platform names
 library(conflicted)
 
 conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
@@ -70,7 +69,7 @@ source('./Code/Stars_HowTo/shift_longitude.R')
 ### PART ONE: User settings - choose AFB, AFB manager, model, scenarios, years of interest  ###
 ###############################################################################################
 
-First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Name` and/or `models` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
+First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Names` and/or `models` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
 
 
 In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest.* 
