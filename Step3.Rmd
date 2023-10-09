@@ -34,6 +34,7 @@ library(tmap)
 library(tmaptools)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
+library(fs) # for cross-platform names
 library(conflicted)
 
 conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
@@ -112,6 +113,7 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 # Directories
 
 model_dir <- paste('/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Data/', model, sep = "") # Mac location
+
  # See if this works:
 
 # model_dir <- paste0('\\RStor\\mindyc\\afccm\\Climate Modeling\\Data',"/",model, sep = "") # nope
@@ -799,7 +801,14 @@ This section creates WL Diagrams for both F and C and places the results in the 
 
 source('./Code/Functions/WL_Adapted.R') # Adapted from https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R by Annie Kellner 09-14-23 
 
-wlC <- monthSum[[1]] %>%
+wl_dir <- paste0(results_folder,"Plots/","Walter-Lieth")
+
+if (!dir.exists(wl_dir)){
+  dir.create(wl_dir)}
+
+for(i in 1:length(monthSum)){
+
+wlC = monthSum[[i]] %>%
   mutate(Avg_TMaxC = RasterUnitConvert(Avg_TMaxF, "FtoC")) %>%
   mutate(Avg_TMinC = RasterUnitConvert(Avg_TMinF, "FtoC")) %>%
   mutate(Abs_TminC = RasterUnitConvert(Abs_TminF, "FtoC")) %>%
@@ -810,7 +819,7 @@ wlC <- data.table::transpose(wlC)
 
 # ----------  Celsius plot  ----------------- #
 
-wlCplot <- ggclimat_walter_lieth(wlC, 
+wlCplot = ggclimat_walter_lieth(wlC, 
                       est = "Malmstron AFB", 
                       per = "1985 - 2014", 
                       mlab = "en", 
@@ -818,6 +827,22 @@ wlCplot <- ggclimat_walter_lieth(wlC,
                       tcol = "red", 
                       pfcol = "lightblue", 
                       sfcol = "steelblue")
+
+# Save plot in results_folder/Plots/Walter-Lieth 
+
+
+wl_scenario = if (str_detect(names(monthSum[i]), "baseline")){
+    "historical"
+  } else if(str_detect(names(monthSum[i]),"s1")) {
+    scenarios[2]
+  } else {
+    scenarios[3]
+  }
+
+filename = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,".png")
+filepath = paste(wl_dir,filename, sep = "/")
+
+ggsave()
 
 
 # ----------   Fahrenheit Plot  --------------  #
