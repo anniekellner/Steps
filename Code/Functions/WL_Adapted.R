@@ -298,6 +298,8 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
                                   sfcol = "#3C6FC4", shem = FALSE,
                                   p3line = FALSE,
                                   ...) {
+
+  
   ## Validate inputs----
   
   if (!all(dim(dat) == c(4, 12))) {
@@ -334,7 +336,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   names(dat_long) <- c("p_mes", "tm_max", "tm_min", "ta_min")
   
   dat_long <- dplyr::bind_cols(label = mlab, dat_long)
-  assign("dat_long", dat_long, envir = .GlobalEnv)
+
 
   
   # Southern hemisphere
@@ -407,6 +409,19 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   dat_long_end <- tibble::as_tibble(dat_long_end)
   # Final tibble with normalized and helper values
   
+  ## ADAPTED FOR CEMML ###
+  
+  # Add function inputs to global environment so can be retrieved for Fahrenheit plot
+  
+  assign("dat_long_end", dat_long_end, envir = .GlobalEnv)
+  assign("est", est, envir = .GlobalEnv)
+  assign("alt", alt, envir = .GlobalEnv)
+  assign("per", per, envir = .GlobalEnv)
+  assign("tcol", tcol, envir = .GlobalEnv)
+  assign("pcol", pcol, envir = .GlobalEnv)
+  assign("sfcol", sfcol, envir = .GlobalEnv)
+  assign("shem", shem, envir = .GlobalEnv)
+  assign("p3line", p3line, envir = .GlobalEnv)
   
   
   # Labels and axis----
@@ -414,6 +429,9 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   ## Horizontal axis ----
   month_breaks <- dat_long_end[dat_long_end$label != "", ]$indrow
   month_labs <- dat_long_end[dat_long_end$label != "", ]$label
+  
+  #assign("month_breaks", month_breaks, envir = .GlobalEnv)
+  #assign("month_labs", month_labs, envir = .GlobalEnv)
   
   ## Vert. Axis range - temp ----
   ymax <- max(60, 10 * floor(max(dat_long_end$pm_reesc) / 10) + 10)
@@ -483,7 +501,7 @@ assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) # assigns variable to
   #######. ALTERED FOR CEMML  ##########
   # Annie Kellner 09-20-23 #
   
-  subF <- 
+
   # Vertical tags
   maxtm <- prettyNum(round(max(dat_long_end$tm_max), 1))
   mintm <- prettyNum(round(min(dat_long_end$tm_min), 1))
@@ -723,6 +741,9 @@ assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) # assigns variable to
         colour = "black"
       )
   }
+  
+  assign("wandlplot", wandlplot, envir = .GlobalEnv) # Added by Annie Kellner 10-02-23
+ 
   
   
   # Add lines and scales to chart

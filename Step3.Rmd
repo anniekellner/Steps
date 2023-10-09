@@ -34,6 +34,7 @@ library(tmap)
 library(tmaptools)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
+library(fs) # for cross-platform names
 library(conflicted)
 
 conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
@@ -69,6 +70,23 @@ source('./Code/Stars_HowTo/shift_longitude.R')
 ### PART ONE: User settings - choose AFB, AFB manager, model, scenarios, years of interest  ###
 ###############################################################################################
 
+First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Name` and/or `models` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
+
+
+In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest.* 
+
+```{r enter-afb-and-model}
+
+AFB_Name <- AFB_Names[16] 
+
+model <- models[5] 
+
+cat(paste("The model you have selected is", model, "and the AFB is", AFB_Name))
+
+```
+
+We use the next chunk to set the path to the correct directory for the installation boundary (shapefile).
+
 *If the AFB is managed by the Navy, set Navy = TRUE*
 *If the AFB is managed by the Air Force, set Navy = FALSE*
 
@@ -84,20 +102,7 @@ dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile 
 
 ```
 
-First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Name` and/or `models` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
 
-
-In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest.* 
-
-```{r enter-afb-and-model}
-
-AFB_Name <- AFB_Name[16] 
-
-model <- models[5] 
-
-cat(paste("The model you have selected is", model, "and the AFB is", AFB_Name))
-
-```
 
 Then let's see what scenarios and variables are available for that model.
 
@@ -108,6 +113,7 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 # Directories
 
 model_dir <- paste('/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Data/', model, sep = "") # Mac location
+
  # See if this works:
 
 # model_dir <- paste0('\\RStor\\mindyc\\afccm\\Climate Modeling\\Data',"/",model, sep = "") # nope
@@ -361,8 +367,8 @@ INTERPRETING THE OUTPUT ABOVE: If the output of the following code chunk says 'n
 
 *If you want to override the automatic choice, manually highlight and run either of the options below:* (if you enter it into the code chunk it will remain there and you risk overriding future choices you may not want to, so just do it here in the main text.) Do not include the **; I inserted those to change the color of the text to highlight what is code vs. text for readability.
 
-**extract_obj <- cell** to use the centroid  -OR-
-**extract_obj <- afb** to use the entire shapefile
+`extract_obj <- cell` to use the centroid  -OR-
+`extract_obj <- afb` to use the entire shapefile
 
 
 ## DATA EXTRACTION
@@ -795,8 +801,14 @@ This section creates WL Diagrams for both F and C and places the results in the 
 
 source('./Code/Functions/WL_Adapted.R') # Adapted from https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R by Annie Kellner 09-14-23 
 
+wl_dir <- paste0(results_folder,"Plots/","Walter-Lieth")
 
-wlC <- monthSum[[1]] %>%
+if (!dir.exists(wl_dir)){
+  dir.create(wl_dir)}
+
+for(i in 1:length(monthSum)){
+
+wlC = monthSum[[i]] %>%
   mutate(Avg_TMaxC = RasterUnitConvert(Avg_TMaxF, "FtoC")) %>%
   mutate(Avg_TMinC = RasterUnitConvert(Avg_TMinF, "FtoC")) %>%
   mutate(Abs_TminC = RasterUnitConvert(Abs_TminF, "FtoC")) %>%
@@ -805,9 +817,9 @@ wlC <- monthSum[[1]] %>%
 wlC <- wlC[1:12,]
 wlC <- data.table::transpose(wlC)
 
-# Celsius plot
+# ----------  Celsius plot  ----------------- #
 
-wlCplot <- ggclimat_walter_lieth(wlC, 
+wlCplot = ggclimat_walter_lieth(wlC, 
                       est = "Malmstron AFB", 
                       per = "1985 - 2014", 
                       mlab = "en", 
@@ -816,48 +828,151 @@ wlCplot <- ggclimat_walter_lieth(wlC,
                       pfcol = "lightblue", 
                       sfcol = "steelblue")
 
+# Save plot in results_folder/Plots/Walter-Lieth 
 
-# Fahrenheit Plot
 
-wlCplot + scale_y_continuous(
-  "°F",
-  labels = function(x) x* (9/5) + 32,
-  sec.axis = dup_axis(name = "in",
-                      labels = round(preclabsCEMML, digits = 1)))
+wl_scenario = if (str_detect(names(monthSum[i]), "baseline")){
+    "historical"
+  } else if(str_detect(names(monthSum[i]),"s1")) {
+    scenarios[2]
+  } else {
+    scenarios[3]
+  }
 
-  wandlplot <- wandlplot +
+filename = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,".png")
+filepath = paste(wl_dir,filename, sep = "/")
+
+ggsave()
+
+
+# ----------   Fahrenheit Plot  --------------  #
+
+#source('./Code/Functions/WL_Fahrenheit.R')
+
+# Helper for ticks
+  
+ticks <- data.frame(
+    x = seq(0, 12),
+    ymin = -3,
+    ymax = 0
+  )
+
+
+wlFplot <- wandlplot + 
+    geom_hline(yintercept = c(0, 50)) + # removed 'size' argument (CEMML/AK 09-14-23)
+    geom_segment(data = ticks, aes(
+      x = x,
+      xend = x,
+      y = ymin,
+      yend = ymax
+    )) +
+    scale_x_continuous(
+      breaks = month_breaks,
+      name = "",
+      labels = month_labs,
+      expand = c(0, 0)
+    ) +
+    scale_y_continuous(
+    "°F",
+    labels = function(x) x* (9/5) + 32,
+    sec.axis = dup_axis(name = "in",
+                        labels = round(preclabsCEMML, digits = 1)))
+  
+
+# Create Fahrenheit dataframe for plot tags
+
+dat_long_endF <- dat_long_end %>%
+    mutate(p_mesIN = p_mes/25.4) %>%
+    mutate(tm_maxF = tm_max*(9/5) + 32) %>%
+    mutate(tm_minF = tm_min *(9/5) + 32) %>%
+    mutate(ta_minF = ta_min*(9/5) + 32) %>%
+    mutate(tmF = (tm_maxF + tm_minF) / 2)
+
+## Titles and additional labels----
+  title <- est
+  
+  if (!is.na(alt)) {
+    title <- paste0(
+      title, " (",
+      prettyNum(alt, big.mark = ",", decimal.mark = "."), " m)"
+    )
+  }
+  
+  if (!is.na(per)) {
+    title <- paste0(title, "\n", per)
+  }
+
+  # Subtitles
+  sub <- paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
+               "F        ",
+               prettyNum(
+                 round(sum(
+                   dat_long_endF[dat_long_endF$interpolate == FALSE, ]$p_mesIN
+                 )),
+                 big.mark = ","
+               ),
+               " in",
+               sep = ""
+  )
+  
+  # Vertical tags 
+  
+  maxtmF <- prettyNum(round(max(dat_long_endF$tm_maxF), 1))
+  mintmF <- prettyNum(round(min(dat_long_endF$tm_minF), 1))
+  
+  tags <- paste0(
+    paste0(rep(" \n", 6), collapse = ""),
+    maxtmF,
+    paste0(rep(" \n", 10), collapse = ""),
+    mintmF
+  )
+
+  
+  
+  
+  # Add tags and theme
+wlFplot <- wlFplot +
     ggplot2::labs(
       title = title,
       subtitle = sub,
       tag = tags
+    ) +
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      plot.title = element_text(
+        lineheight = 1,
+        size = 14,
+        face = "bold"
+      ),
+      plot.subtitle = element_text(
+        hjust = 1,
+        vjust = 1,
+        size = 14
+      ),
+      plot.tag = element_text(size = 10),
+      plot.tag.position = "left",
+      axis.ticks.length.x.bottom = unit(0, "pt"),
+      axis.line.x.bottom = element_blank(),
+      axis.title.y.left = element_text(
+        angle = 0,
+        vjust = 0.9,
+        size = 10,
+        colour = tcol,
+        margin = unit(rep(10, 4), "pt")
+      ),
+      axis.text.x.bottom = element_text(size = 10),
+      axis.text.y.left = element_text(colour = tcol, size = 10),
+      axis.title.y.right = element_text(
+        angle = 0,
+        vjust = 0.9,
+        size = 10,
+        colour = pcol,
+        margin = unit(rep(10, 4), "pt")
+      ),
+      axis.text.y.right = element_text(colour = pcol, size = 10)
     )
-  
-  # Subtitles
-  sub <-
-    paste(round(mean(dat_long_end[dat_long_end$interpolate == FALSE, ]$tm), 1),
-          "C        ",
-          prettyNum(
-            round(sum(
-              dat_long_end[dat_long_end$interpolate == FALSE, ]$p_mes
-            )),
-            big.mark = ","
-          ),
-          " mm",
-          sep = ""
-    )
-  
-  # Vertical tags
-  maxtm <- prettyNum(round(max(dat_long_end$tm_max), 1))
-  mintm <- prettyNum(round(min(dat_long_end$tm_min), 1))
-  
-  tags <- paste0(
-    paste0(rep(" \n", 6), collapse = ""),
-    maxtm,
-    paste0(rep(" \n", 10), collapse = ""),
-    mintm
-  )
-  
 
+wlFplot  
 
 ```
 
