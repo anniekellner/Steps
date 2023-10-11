@@ -906,11 +906,11 @@ for(k in 1:length(templabs2)){
 
 # In the event the temp and precip vectors are not of equal size, add values
 
-if (length(preclabsF) > length(templabsF)){
-  append(14, templabsF) -> templabsF
-#}
+if (length(preclabsF) > length(range_tm)){
+  append(-10, range_tm) -> range_tm
+}
 
-if(length(templabsF) > length(preclabsF)){
+if(length(range_tm) > length(preclabsF)){
   append(preclabsF, 15.7) -> preclabsF
 }
 
@@ -928,7 +928,7 @@ wlFplot = wandlplot +
       name = "",
       labels = month_labs,
       expand = c(0, 0)
-    ) +
+      ) +
     scale_y_continuous(
     "°F",
     #limits = c(yminF, ymaxF),
