@@ -430,8 +430,8 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   month_breaks <- dat_long_end[dat_long_end$label != "", ]$indrow
   month_labs <- dat_long_end[dat_long_end$label != "", ]$label
   
-  #assign("month_breaks", month_breaks, envir = .GlobalEnv)
-  #assign("month_labs", month_labs, envir = .GlobalEnv)
+  assign("month_breaks", month_breaks, envir = .GlobalEnv)
+  assign("month_labs", month_labs, envir = .GlobalEnv)
   
   ## Vert. Axis range - temp ----
   ymax <- max(60, 10 * floor(max(dat_long_end$pm_reesc) / 10) + 10)
@@ -446,27 +446,24 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
     range_tm <- seq(ymin, ymax, 10)
   }
   
+  assign("range_tm", range_tm, envir = .GlobalEnv)
+  
   # Labels
   templabs <- paste0(range_tm)
   templabs[range_tm > 50] <- ""
+  
+  assign("templabs", templabs, envir = .GlobalEnv)
   
   # Vert. Axis range - prec
   range_prec <- range_tm * 2
   range_prec[range_tm > 50] <- range_tm[range_tm > 50] * 20 - 900
   preclabs <- paste0(range_prec)
   preclabs[range_tm < 0] <- ""
+  
+  assign("preclabs", preclabs, envir = .GlobalEnv)
 
   ## ADAPTED FOR CEMML 09-14-23 ##
   
-  preclabs2 <- as.numeric(preclabs)
-  preclabs2 <- preclabs2[2:8]
-  preclabsCEMML <- as.numeric() 
-  
-  for(i in 1:length(preclabs2)){
-    preclabsCEMML[i] = preclabs2[i]/25.4
-  }
-
-assign("preclabsCEMML", preclabsCEMML, envir = .GlobalEnv) # assigns variable to global environment so can be accessed by .Rmd script
 
   ## END ADAPTATION ##
    
