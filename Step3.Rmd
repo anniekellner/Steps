@@ -836,7 +836,7 @@ wl_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 
 filenameC = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_Celsius.png")
 
-ggsave(filenameC, path = wl_dir, width = 4.5, height = 6.5, units = "in", dpi = 300)
+ggsave(filenameC, plot = wlCplot, device = png, path = wl_dir, width = 4.5, height = 6.5, units = "in", dpi = 300)
 
 
 # ----------   Fahrenheit Plot  --------------  #
@@ -1039,7 +1039,7 @@ wlFplot = wlFplot +
 
 filenameF = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_Fahrenheit.png")
 
-ggsave(filenameF, path = wl_dir, width = 4.5, height = 6.5, units = "in", dpi = 300)
+ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 4.5, height = 6.5, units = "in", dpi = 300)
 
 }
 
