@@ -111,19 +111,7 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 
 # Directories
 
-model_dir <- paste('/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Data/', model, sep = "") # Mac location
-
- # See if this works:
-
-# model_dir <- paste0('\\RStor\\mindyc\\afccm\\Climate Modeling\\Data',"/",model, sep = "") # nope
-
-####### Attempting to use a UNC address for cross-platform compatibility. So far not working. 
-# model_dir <- paste('smb:\\acns.colostate.edu\\wcnr-network\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\', model, sep = "")
-# model_dir <- '//mindyc/afccm/Climate Modeling/Data/'
-
-
-# Uniform naming convention (UNC) for cross-platform compatibility
-# model_dir <- file.path(model_dir) # can possibly ensure that directory is a filepath on all OS's
+model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "") 
 
 scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
 
@@ -638,7 +626,8 @@ rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
                         "scenarios",
                         "years",
                         "results_folder",
-                        "AllDays")))
+                        "AllDays",
+                        "plots_dir")))
 
 ```
 
@@ -800,7 +789,7 @@ This section creates WL Diagrams for both F and C and places the results in the 
 
 source('./Code/Functions/WL_Adapted.R') # Adapted from https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R by Annie Kellner 09-14-23 
 
-wl_dir <- paste0(results_folder,"Plots/","Walter-Lieth")
+wl_dir <- paste(plots_dir,"Walter-Lieth", sep = "/")
 
 if (!dir.exists(wl_dir)){
   dir.create(wl_dir)}
@@ -813,19 +802,26 @@ wlC = monthSum[[i]] %>%
   mutate(Abs_TminC = RasterUnitConvert(Abs_TminF, "FtoC")) %>%
   select(Avg_PPT_mm, Avg_TMaxC, Avg_TMinC, Abs_TminC) 
 
-wlC <- wlC[1:12,]
-wlC <- data.table::transpose(wlC)
+wlC = wlC[1:12,]
+wlC = data.table::transpose(wlC)
 
 # ----------  Celsius plot  ----------------- #
 
+per = case_when( # per is 'period' and is an argument in the ggclimat_walter_lieth() function
+  i == 1 ~ as.character(paste(years[1], years[2], sep = " - ")),
+  i == 2 ~ as.character(paste(years[3], years[4], sep = " - ")),
+  i == 3 ~ as.character(paste(years[5], years[6], sep = " - ")),
+  i == 4 ~ as.character(paste(years[3], years[4], sep = " - ")),
+  i == 5 ~ as.character(paste(years[5], years[6], sep = " - ")))
+
 wlCplot = ggclimat_walter_lieth(wlC, 
                       est = "Malmstron AFB", 
-                      per = "1985 - 2014", 
-                      mlab = "en", 
-                      pcol = "blue", 
-                      tcol = "red", 
-                      pfcol = "lightblue", 
-                      sfcol = "steelblue")
+                      per = per,
+                      mlab = "en", # English language 
+                      pcol = "blue", # precip color
+                      tcol = "red", # temp color
+                      pfcol = "lightblue", # probable freeze
+                      sfcol = "steelblue") # certain freeze
 
 # Save plot in results_folder/Plots/Walter-Lieth 
 
@@ -838,26 +834,88 @@ wl_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     scenarios[3]
   }
 
-filename = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,".png")
-filepath = paste(wl_dir,filename, sep = "/")
+filenameC = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_Celsius.png")
 
-ggsave()
+ggsave(filenameC, plot = wlCplot, device = png, path = wl_dir, width = 4.5, height = 6.5, units = "in", dpi = 300)
 
 
 # ----------   Fahrenheit Plot  --------------  #
 
-#source('./Code/Functions/WL_Fahrenheit.R')
+# Create Fahrenheit dataframe 
+
+dat_long_endF <- dat_long_end %>%
+    mutate(p_mesIN = p_mes/25.4) %>%
+    mutate(tm_maxF = tm_max*(9/5) + 32) %>%
+    mutate(tm_minF = tm_min *(9/5) + 32) %>%
+    mutate(ta_minF = ta_min*(9/5) + 32) %>%
+    mutate(tmF = (tm_maxF + tm_minF) / 2)
+
+  ## Vert. Axis range - temp ----
+  #ymax <- max(60, 10 * floor(max(dat_long_end$pm_reesc) / 10) + 10)
+  ymaxF <- 140
+  
+  # Min range
+  #ymin <- min(-3, min(dat_long_end$tm)) # min Temp
+  yminF <- min(dat_long_endF$tmF)
+  
+  #range_tm <- seq(0, ymax, 10)
+  range_tmF <- seq(32, ymaxF, 18)
+  
+  if (yminF < 26.6) {
+    yminF <- floor(yminF / 10) * 10 # min Temp rounded
+    # Labels
+    range_tmF <- seq(yminF, ymaxF, 18)
+  }
+
+  #Celsius
+  
+    #if (ymin < -3) {
+    #ymin <- floor(ymin / 10) * 10 # min Temp rounded
+    # Labels
+    #range_tm <- seq(ymin, ymax, 10)
+  #}
 
 # Helper for ticks
   
-ticks <- data.frame(
+ticks = data.frame(
     x = seq(0, 12),
     ymin = -3,
     ymax = 0
   )
 
+# Precip labels
 
-wlFplot <- wandlplot + 
+preclabs2 <- as.numeric(as.character(preclabs))
+preclabs2 <- na.omit(preclabs2)
+preclabsF <- as.numeric() 
+  
+  for(j in 1:length(preclabs2)){
+    preclabsF[j] = preclabs2[j]/25.4
+  }
+
+# Temp labels
+
+templabsF <- as.numeric()
+
+templabs2 <- as.numeric(templabs)
+templabs2 <- na.omit(templabs2)
+
+for(k in 1:length(templabs2)){
+  templabsF[k] = templabs2[k]*(9/5) + 32 
+}
+
+# In the event the temp and precip vectors are not of equal size, add values
+
+if (length(preclabsF) > length(range_tm)){
+  append(-10, range_tm) -> range_tm
+}
+
+if(length(range_tm) > length(preclabsF)){
+  append(preclabsF, 15.7) -> preclabsF
+}
+
+  
+wlFplot = wandlplot + 
     geom_hline(yintercept = c(0, 50)) + # removed 'size' argument (CEMML/AK 09-14-23)
     geom_segment(data = ticks, aes(
       x = x,
@@ -870,22 +928,28 @@ wlFplot <- wandlplot +
       name = "",
       labels = month_labs,
       expand = c(0, 0)
-    ) +
+      ) +
     scale_y_continuous(
     "°F",
+    #limits = c(yminF, ymaxF),
     labels = function(x) x* (9/5) + 32,
+    breaks = range_tm, # Celsius breaks are kept so that precip axis is aligned
     sec.axis = dup_axis(name = "in",
-                        labels = round(preclabsCEMML, digits = 1)))
+                        labels = round(preclabsF, digits = 1)))
+
+# Original script for Celsius (from ggclimat fxn)
+   #scale_y_continuous(
+      #"C",
+      #limits = c(ymin, ymax),
+      #labels = templabs,
+      #breaks = range_tm,
+      #sec.axis = dup_axis(
+        #name = "mm",
+        #labels = preclabs
+      #)
   
 
-# Create Fahrenheit dataframe for plot tags
 
-dat_long_endF <- dat_long_end %>%
-    mutate(p_mesIN = p_mes/25.4) %>%
-    mutate(tm_maxF = tm_max*(9/5) + 32) %>%
-    mutate(tm_minF = tm_min *(9/5) + 32) %>%
-    mutate(ta_minF = ta_min*(9/5) + 32) %>%
-    mutate(tmF = (tm_maxF + tm_minF) / 2)
 
 ## Titles and additional labels----
   title <- est
@@ -902,7 +966,7 @@ dat_long_endF <- dat_long_end %>%
   }
 
   # Subtitles
-  sub <- paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
+  sub = paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
                "F        ",
                prettyNum(
                  round(sum(
@@ -916,10 +980,10 @@ dat_long_endF <- dat_long_end %>%
   
   # Vertical tags 
   
-  maxtmF <- prettyNum(round(max(dat_long_endF$tm_maxF), 1))
-  mintmF <- prettyNum(round(min(dat_long_endF$tm_minF), 1))
+  maxtmF = prettyNum(round(max(dat_long_endF$tm_maxF), 1))
+  mintmF = prettyNum(round(min(dat_long_endF$tm_minF), 1))
   
-  tags <- paste0(
+  tags = paste0(
     paste0(rep(" \n", 6), collapse = ""),
     maxtmF,
     paste0(rep(" \n", 10), collapse = ""),
@@ -930,7 +994,7 @@ dat_long_endF <- dat_long_end %>%
   
   
   # Add tags and theme
-wlFplot <- wlFplot +
+wlFplot = wlFplot +
     ggplot2::labs(
       title = title,
       subtitle = sub,
@@ -971,7 +1035,13 @@ wlFplot <- wlFplot +
       axis.text.y.right = element_text(colour = pcol, size = 10)
     )
 
-wlFplot  
+# Save Fahrenheit plot
+
+filenameF = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_Fahrenheit.png")
+
+ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 4.5, height = 6.5, units = "in", dpi = 300)
+
+}
 
 ```
 

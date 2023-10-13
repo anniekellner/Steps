@@ -41,16 +41,16 @@ climatogram_normal <- function(station, labels = "en", verbose = FALSE,
   if (verbose) {
     message("Data download may take a few seconds ... please wait \n")
   }
-  
+
   data_raw <-
     aemet_normal_clim(station, verbose = verbose)
-  
+
   if (nrow(data_raw) == 0) {
     stop("No valid results from the API")
   }
-  
+
   data <- data_raw[c("mes", "p_mes_md", "tm_max_md", "tm_min_md", "ta_min_min")]
-  
+
   data$mes <- as.numeric(data$mes)
   data <- data[data$mes < 13, ]
   data <- tidyr::pivot_longer(data, 2:5)
@@ -59,21 +59,21 @@ climatogram_normal <- function(station, labels = "en", verbose = FALSE,
     data,
     match("name", c("p_mes_md", "tm_max_md", "tm_min_md", "ta_min_min"))
   )
-  
+
   # Need a data frame with row names
   data <- as.data.frame(data)
   rownames(data) <- data$name
   data <- data[, colnames(data) != "name"]
-  
+
   stations <- aemet_stations(verbose = verbose)
   stations <- stations[stations$indicativo == station, ]
-  
+
   data_na <- as.integer(sum(is.na(data)))
-  
+
   if (is.null(labels)) {
     labels <- "en"
   }
-  
+
   if (data_na > 0) {
     message("Data with null values, unable to plot the diagram \n")
   } else if (ggplot2 == TRUE) {
@@ -89,7 +89,7 @@ climatogram_normal <- function(station, labels = "en", verbose = FALSE,
     if (!requireNamespace("climatol", quietly = TRUE)) {
       stop("\n\npackage climatol required, please install it first")
     }
-    
+
     climatol::diagwl(
       data,
       est = stations$nombre,
@@ -138,25 +138,25 @@ climatogram_period <- function(station = NULL, start = 1990, end = 2020,
                                labels = "en", verbose = FALSE, ggplot2 = TRUE,
                                ...) {
   message("Data download may take a few minutes ... please wait \n")
-  
+
   data_raw <- aemet_monthly_period(station,
-                                   start = start,
-                                   end = end,
-                                   verbose = verbose
+    start = start,
+    end = end,
+    verbose = verbose
   )
-  
+
   if (nrow(data_raw) == 0) {
     stop("No valid results from the API")
   }
-  
+
   data <- data_raw[c("fecha", "p_mes", "tm_max", "tm_min", "ta_min")]
   data <- tidyr::drop_na(data, c("p_mes", "tm_max", "tm_min", "ta_min"))
   data <- data[-grep("-13", data$fecha), ]
-  
+
   data$ta_min <- as.double(
     gsub("\\s*\\([^\\)]+\\)", "", as.character(data$ta_min))
   )
-  
+
   data$fecha <- as.Date(paste0(data$fecha, "-01"))
   data$mes <- as.integer(format(data$fecha, "%m"))
   data <- data[names(data) != "fecha"]
@@ -167,21 +167,21 @@ climatogram_period <- function(station = NULL, start = 1990, end = 2020,
     data,
     match("name", c("p_mes_md", "tm_max_md", "tm_min_md", "ta_min_min"))
   )
-  
+
   # Need a data frame with row names
   data <- as.data.frame(data)
   rownames(data) <- data$name
   data <- data[, colnames(data) != "name"]
-  
+
   stations <- aemet_stations(verbose = verbose)
   stations <- stations[stations$indicativo == station, ]
-  
+
   data_na <- as.integer(sum(is.na(data)))
-  
+
   if (is.null(labels)) {
     labels <- "en"
   }
-  
+
   if (data_na > 0) {
     message("Data with null values, unable to plot the diagram \n")
   } else if (ggplot2) {
@@ -197,7 +197,7 @@ climatogram_period <- function(station = NULL, start = 1990, end = 2020,
     if (!requireNamespace("climatol", quietly = TRUE)) {
       stop("\n\npackage climatol required, please install it first")
     }
-    
+
     climatol::diagwl(
       data,
       est = stations$nombre,
@@ -298,82 +298,78 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
                                   sfcol = "#3C6FC4", shem = FALSE,
                                   p3line = FALSE,
                                   ...) {
-
-  
   ## Validate inputs----
-  
+
   if (!all(dim(dat) == c(4, 12))) {
     stop(
       "`dat` should have 4 rows and 12 colums. Your inputs has ",
       nrow(dat), " rows and ", ncol(dat), " columns."
     )
   }
-  
+
   # NULL data
   data_na <- as.integer(sum(is.na(dat)))
   if (data_na > 0) {
     stop("Data with null values, unable to plot the diagram \n")
   }
-  
+
   # If matrix transform to data frame
   if (is.matrix(dat)) {
     dat <- as.data.frame(dat,
-                         row.names = c(
-                           "p_mes_md", "tm_max_md", "tm_min_md",
-                           "ta_min_min"
-                         ),
-                         col.names = paste0("m", seq_len(12))
+      row.names = c(
+        "p_mes_md", "tm_max_md", "tm_min_md",
+        "ta_min_min"
+      ),
+      col.names = paste0("m", seq_len(12))
     )
   }
-  
+
   ## Transform data----
   # Months label
   mlab <- toupper(substr(readr::locale(mlab)$date_names$mon, 1, 1))
-  
+
   # Pivot table and tidydata
   dat_long <- tibble::as_tibble(as.data.frame(t(dat)))
   # Easier to handle, normalize names
   names(dat_long) <- c("p_mes", "tm_max", "tm_min", "ta_min")
-  
+
   dat_long <- dplyr::bind_cols(label = mlab, dat_long)
 
-
-  
   # Southern hemisphere
   if (shem) {
     dat_long <- rbind(dat_long[7:12, ], dat_long[1:6, ])
   }
-  
+
   # Mean temp
   dat_long$tm <- (dat_long[[3]] + dat_long[[4]]) / 2
-  
+
   # Reescalate p_mes
   dat_long$pm_reesc <- ifelse(dat_long$p_mes < 100,
-                              dat_long$p_mes * 0.5,
-                              dat_long$p_mes * 0.05 + 45
+    dat_long$p_mes * 0.5,
+    dat_long$p_mes * 0.05 + 45
   )
-  
+
   # Add p3line
-  
+
   dat_long$p3line <- dat_long$p_mes / 3
-  
+
   # Add first and last row for plotting properly
   dat_long <- dplyr::bind_rows(
     dat_long[nrow(dat_long), ],
     dat_long,
     dat_long[1, ]
   )
-  
+
   dat_long[c(1, nrow(dat_long)), "label"] <- ""
-  
+
   # Interpolate values to expand x range
   # Number rows
   dat_long <- cbind(indrow = seq(-0.5, 12.5, 1), dat_long)
   dat_long_int <- NULL
-  
+
   for (j in seq(nrow(dat_long) - 1)) {
     intres <- NULL
-    
+
     for (i in seq_len(ncol(dat_long))) {
       if (is.character(dat_long[j, i])) {
         # On character don't interpolate
@@ -391,10 +387,10 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
       names(val) <- names(dat_long)[i]
       intres <- dplyr::bind_cols(intres, val)
     }
-    
+
     dat_long_int <- dplyr::bind_rows(dat_long_int, intres)
   }
-  
+
   # Regenerate and filter values
   dat_long_int$interpolate <- TRUE
   dat_long_int$label <- ""
@@ -408,129 +404,98 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   ]
   dat_long_end <- tibble::as_tibble(dat_long_end)
   # Final tibble with normalized and helper values
-  
-  ## ADAPTED FOR CEMML ###
-  
-  # Add function inputs to global environment so can be retrieved for Fahrenheit plot
-  
-  assign("dat_long_end", dat_long_end, envir = .GlobalEnv)
-  assign("est", est, envir = .GlobalEnv)
-  assign("alt", alt, envir = .GlobalEnv)
-  assign("per", per, envir = .GlobalEnv)
-  assign("tcol", tcol, envir = .GlobalEnv)
-  assign("pcol", pcol, envir = .GlobalEnv)
-  assign("sfcol", sfcol, envir = .GlobalEnv)
-  assign("shem", shem, envir = .GlobalEnv)
-  assign("p3line", p3line, envir = .GlobalEnv)
-  
-  
+
+
+
   # Labels and axis----
-  
+
   ## Horizontal axis ----
   month_breaks <- dat_long_end[dat_long_end$label != "", ]$indrow
   month_labs <- dat_long_end[dat_long_end$label != "", ]$label
-  
-  assign("month_breaks", month_breaks, envir = .GlobalEnv)
-  assign("month_labs", month_labs, envir = .GlobalEnv)
-  
+
   ## Vert. Axis range - temp ----
   ymax <- max(60, 10 * floor(max(dat_long_end$pm_reesc) / 10) + 10)
-  
+
   # Min range
   ymin <- min(-3, min(dat_long_end$tm)) # min Temp
   range_tm <- seq(0, ymax, 10)
-  
+
   if (ymin < -3) {
     ymin <- floor(ymin / 10) * 10 # min Temp rounded
     # Labels
     range_tm <- seq(ymin, ymax, 10)
   }
-  
-  assign("range_tm", range_tm, envir = .GlobalEnv)
-  
+
   # Labels
   templabs <- paste0(range_tm)
   templabs[range_tm > 50] <- ""
-  
-  assign("templabs", templabs, envir = .GlobalEnv)
-  
+
   # Vert. Axis range - prec
   range_prec <- range_tm * 2
   range_prec[range_tm > 50] <- range_tm[range_tm > 50] * 20 - 900
   preclabs <- paste0(range_prec)
   preclabs[range_tm < 0] <- ""
-  
-  assign("preclabs", preclabs, envir = .GlobalEnv)
 
-  ## ADAPTED FOR CEMML 09-14-23 ##
-  
-
-  ## END ADAPTATION ##
-   
   ## Titles and additional labels----
   title <- est
-  
+
   if (!is.na(alt)) {
     title <- paste0(
       title, " (",
       prettyNum(alt, big.mark = ",", decimal.mark = "."), " m)"
     )
   }
-  
+
   if (!is.na(per)) {
     title <- paste0(title, "\n", per)
   }
-  
+
   # Subtitles
   sub <-
     paste(round(mean(dat_long_end[dat_long_end$interpolate == FALSE, ]$tm), 1),
-          "C        ",
-          prettyNum(
-            round(sum(
-              dat_long_end[dat_long_end$interpolate == FALSE, ]$p_mes
-            )),
-            big.mark = ","
-          ),
-          " mm",
-          sep = ""
+      "C        ",
+      prettyNum(
+        round(sum(
+          dat_long_end[dat_long_end$interpolate == FALSE, ]$p_mes
+        )),
+        big.mark = ","
+      ),
+      " mm",
+      sep = ""
     )
-  
-  #######. ALTERED FOR CEMML  ##########
-  # Annie Kellner 09-20-23 #
-  
 
   # Vertical tags
   maxtm <- prettyNum(round(max(dat_long_end$tm_max), 1))
   mintm <- prettyNum(round(min(dat_long_end$tm_min), 1))
-  
+
   tags <- paste0(
     paste0(rep(" \n", 6), collapse = ""),
     maxtm,
     paste0(rep(" \n", 10), collapse = ""),
     mintm
   )
-  
+
   # Helper for ticks
-  
+
   ticks <- data.frame(
     x = seq(0, 12),
     ymin = -3,
     ymax = 0
   )
-  
-  
-  
-  
+
+
+
+
   # Lines and additional areas----
   getpolymax <- function(x, y, y_lim) {
     initpoly <- FALSE
     yres <- NULL
     xres <- NULL
-    
+
     # Check
     for (i in seq_len(length(y))) {
       lastobs <- i == length(x)
-      
+
       # If conditions to plot polygon
       if (y[i] > y_lim[i]) {
         if (isFALSE(initpoly)) {
@@ -541,7 +506,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
         }
         xres <- c(xres, x[i])
         yres <- c(yres, y[i])
-        
+
         # On lastobs we need to close the polygon
         if (lastobs) {
           xres <- c(xres, x[i], NA)
@@ -559,13 +524,13 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
     poly <- tibble::tibble(x = xres, y = yres)
     return(poly)
   }
-  
-  
+
+
   getlines <- function(x, y, y_lim) {
     yres <- NULL
     xres <- NULL
     ylim_res <- NULL
-    
+
     # Check
     for (i in seq_len(length(y))) {
       # If conditions to line
@@ -582,25 +547,25 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
     )
     return(line)
   }
-  
+
   prep_max_poly <- getpolymax(
     x = dat_long_end$indrow,
     y = pmax(dat_long_end$pm_reesc, 50),
     y_lim = rep(50, length(dat_long_end$indrow))
   )
-  
+
   tm_max_line <- getlines(
     x = dat_long_end$indrow,
     y = dat_long_end$tm,
     y_lim = dat_long_end$pm_reesc
   )
-  
+
   pm_max_line <- getlines(
     x = dat_long_end$indrow,
     y = pmin(dat_long_end$pm_reesc, 50),
     y_lim = dat_long_end$tm
   )
-  
+
   # Prob freeze
   dat_real <-
     dat_long_end[dat_long_end$interpolate == FALSE, c("indrow", "ta_min")]
@@ -627,7 +592,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   # Sure freeze
   dat_real <-
     dat_long_end[dat_long_end$interpolate == FALSE, c("indrow", "tm_min")]
-  
+
   x <- NULL
   y <- NULL
   for (i in seq_len(nrow(dat_real))) {
@@ -647,7 +612,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
     }
   }
   surefreeze <- tibble::tibble(x = x, y = y)
-  
+
   # Start plotting----
   # Basic lines and segments
   wandlplot <- ggplot2::ggplot() +
@@ -661,7 +626,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
       aes(x = .data$indrow, y = .data$tm),
       color = tcol
     )
-  
+
   if (nrow(tm_max_line > 0)) {
     wandlplot <- wandlplot +
       ggplot2::geom_segment(
@@ -676,7 +641,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
         alpha = 0.2
       )
   }
-  
+
   if (nrow(pm_max_line > 0)) {
     wandlplot <- wandlplot +
       ggplot2::geom_segment(
@@ -702,9 +667,9 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
         color = pcol
       )
   }
-  
+
   # Add polygons
-  
+
   # Max precip
   if (max(dat_long_end$pm_reesc) > 50) {
     wandlplot <- wandlplot +
@@ -713,10 +678,10 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
         aes(x, y), fill = pcol
       )
   }
-  
-  
+
+
   # Probable freeze
-  
+
   if (min(dat_long_end$ta_min) < 0) {
     wandlplot <- wandlplot +
       ggplot2::geom_polygon(
@@ -726,9 +691,9 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
         colour = "black"
       )
   }
-  
+
   # Sure freeze
-  
+
   if (min(dat_long_end$tm_min) < 0) {
     wandlplot <- wandlplot +
       geom_polygon(
@@ -738,14 +703,11 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
         colour = "black"
       )
   }
-  
-  assign("wandlplot", wandlplot, envir = .GlobalEnv) # Added by Annie Kellner 10-02-23
- 
-  
-  
+
+
   # Add lines and scales to chart
   wandlplot <- wandlplot +
-    geom_hline(yintercept = c(0, 50)) + # removed 'size' argument (CEMML/AK 09-14-23)
+    geom_hline(yintercept = c(0, 50), size = 0.5) +
     geom_segment(data = ticks, aes(
       x = x,
       xend = x,
@@ -768,8 +730,8 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
         labels = preclabs
       )
     )
-  
-  
+
+
   # Add tags and theme
   wandlplot <- wandlplot +
     ggplot2::labs(
@@ -811,9 +773,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
       ),
       axis.text.y.right = element_text(colour = pcol, size = 10)
     )
-  
-  
+
+
   return(wandlplot)
 }
-
-
