@@ -61,7 +61,8 @@ conflicts_prefer( # this ensures that the correct package is used when multiple 
 source('./Code/Misc/character_vectors.R')
 source('./Code/CEMML/Functions/Function_General.R')
 source('./Code/Step3Functions.R')
-source('./Code/Stars_HowTo/shift_longitude.R')
+source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude systems from (-180, 180 ) to (0, 360
+source('./Code/Functions/WL_Adapted.R') # Walter-Lieth plots
 
 ```
 
@@ -162,11 +163,11 @@ variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin") # an example of
 baseline_start_year <- 1985 # Start year of interest for the historical time period  
 baseline_end_year <- 2014 # End year of interest for the historical time period
 
-future1_start_year <- 2026 # Start year of interest for the first future time period 
-future1_end_year <- 2045 # End year of interest for the first future time period 
+future1_start_year <- 2021 # Start year of interest for the first future time period 
+future1_end_year <- 2050 # End year of interest for the first future time period 
 
-future2_start_year <- 2056 # Start year of interest for the second future time period 
-future2_end_year <- 2075 # End year of interest for the second future time period 
+future2_start_year <- 2051 # Start year of interest for the second future time period 
+future2_end_year <- 2080 # End year of interest for the second future time period 
 
 years <- c(baseline_start_year, # vector for easy reference
            baseline_end_year, 
@@ -174,6 +175,7 @@ years <- c(baseline_start_year, # vector for easy reference
            future1_end_year, 
            future2_start_year, 
            future2_end_year)
+
 ```
 
 ####################################################################################################
