@@ -48,6 +48,8 @@ conflicts_prefer( # this ensures that the correct package is used when multiple 
 
 **NOTE: Only run the next chunk (clear-workspace) if necessary. Code is commented out to avoid accidentally clearing the workspace. If you un-comment to clear the workspace, please remember to reinsert the # to comment it back out. 
 
+NOTE: If you clear the workspace but save the environment for later use (i.e., an .RData file), spatial objects created by the {terra} package are not retained. You will need to re-run the code in the chunk {r spatial-check} even if you save all objects in the global environment.
+
 ```{r clear-workspace}
 
 #rm(list = ls()) # clear workspace - this can be commented out as needed
@@ -63,7 +65,6 @@ source('./Code/Misc/character_vectors.R')
 source('./Code/CEMML/Functions/Function_General.R')
 source('./Code/Step3Functions.R')
 source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude systems from (-180, 180 ) to (0, 360
-source('./Code/Functions/WL_Adapted.R') # Walter-Lieth plots
 
 ```
 
@@ -355,7 +356,7 @@ cat("The object used for data extraction is ", class(extract_obj))
 
 ```
 
-INTERPRETING THE OUTPUT ABOVE: If the output of the following code chunk says 'numeric', the script will use the centroid. If it says 'spatVector', it will use the spatial object (afb). 
+*INTERPRETING THE OUTPUT ABOVE*: If the output of the following code chunk says 'numeric', the script will use the centroid. If it says 'spatVector', it will use the spatial object (afb). 
 
 *If you want to override the automatic choice, manually highlight and run either of the options below:* (if you enter it into the code chunk it will remain there and you risk overriding future choices you may not want to, so just do it here in the main text.) Do not include the **; I inserted those to change the color of the text to highlight what is code vs. text for readability.
 
@@ -542,7 +543,7 @@ for(i in 1:length(avdf)){
   # Write output to .csv
 
 for(i in 1:length(AllDays)){
-  
+  csv = AllDays[[i]]
   csv_scenario = if (str_detect(names(AllDays[i]), "baseline")){
     "historical"
   } else if(str_detect(names(AllDays[i]),"s1")) {
@@ -571,6 +572,7 @@ for(i in 1:length(AllDays)){
     write_csv(csv, file = paste0(results_folder,csv_fileName,".csv"))
 
     } # end write to csv
+
 ```
 
 Now that the AllDays.csv files have been created, it is no longer necessary to retain space-intensive objects in the environment. We can routinely remove objects we no longer need.
@@ -578,6 +580,7 @@ Now that the AllDays.csv files have been created, it is no longer necessary to r
 ```{r remove-extraneous-stuff}
 
 rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
+                        "official_name",
                         "model", 
                         "scenarios",
                         "years",
@@ -601,11 +604,13 @@ source('Code/Ecosystems_Climate_Data.R')
 ```{r remove-extraneous-stuff, warning=FALSE}
 
 rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
+                        "official_name",
                         "model", 
                         "scenarios",
                         "years",
                         "results_folder",
-                        "AllDays")))
+                        "AllDays",
+                        "RasterUnitConvert")))
 
 ```
 
@@ -627,12 +632,14 @@ source("./Code/Climographs.R")
 ```{r remove-extraneous-stuff}
 
 rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
+                        "official_name",
                         "model", 
                         "scenarios",
                         "years",
                         "results_folder",
                         "AllDays",
-                        "plots_dir")))
+                        "plots_dir",
+                        "RasterUnitConvert")))
 
 ```
 
@@ -788,16 +795,20 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 
 ## Walter and Leith Diagrams
 
-This section creates WL Diagrams for both F and C and places the results in the results_folder
+This section creates WL Diagrams for both F and C and places the results in the results_folder (under Plots/Walter-Lieth)
 
-```{r}
+```{r walter-lieth-diagrams}
 
-source('./Code/Functions/WL_Adapted.R') # Adapted from https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R by Annie Kellner 09-14-23 
-
+source('./Code/Functions/WL_Adapted.R') # Walter-Lieth plots. Adapted from https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R by Annie Kellner 10-15-23  
+  
+# Directory for WL plots
+  
 wl_dir <- paste(plots_dir,"Walter-Lieth", sep = "/")
 
 if (!dir.exists(wl_dir)){
   dir.create(wl_dir)}
+
+# Calculate Celsius values before running function for plot creation
 
 for(i in 1:length(monthSum)){
 
@@ -820,13 +831,16 @@ per = case_when( # per is 'period' and is an argument in the ggclimat_walter_lie
   i == 5 ~ as.character(paste(years[5], years[6], sep = " - ")))
 
 wlCplot = ggclimat_walter_lieth(wlC, 
-                      est = "Malmstron AFB", 
+                      est = official_name, 
                       per = per,
                       mlab = "en", # English language 
                       pcol = "blue", # precip color
                       tcol = "red", # temp color
                       pfcol = "lightblue", # probable freeze
                       sfcol = "steelblue") # certain freeze
+
+wlCplot = wlCplot + theme(text=element_text(family="serif")) # serif = Times New Roman 
+
 
 # Save plot in results_folder/Plots/Walter-Lieth 
 
@@ -841,14 +855,14 @@ wl_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 
 filenameC = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_Celsius.png")
 
-ggsave(filenameC, plot = wlCplot, device = png, path = wl_dir, width = 4.5, height = 6.5, units = "in", dpi = 300)
+ggsave(filenameC, plot = wlCplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
 
 
 # ----------   Fahrenheit Plot  --------------  #
 
 # Create Fahrenheit dataframe 
 
-dat_long_endF <- dat_long_end %>%
+dat_long_endF = dat_long_end %>%
     mutate(p_mesIN = p_mes/25.4) %>%
     mutate(tm_maxF = tm_max*(9/5) + 32) %>%
     mutate(tm_minF = tm_min *(9/5) + 32) %>%
@@ -856,11 +870,9 @@ dat_long_endF <- dat_long_end %>%
     mutate(tmF = (tm_maxF + tm_minF) / 2)
 
   ## Vert. Axis range - temp ----
-  #ymax <- max(60, 10 * floor(max(dat_long_end$pm_reesc) / 10) + 10)
   ymaxF <- 140
   
   # Min range
-  #ymin <- min(-3, min(dat_long_end$tm)) # min Temp
   yminF <- min(dat_long_endF$tmF)
   
   #range_tm <- seq(0, ymax, 10)
@@ -871,14 +883,6 @@ dat_long_endF <- dat_long_end %>%
     # Labels
     range_tmF <- seq(yminF, ymaxF, 18)
   }
-
-  #Celsius
-  
-    #if (ymin < -3) {
-    #ymin <- floor(ymin / 10) * 10 # min Temp rounded
-    # Labels
-    #range_tm <- seq(ymin, ymax, 10)
-  #}
 
 # Helper for ticks
   
@@ -897,17 +901,6 @@ preclabsF <- as.numeric()
   for(j in 1:length(preclabs2)){
     preclabsF[j] = preclabs2[j]/25.4
   }
-
-# Temp labels
-
-templabsF <- as.numeric()
-
-templabs2 <- as.numeric(templabs)
-templabs2 <- na.omit(templabs2)
-
-for(k in 1:length(templabs2)){
-  templabsF[k] = templabs2[k]*(9/5) + 32 
-}
 
 # In the event the temp and precip vectors are not of equal size, add values
 
@@ -942,22 +935,10 @@ wlFplot = wandlplot +
     sec.axis = dup_axis(name = "in",
                         labels = round(preclabsF, digits = 1)))
 
-# Original script for Celsius (from ggclimat fxn)
-   #scale_y_continuous(
-      #"C",
-      #limits = c(ymin, ymax),
-      #labels = templabs,
-      #breaks = range_tm,
-      #sec.axis = dup_axis(
-        #name = "mm",
-        #labels = preclabs
-      #)
-  
-
-
 
 ## Titles and additional labels----
-  title <- est
+  
+title = official_name
   
   if (!is.na(alt)) {
     title <- paste0(
@@ -995,10 +976,8 @@ wlFplot = wandlplot +
     mintmF
   )
 
-  
-  
-  
   # Add tags and theme
+  
 wlFplot = wlFplot +
     ggplot2::labs(
       title = title,
@@ -1038,13 +1017,14 @@ wlFplot = wlFplot +
         margin = unit(rep(10, 4), "pt")
       ),
       axis.text.y.right = element_text(colour = pcol, size = 10)
-    )
+    ) +
+      ggplot2::theme(text=element_text(family="serif")) # Times New Roman
 
 # Save Fahrenheit plot
 
 filenameF = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_Fahrenheit.png")
 
-ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 4.5, height = 6.5, units = "in", dpi = 300)
+ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
 
 }
 
