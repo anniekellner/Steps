@@ -46,7 +46,8 @@ conflicts_prefer( # this ensures that the correct package is used when multiple 
 )
 ```
 
-**NOTE: Only run the next chunk (clear-workspace) if necessary. Code is commented out to avoid accidentally clearing the workspace. 
+**NOTE: Only run the next chunk (clear-workspace) if necessary. Code is commented out to avoid accidentally clearing the workspace. If you un-comment to clear the workspace, please remember to reinsert the # to comment it back out. 
+
 ```{r clear-workspace}
 
 #rm(list = ls()) # clear workspace - this can be commented out as needed
@@ -73,15 +74,17 @@ source('./Code/Functions/WL_Adapted.R') # Walter-Lieth plots
 First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Name` and/or `models` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
 
 
-In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest.* 
+In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest. Official base names are used for plot titles. If the base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the AFB_Names and official_base_names vectors and save.* 
 
 ```{r enter-afb-and-model}
 
-AFB_Name <- AFB_Names[16] 
+AFB_Name <- AFB_Names[17] 
+
+official_name <- official_base_names_for_plots[1]
 
 model <- models[5] 
 
-cat(paste("The model you have selected is", model, "and the AFB is", AFB_Name))
+cat(paste("The model you have selected is", model,". The AFB is", AFB_Name, "and its official name is", official_name))
 
 ```
 
@@ -94,7 +97,7 @@ We use the next chunk to set the path to the correct directory for the installat
 
 # Is the AFB managed by the Navy?
 
-Navy = FALSE
+Navy = TRUE
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
                                        "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
