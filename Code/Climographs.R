@@ -58,9 +58,10 @@ jul.dat <- subset(clim.dat, month=="Jul")
 aug.dat <- subset(clim.dat, month=="Aug")
 sep.dat <- subset(clim.dat, month=="Sep")
 oct.dat <- subset(clim.dat, month=="Oct")
-nov.dat <- subset(clim.dat, month=="Nov", na.rm=TRUE)
+nov.dat <- subset(clim.dat, month=="Nov") # 10-15-23 deleted na.rm = TRUE because received warning that this argument would be disregarded
 dec.dat <- subset(clim.dat, month=="Dec")
 
+  
 ##lets create quantiles##
 #mins#
 #jan
@@ -316,7 +317,7 @@ plot_name <- pick_plotname(AllDays[i])
 
 ggplot(df) +
   geom_bar(aes(x=factor(month, level =c(month.abb)), precip*5), color="lightblue", fill="lightblue", stat = "identity") +
-  geom_line(aes(x=factor(month, level =c(month.abb)), tmin), size=1, linetype=1, color="goldenrod3", group=1) +
+  geom_line(aes(x=factor(month, level =c(month.abb)), tmin), linetype=1, color="goldenrod3", group=1) + # 10-15-23 removed 'size' argument because is deprecated. If default is not OK use linewidth to adjust
   geom_line(aes(x=factor(month, level =c(month.abb)), quan.min.25), linewidth=.5, linetype=2, color="goldenrod3", group=2) +
   geom_line(aes(x=factor(month, level =c(month.abb)), quan.min.75), linewidth=.5, linetype=2, color="goldenrod3", group=3) +
   geom_line(aes(x=factor(month, level =c(month.abb)), tmax), linewidth=1, linetype=1, color="red4", group=4) +
