@@ -30,4 +30,6 @@ AFB_Names <- c("Homestead_ARB",
               "Malmstrom_AFB_Proxy",
               "Kitsap_Proxy") 
 
+official_base_names_for_plots <- c("NAVBASE Kitsap")
+
 
