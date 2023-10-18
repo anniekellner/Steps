@@ -759,7 +759,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
       expand = c(0, 0)
     ) +
     scale_y_continuous(
-      "C",
+      "°C",
       limits = c(ymin, ymax),
       labels = templabs,
       breaks = range_tm,
