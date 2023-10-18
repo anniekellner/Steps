@@ -1044,11 +1044,6 @@ wlFplot = wlFplot +
         lineheight = 1,
         size = 14,
       ),
-      #plot.subtitle = element_text(
-        #hjust = 1,
-        #vjust = 0,
-        #size = 14
-      #),
       plot.tag = element_text(size = 10),
       plot.tag.position = "left",
       axis.ticks.length.x.bottom = unit(0, "pt"),
