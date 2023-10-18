@@ -197,6 +197,7 @@ future2_end_year <- 2080 # End year of interest for the second future time perio
 ###     The rest of the script should be able to be run automatically     ################################
 ####################################################################################################
 
+From this point forward, all you need to do is press the green 'run' arrow for each chunk. DO NOT ALTER THE CODE BELOW. 
 
 ## CREATE VECTORS FOR YEAR-SCENARIO COMBOS
 
@@ -866,11 +867,11 @@ per_years = case_when( # per is 'period' and is an argument in the ggclimat_walt
   i == 5 ~ as.character(paste(years[5], years[6], sep = " - ")))
 
 per_scenario = if (str_detect(names(monthSum[i]), "baseline")){
-    scenarios_for_plots[1]
+    scenario_plotNames[1]
   } else if(str_detect(names(monthSum[i]),"s1")) {
-    scenarios_for_plots[2]
+    scenario_plotNames[2]
   } else {
-    scenarios_for_plots[3]
+    scenario_plotNames[3]
   }
 
 per = paste(per_scenario,per_years,sep = ", ")
@@ -995,6 +996,8 @@ title = official_name
     title <- paste0(title, "\n", per)
   }
 
+
+
   # Subtitles
   sub = paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
                "F        ",
@@ -1006,6 +1009,13 @@ title = official_name
                ),
                " in",
                sep = ""
+  )
+  
+  title = paste0(
+  title, 
+  paste0(rep(" ",120), collapse = ""), # the 120 value is the number of spaces required to align the F and in values with the right axis. This can be adjusted if necessary, but will also need to be adjusted in the WL_Adapted script for the Celsius plots 
+  sub,
+  "\n" # space between title and plot
   )
   
   # Vertical tags 
@@ -1025,7 +1035,7 @@ title = official_name
 wlFplot = wlFplot +
     ggplot2::labs(
       title = title,
-      subtitle = sub,
+      subtitle = NULL,
       tag = tags
     ) +
     ggplot2::theme_classic() +
@@ -1034,11 +1044,11 @@ wlFplot = wlFplot +
         lineheight = 1,
         size = 14,
       ),
-      plot.subtitle = element_text(
-        hjust = 1,
-        vjust = 1,
-        size = 14
-      ),
+      #plot.subtitle = element_text(
+        #hjust = 1,
+        #vjust = 0,
+        #size = 14
+      #),
       plot.tag = element_text(size = 10),
       plot.tag.position = "left",
       axis.ticks.length.x.bottom = unit(0, "pt"),

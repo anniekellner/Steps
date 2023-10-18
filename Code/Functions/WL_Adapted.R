@@ -462,10 +462,8 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   
   assign("preclabs", preclabs, envir = .GlobalEnv)
 
-  ## ADAPTED FOR CEMML 09-14-23 ##
+  ## ADAPTED FOR CEMML 10-18-23 ##
   
-
-  ## END ADAPTATION ##
    
   ## Titles and additional labels----
   title <- est
@@ -494,9 +492,13 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
           " mm",
           sep = ""
     )
-  
-  #######. ALTERED FOR CEMML  ##########
-  # Annie Kellner 09-20-23 #
+ 
+  title = paste0(
+    title, 
+    paste0(rep(" ",120), collapse = ""), # the 120 value is the number of spaces required to align the F and in values with the right axis. This can be adjusted if necessary, but will also need to be adjusted in the WL_Adapted script for the Celsius plots 
+    sub,
+    "\n" # space between title and plot
+  )
   
 
   # Vertical tags
@@ -518,9 +520,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
     ymax = 0
   )
   
-  
-  
-  
+
   # Lines and additional areas----
   getpolymax <- function(x, y, y_lim) {
     initpoly <- FALSE
@@ -774,7 +774,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   wandlplot <- wandlplot +
     ggplot2::labs(
       title = title,
-      subtitle = sub,
+      subtitle = NULL,
       tag = tags
     ) +
     ggplot2::theme_classic() +
@@ -782,12 +782,6 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
       plot.title = element_text(
         lineheight = 1,
         size = 14,
-        #face = "bold" # commented out to fit with CEMML conventions 
-      ),
-      plot.subtitle = element_text(
-        hjust = 1,
-        vjust = 1,
-        size = 14
       ),
       plot.tag = element_text(size = 10),
       plot.tag.position = "left",
