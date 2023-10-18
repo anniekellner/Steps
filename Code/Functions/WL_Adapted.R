@@ -782,7 +782,7 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
       plot.title = element_text(
         lineheight = 1,
         size = 14,
-        face = "bold"
+        #face = "bold" # commented out to fit with CEMML conventions 
       ),
       plot.subtitle = element_text(
         hjust = 1,
