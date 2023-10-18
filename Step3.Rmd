@@ -91,7 +91,7 @@ source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude sys
 ### PART ONE: User settings - choose AFB, AFB manager, model, scenarios, years of interest  ###
 ###############################################################################################
 
-First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Names` and/or `models` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
+First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Names`, `models`, or `official_base_names_for_plots` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"). The available models correspond to numbers in the vector (e.g., the model HADGEM2-ES is [1]). 
 
 
 In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest. Official base names are used for plot titles. If the base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the AFB_Names and official_base_names vectors and save.* 
@@ -100,7 +100,7 @@ In the code chunk below, *enter the number between the brackets ([]) that corres
 
 AFB_Name <- AFB_Names[17] 
 
-official_name <- official_base_names_for_plots[1]
+official_name <- official_base_names_for_plots[1] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 model <- models[5] 
 
@@ -113,7 +113,7 @@ We use the next chunk to set the path to the correct directory for the installat
 *If the AFB is managed by the Navy, set Navy = TRUE*
 *If the AFB is managed by the Air Force, set Navy = FALSE*
 
-```{r set-directories}
+```{r set-directory-to-access-installation-boundaries}
 
 # Is the AFB managed by the Navy?
 
@@ -145,7 +145,7 @@ cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for reada
 
 ```
 
-*Enter the scenarios of interest below.* You only need to enter the models between the quotation marks (""). The 'scenarios' vector will populate automatically
+*Enter the scenarios of interest below, as well as the way you'd like the scenarios to appear in plots.* You only need to input values between the quotation marks (""). The vectors will populate automatically.
 
 ```{r enter-scenarios}
 
@@ -153,7 +153,11 @@ baseline <- "historical"
 scenario1 <- "ssp245"
 scenario2 <- "ssp585"
 
+scenario1_plot_description <- "SSP2-4.5"
+scenario2_plot_description <- "SSP5-8.5"
+
 scenarios <- c(baseline, scenario1, scenario2)
+scenarios_for_plots <- c("Historical", scenario1_plot_description, scenario2_plot_description)
 
 ```
 
@@ -602,6 +606,7 @@ rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
                         "official_name",
                         "model", 
                         "scenarios",
+                        "scenarios_for_plots",
                         "years",
                         "results_folder",
                         "AllDays",
@@ -626,6 +631,7 @@ rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
                         "official_name",
                         "model", 
                         "scenarios",
+                        "scenarios_for_plots",
                         "years",
                         "results_folder",
                         "AllDays",
@@ -654,6 +660,7 @@ rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
                         "official_name",
                         "model", 
                         "scenarios",
+                        "scenarios_for_plots",
                         "years",
                         "results_folder",
                         "AllDays",
@@ -842,12 +849,22 @@ wlC = data.table::transpose(wlC)
 
 # ----------  Celsius plot  ----------------- #
 
-per = case_when( # per is 'period' and is an argument in the ggclimat_walter_lieth() function
+per_years = case_when( # per is 'period' and is an argument in the ggclimat_walter_lieth() function
   i == 1 ~ as.character(paste(years[1], years[2], sep = " - ")),
   i == 2 ~ as.character(paste(years[3], years[4], sep = " - ")),
   i == 3 ~ as.character(paste(years[5], years[6], sep = " - ")),
   i == 4 ~ as.character(paste(years[3], years[4], sep = " - ")),
   i == 5 ~ as.character(paste(years[5], years[6], sep = " - ")))
+
+per_scenario = if (str_detect(names(monthSum[i]), "baseline")){
+    scenarios_for_plots[1]
+  } else if(str_detect(names(monthSum[i]),"s1")) {
+    scenarios_for_plots[2]
+  } else {
+    scenarios_for_plots[3]
+  }
+
+per = paste(per_scenario,per_years,sep = ", ")
 
 wlCplot = ggclimat_walter_lieth(wlC, 
                       est = official_name, 
@@ -862,7 +879,6 @@ wlCplot = wlCplot + theme(text=element_text(family="serif")) # serif = Times New
 
 
 # Save plot in results_folder/Plots/Walter-Lieth 
-
 
 wl_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     "historical"
@@ -1008,7 +1024,6 @@ wlFplot = wlFplot +
       plot.title = element_text(
         lineheight = 1,
         size = 14,
-        face = "bold"
       ),
       plot.subtitle = element_text(
         hjust = 1,
