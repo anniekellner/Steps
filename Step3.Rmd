@@ -616,7 +616,7 @@ rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
                         "official_name",
                         "model", 
                         "scenarios",
-                        "scenarios_for_plots",
+                        "scenario_plotNames",
                         "years",
                         "results_folder",
                         "AllDays",
@@ -641,7 +641,7 @@ rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
                         "official_name",
                         "model", 
                         "scenarios",
-                        "scenarios_for_plots",
+                        "scenario_plotNames",
                         "years",
                         "results_folder",
                         "AllDays",
@@ -670,7 +670,7 @@ rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
                         "official_name",
                         "model", 
                         "scenarios",
-                        "scenarios_for_plots",
+                        "scenario_plotNames",
                         "years",
                         "results_folder",
                         "AllDays",
@@ -876,6 +876,9 @@ per_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 
 per = paste(per_scenario,per_years,sep = ", ")
 
+per_length = nchar(per) # to calculate where to put the "subtitle" on the plot
+
+
 wlCplot = ggclimat_walter_lieth(wlC, 
                       est = official_name, 
                       per = per,
@@ -996,8 +999,6 @@ title = official_name
     title <- paste0(title, "\n", per)
   }
 
-
-
   # Subtitles
   sub = paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
                "F        ",
@@ -1011,9 +1012,13 @@ title = official_name
                sep = ""
   )
   
+  sub_length = nchar(sub)
+  sub_placement = 78 - sub_length - per_length # 1 in = 12 spaces, so a 6.5" in width image contains 78 spaces per line. This right-aligns the "subtitle" (i.e., the righthand temp/precip values)
+  
+  
   title = paste0(
   title, 
-  paste0(rep(" ",120), collapse = ""), # the 120 value is the number of spaces required to align the F and in values with the right axis. This can be adjusted if necessary, but will also need to be adjusted in the WL_Adapted script for the Celsius plots 
+  paste0(rep(" ",sub_placement), collapse = ""), 
   sub,
   "\n" # space between title and plot
   )

@@ -492,10 +492,15 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
           " mm",
           sep = ""
     )
+  
+per_length = nchar(per)
+sub_length = nchar(sub)
+
+sub_placement = 78 - per_length - sub_length
  
   title = paste0(
     title, 
-    paste0(rep(" ",120), collapse = ""), # the 120 value is the number of spaces required to align the F and in values with the right axis. This can be adjusted if necessary, but will also need to be adjusted in the WL_Adapted script for the Celsius plots 
+    paste0(rep(" ",sub_placement), collapse = ""), 
     sub,
     "\n" # space between title and plot
   )
