@@ -977,7 +977,6 @@ wlFplot = wandlplot +
       ) +
     scale_y_continuous(
     "°F",
-    #limits = c(yminF, ymaxF),
     labels = function(x) x* (9/5) + 32,
     breaks = range_tm, # Celsius breaks are kept so that precip axis is aligned
     sec.axis = dup_axis(name = "in",
@@ -995,13 +994,11 @@ title = official_name
     )
   }
   
-  if (!is.na(per)) {
-    title <- paste0(title, "\n", per)
-  }
 
-  # Subtitles
-  sub = paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
-               "F        ",
+# Subtitle (aka, time period and precip/temp values)
+
+sub = paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
+               "°F        ",
                prettyNum(
                  round(sum(
                    dat_long_endF[dat_long_endF$interpolate == FALSE, ]$p_mesIN
@@ -1013,15 +1010,18 @@ title = official_name
   )
   
   sub_length = nchar(sub)
-  sub_placement = 78 - sub_length - per_length # 1 in = 12 spaces, so a 6.5" in width image contains 78 spaces per line. This right-aligns the "subtitle" (i.e., the righthand temp/precip values)
+  sub_placement = 78 - per_length - sub_length # 1 in = ~10 character-spaces in Times New Roman font, so an image of 6.5" in width contains 78 character-spaces per line. This right-aligns the "subtitle" (i.e., the righthand temp/precip values)
   
   
-  title = paste0(
-  title, 
+  sub2 = paste0(
+  per, 
   paste0(rep(" ",sub_placement), collapse = ""), 
   sub,
-  "\n" # space between title and plot
+  "\n" # linebreak between "subtitle" and plot
   )
+  
+  
+  
   
   # Vertical tags 
   
@@ -1040,7 +1040,7 @@ title = official_name
 wlFplot = wlFplot +
     ggplot2::labs(
       title = title,
-      subtitle = NULL,
+      subtitle = sub2,
       tag = tags
     ) +
     ggplot2::theme_classic() +
@@ -1048,6 +1048,12 @@ wlFplot = wlFplot +
       plot.title = element_text(
         lineheight = 1,
         size = 14,
+        face = "bold"
+      ),
+      plot.subtitle = element_text(
+        lineheight = 1,
+        size = 14,
+        face = "plain"
       ),
       plot.tag = element_text(size = 10),
       plot.tag.position = "left",
