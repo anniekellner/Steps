@@ -461,49 +461,8 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
   preclabs[range_tm < 0] <- ""
   
   assign("preclabs", preclabs, envir = .GlobalEnv)
-
-  ## ADAPTED FOR CEMML 10-18-23 ##
   
    
-  ## Titles and additional labels----
-  title <- est
-  
-  if (!is.na(alt)) {
-    title <- paste0(
-      title, " (",
-      prettyNum(alt, big.mark = ",", decimal.mark = "."), " m)"
-    )
-  }
-  
-  if (!is.na(per)) {
-    title <- paste0(title, "\n", per)
-  }
-  
-  # Subtitles
-  sub <-
-    paste(round(mean(dat_long_end[dat_long_end$interpolate == FALSE, ]$tm), 1),
-          "C        ",
-          prettyNum(
-            round(sum(
-              dat_long_end[dat_long_end$interpolate == FALSE, ]$p_mes
-            )),
-            big.mark = ","
-          ),
-          " mm",
-          sep = ""
-    )
-  
-per_length = nchar(per)
-sub_length = nchar(sub)
-
-sub_placement = 78 - per_length - sub_length
- 
-  title = paste0(
-    title, 
-    paste0(rep(" ",sub_placement), collapse = ""), 
-    sub,
-    "\n" # space between title and plot
-  )
   
 
   # Vertical tags
@@ -744,8 +703,43 @@ sub_placement = 78 - per_length - sub_length
       )
   }
   
-  assign("wandlplot", wandlplot, envir = .GlobalEnv) # Added by Annie Kellner 10-02-23
- 
+  assign("wandlplot", wandlplot, envir = .GlobalEnv) # for use with Fahrenheit plot
+  
+  ## Titles and additional labels----
+  
+  title <- official_name # was est parameter (estacion)
+  
+  if (!is.na(alt)) {
+    title <- paste0(
+      title, " (",
+      prettyNum(alt, big.mark = ",", decimal.mark = "."), " m)"
+    )
+  }
+  
+  
+  # Subtitles
+  sub = paste(round(mean(dat_long_end[dat_long_end$interpolate == FALSE, ]$tm), 1),
+              "C        ",
+              prettyNum(
+                round(sum(
+                  dat_long_end[dat_long_end$interpolate == FALSE, ]$p_mes
+                )),
+                big.mark = ","
+              ),
+              " mm",
+              sep = ""
+  )
+  
+  sub_length = nchar(sub) # 1 in = ~10 character-spaces in Times New Roman font, so an image of 6.5" in width contains 78 character-spaces per line. This right-aligns the "subtitle" (i.e., the righthand temp/precip values)
+  
+  sub_placement = 78 - per_length - sub_length
+  
+  sub2 = paste0(
+    per, 
+    paste0(rep(" ",sub_placement), collapse = ""), 
+    sub,
+    "\n" # linebreak between "subtitle" and plot
+  )
   
   
   # Add lines and scales to chart
@@ -764,7 +758,7 @@ sub_placement = 78 - per_length - sub_length
       expand = c(0, 0)
     ) +
     scale_y_continuous(
-      "°C",
+      "C",
       limits = c(ymin, ymax),
       labels = templabs,
       breaks = range_tm,
@@ -779,7 +773,7 @@ sub_placement = 78 - per_length - sub_length
   wandlplot <- wandlplot +
     ggplot2::labs(
       title = title,
-      subtitle = NULL,
+      subtitle = sub2,
       tag = tags
     ) +
     ggplot2::theme_classic() +
@@ -787,6 +781,12 @@ sub_placement = 78 - per_length - sub_length
       plot.title = element_text(
         lineheight = 1,
         size = 14,
+        face = "bold"
+            ),
+      plot.subtitle = element_text(
+        lineheight = 1,
+        size = 14,
+        face = "plain"
       ),
       plot.tag = element_text(size = 10),
       plot.tag.position = "left",
@@ -808,8 +808,8 @@ sub_placement = 78 - per_length - sub_length
         colour = pcol,
         margin = unit(rep(10, 4), "pt")
       ),
-      axis.text.y.right = element_text(colour = pcol, size = 10)
-    )
+      axis.text.y.right = element_text(colour = pcol, size = 10)) +
+    ggplot2::theme(text=element_text(family="serif")) # Times New Roman
   
   
   return(wandlplot)
