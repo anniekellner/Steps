@@ -831,7 +831,7 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 
 ## Walter and Leith Diagrams
 
-This section creates WL Diagrams for both F and C and places the results in the results_folder (under Plots/Walter-Lieth)
+This section creates WL Diagrams for both F and C and places the results in the results_folder (under Plots/Walter-Lieth). The specs are set for a 4.5 x 6.5 in plot, so the appearance in the viewer does not appear aligned, but the output should be as desired. 
 
 ```{r walter-lieth-diagrams}
 
@@ -888,7 +888,7 @@ wlCplot = ggclimat_walter_lieth(wlC,
                       pfcol = "lightblue", # probable freeze
                       sfcol = "steelblue") # certain freeze
 
-wlCplot = wlCplot + theme(text=element_text(family="serif")) # serif = Times New Roman 
+#wlCplot = wlCplot + theme(text=element_text(family="serif")) # serif = Times New Roman 
 
 
 # Save plot in results_folder/Plots/Walter-Lieth 
