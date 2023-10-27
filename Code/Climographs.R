@@ -323,7 +323,7 @@ ggplot(df) +
   labs(title = title, 
        subtitle = subtitle) +
   xlab(paste0("\n","Month"))                       +
-  ylab("Average Temperature (°F)")    +
+  ylab("Average Temperature (\u00B0F)")    + # prints degree symbol before Fahrenheit
   theme_minimal() +
   theme(text=element_text(family="Times New Roman")) +
   theme(title=element_text(size=17)) +
