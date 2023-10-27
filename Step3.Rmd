@@ -98,9 +98,9 @@ In the code chunk below, *enter the number between the brackets ([]) that corres
 
 ```{r enter-afb-and-model}
 
-AFB_Name <- AFB_Names[17] 
+AFB_Name <- AFB_Names[18] 
 
-official_name <- official_base_names_for_plots[1] # These names serve as titles for the climatograph and Walter-Lieth plots
+official_name <- official_base_names_for_plots[2] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 model <- models[5] 
 
@@ -887,8 +887,6 @@ wlCplot = ggclimat_walter_lieth(wlC,
                       tcol = "red", # temp color
                       pfcol = "lightblue", # probable freeze
                       sfcol = "steelblue") # certain freeze
-
-#wlCplot = wlCplot + theme(text=element_text(family="serif")) # serif = Times New Roman 
 
 
 # Save plot in results_folder/Plots/Walter-Lieth 
