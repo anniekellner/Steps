@@ -848,6 +848,8 @@ if (!dir.exists(wl_dir)){
 
 for(i in 1:length(monthSum)){
 
+# Format data
+  
 wlC = monthSum[[i]] %>%
   mutate(Avg_TMaxC = RasterUnitConvert(Avg_TMaxF, "FtoC")) %>%
   mutate(Avg_TMinC = RasterUnitConvert(Avg_TMinF, "FtoC")) %>%
@@ -859,12 +861,7 @@ wlC = data.table::transpose(wlC)
 
 # ----------  Celsius plot  ----------------- #
 
-per_years = case_when( # per is 'period' and is an argument in the ggclimat_walter_lieth() function
-  i == 1 ~ as.character(paste(years[1], years[2], sep = " - ")),
-  i == 2 ~ as.character(paste(years[3], years[4], sep = " - ")),
-  i == 3 ~ as.character(paste(years[5], years[6], sep = " - ")),
-  i == 4 ~ as.character(paste(years[3], years[4], sep = " - ")),
-  i == 5 ~ as.character(paste(years[5], years[6], sep = " - ")))
+# per is 'period' and is an argument in the ggclimat_walter_lieth() function
 
 per_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     scenario_plotNames[1]
@@ -874,6 +871,15 @@ per_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     scenario_plotNames[3]
   }
 
+per_years = if(str_detect(names(monthSum[i]), "baseline")){ 
+  as.character(paste(years[1], years[2], sep = " - "))
+} else if(str_detect(names(monthSum[i]),"f1")){
+  as.character(paste(years[3],years[4], sep = " - "))
+} else {
+  as.character(paste(years[5], years[6], sep = " - "))
+}
+  
+  
 per = paste(per_scenario,per_years,sep = ", ")
 
 per_length = nchar(per) # to calculate where to put the "subtitle" on the plot
@@ -899,7 +905,16 @@ wl_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     scenarios[3]
   }
 
-filenameC = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_Celsius.png")
+midyear = if (str_detect(names(monthSum[i]), "baseline")){
+  floor((years[1] + years[2])/2)
+} else if (str_detect(names(monthSum[i]),"f1")) {
+  floor((years[3] + years[4])/2)
+} else if (str_detect(names(monthSum[i]),"f2")) {
+  floor((years[5] + years[6])/2)
+}
+  
+
+filenameC = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Celsius.png")
 
 ggsave(filenameC, plot = wlCplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
 
@@ -981,18 +996,6 @@ wlFplot = wandlplot +
                         labels = round(preclabsF, digits = 1)))
 
 
-## Titles and additional labels----
-  
-title = official_name
-  
-  if (!is.na(alt)) {
-    title <- paste0(
-      title, " (",
-      prettyNum(alt, big.mark = ",", decimal.mark = "."), " m)"
-    )
-  }
-  
-
 # Subtitle (aka, time period and precip/temp values)
 
 sub = paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
@@ -1017,9 +1020,6 @@ sub = paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF),
   sub,
   "\n" # linebreak between "subtitle" and plot
   )
-  
-  
-  
   
   # Vertical tags 
   
@@ -1079,7 +1079,7 @@ wlFplot = wlFplot +
 
 # Save Fahrenheit plot
 
-filenameF = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_Fahrenheit.png")
+filenameF = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Fahrenheit.png")
 
 ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
 

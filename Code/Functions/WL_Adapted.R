@@ -716,7 +716,8 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
     )
   }
   
-  
+assign("title", title, envir = .GlobalEnv)
+    
   # Subtitles
   sub = paste(round(mean(dat_long_end[dat_long_end$interpolate == FALSE, ]$tm), 1),
               "C        ",
