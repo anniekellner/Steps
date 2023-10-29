@@ -98,9 +98,9 @@ In the code chunk below, *enter the number between the brackets ([]) that corres
 
 ```{r enter-afb-and-model}
 
-AFB_Name <- AFB_Names[17] 
+AFB_Name <- AFB_Names[18] 
 
-official_name <- official_base_names_for_plots[1] # These names serve as titles for the climatograph and Walter-Lieth plots
+official_name <- official_base_names_for_plots[2] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 model <- models[5] 
 
@@ -831,7 +831,7 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 
 ## Walter and Leith Diagrams
 
-This section creates WL Diagrams for both F and C and places the results in the results_folder (under Plots/Walter-Lieth)
+This section creates WL Diagrams for both F and C and places the results in the results_folder (under Plots/Walter-Lieth). The specs are set for a 4.5 x 6.5 in plot, so the appearance in the viewer does not appear aligned, but the output should be as desired. 
 
 ```{r walter-lieth-diagrams}
 
@@ -848,6 +848,8 @@ if (!dir.exists(wl_dir)){
 
 for(i in 1:length(monthSum)){
 
+# Format data
+  
 wlC = monthSum[[i]] %>%
   mutate(Avg_TMaxC = RasterUnitConvert(Avg_TMaxF, "FtoC")) %>%
   mutate(Avg_TMinC = RasterUnitConvert(Avg_TMinF, "FtoC")) %>%
@@ -859,12 +861,7 @@ wlC = data.table::transpose(wlC)
 
 # ----------  Celsius plot  ----------------- #
 
-per_years = case_when( # per is 'period' and is an argument in the ggclimat_walter_lieth() function
-  i == 1 ~ as.character(paste(years[1], years[2], sep = " - ")),
-  i == 2 ~ as.character(paste(years[3], years[4], sep = " - ")),
-  i == 3 ~ as.character(paste(years[5], years[6], sep = " - ")),
-  i == 4 ~ as.character(paste(years[3], years[4], sep = " - ")),
-  i == 5 ~ as.character(paste(years[5], years[6], sep = " - ")))
+# per is 'period' and is an argument in the ggclimat_walter_lieth() function
 
 per_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     scenario_plotNames[1]
@@ -874,7 +871,19 @@ per_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     scenario_plotNames[3]
   }
 
+per_years = if(str_detect(names(monthSum[i]), "baseline")){ 
+  as.character(paste(years[1], years[2], sep = " - "))
+} else if(str_detect(names(monthSum[i]),"f1")){
+  as.character(paste(years[3],years[4], sep = " - "))
+} else {
+  as.character(paste(years[5], years[6], sep = " - "))
+}
+  
+  
 per = paste(per_scenario,per_years,sep = ", ")
+
+per_length = nchar(per) # to calculate where to put the "subtitle" on the plot
+
 
 wlCplot = ggclimat_walter_lieth(wlC, 
                       est = official_name, 
@@ -884,8 +893,6 @@ wlCplot = ggclimat_walter_lieth(wlC,
                       tcol = "red", # temp color
                       pfcol = "lightblue", # probable freeze
                       sfcol = "steelblue") # certain freeze
-
-wlCplot = wlCplot + theme(text=element_text(family="serif")) # serif = Times New Roman 
 
 
 # Save plot in results_folder/Plots/Walter-Lieth 
@@ -898,7 +905,16 @@ wl_scenario = if (str_detect(names(monthSum[i]), "baseline")){
     scenarios[3]
   }
 
-filenameC = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_Celsius.png")
+midyear = if (str_detect(names(monthSum[i]), "baseline")){
+  floor((years[1] + years[2])/2)
+} else if (str_detect(names(monthSum[i]),"f1")) {
+  floor((years[3] + years[4])/2)
+} else if (str_detect(names(monthSum[i]),"f2")) {
+  floor((years[5] + years[6])/2)
+}
+  
+
+filenameC = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Celsius.png")
 
 ggsave(filenameC, plot = wlCplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
 
@@ -974,33 +990,16 @@ wlFplot = wandlplot +
       ) +
     scale_y_continuous(
     "°F",
-    #limits = c(yminF, ymaxF),
     labels = function(x) x* (9/5) + 32,
     breaks = range_tm, # Celsius breaks are kept so that precip axis is aligned
     sec.axis = dup_axis(name = "in",
                         labels = round(preclabsF, digits = 1)))
 
 
-## Titles and additional labels----
-  
-title = official_name
-  
-  if (!is.na(alt)) {
-    title <- paste0(
-      title, " (",
-      prettyNum(alt, big.mark = ",", decimal.mark = "."), " m)"
-    )
-  }
-  
-  if (!is.na(per)) {
-    title <- paste0(title, "\n", per)
-  }
+# Subtitle (aka, time period and precip/temp values)
 
-
-
-  # Subtitles
-  sub = paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
-               "F        ",
+sub = paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
+               "°F        ",
                prettyNum(
                  round(sum(
                    dat_long_endF[dat_long_endF$interpolate == FALSE, ]$p_mesIN
@@ -1011,11 +1010,15 @@ title = official_name
                sep = ""
   )
   
-  title = paste0(
-  title, 
-  paste0(rep(" ",120), collapse = ""), # the 120 value is the number of spaces required to align the F and in values with the right axis. This can be adjusted if necessary, but will also need to be adjusted in the WL_Adapted script for the Celsius plots 
+  sub_length = nchar(sub)
+  sub_placement = 78 - per_length - sub_length # 1 in = ~10 character-spaces in Times New Roman font, so an image of 6.5" in width contains 78 character-spaces per line. This right-aligns the "subtitle" (i.e., the righthand temp/precip values)
+  
+  
+  sub2 = paste0(
+  per, 
+  paste0(rep(" ",sub_placement), collapse = ""), 
   sub,
-  "\n" # space between title and plot
+  "\n" # linebreak between "subtitle" and plot
   )
   
   # Vertical tags 
@@ -1035,7 +1038,7 @@ title = official_name
 wlFplot = wlFplot +
     ggplot2::labs(
       title = title,
-      subtitle = NULL,
+      subtitle = sub2,
       tag = tags
     ) +
     ggplot2::theme_classic() +
@@ -1043,6 +1046,12 @@ wlFplot = wlFplot +
       plot.title = element_text(
         lineheight = 1,
         size = 14,
+        face = "bold"
+      ),
+      plot.subtitle = element_text(
+        lineheight = 1,
+        size = 14,
+        face = "plain"
       ),
       plot.tag = element_text(size = 10),
       plot.tag.position = "left",
@@ -1070,7 +1079,7 @@ wlFplot = wlFplot +
 
 # Save Fahrenheit plot
 
-filenameF = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_Fahrenheit.png")
+filenameF = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Fahrenheit.png")
 
 ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
 

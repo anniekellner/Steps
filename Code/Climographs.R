@@ -6,8 +6,8 @@
 
 # Inputs: 
   # AllDays dataframe
-  # AFB_Name
-  # scenarios
+  # official_name
+  # scenario_plotNames
   # years
   # plots_dir
 
@@ -39,8 +39,6 @@ for(i in 1:length(AllDays)){
   AllDays[[i]]$month = as.character(AllDays[[i]]$month)
 }
 
-# Ultimately will put the entire script into a loop so that 10-14 are consolidated
-# For now, run historical script only 
 
 for(i in 1:length(AllDays)){
 
@@ -263,7 +261,6 @@ tmax <- data.frame(c(jan.hi, feb.hi, mar.hi, apr.hi, may.hi, jun.hi, jul.hi, aug
 col_headings <- c('tmax')
 names(tmax) <- col_headings
 
-### WORKS UP UNTIL THIS POINT. NEED TO AMEND DF CREATION ###
 
 #set up data frame
 
@@ -273,11 +270,11 @@ df <- data.frame(month, precip, tmin, quan.min.25, quan.min.75, tmax, quan.max.2
 
 # Create plot names and subtitles
 
-plot_subtitles <- c(paste("Historical",years[1],"-",years[2], sep = " "),
-                    paste(scenarios[2],years[3],"-",years[4], sep = " "),
-                    paste(scenarios[2],years[5],"-",years[6], sep = " "),
-                    paste(scenarios[3],years[3],"-",years[4], sep = " "),
-                    paste(scenarios[3],years[5],"-",years[6], sep = " "))
+plot_subtitles <- c(paste0("Historical, ",years[1],"-",years[2],"\n"),
+                    paste0(scenario_plotNames[2],", ",years[3],"-",years[4],"\n"),
+                    paste0(scenario_plotNames[2],", ",years[5],"-",years[6],"\n"),
+                    paste0(scenario_plotNames[3],", ",years[3],"-",years[4],"\n"),
+                    paste0(scenario_plotNames[3],", ",years[5],"-",years[6],"\n"))
 
 # Plot names include "Monthly Means", scenario, and center year (e.g., 2030)
 plot_names <- c("Monthly_Means_Historical.png",
@@ -308,7 +305,7 @@ pick_plotname <- function(df){
 
 # Determine title, subtitle, and name of plot
 
-title <- str_replace_all(AFB_Name, "_", " ")  
+title <- str_replace_all(official_name, "_", " ")  
 subtitle <- pick_subtitle(AllDays[i])  
 plot_name <- pick_plotname(AllDays[i])
 
@@ -325,8 +322,8 @@ ggplot(df) +
   geom_line(aes(x=factor(month, level =c(month.abb)), quan.max.75), linewidth=.5, linetype=2, color="red4", group=6) +
   labs(title = title, 
        subtitle = subtitle) +
-  xlab("Month")                       +
-  ylab("Average Temperature (°F)")    +
+  xlab(paste0("\n","Month"))                       +
+  ylab("Average Temperature (\u00B0F)")    + # prints degree symbol before Fahrenheit
   theme_minimal() +
   theme(text=element_text(family="Times New Roman")) +
   theme(title=element_text(size=17)) +
