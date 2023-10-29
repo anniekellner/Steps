@@ -5,24 +5,42 @@ date: "2023-05-10"
 output: html_document
 ---
 
+## GitHub Integration
+
+This script uses git version control via Github. As of 10-17-2023, the remote repository is housed at https://github.com/anniekellner/Steps. The SSH associated with the repo is git@github.com:anniekellner/Steps.git.
+
+Best practices for using this script require the following:
+
+1. Integrate RStudio with git by following the protocol at https://happygitwithr.com/
+
+2. PULL the script prior to running it so that you are sure to have the most current version
+
+3. Make sure you are running the script on the 'Main' branch, unless you have express reason to use a different branch. You can check what branch you are using by either
+  a) selecting the 'Git' tab in the top-right quadrant of RStudio (assuming RStudio's default layout) and ensuring you see the word "Main" on the right side of the menu bar OR
+  b) opening a Terminal (tab in bottom left quadrant) that is set to Git Bash (this can be changed in the Tools menu). If you type `git branch` (without ``) and press enter, the *Main branch should appear highlighted with an asterisk
+  
+
 ## R Markdown
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
 For this script, it is best to run one chunk (box of R code) at a time to make sure each is working properly. Also, some chunks produce output you will want to inspect. Output will appear below the chunk on this screen rather than in the bottom right window (results appear in the bottom right window for regular .R scripts)
 
-*Throughout the script, instructions you need to follow will appear like this. You can ignore code in the same color within code chunks, unless it is part of the code that explicitly requires user input*
+*Throughout the script, instructions you need to follow will appear like this*. You can ignore code in the same color within code chunks, unless it is part of the code that explicitly requires user input. 
+
+*The first chunks (before 'PART ONE') should not require any user input. You just need to run them to set up the script.*   
 
 The first chunk ('setup') allows you to set options that apply to every chunk in the script)
 
 ```{r setup, include=FALSE}
 
-knitr::opts_chunk$set(echo = FALSE) # echo = FALSE means R will not print the code along with the results. 
-
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+ # echo = FALSE means R will not print the code along with the results. 
 ```
 
+The next chunk loads the libraries required for use with this script. All required libraries are loaded here except those contained in 'source' scripts.
 
-```{r load-libraries, include=FALSE}
+```{r load-libraries}
 
 library(terra)
 library(sf)
@@ -33,6 +51,7 @@ library(mapview)
 library(tmap)
 library(tmaptools)
 library(leaflet)
+library(climatol) # for Walter-Lieth Diagrams
 library(conflicted)
 
 conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
@@ -45,14 +64,17 @@ conflicts_prefer( # this ensures that the correct package is used when multiple 
 )
 ```
 
-**NOTE: Only run the next chunk (clear-workspace) if necessary. Code is commented out to avoid accidentally clearing the workspace. 
+**NOTE: Only run the next chunk (clear-workspace) if necessary. Code is commented out to avoid accidentally clearing the workspace. If you un-comment to clear the workspace, please remember to reinsert the #**
+
+NOTE: If you clear the workspace but save the environment for later use (i.e., an .RData file), spatial objects created by the {terra} package are not retained. You will need to re-run the code in the chunk {r spatial-check} even if you save all objects in the global environment.
 
 ```{r clear-workspace}
 
-#rm(list = ls()) 
+#rm(list = ls()) # clear workspace - this can be commented out as needed
 
 ```
 
+These scripts contain objects and functions required to run the script.
 
 ```{r functions}
 
@@ -61,7 +83,7 @@ conflicts_prefer( # this ensures that the correct package is used when multiple 
 source('./Code/Misc/character_vectors.R')
 source('./Code/CEMML/Functions/Function_General.R')
 source('./Code/Step3Functions.R')
-source('./Code/Stars_HowTo/shift_longitude.R')
+source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude systems from (-180, 180 ) to (0, 360
 
 ```
 
@@ -69,18 +91,20 @@ source('./Code/Stars_HowTo/shift_longitude.R')
 ### PART ONE: User settings - choose AFB, AFB manager, model, scenarios, years of interest  ###
 ###############################################################################################
 
-First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Name` and/or `models` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"*). The available models correspond to numbers in the vector (e.g., HADGEM2-ES is [1]). 
+First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Names`, `models`, or `official_base_names_for_plots` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"). The available models correspond to numbers in the vector (e.g., the model HADGEM2-ES is [1]). 
 
 
-In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest.* 
+In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest. Official base names are used for plot titles. If the base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the AFB_Names and official_base_names vectors and save.* 
 
 ```{r enter-afb-and-model}
 
-AFB_Name <- AFB_Names[6] 
+AFB_Name <- AFB_Names[18] 
+
+official_name <- official_base_names_for_plots[2] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 model <- models[5] 
 
-cat(paste("The model you have selected is", model, "and the AFB is", AFB_Name))
+cat(paste("The model you have selected is", model,". The AFB is", AFB_Name, "and its official name is", official_name))
 
 ```
 
@@ -89,11 +113,11 @@ We use the next chunk to set the path to the correct directory for the installat
 *If the AFB is managed by the Navy, set Navy = TRUE*
 *If the AFB is managed by the Air Force, set Navy = FALSE*
 
-```{r set-directories}
+```{r set-directory-to-access-installation-boundaries}
 
 # Is the AFB managed by the Navy?
 
-Navy = FALSE
+Navy = TRUE
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
                                        "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
@@ -121,15 +145,13 @@ cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for reada
 
 ```
 
-*Enter the scenarios of interest below.* You only need to enter the models between the quotation marks (""). The 'scenarios' vector will populate automatically
+*Enter the scenarios of interest below*. You only need to input values between the quotation marks ("") for 'baseline', 'scenario1', and 'scenario2'.
 
 ```{r enter-scenarios}
 
 baseline <- "historical"
 scenario1 <- "ssp245"
 scenario2 <- "ssp585"
-
-scenarios <- c(baseline, scenario1, scenario2)
 
 ```
 
@@ -151,7 +173,7 @@ Of the variables listed, which do you want to include in your analysis? *Enter t
 
 ```{r}
 
-variables <- c("pr_day", "tasmax", "tasmin", "tas_da", "hurs_d", "sfcWin") # an example of how you would choose among the variables if desired
+variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin") # an example of how you would choose among the variables if desired
 
 ```
 
@@ -169,18 +191,35 @@ future1_end_year <- 2050 # End year of interest for the first future time period
 future2_start_year <- 2051 # Start year of interest for the second future time period 
 future2_end_year <- 2080 # End year of interest for the second future time period 
 
-years <- c(baseline_start_year, # vector for easy reference
-           baseline_end_year, 
-           future1_start_year, 
-           future1_end_year, 
-           future2_start_year, 
-           future2_end_year)
 ```
 
 ####################################################################################################
 ###     THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT            ################################
 ###     The rest of the script should be able to be run automatically     ################################
 ####################################################################################################
+
+From this point forward, all you need to do is press the green 'run' arrow for each chunk. DO NOT ALTER THE CODE BELOW. 
+
+## CREATE VECTORS FOR YEAR-SCENARIO COMBOS
+
+```{r character-vectors}
+
+scenarios <- c(baseline, scenario1, scenario2)
+
+scenario1_plotName <- ifelse(str_detect(scenario1, "ssp245"), "SSP2-4.5", "RCP 4.5")
+scenario2_plotName <- ifelse(str_detect(scenario2, "ssp585"), "SSP5-8.5", "RCP 8.5")
+  
+scenario_plotNames <- c("Historical", scenario1_plotName, scenario2_plotName)
+
+years <- c(baseline_start_year, # vector for easy reference
+           baseline_end_year, 
+           future1_start_year, 
+           future1_end_year, 
+           future2_start_year, 
+           future2_end_year)
+
+```
+
 
 ## SET DIRECTORY FOR RESULTS
 
@@ -351,12 +390,12 @@ cat("The object used for data extraction is ", class(extract_obj))
 
 ```
 
-INTERPRETING THE OUTPUT ABOVE: If the output of the following code chunk says 'numeric', the script will use the centroid. If it says 'spatVector', it will use the spatial object (afb). 
+*INTERPRETING THE OUTPUT ABOVE*: If the output of the following code chunk says 'numeric', the script will use the centroid. If it says 'spatVector', it will use the spatial object (afb). 
 
 *If you want to override the automatic choice, manually highlight and run either of the options below:* (if you enter it into the code chunk it will remain there and you risk overriding future choices you may not want to, so just do it here in the main text.) 
 
-```extract_obj <- cell``` to use the centroid  -OR-
-```extract_obj <- afb``` to use the entire shapefile
+`extract_obj <- cell` to use the centroid  -OR-
+`extract_obj <- afb` to use the entire shapefile
 
 
 ## DATA EXTRACTION
@@ -567,6 +606,7 @@ for(i in 1:length(AllDays)){
     write_csv(csv, file = paste0(results_folder,csv_fileName,".csv"))
 
     } # end write to csv
+
 ```
 
 Now that the AllDays.csv files have been created, it is no longer necessary to retain space-intensive objects in the environment. We can routinely remove objects we no longer need.
@@ -574,11 +614,14 @@ Now that the AllDays.csv files have been created, it is no longer necessary to r
 ```{r remove-extraneous-stuff}
 
 rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
+                        "official_name",
                         "model", 
                         "scenarios",
+                        "scenario_plotNames",
                         "years",
                         "results_folder",
-                        "AllDays")))
+                        "AllDays",
+                        "RasterUnitConvert")))
 
 ```
 
@@ -596,11 +639,14 @@ source('Code/Ecosystems_Climate_Data.R')
 ```{r remove-extraneous-stuff, warning=FALSE}
 
 rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
+                        "official_name",
                         "model", 
                         "scenarios",
+                        "scenario_plotNames",
                         "years",
                         "results_folder",
-                        "AllDays")))
+                        "AllDays",
+                        "RasterUnitConvert")))
 
 ```
 
@@ -622,11 +668,15 @@ source("./Code/Climographs.R")
 ```{r remove-extraneous-stuff}
 
 rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
+                        "official_name",
                         "model", 
                         "scenarios",
+                        "scenario_plotNames",
                         "years",
                         "results_folder",
-                        "AllDays")))
+                        "AllDays",
+                        "plots_dir",
+                        "RasterUnitConvert")))
 
 ```
 
@@ -780,6 +830,265 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 
 ```
 
+## Walter and Leith Diagrams
+
+This section creates WL Diagrams for both F and C and places the results in the results_folder (under Plots/Walter-Lieth). The specs are set for a 4.5 x 6.5 in plot, so the appearance in the viewer does not appear aligned, but the output should be as desired. 
+
+```{r walter-lieth-diagrams}
+
+source('./Code/Functions/WL_Adapted.R') # Walter-Lieth plots. Adapted from https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R by Annie Kellner 10-15-23  
+  
+# Directory for WL plots
+  
+wl_dir <- paste(plots_dir,"Walter-Lieth", sep = "/")
+
+if (!dir.exists(wl_dir)){
+  dir.create(wl_dir)}
+
+# Calculate Celsius values before running function for plot creation
+
+for(i in 1:length(monthSum)){
+
+# Format data
+  
+wlC = monthSum[[i]] %>%
+  mutate(Avg_TMaxC = RasterUnitConvert(Avg_TMaxF, "FtoC")) %>%
+  mutate(Avg_TMinC = RasterUnitConvert(Avg_TMinF, "FtoC")) %>%
+  mutate(Abs_TminC = RasterUnitConvert(Abs_TminF, "FtoC")) %>%
+  select(Avg_PPT_mm, Avg_TMaxC, Avg_TMinC, Abs_TminC) 
+
+wlC = wlC[1:12,]
+wlC = data.table::transpose(wlC)
+
+# ----------  Celsius plot  ----------------- #
+
+# per is 'period' and is an argument in the ggclimat_walter_lieth() function
+
+per_scenario = if (str_detect(names(monthSum[i]), "baseline")){
+    scenario_plotNames[1]
+  } else if(str_detect(names(monthSum[i]),"s1")) {
+    scenario_plotNames[2]
+  } else {
+    scenario_plotNames[3]
+  }
+
+per_years = if(str_detect(names(monthSum[i]), "baseline")){ 
+  as.character(paste(years[1], years[2], sep = " - "))
+} else if(str_detect(names(monthSum[i]),"f1")){
+  as.character(paste(years[3],years[4], sep = " - "))
+} else {
+  as.character(paste(years[5], years[6], sep = " - "))
+}
+  
+  
+per = paste(per_scenario,per_years,sep = ", ")
+
+per_length = nchar(per) # to calculate where to put the "subtitle" on the plot
+
+
+wlCplot = ggclimat_walter_lieth(wlC, 
+                      est = official_name, 
+                      per = per,
+                      mlab = "en", # English language 
+                      pcol = "blue", # precip color
+                      tcol = "red", # temp color
+                      pfcol = "lightblue", # probable freeze
+                      sfcol = "steelblue") # certain freeze
+
+
+# Save plot in results_folder/Plots/Walter-Lieth 
+
+wl_scenario = if (str_detect(names(monthSum[i]), "baseline")){
+    "historical"
+  } else if(str_detect(names(monthSum[i]),"s1")) {
+    scenarios[2]
+  } else {
+    scenarios[3]
+  }
+
+midyear = if (str_detect(names(monthSum[i]), "baseline")){
+  floor((years[1] + years[2])/2)
+} else if (str_detect(names(monthSum[i]),"f1")) {
+  floor((years[3] + years[4])/2)
+} else if (str_detect(names(monthSum[i]),"f2")) {
+  floor((years[5] + years[6])/2)
+}
+  
+
+filenameC = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Celsius.png")
+
+ggsave(filenameC, plot = wlCplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
+
+
+# ----------   Fahrenheit Plot  --------------  #
+
+# Create Fahrenheit dataframe 
+
+dat_long_endF = dat_long_end %>%
+    mutate(p_mesIN = p_mes/25.4) %>%
+    mutate(tm_maxF = tm_max*(9/5) + 32) %>%
+    mutate(tm_minF = tm_min *(9/5) + 32) %>%
+    mutate(ta_minF = ta_min*(9/5) + 32) %>%
+    mutate(tmF = (tm_maxF + tm_minF) / 2)
+
+  ## Vert. Axis range - temp ----
+  ymaxF <- 140
+  
+  # Min range
+  yminF <- min(dat_long_endF$tmF)
+  
+  #range_tm <- seq(0, ymax, 10)
+  range_tmF <- seq(32, ymaxF, 18)
+  
+  if (yminF < 26.6) {
+    yminF <- floor(yminF / 10) * 10 # min Temp rounded
+    # Labels
+    range_tmF <- seq(yminF, ymaxF, 18)
+  }
+
+# Helper for ticks
+  
+ticks = data.frame(
+    x = seq(0, 12),
+    ymin = -3,
+    ymax = 0
+  )
+
+# Precip labels
+
+preclabs2 <- as.numeric(as.character(preclabs))
+preclabs2 <- na.omit(preclabs2)
+preclabsF <- as.numeric() 
+  
+  for(j in 1:length(preclabs2)){
+    preclabsF[j] = preclabs2[j]/25.4
+  }
+
+# In the event the temp and precip vectors are not of equal size, add values
+
+if (length(preclabsF) > length(range_tm)){
+  append(-10, range_tm) -> range_tm
+}
+
+if(length(range_tm) > length(preclabsF)){
+  append(preclabsF, 15.7) -> preclabsF
+}
+
+  
+wlFplot = wandlplot + 
+    geom_hline(yintercept = c(0, 50)) + # removed 'size' argument (CEMML/AK 09-14-23)
+    geom_segment(data = ticks, aes(
+      x = x,
+      xend = x,
+      y = ymin,
+      yend = ymax
+    )) +
+    scale_x_continuous(
+      breaks = month_breaks,
+      name = "",
+      labels = month_labs,
+      expand = c(0, 0)
+      ) +
+    scale_y_continuous(
+    "°F",
+    labels = function(x) x* (9/5) + 32,
+    breaks = range_tm, # Celsius breaks are kept so that precip axis is aligned
+    sec.axis = dup_axis(name = "in",
+                        labels = round(preclabsF, digits = 1)))
+
+
+# Subtitle (aka, time period and precip/temp values)
+
+sub = paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
+               "°F        ",
+               prettyNum(
+                 round(sum(
+                   dat_long_endF[dat_long_endF$interpolate == FALSE, ]$p_mesIN
+                 )),
+                 big.mark = ","
+               ),
+               " in",
+               sep = ""
+  )
+  
+  sub_length = nchar(sub)
+  sub_placement = 78 - per_length - sub_length # 1 in = ~10 character-spaces in Times New Roman font, so an image of 6.5" in width contains 78 character-spaces per line. This right-aligns the "subtitle" (i.e., the righthand temp/precip values)
+  
+  
+  sub2 = paste0(
+  per, 
+  paste0(rep(" ",sub_placement), collapse = ""), 
+  sub,
+  "\n" # linebreak between "subtitle" and plot
+  )
+  
+  # Vertical tags 
+  
+  maxtmF = prettyNum(round(max(dat_long_endF$tm_maxF), 1))
+  mintmF = prettyNum(round(min(dat_long_endF$tm_minF), 1))
+  
+  tags = paste0(
+    paste0(rep(" \n", 6), collapse = ""),
+    maxtmF,
+    paste0(rep(" \n", 10), collapse = ""),
+    mintmF
+  )
+
+  # Add tags and theme
+  
+wlFplot = wlFplot +
+    ggplot2::labs(
+      title = title,
+      subtitle = sub2,
+      tag = tags
+    ) +
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      plot.title = element_text(
+        lineheight = 1,
+        size = 14,
+        face = "bold"
+      ),
+      plot.subtitle = element_text(
+        lineheight = 1,
+        size = 14,
+        face = "plain"
+      ),
+      plot.tag = element_text(size = 10),
+      plot.tag.position = "left",
+      axis.ticks.length.x.bottom = unit(0, "pt"),
+      axis.line.x.bottom = element_blank(),
+      axis.title.y.left = element_text(
+        angle = 0,
+        vjust = 0.9,
+        size = 10,
+        colour = tcol,
+        margin = unit(rep(10, 4), "pt")
+      ),
+      axis.text.x.bottom = element_text(size = 10),
+      axis.text.y.left = element_text(colour = tcol, size = 10),
+      axis.title.y.right = element_text(
+        angle = 0,
+        vjust = 0.9,
+        size = 10,
+        colour = pcol,
+        margin = unit(rep(10, 4), "pt")
+      ),
+      axis.text.y.right = element_text(colour = pcol, size = 10)
+    ) +
+      ggplot2::theme(text=element_text(family="serif")) # Times New Roman
+
+# Save Fahrenheit plot
+
+filenameF = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Fahrenheit.png")
+
+ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
+
+}
+
+```
+
+
 ```{r remove-objects}
 
 rm(list=setdiff(ls(), c("monthSum", 
@@ -787,7 +1096,8 @@ rm(list=setdiff(ls(), c("monthSum",
                         "model", 
                         "scenarios",
                         "results_folder",
-                        "years")))
+                        "years",
+                        "RasterUnitConvert")))
 
 ```
 
@@ -841,6 +1151,7 @@ write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = 
 }
 
 ```
+
 
 
 

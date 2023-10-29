@@ -12,11 +12,7 @@ models <- c("HADGEM2-ES",
             "MIROC6",
             "MPI-ESM1-2-HR")
 
-<<<<<<< HEAD
 AFB_Names <- c("Homestead_ARB", 
-=======
-AFBs <- c("Homestead_ARB", 
->>>>>>> main
               "Guam_Proxy_v1", # Navy
               "CNMI_Proxy_v1", # Navy
               "Indianhead_Proxy", # Navy
@@ -31,4 +27,11 @@ AFBs <- c("Homestead_ARB",
               "Carter_Creek_Recreation_Center_Boundary",
               "JBLE",
               "Edwards_AFB",
-              "Malmstrom_AFB_Proxy") 
+              "Malmstrom_AFB_Proxy",
+              "Kitsap_Proxy",
+              "NB_SanDiego_Proxy") 
+
+official_base_names_for_plots <- c("NAVBASE Kitsap",
+                                   "NAVBASE San Diego") 
+
+
