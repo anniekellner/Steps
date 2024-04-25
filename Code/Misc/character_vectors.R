@@ -29,9 +29,11 @@ AFB_Names <- c("Homestead_ARB",
               "Edwards_AFB",
               "Malmstrom_AFB_Proxy",
               "Kitsap_Proxy",
-              "NB_SanDiego_Proxy") 
+              "NB_SanDiego_Proxy",
+              "NAS Oceana") 
 
 official_base_names_for_plots <- c("NAVBASE Kitsap",
-                                   "NAVBASE San Diego") 
+                                   "NAVBASE San Diego",
+                                   "Naval Air Station Oceana") 
 
 
