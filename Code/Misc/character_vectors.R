@@ -35,6 +35,7 @@ AFB_Names <- c("Homestead_ARB",
 
 official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "NAVBASE San Diego",
-                                   "Naval Air Station Oceana") 
+                                   "Naval Air Station Oceana",
+                                   "Nellis Air Force Base") 
 
 
