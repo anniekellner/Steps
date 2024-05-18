@@ -104,11 +104,11 @@ source('./Code/Misc/character_vectors.R') This code will not run, so please re-r
 
 ```{r enter-base-and-model}
 
-AFB_Name <- AFB_Names[19] 
+AFB_Name <- AFB_Names[20] 
 
-official_name <- official_base_names_for_plots[3] # These names serve as titles for the climatograph and Walter-Lieth plots
+official_name <- official_base_names_for_plots[4] # These names serve as titles for the climatograph and Walter-Lieth plots
 
-model <- models[5] 
+model <- models[2] 
 
 cat(paste("The model you have selected is", model,". The base is", AFB_Name, "and its official name is", official_name))
 
@@ -123,7 +123,7 @@ We use the next chunk to set the path to the correct directory for the installat
 
 # Is the AFB managed by the Navy?
 
-Navy = TRUE
+Navy = FALSE
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
                                        "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
@@ -156,8 +156,8 @@ cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for reada
 ```{r enter-scenarios}
 
 baseline <- "historical"
-scenario1 <- "ssp245"
-scenario2 <- "ssp585"
+scenario1 <- "rcp45"
+scenario2 <- "rcp85"
 
 ```
 
@@ -179,7 +179,7 @@ Of the variables listed, which do you want to include in your analysis? *Enter t
 
 ```{r}
 
-variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin") # an example of how you would choose among the variables if desired
+variables <- c("pr_day", "tasmax", "tasmin") # an example of how you would choose among the variables if desired
 
 ```
 
@@ -188,8 +188,8 @@ variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin") # an example of
 
 ```{r enter-years-of-interest}
 
-baseline_start_year <- 1985 # Start year of interest for the historical time period  
-baseline_end_year <- 2014 # End year of interest for the historical time period
+baseline_start_year <- 1976 # Start year of interest for the historical time period  
+baseline_end_year <- 2005 # End year of interest for the historical time period
 
 future1_start_year <- 2021 # Start year of interest for the first future time period 
 future1_end_year <- 2050 # End year of interest for the first future time period 
