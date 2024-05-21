@@ -10,7 +10,8 @@ models <- c("HADGEM2-ES",
             "MACA_CCSM4",
             "MACA_CCSM4_Monthly",
             "MIROC6",
-            "MPI-ESM1-2-HR")
+            "MPI-ESM1-2-HR",
+            "EC-Earth3-Veg-LR")
 
 AFB_Names <- c("Homestead_ARB", 
               "Guam_Proxy_v1", # Navy
@@ -31,11 +32,19 @@ AFB_Names <- c("Homestead_ARB",
               "Kitsap_Proxy",
               "NB_SanDiego_Proxy",
               "NAS Oceana",
-              "Nellis_AFB") 
+              "Nellis_AFB",
+              "Rainier_Mesa",
+              "Antelope_Lake",
+              "West_of_Quartz_Peak",
+              "Creech_AFB") 
 
 official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "NAVBASE San Diego",
                                    "Naval Air Station Oceana",
-                                   "Nellis Air Force Base") 
+                                   "Nellis Air Force Base",
+                                   "NTTR Central - Rainier Mesa",
+                                   "NTTR North - Antelope Lake",
+                                   "NTTR South - West of Quartz Peak",
+                                   "Creech Air Force Base") 
 
 
