@@ -93,24 +93,24 @@ source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude sys
 ### PART ONE: User settings - choose AFB, AFB manager, model, scenarios, years of interest  ###
 ###############################################################################################
 
-First, let's *select which base (AFB, etc.) and model you wish to run.*  To choose from a list, highlight the word `AFB_Names`, `models`, or `official_base_names_for_plots` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"). The available models correspond to numbers in the vector (e.g., the model HADGEM2-ES is [1]). 
+First, let's *select which base (AFB, etc.) and model you wish to run.*  To choose from a list, highlight the word `installation_names`, `models`, or `official_base_names_for_plots` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"). The available models correspond to numbers in the vector (e.g., the model HADGEM2-ES is [1]). 
 
 
 In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest.* 
 
-Official base names are used for plot titles. *If the base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the AFB_Names and official_base_names vectors and save. You will then have to re-run the following line above:*
+Official base names are used for plot titles. *If the base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the installation_names and official_base_names vectors and save. You will then have to re-run the following line above:*
 
 source('./Code/Misc/character_vectors.R') This code will not run, so please re-run above
 
 ```{r enter-base-and-model}
 
-AFB_Name <- AFB_Names[24] 
+installation <- installation_names[24] 
 
 official_name <- official_base_names_for_plots[8] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 model <- models[7] 
 
-cat(paste("The model you have selected is", model,". The base is", AFB_Name, "and its official name is", official_name))
+cat(paste("The model you have selected is", model,". The base is", installation, "and its official name is", official_name))
 
 ```
 
@@ -234,9 +234,9 @@ years <- c(baseline_start_year, # vector for easy reference
 ```{r set-output-directory}
 
 results_folder <- if(model == "LOCA_CCSM4") {
-  paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2',"/",AFB_Name,"/")
+  paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2',"/",installation,"/")
   } else {
-  paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_',model,"/",AFB_Name,"/")
+  paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_',model,"/",installation,"/")
   }
 ```
 
@@ -335,7 +335,7 @@ rx <- stackX[[random_raster]]
 
 # AFB 
 
-afb_dir <- (paste(dir_installation_boundaries, AFB_Name, sep = '/'))
+afb_dir <- (paste(dir_installation_boundaries, installation, sep = '/'))
 afb_filename <- paste(afb_dir, '.shp', sep = "")
 
 afbSF <- st_read(afb_filename) # Because plotting package (tmap) doesn't take terra vectors
@@ -598,7 +598,7 @@ for(i in 1:length(AllDays)){
   } else {
     paste(baseline_start_year,"-",baseline_end_year)
   }
-    csv_fileName = paste(AFB_Name, csv_scenario, csv_years,"AllDays",sep = '_')
+    csv_fileName = paste(installation, csv_scenario, csv_years,"AllDays",sep = '_')
     
     # Create directory for files if it does not already exist
     
@@ -619,7 +619,7 @@ Now that the AllDays.csv files have been created, it is no longer necessary to r
 
 ```{r remove-extraneous-stuff}
 
-rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
+rm(list=setdiff(ls(), c("installation", # These are the objects we want to keep
                         "official_name",
                         "model", 
                         "scenarios",
@@ -644,7 +644,7 @@ source('Code/Ecosystems_Climate_Data.R')
 
 ```{r remove-extraneous-stuff, warning=FALSE}
 
-rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
+rm(list=setdiff(ls(), c("installation", # These are the objects we want to keep
                         "official_name",
                         "model", 
                         "scenarios",
@@ -673,7 +673,7 @@ source("./Code/Climographs.R")
 
 ```{r remove-extraneous-stuff}
 
-rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
+rm(list=setdiff(ls(), c("installation", # These are the objects we want to keep
                         "official_name",
                         "model", 
                         "scenarios",
@@ -830,7 +830,7 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
   } else {
     paste(first(year(AllDays$results_baseline$date)),"-",last(year(AllDays$results_baseline$date)))
   }
-    csv_fileName = paste(AFB_Name,csv_scenario,csv_years,"MonthSum",sep = '_')
+    csv_fileName = paste(installation,csv_scenario,csv_years,"MonthSum",sep = '_')
     write_csv(monthSum[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = ""))
 }
 
@@ -921,7 +921,7 @@ midyear = if (str_detect(names(monthSum[i]), "baseline")){
 }
   
 
-filenameC = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Celsius.png")
+filenameC = paste0(installation,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Celsius.png")
 
 ggsave(filenameC, plot = wlCplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
 
@@ -1086,7 +1086,7 @@ wlFplot = wlFplot +
 
 # Save Fahrenheit plot
 
-filenameF = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Fahrenheit.png")
+filenameF = paste0(installation,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Fahrenheit.png")
 
 ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
 
@@ -1098,7 +1098,7 @@ ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 6.5, heig
 ```{r remove-objects}
 
 rm(list=setdiff(ls(), c("monthSum", 
-                        "AFB_Name", 
+                        "installation", 
                         "model", 
                         "scenarios",
                         "results_folder",
@@ -1151,7 +1151,7 @@ csv_years = if (str_detect(names(diffHist[i]), "f1")){
     paste0(years[5],"-",years[6])
   } 
     
-csv_fileName = paste(AFB_Name,csv_scenario,csv_years,"DiffHist",sep = '_')
+csv_fileName = paste(installation,csv_scenario,csv_years,"DiffHist",sep = '_')
 write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = ""))
 
 }
