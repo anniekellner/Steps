@@ -5,7 +5,7 @@
 # Adapted from Step9a_Ecosystems Climate Data - CMIP6Updated.R by Annie Kellner 6/13/23
 
 # Objects from Step3.Rmd needed to run this script include 
-  #AllDays (list), model, AFB_Name, and start_year and end_year for the historical and future time periods
+  #AllDays (list), model, installation, and start_year and end_year for the historical and future time periods
 
 conflicts_prefer(month::lubridate) # set conflict preferences
 
