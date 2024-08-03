@@ -104,13 +104,13 @@ source('./Code/Misc/character_vectors.R') This code will not run, so please re-r
 
 ```{r enter-base-and-model}
 
-installation <- installation_names[24] 
+installation <- installation_names[25] 
 
-official_name <- official_base_names_for_plots[8] # These names serve as titles for the climatograph and Walter-Lieth plots
+official_name <- official_base_names_for_plots[9] # These names serve as titles for the climatograph and Walter-Lieth plots
 
-model <- models[7] 
+model <- models[5] 
 
-cat(paste("The model you have selected is", model,". The base is", installation, "and its official name is", official_name))
+cat(paste("The model you have selected is", model,". The installation is", installation, "and its official name is", official_name))
 
 ```
 
@@ -179,7 +179,7 @@ Of the variables listed, which do you want to include in your analysis? *Enter t
 
 ```{r}
 
-variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "huss_d", "sfcWin") # an example of how you would choose among the variables if desired
+variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin") # an example of how you would choose among the variables if desired
 
 ```
 
