@@ -710,7 +710,7 @@ for(i in 1:length(AllDays)){
     dplyr::select(-c(lat, lon))
   
   yearAvg = df %>%
-    dplyr::select(!c('date','PPT_in', 'PPT_mm')) %>% # Exclude variables for which the result is not simply a monthly average
+    dplyr::select(!c('date','PPT_in', 'PPT_mm', 'GDDF')) %>% # Exclude variables for which the result is not simply a monthly average
     dplyr::select(!(contains("days"))) %>%
     group_by(year, month) %>%
     summarise(across(where(is.double), mean))
@@ -720,20 +720,26 @@ for(i in 1:length(AllDays)){
   group_by(year, month) %>%
   summarise(Abs_TminF = min(TMinF))
   
-  ppt = df %>%
+  sum_ppt = df %>%
   select(date, year, month, 'PPT_in', 'PPT_mm') %>%
   group_by(year, month) %>%
   summarise(across(contains('PPT'), sum))
   
-  days = df %>%
+  sum_days = df %>%
   select(date, year, month, contains('days')) %>%
   group_by(year, month) %>%
   summarise(across(contains('days'), sum))
   
+  sum_GDDF = df %>%
+    select(date, year, month, GDDF) %>%
+    group_by(year, month) %>%
+    summarise(GDDF = sum(GDDF))
+  
   all = yearAvg %>%
-  full_join(days) %>%
-  full_join(ppt) %>%
+  full_join(sum_days) %>%
+  full_join(sum_ppt) %>%
   full_join(Abs_TminF) %>%
+  full_join(sum_GDDF) %>%
   ungroup()
   
   monthAvg = all %>%
