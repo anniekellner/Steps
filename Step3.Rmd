@@ -693,7 +693,7 @@ The next chunk creates MonthSum.csv files
 ```{r MonthSum, message=FALSE}
 
 # input: AllDays df
-# output: MonthSum df (and csv's)
+# output: MonthSum df and csv's
 
 monthSum <- list()
 
