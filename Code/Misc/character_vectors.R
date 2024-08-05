@@ -37,7 +37,8 @@ installation_names <- c("Homestead_ARB",
               "Antelope_Lake",
               "West_of_Quartz_Peak",
               "Creech_AFB",
-              "Ascension_Proxy") 
+              "Ascension_Proxy",
+              "Eareckson_AFB") 
 
 official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "NAVBASE San Diego",
@@ -47,6 +48,7 @@ official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "NTTR North - Antelope Lake",
                                    "NTTR South - West of Quartz Peak",
                                    "Creech Air Force Base",
-                                   "Ascension Island") 
+                                   "Ascension Island",
+                                   "Eareckson AFB") 
 
 
