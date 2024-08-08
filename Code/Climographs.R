@@ -40,6 +40,10 @@ for(i in 1:length(AllDays)){
 }
 
 
+##### MAKE AXES CONSISTENT
+
+plots <- list()
+
 for(i in 1:length(AllDays)){
 
 clim.dat <- AllDays[[i]]
@@ -320,6 +324,7 @@ ggplot(df) +
   geom_line(aes(x=factor(month, level =c(month.abb)), tmax), linewidth=1, linetype=1, color="red4", group=4) +
   geom_line(aes(x=factor(month, level =c(month.abb)), quan.max.25), linewidth=.5, linetype=2, color="red4", group=5) +
   geom_line(aes(x=factor(month, level =c(month.abb)), quan.max.75), linewidth=.5, linetype=2, color="red4", group=6) +
+ #scale_y_continuous(limits = c(0,100), n.breaks = 6) +
   labs(title = title, 
        subtitle = subtitle) +
   xlab(paste0("\n","Month"))                       +
@@ -332,9 +337,9 @@ ggplot(df) +
   theme(axis.text.y=element_text(size=15)) +
   theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0))) +
   theme(axis.title.y.right = element_text(margin = margin(t = 0, r = 0, b = 0, l = 15))) +
-  scale_y_continuous(sec.axis = sec_axis(~./5, name = "Average Precip (in/month)")) +
+  scale_y_continuous(limits = c(0, 100), n.breaks = 6, sec.axis = sec_axis(~./5, name = "Average Precip (in/month)")) +
   theme(legend.position = "right")
-
+  
 ggsave(filename = paste(path_to_climographs,plot_name,sep = "/"), dpi = 200)
 
 }
