@@ -40,10 +40,6 @@ for(i in 1:length(AllDays)){
 }
 
 
-##### MAKE AXES CONSISTENT
-
-plots <- list()
-
 for(i in 1:length(AllDays)){
 
 clim.dat <- AllDays[[i]]
@@ -324,13 +320,12 @@ ggplot(df) +
   geom_line(aes(x=factor(month, level =c(month.abb)), tmax), linewidth=1, linetype=1, color="red4", group=4) +
   geom_line(aes(x=factor(month, level =c(month.abb)), quan.max.25), linewidth=.5, linetype=2, color="red4", group=5) +
   geom_line(aes(x=factor(month, level =c(month.abb)), quan.max.75), linewidth=.5, linetype=2, color="red4", group=6) +
- #scale_y_continuous(limits = c(0,100), n.breaks = 6) +
   labs(title = title, 
        subtitle = subtitle) +
   xlab(paste0("\n","Month"))                       +
   ylab("Average Temperature (\u00B0F)")    + # prints degree symbol before Fahrenheit
   theme_minimal() +
-  theme(text=element_text(family="Times New Roman")) +
+  theme(text=element_text(color = "black", family = "serif")) +
   theme(title=element_text(size=17)) +
   theme(axis.title=element_text(size=15)) +
   theme(axis.text.x=element_text(size=15)) +
