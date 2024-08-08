@@ -13,8 +13,6 @@
 
 #################################################
 
-library(extrafont)
-
 ## Create directory for Climographs
 
 path_to_climographs <- paste(plots_dir,"Climographs", sep = "/")
