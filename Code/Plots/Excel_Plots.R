@@ -28,26 +28,7 @@ rownames(dfT) <- col_names
 colnames(dfT) <- month.abb
 
 
- 
 
-df2 <- pivot_longer(
-  data = df, 
-  cols = starts_with("Avg"), 
-  names_to = "Month",
-  names_prefix = )
-
-# Pivot plot so that columns names are month.abb and rows are Avg_
-# See this example (or others)
-
-billboard
-billboard %>%
-  pivot_longer(
-    cols = starts_with("wk"),
-    names_to = "week",
-    names_prefix = "wk",
-    values_to = "rank",
-    values_drop_na = TRUE
-  )
 
 
 
