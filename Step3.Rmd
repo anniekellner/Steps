@@ -104,11 +104,11 @@ source('./Code/Misc/character_vectors.R') This code will not run, so please re-r
 
 ```{r enter-base-and-model}
 
-installation <- installation_names[26] 
+installation <- installation_names[27] 
 
-official_name <- official_base_names_for_plots[10] # These names serve as titles for the climatograph and Walter-Lieth plots
+official_name <- official_base_names_for_plots[11] # These names serve as titles for the climatograph and Walter-Lieth plots
 
-model <- models[5] 
+model <- models[7] 
 
 cat(paste("The model you have selected is", model,". The installation is", installation, "and its official name is", official_name))
 
@@ -410,7 +410,9 @@ The following chunk extracts raw data from the ncdf files of interest.
 
 It assumes the centroid is being used for data extraction. It has not been tested for use with a spatial object. It may still work, but might be quite slow. If you are running several large bases sequentially, it will be worth exploring an alternate coding strategy.
 
-This is the most time-consuming chunk of the entire script. If you will need to refer back to this data, you can save the entire environment (all objects) as an .RData file (save.image()) after the chunk has run. Alternatively, you can save individual objects with the function (saveRDS()). 
+This is the most time-consuming chunk of the entire script. If you will need to refer back to this data, you can save the entire environment (all objects) as an .RData file (save.image()) after the chunk has run. Alternatively, you can save individual objects with the function (saveRDS()). *In order to load and run chunks from the .RData file, it is necessary to save the rx raster object separately, because it won't load from the .RData file.* In order to do this, use the code:
+
+writeRaster(rx, filename = '/path/to/dir')
 
 ```{r extract-values}
 
@@ -841,22 +843,6 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 }
 
 ```
-
-This chunk reproduces the plots originally created in Excel by T. Even
-
-```{r Excel-figs}
-
-
-
-
-
-
-
-```
-
-
-
-
 
 ## Walter and Leith Diagrams
 
