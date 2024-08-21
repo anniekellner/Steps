@@ -28,12 +28,7 @@ rownames(dfT) <- col_names
 colnames(dfT) <- month.abb
 
 
+rownames(test) <- month.abb
+colnames(test) <- col_names
 
-
-
-
-hist_Tmean_ave <- ggplot(data = df, aes(x = month, y = Avg_TMeanF)) +
-  geom_bar(aes(color = "#CBC598", fill = "#CBC598"))
-  
-                         
-
+#### USE CODE FROM CLIMOGRAPHS SCRIPT
