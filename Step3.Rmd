@@ -410,7 +410,9 @@ The following chunk extracts raw data from the ncdf files of interest.
 
 It assumes the centroid is being used for data extraction. It has not been tested for use with a spatial object. It may still work, but might be quite slow. If you are running several large bases sequentially, it will be worth exploring an alternate coding strategy.
 
-This is the most time-consuming chunk of the entire script. If you will need to refer back to this data, you can save the entire environment (all objects) as an .RData file (save.image()) after the chunk has run. Alternatively, you can save individual objects with the function (saveRDS()). 
+This is the most time-consuming chunk of the entire script. If you will need to refer back to this data, you can save the entire environment (all objects) as an .RData file (save.image()) after the chunk has run. Alternatively, you can save individual objects with the function (saveRDS()). *In order to load and run chunks from the .RData file, it is necessary to save the rx raster object separately, because it won't load from the .RData file.* In order to do this, use the code:
+
+```writeRaster(rx, filename = '/path/to/dir')```
 
 ```{r extract-values}
 
