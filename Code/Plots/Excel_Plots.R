@@ -18,17 +18,29 @@ if (!dir.exists(xl_plots_dir)){
 
 
 df <- monthSum$results_baseline[1:12,]
-df <- df %>%  select(-month)
-
-col_names <- colnames(df)
-
-dfT <- data.table::transpose(df) 
-
-rownames(dfT) <- col_names
-colnames(dfT) <- month.abb
+df <- df %>%  
+  select(-month) %>%
+  mutate(Month = month.abb) %>% glimpse()
+           
+           
+           month(df$month, label = TRUE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")))
 
 
-rownames(test) <- month.abb
-colnames(test) <- col_names
+ggplot(df) +
+geom_col(aes(x = factor(Month, levels = c(month.abb)), y = Avg_TMeanF), color="#CBC598", fill="#CBC598") 
+
+
+#Historical: #CBC598
+
+#col_names <- colnames(df)
+
+#dfT <- data.table::transpose(df) 
+
+#rownames(df) <- col_names
+#colnames(df) <- month.abb
+
+
+#rownames(dfT) <- month.abb
+#colnames(dfT) <- col_names
 
 #### USE CODE FROM CLIMOGRAPHS SCRIPT
