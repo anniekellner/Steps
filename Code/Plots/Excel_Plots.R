@@ -31,13 +31,13 @@ p <- ggplot(df) +
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Average Temperature (\u00B0F)", "\n")) +
   labs(title = "Historical Average Temperature") +
-  theme(element_text(family = "serif", size = 9, hjust = 0.5),
-        plot.title = element_text(family = "serif", hjust = 0.5, size = 9),
-        axis.title = element_text(family = "serif", hjust = 0.5, size = 9),
+  theme(element_text(family = "serif", hjust = 0.5),
+        plot.title = element_text(family = "serif", hjust = 0.5),
+        axis.title = element_text(family = "serif", hjust = 0.5),
         panel.background = element_blank(), 
         panel.grid.major.y = element_line(color = "grey", linetype = "solid", linewidth = 0.5),
         axis.ticks = element_blank(),
-        axis.text.x = element_text(margin = margin(t = -40, r = 0, b = 0, l = 0)))
+        axis.text.x = element_text(margin = margin(t = -40, r = 0, b = 0, l = 0))) # See whether - values put the text above the axis. If so, adjust
           
   
   
