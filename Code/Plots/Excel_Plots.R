@@ -35,12 +35,18 @@ histAve <- ggplot(df) +
         plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
         axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
         panel.background = element_blank(), 
-        panel.grid.major.y = element_line(color = "grey", linetype = "solid", linewidth = 0.5),
+        panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
         axis.ticks = element_blank(),
         axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
         axis.text.y = element_text(size = 8)) # See whether - values put the text above the axis. If so, adjust
           
-  
+ ggsave(filename = 'Historical Average Temperate.png', 
+        plot = histAve,
+        path = './Results/Test-Excel_Plots',
+        width = 5.5,
+        height = 3,
+        units = "in",
+        dpi = 300) 
   
 
 
