@@ -14,14 +14,24 @@ if (!dir.exists(xl_plots_dir)){
   dir.create(xl_plots_dir)}
 
 
+# ------------  Create function for adding month (e.g., "Jan") to dataframe --------------  #
+
+add_month <- function(df){
+  df = monthSum[[i]][1:12,]
+  df = select(df, -month)
+  df = mutate(df, Month = month.abb)
+}
+
+
 # ----------  Loop to reformat dataframes for use with ggplot2 --------------------  #
 
+for(i in 1:length(monthSum)){
+  monthSum[[i]] = add_month(monthSum[[i]])
+}
 
-df <- monthSum$results_baseline[1:12,]
 
-df <- df %>%  
-  select(-month) %>%
-  mutate(Month = month.abb) 
+
+
            
 
 # Plots
