@@ -29,18 +29,28 @@ for(i in 1:length(monthSum)){
   monthSum[[i]] = add_month(monthSum[[i]])
 }
 
+# ----------  PLOTS --------------------  #           
+
+### Single bar
+
+## Prep data
+
+df <- monthSum[[1]]
+df <- df[,3:5] # select only relevant columns for plots
+df <- select(df, 3,1,2) # reorder columns to match 
+titles <- c("Historical Average Temperature", "Historical Average Maximum Temperature", "Historical Average Minimum Temperature")
+plots <- c("Hist Avg_TMeanF", "Hist Avg_TMaxF", "Hist Avg_TMinF")
 
 
+## Create Plots
 
-           
+for(i in 1:length(titles)){
 
-# Plots
-
-histAve <- ggplot(df) +
-  geom_col(aes(x = factor(Month, levels = c(month.abb)), y = Avg_TMeanF), color="#CBC598", fill="#CBC598", width = 0.7) +
+ggplot(df) +
+  geom_col(aes(x = factor(Month, levels = c(month.abb)), y = colnames(df)[i]), color="#CBC598", fill="#CBC598", width = 0.7) +
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Average Temperature (\u00B0F)", "\n")) +
-  labs(title = "Historical Average Temperature",) +
+  labs(title = titles[i]) +
   theme(element_text(family = "serif", hjust = 0.5),
         plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
         axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
@@ -50,17 +60,14 @@ histAve <- ggplot(df) +
         axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
         axis.text.y = element_text(size = 8)) # See whether - values put the text above the axis. If so, adjust
           
- ggsave(filename = 'Historical Average Temperate.png', 
-        plot = histAve,
+ ggsave(filename = paste0(titles[i],'.png'), 
+        plot = plots[i],
         path = './Results/Test-Excel_Plots',
         width = 5.5,
         height = 3,
         units = "in",
         dpi = 300) 
-  
+}
+ 
 
 
-
-
-
-#### USE CODE FROM CLIMOGRAPHS SCRIPT
