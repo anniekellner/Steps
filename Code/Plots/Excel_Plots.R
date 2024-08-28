@@ -71,7 +71,6 @@ for(i in 1:length(plot_list)){
         axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
         axis.text.y = element_text(size = 8)) 
     
-          
  ggsave(filename = paste0(titles[i],'.png'), 
         plot = p,
         path = './Results/Test-Excel_Plots',
