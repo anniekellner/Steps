@@ -56,7 +56,8 @@ p <- ggplot(df) +
   ylab(paste0("Average Temperature (\u00B0F)", "\n"))
   
  plot_list[[y_col]] <- p
-}
+
+ }
   
 for(i in 1:length(plot_list)){  
   p = plot_list[[i]] +
