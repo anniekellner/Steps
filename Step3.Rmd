@@ -1166,6 +1166,23 @@ write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = 
 
 ```
 
+```{r bar-charts}
+
+bar_charts_dir <- paste(plots_dir,"Bar_Charts", sep = "/") 
+
+if (!dir.exists(bar_charts_dir)){
+  dir.create(bar_charts_dir)}
+
+add_month <- function(df){
+  df = monthSum[[i]][1:12,]
+  df = select(df, -month)
+  df = mutate(df, Month = month.abb)
+}
+
+source('./Code/Plots/Hist_Bar_Charts.R')
+source('./Code/Plots/Comparison_Bar_Charts.R')
+
+```
 
 
 
