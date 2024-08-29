@@ -8,7 +8,7 @@
 
 # ------------  Create Directory for Plots  ----------------------- #
 
-xl_plots_dir <- paste(plots_dir,"Excel_Plots", sep = "/") # Change this folder name -- ASK TREVOR
+xl_plots_dir <- paste(plots_dir,"Bar_Charts", sep = "/") 
 
 if (!dir.exists(xl_plots_dir)){
   dir.create(xl_plots_dir)}
