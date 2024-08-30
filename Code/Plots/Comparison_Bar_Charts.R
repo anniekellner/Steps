@@ -9,11 +9,31 @@
 
 ##  ------  Prep Data  ------------ ##
 
+# Add month (character) to diffHist
+
 for(i in 1:length(diffHist)){ 
   diffHist[[i]] = add_month(diffHist[[i]])
 }
 
-# Create new df's to compare changes within-scenario
+## Plot titles
+
+# Get mid-range values for years
+
+s1_midyear <- floor((years[3] + years[4])/2)
+s2_midyear <- floor((years[5] + years[6])/2)
+
+# Titles
+
+titles <- c(
+  paste(scenario1_plotName,"Change in Average Temperature", sep = " "),
+  paste(scenario2_plotName,"Change in Average Temperature", sep = " "),
+  paste(scenario1_plotName,"Change in Average Maximum Temperature", sep = " "),
+  paste(scenario2_plotName,"Change in Average Maximum Temperature", sep = " "),
+  paste(scenario1_plotName, "Change in Average Minimum Temperature", sep = " "),
+  paste(scenario2_plotName, "Change in Average Minimum Temperature", sep = " "),
+  paste(scenario1_plotName,"Change in Average Precipitation", sep = " "),
+  paste(scenario2_plotName,"Change in Average Precipitation", sep = " ")
+)
 
 
 # Scenario 1 (e.g., SSP2-4.5)
@@ -49,4 +69,5 @@ S2 <- full_join(s2f1, s2f2, by = "Month")
 
 ##  ----------  PLOTS   ------------------------------------    ##
 
+titles <- c("Historical Average Temperature", "Historical Average Maximum Temperature", "Historical Average Minimum Temperature")
 
