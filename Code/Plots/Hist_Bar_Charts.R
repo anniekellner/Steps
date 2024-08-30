@@ -10,14 +10,20 @@
 df <- monthSum[[1]] # Historical data
 
 df <- df 
-df <- add_month(df) %>% ## Make sure this works
-df <- select(df, Month, Avg_TMeanF, Avg_TMaxF, Avg_TMinF)
+df <- add_month(df)  ## Make sure this works
+df <- select(df, Month, Avg_TMeanF, Avg_TMaxF, Avg_TMinF, Avg_PPT_in)
 
-titles <- c("Historical Average Temperature", "Historical Average Maximum Temperature", "Historical Average Minimum Temperature")
+titles <- c("Historical Average Temperature", 
+            "Historical Average Maximum Temperature", 
+            "Historical Average Minimum Temperature")
+
 plots <- c("Hist Avg_TMeanF", "Hist Avg_TMaxF", "Hist Avg_TMinF")
+
 y_cols <- c("Avg_TMeanF", "Avg_TMaxF", "Avg_TMinF")
 
 # ------------- Create Plots  --------------------------  #
+
+##  TEMPERATURES
 
 plot_list <- list() # Need to create list in order to run plots through a loop
 
@@ -53,4 +59,29 @@ for(i in 1:length(plot_list)){
         units = "in",
         dpi = 300) 
 }
+
+### PRECIP
+
+prcp <- ggplot(df) + 
+  geom_col(aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in), color="#0083BE", fill="#0083BE", width = 0.7) + 
+  xlab(paste0("\n", "Month")) +
+  ylab(paste0("Average Precipitation (inches)", "\n")) +
+  labs(title = "Historical Average Precipitation") +
+  scale_y_continuous(limits = c(0,6), n.breaks = 7) + 
+  theme(element_text(family = "serif", hjust = 0.5),
+        plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
+        axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
+        panel.background = element_blank(), 
+        panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
+        axis.ticks = element_blank(),
+        axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
+        axis.text.y = element_text(size = 8)) 
+
+ggsave(filename = "Hist Avg_PPT_in.png",
+       plot = prcp,
+       path = './Results/Test-Excel_Plots',
+       width = 5.5,
+       height = 3,
+       units = "in",
+       dpi = 300)
  
