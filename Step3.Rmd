@@ -151,7 +151,7 @@ cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for reada
 
 ```
 
-*Enter the scenarios of interest below*. You only need to input values between the quotation marks ("") for 'baseline', 'scenario1', and 'scenario2'.
+*Enter the scenarios of interest below*. Input values between the quotation marks ("") for 'baseline', 'scenario1', and 'scenario2'.
 
 ```{r enter-scenarios}
 
@@ -1109,6 +1109,7 @@ rm(list=setdiff(ls(), c("monthSum",
                         "installation", 
                         "model", 
                         "scenarios",
+                        "scenario_plotNames",
                         "results_folder",
                         "years",
                         "RasterUnitConvert")))

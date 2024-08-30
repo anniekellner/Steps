@@ -1,4 +1,13 @@
-##  ------  PLOTS - CHANGE FROM HISTORICAL  ------------ ##
+#########################################################################
+##########    BAR CHARTS - COMPARISON OF VARIABLE CHANGES   #############
+##########          BY SCENARIO                             #############
+#########################################################################
+
+# written by Annie Kellner for CEMML, annie.kellner@colostate.edu
+# 8-30-24
+
+
+##  ------  Prep Data  ------------ ##
 
 for(i in 1:length(diffHist)){ 
   diffHist[[i]] = add_month(diffHist[[i]])
@@ -37,3 +46,7 @@ s2f2 <- s2f2 %>%
   rename_with(~paste0(., "_F2"), starts_with("Abs"))
 
 S2 <- full_join(s2f1, s2f2, by = "Month") 
+
+##  ----------  PLOTS   ------------------------------------    ##
+
+
