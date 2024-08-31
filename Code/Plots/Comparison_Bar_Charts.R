@@ -9,51 +9,85 @@
 
 ##  ------  Prep Data  ------------ ##
 
-# Add month (character) to diffHist
+# Add month (character) to diffHist and create new df
+
+diffs <- list()
 
 for(i in 1:length(diffHist)){ 
-  diffHist[[i]] = add_month(diffHist[[i]])
+  df = diffHist[[i]]
+  df = add_month(df)
+  df = select(df, Month, Avg_TMeanF, Avg_TMaxF, Avg_TMinF, Avg_PPT_in)
+  diffs[[i]] = df
+  names(diffs)[[i]] = names(diffHist[i])
 }
-
-## Plot titles
 
 # Get mid-range values for years
 
-s1_midyear <- floor((years[3] + years[4])/2)
-s2_midyear <- floor((years[5] + years[6])/2)
+f1_midyear <- floor((years[3] + years[4])/2)
+f2_midyear <- floor((years[5] + years[6])/2)
 
-# Titles
+
+# Plot titles
 
 titles <- c(
-  paste(scenario1_plotName,"Change in Average Temperature", sep = " "),
-  paste(scenario2_plotName,"Change in Average Temperature", sep = " "),
-  paste(scenario1_plotName,"Change in Average Maximum Temperature", sep = " "),
-  paste(scenario2_plotName,"Change in Average Maximum Temperature", sep = " "),
-  paste(scenario1_plotName, "Change in Average Minimum Temperature", sep = " "),
-  paste(scenario2_plotName, "Change in Average Minimum Temperature", sep = " "),
-  paste(scenario1_plotName,"Change in Average Precipitation", sep = " "),
-  paste(scenario2_plotName,"Change in Average Precipitation", sep = " ")
+  paste(scenario_plotNames[2],"Change in Average Temperature", sep = " "),
+  paste(scenario_plotNames[3],"Change in Average Temperature", sep = " "),
+  paste(scenario_plotNames[2],"Change in Average Maximum Temperature", sep = " "),
+  paste(scenario_plotNames[3],"Change in Average Maximum Temperature", sep = " "),
+  paste(scenario_plotNames[2], "Change in Average Minimum Temperature", sep = " "),
+  paste(scenario_plotNames[3], "Change in Average Minimum Temperature", sep = " "),
+  paste(scenario_plotNames[2],"Change in Average Precipitation", sep = " "),
+  paste(scenario_plotNames[3],"Change in Average Precipitation", sep = " ")
 )
 
-plots <- c(,
+# Plot filenames - Temps
+
+tempPlots <- c("Change in TAve 4.5",
            "Change in TAve 8.5",
-           
+           "Change in TMax 4.5",
            "Change in TMax 8.5",
-           ,
+           "Change in TMin 4.5",
            "Change in TMin 8.5"
            )
 
+custom_fill <- c("F1" = "#BB5145", "F2" = "#D4B83A") # colors for temp plots
+
 # Scenario 1 (e.g., SSP2-4.5)
 
-s1f1 <- diffHist[[1]][1:12,] # eliminate summary rows
+s1f1 <- diffs[[1]] # eliminate summary rows
 s1f1 <- s1f1 %>%
   mutate(Future = "F1") 
 
-s1f2 <- diffHist[[2]][1:12,]
+s1f2 <- diffs[[2]]
 s1f2 <- s1f2 %>%
   mutate(Future = "F2")
 
 S1 <- full_join(s1f1, s1f2) 
+
+## PLOTS FOR SCENARIO 1 ##
+
+custom_labels <- c(paste(scenario_plotNames[2], f1_midyear, sep = " "), paste(scenario_plotNames[2], f2_midyear, sep = " "))
+
+ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_TMeanF, fill = Future)) +
+  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+  xlab(paste0("\n", "Month")) +
+  ylab(paste0("Average Temperature (\u00B0F)", "\n")) + 
+  labs(title = titles[i]) +
+  scale_y_continuous(limits = c(0,10), n.breaks = 6) +
+  scale_fill_manual(values = custom_fill, labels = custom_labels) +
+  theme(element_text(family = "serif", hjust = 0.5),
+        plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
+        axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
+        panel.background = element_blank(), 
+        panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
+        axis.ticks = element_blank(),
+        axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
+        axis.text.y = element_text(size = 8),
+        legend.position = "bottom",
+        legend.title = element_blank(), 
+        legend.box.margin = margin(t = 0, r = 50, b = 0, l = 50),
+        legend.spacing.x = unit(4, "cm"))
+
 
 
 

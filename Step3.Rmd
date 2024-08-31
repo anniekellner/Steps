@@ -1175,7 +1175,7 @@ if (!dir.exists(bar_charts_dir)){
   dir.create(bar_charts_dir)}
 
 add_month <- function(df){
-  df = monthSum[[i]][1:12,]
+  df = df[1:12,]
   df = select(df, -month)
   df = mutate(df, Month = month.abb)
 }
