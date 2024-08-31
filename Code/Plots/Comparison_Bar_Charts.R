@@ -35,21 +35,26 @@ titles <- c(
   paste(scenario2_plotName,"Change in Average Precipitation", sep = " ")
 )
 
+plots <- c(,
+           "Change in TAve 8.5",
+           
+           "Change in TMax 8.5",
+           ,
+           "Change in TMin 8.5"
+           )
 
 # Scenario 1 (e.g., SSP2-4.5)
 
 s1f1 <- diffHist[[1]][1:12,] # eliminate summary rows
-s1f2 <- diffHist[[2]][1:12,]
-
 s1f1 <- s1f1 %>%
-  rename_with(~paste0(., "_F1"), starts_with("Avg")) %>%
-  rename_with(~paste0(., "_F1"), starts_with("Abs")) 
+  mutate(Future = "F1") 
 
+s1f2 <- diffHist[[2]][1:12,]
 s1f2 <- s1f2 %>%
-  rename_with(~paste0(., "_F2"), starts_with("Avg")) %>%
-  rename_with(~paste0(., "_F2"), starts_with("Abs"))
+  mutate(Future = "F2")
 
-S1 <- full_join(s1f1, s1f2, by = "Month") 
+S1 <- full_join(s1f1, s1f2) 
+
 
 
 # Scenario 2 (e.g., SSP2-8.5)
@@ -69,5 +74,12 @@ S2 <- full_join(s2f1, s2f2, by = "Month")
 
 ##  ----------  PLOTS   ------------------------------------    ##
 
-titles <- c("Historical Average Temperature", "Historical Average Maximum Temperature", "Historical Average Minimum Temperature")
+# Temps - Scenario 1
+
+plots_S1 <- c("Change in TAve 4.5",
+              "Change in TMax 4.5",
+              "Change in TMin 4.5")
+
+pS1 <- ggplot(S1) +
+  geom_col(aes(x = factor(Month, levels = c(month.abb)), y = !!sym(y_col)), color="#CBC598", fill="#CBC598", width = 0.7) )
 
