@@ -50,7 +50,7 @@ tempPlots <- c("Change in TAve 4.5",
            "Change in TMin 8.5"
            )
 
-custom_fill <- c("F1" = "#BB5145", "F2" = "#D4B83A") # colors for temp plots
+custom_fill_temp <- c("F1" = "#BB5145", "F2" = "#D4B83A") # colors for temp plots
 
 # Scenario 1 (e.g., SSP2-4.5)
 
@@ -68,13 +68,13 @@ S1 <- full_join(s1f1, s1f2)
 
 custom_labels <- c(paste(scenario_plotNames[2], f1_midyear, sep = " "), paste(scenario_plotNames[2], f2_midyear, sep = " "))
 
-ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_TMeanF, fill = Future)) +
-  geom_bar(stat = "identity", position = "dodge", width = 0.7) +
+p <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_TMeanF, fill = Future)) +
+  geom_bar(stat = "identity", color = "black", position = "dodge", width = 0.7) +
   xlab(paste0("\n", "Month")) +
-  ylab(paste0("Average Temperature (\u00B0F)", "\n")) + 
+  ylab(paste0("Change in temperature (\u00B0F)", "\n")) + 
   labs(title = titles[i]) +
   scale_y_continuous(limits = c(0,10), n.breaks = 6) +
-  scale_fill_manual(values = custom_fill, labels = custom_labels) +
+  scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
   theme(element_text(family = "serif", hjust = 0.5),
         plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
         axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
@@ -86,10 +86,18 @@ ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_TMeanF, fill = 
         legend.position = "bottom",
         legend.title = element_blank(), 
         legend.box.margin = margin(t = 0, r = 50, b = 0, l = 50),
-        legend.spacing.x = unit(4, "cm"))
+        legend.key.spacing.x = unit(0.5, "in")) + 
+  guides(fill = guide_legend(byrow = TRUE))
 
 
-
+ggsave(filename = paste0(tempPlots[i],'.png'), 
+       plot = p,
+       path = './Results/Test-Excel_Plots',
+       width = 5.5,
+       height = 3,
+       units = "in",
+       dpi = 300) 
+}
 
 # Scenario 2 (e.g., SSP2-8.5)
 
