@@ -77,10 +77,6 @@ prcp <- ggplot(df) +
         axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
         axis.text.y = element_text(size = 8)) 
 
-scale_y_continuous(limits = c(-1.2, 2), 
-                   breaks = seq(from=-1.2, to=2, by=0.4), 
-                   labels = scales::number_format(accuracy = 0.1))
-
 ggsave(filename = "Hist Avg_PPT_in.png",
        plot = prcp,
        path = './Results/Test-Excel_Plots',
