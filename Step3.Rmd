@@ -104,11 +104,11 @@ source('./Code/Misc/character_vectors.R') This code will not run, so please re-r
 
 ```{r enter-base-and-model}
 
-installation <- installation_names[26] 
+installation <- installation_names[28] 
 
-official_name <- official_base_names_for_plots[10] # These names serve as titles for the climatograph and Walter-Lieth plots
+official_name <- official_base_names_for_plots[12] # These names serve as titles for the climatograph and Walter-Lieth plots
 
-model <- models[5] 
+model <- models[7] 
 
 cat(paste("The model you have selected is", model,". The installation is", installation, "and its official name is", official_name))
 
@@ -493,6 +493,13 @@ for(i in 1:length(files_s2f2)){
   results_s2f2[[i]]$date = times
   rm(r)
 }
+
+timestamp <- format(today(), "%Y%m%d")
+image_filename <-  paste(installation,model,timestamp, sep = "_")
+directory <- "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\"
+
+
+save.image(file = paste0(directory,image_filename,".RData"))
 
 ```
 
