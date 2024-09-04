@@ -412,7 +412,7 @@ It assumes the centroid is being used for data extraction. It has not been teste
 
 This is the most time-consuming chunk of the entire script. If you will need to refer back to this data, you can save the entire environment (all objects) as an .RData file (save.image()) after the chunk has run. Alternatively, you can save individual objects with the function (saveRDS()). *In order to load and run chunks from the .RData file, it is necessary to save the rx raster object separately, because it won't load from the .RData file.* In order to do this, use the code:
 
-```writeRaster(rx, filename = '/path/to/dir')``` The path should conclude with the filename.TIFF
+```saveRDS(rx, file = '/path/to/dir')``` The path should conclude with the filename.RDS
 
 ```{r extract-values}
 
@@ -980,11 +980,11 @@ preclabsF <- as.numeric()
 
 # In the event the temp and precip vectors are not of equal size, add values
 
-if (length(preclabsF) > length(range_tm) & length(preclabsF) < 8){
+if (length(preclabsF) > length(range_tm) & length(preclabsF) == 8){
   append(-10, range_tm) -> range_tm
 }
 
-if (length(preclabsF) > length(range_tm) & length(preclabsF) == 8){
+if (length(preclabsF) > length(range_tm) & length(preclabsF) > 8){
   append(-20, -10, range_tm) -> range_tm
 }
 
