@@ -130,7 +130,7 @@ custom_fill_prcp <- c("F1" = "#BDD7EE", "F2" = "#0083BE")
 
 # Plot
 
-prcp <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in, fill = Future)) +
+prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in, fill = Future)) +
   geom_bar(stat = "identity", color = "black", position = "dodge", width = 0.7) +
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Change in precipitation (inches)", "\n")) + 
@@ -152,7 +152,7 @@ prcp <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in,
   guides(fill = guide_legend(byrow = TRUE))
 
 ggsave(filename = paste0(fileName_prcpS1,'.png'), 
-       plot = prcp,
+       plot = prcpS1,
        path = './Results/Test-Excel_Plots',
        width = 5.5,
        height = 3,
@@ -218,5 +218,36 @@ for(i in 1:length(plotList_S2)){
 
 ##  Precip Plot  ##
 
+title_prcpS2 <- paste(scenario_plotNames[3],"Change in Average Precipitation", sep = " ")
 
+fileName_prcpS2 <- "Change in Avg_PPT_in 8.5"
+
+prcpS2 <- ggplot(S2, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in, fill = Future)) +
+  geom_bar(stat = "identity", color = "black", position = "dodge", width = 0.7) +
+  xlab(paste0("\n", "Month")) +
+  ylab(paste0("Change in precipitation (inches)", "\n")) + 
+  labs(title = title_prcpS2) +
+  scale_y_continuous(limits = c(-1.2, 2), n.breaks = 9) +
+  scale_fill_manual(values = custom_fill_prcp, labels = custom_labels) +
+  theme(element_text(family = "serif", hjust = 0.5),
+        plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
+        axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
+        panel.background = element_blank(), 
+        panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
+        axis.ticks = element_blank(),
+        axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
+        axis.text.y = element_text(size = 8),
+        legend.position = "bottom",
+        legend.title = element_blank(), 
+        legend.box.margin = margin(t = 0, r = 50, b = 0, l = 50),
+        legend.key.spacing.x = unit(0.5, "in")) + 
+  guides(fill = guide_legend(byrow = TRUE))
+
+ggsave(filename = paste0(fileName_prcpS2,'.png'), 
+       plot = prcp,
+       path = './Results/Test-Excel_Plots',
+       width = 5.5,
+       height = 3,
+       units = "in",
+       dpi = 300) 
 
