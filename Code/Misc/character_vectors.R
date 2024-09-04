@@ -39,7 +39,8 @@ installation_names <- c("Homestead_ARB",
               "Creech_AFB",
               "Ascension_Proxy",
               "Eareckson_AFB",
-              "Eielson_AFB") 
+              "Eielson_AFB",
+              "Eglin_Niceville") 
 
 official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "NAVBASE San Diego",
@@ -51,6 +52,7 @@ official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "Creech Air Force Base",
                                    "Ascension Island",
                                    "Eareckson AFB",
-                                   "Eielson AFB") 
+                                   "Eielson AFB",
+                                   "Eglin Air Force Base") 
 
 
