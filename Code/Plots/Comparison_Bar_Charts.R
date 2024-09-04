@@ -48,20 +48,20 @@ S2 <- full_join(s1f1, s1f2)
 
 # ----  Prep Plot Items ------------  #
 
-# Colors and labels
-
-custom_fill_temp <- c("F1" = "#BB5145", "F2" = "#D4B83A") # colors for temp plots
-custom_labels <- c(paste(scenario_plotNames[2], f1_midyear, sep = " "), paste(scenario_plotNames[2], f2_midyear, sep = " "))
-
 # Get mid-range values for years
 
 f1_midyear <- floor((years[3] + years[4])/2)
 f2_midyear <- floor((years[5] + years[6])/2)
 
+# Colors and labels
+
+custom_fill_temp <- c("F1" = "#D4B83A", "F2" = "#BB5145") # colors for temp plots
+custom_labels <- c(paste(scenario_plotNames[2], f1_midyear, sep = " "), paste(scenario_plotNames[2], f2_midyear, sep = " "))
+
 
 ## PLOTS FOR SCENARIO 1 ##
 
-plotList_compareS1 <- list()
+plotList_S1 <- list()
 
 fileNames45 <- c("Change in TAve 4.5",
                  "Change in TMax 4.5",
@@ -73,24 +73,23 @@ tempTitles45 <- c(
   paste(scenario_plotNames[2], "Change in Average Minimum Temperature", sep = " ")
 )
 
-
 y_cols <- c("Avg_TMeanF", "Avg_TMaxF", "Avg_TMinF")
 
 
 # Loop
 
 for(y_col in y_cols){
-  p = ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = !!sym(y_col), fill = "Future")) + 
+  p = ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = !!sym(y_col), fill = Future)) + 
     geom_bar(stat = "identity", position = "dodge", color = "black", width = 0.7) + # code for the y column points ggplot2 to the correct column within the df
     xlab(paste0("\n", "Month")) +
     ylab(paste0("Change in temperature (\u00B0F)", "\n"))
   
-  plotList_compareS1[[y_col]] <- p
+  plotList_S1[[y_col]] <- p
   
 }
 
-for(i in 1:length(plotList_compareS1)){  
-  p = plotList_compareS1[[i]] +
+for(i in 1:length(plotList_S1)){  
+  p = plotList_S1[[i]] +
     labs(title = tempTitles45[i]) +
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
     scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
@@ -108,7 +107,7 @@ for(i in 1:length(plotList_compareS1)){
           legend.key.spacing.x = unit(0.5, "in")) + 
   guides(fill = guide_legend(byrow = TRUE))
 
-ggsave(filename = paste0(filenames45[i],'.png'), 
+ggsave(filename = paste0(fileNames45[i],'.png'), 
        plot = p,
        path = './Results/Test-Excel_Plots',
        width = 5.5,
