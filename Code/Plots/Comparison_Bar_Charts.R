@@ -56,7 +56,7 @@ f2_midyear <- floor((years[5] + years[6])/2)
 # Colors and labels
 
 custom_fill_temp <- c("F1" = "#D4B83A", "F2" = "#BB5145") # colors for temp plots
-custom_labels <- c(paste(scenario_plotNames[2], f1_midyear, sep = " "), paste(scenario_plotNames[2], f2_midyear, sep = " "))
+custom_labelsS1 <- c(paste(scenario_plotNames[2], f1_midyear, sep = " "), paste(scenario_plotNames[2], f2_midyear, sep = " "))
 
 
 ## PLOTS FOR SCENARIO 1 ##
@@ -92,7 +92,7 @@ for(i in 1:length(plotList_S1)){
   p = plotList_S1[[i]] +
     labs(title = tempTitles45[i]) +
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
-    scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
+    scale_fill_manual(values = custom_fill_temp, labels = custom_labelsS1) +
     theme(element_text(family = "serif", hjust = 0.5),
           plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
           axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
@@ -128,6 +128,9 @@ fileName_prcpS1 <- "Change in Avg_PPT_in 4.5"
 
 custom_fill_prcp <- c("F1" = "#BDD7EE", "F2" = "#0083BE") 
 
+custom_labelsS2 <- c(paste(scenario_plotNames[3], f1_midyear, sep = " "), paste(scenario_plotNames[3], f2_midyear, sep = " "))
+
+
 # Plot
 
 prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in, fill = Future)) +
@@ -135,8 +138,10 @@ prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Change in precipitation (inches)", "\n")) + 
   labs(title = title_prcpS1) +
-  scale_y_continuous(limits = c(-1.2, 2), n.breaks = 9) +
-  scale_fill_manual(values = custom_fill_prcp, labels = custom_labels) +
+  scale_y_continuous(limits = c(-1.2, 2), 
+                     breaks = seq(from=-1.2, to=2, by=0.4), 
+                     labels = scales::number_format(accuracy = 0.1)) +
+  scale_fill_manual(values = custom_fill_prcp, labels = custom_labelsS2) +
   theme(element_text(family = "serif", hjust = 0.5),
         plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
         axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
@@ -246,7 +251,7 @@ prcpS2 <- ggplot(S2, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
   guides(fill = guide_legend(byrow = TRUE))
 
 ggsave(filename = paste0(fileName_prcpS2,'.png'), 
-       plot = prcp,
+       plot = prcpS2,
        path = './Results/Test-Excel_Plots',
        width = 5.5,
        height = 3,
