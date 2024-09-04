@@ -227,7 +227,9 @@ prcpS2 <- ggplot(S2, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Change in precipitation (inches)", "\n")) + 
   labs(title = title_prcpS2) +
-  scale_y_continuous(limits = c(-1.2, 2), n.breaks = 9) +
+  scale_y_continuous(limits = c(-1.2, 2), 
+                     breaks = seq(from=-1.2, to=2, by=0.4), 
+                     labels = scales::number_format(accuracy = 0.1)) +
   scale_fill_manual(values = custom_fill_prcp, labels = custom_labels) +
   theme(element_text(family = "serif", hjust = 0.5),
         plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
