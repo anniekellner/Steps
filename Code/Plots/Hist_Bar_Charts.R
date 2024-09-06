@@ -30,7 +30,7 @@ plot_list <- list() # Need to create list in order to run plots through a loop
 for(y_col in y_cols){
 
 p <- ggplot(df) +
-  geom_col(aes(x = factor(Month, levels = c(month.abb)), y = !!sym(y_col)), color="#CBC598", fill="#CBC598", width = 0.7) + # code for the y column points ggplot2 to the correct column within the dataframe
+  geom_col(aes(x = factor(Month, levels = c(month.abb)), y = !!sym(y_col)), color="#D4B83A", fill="#D4B83A", width = 0.7) + # code for the y column points ggplot2 to the correct column within the dataframe
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Average Temperature (\u00B0F)", "\n"))
   
@@ -75,7 +75,7 @@ prcp <- ggplot(df) +
         panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
         axis.ticks = element_blank(),
         axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
-        axis.text.y = element_text(size = 8)) 
+        axis.text.y = element_text(size = 8)) so
 
 ggsave(filename = "Hist Avg_PPT_in.png",
        plot = prcp,
