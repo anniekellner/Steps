@@ -30,7 +30,7 @@ plot_list <- list() # Need to create list in order to run plots through a loop
 for(y_col in y_cols){
   
   p <- ggplot(df) +
-    geom_col(aes(x = factor(Month, levels = c(month.abb)), y = !!sym(y_col)), color="#D4B83A", fill="#D4B83A", width = 0.7) + # code for the y column points ggplot2 to the correct column within the dataframe
+    geom_col(aes(x = factor(Month, levels = c(month.abb)), y = !!sym(y_col)), color="#CBC598", fill="#CBC598", width = 0.7) + # code for the y column points ggplot2 to the correct column within the dataframe
     xlab(paste0("\n", "Month")) +
     ylab(paste0("Average Temperature (\u00B0F)", "\n"))
   
@@ -53,7 +53,7 @@ for(i in 1:length(plot_list)){
   
   ggsave(filename = paste0(plots[i],'.png'), 
          plot = p,
-         path = plots_dir,
+         path = bar_charts_dir,
          width = 5.5,
          height = 3,
          units = "in",
@@ -79,7 +79,7 @@ prcp <- ggplot(df) +
 
 ggsave(filename = "Hist Avg_PPT_in.png",
        plot = prcp,
-       path = plots_dir,
+       path = bar_charts_dir,
        width = 5.5,
        height = 3,
        units = "in",
