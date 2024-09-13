@@ -51,6 +51,7 @@ library(viridis)
 library(mapview)
 library(tmap)
 library(tmaptools)
+library(kableExtra)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
 library(conflicted)
@@ -1168,6 +1169,12 @@ write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = 
 
 ```
 
+The following chunk uses the monthSum and diffHist lists to create summary plots (bar charts).
+
+Inputs: monthSum list, diffHist list
+Outputs: .png files into ./results_folder/Plots/Bar_Charts
+
+
 ```{r bar-charts}
 
 bar_charts_dir <- paste(plots_dir,"Bar_Charts", sep = "/") 
@@ -1186,6 +1193,13 @@ source('./Code/Plots/Comparison_Bar_Charts.R')
 
 ```
 
+The next chunk creates summary tables
+
+```{r tables}
+
+
+
+```
 
 
 
