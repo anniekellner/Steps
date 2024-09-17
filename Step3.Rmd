@@ -781,7 +781,9 @@ for(i in 1:length(AllDays)){
   names(monthSum)[i] = names(AllDays[i])
 }
 
-# Add summary rows (YrAverage and YrTotals)
+# Add summary rows (YrAverage and YrTotals) and save for table construction
+
+Avs_and_Totals <- list() # saving for summary table
 
 for(i in 1:length(monthSum)){
   YrAverage = colMeans(monthSum[[i]][,2:ncol(monthSum[[i]])]) # converts columns to characters 
@@ -816,9 +818,12 @@ for(i in 1:length(monthSum)){
   csv[13,1] = "YrAverage"
   csv[14,1] = "YrTotals"
   
+  Avs_and_Totals[[i]] = csv %>% slice_tail(n = 2) 
+  names(Avs_and_Totals)[i] = names(AllDays[i])
+  
   monthSum[[i]] = csv # will write over original monthSum df that did not have final two columns
   names(monthSum)[i] = names(AllDays[i])
-  }
+}
   
 # Write csv files 
 
@@ -1114,6 +1119,7 @@ rm(list=setdiff(ls(), c("monthSum",
                         "scenario_plotNames",
                         "results_folder",
                         "years",
+                        "csv",
                         "RasterUnitConvert")))
 
 ```
