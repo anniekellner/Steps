@@ -1199,23 +1199,6 @@ The next chunk creates summary tables
 
 # input: csv object from monthSum
 
-# select relevant values from csv object
-
-histTotals <- csv[14,]
-histTotals <- histTotals %>%
-  select_if(~ all(!is.na(.))) %>%
-  select(-1) 
-
-histAves <- csv[13,]
-histAves <- histAves %>%
-  select_if(~ all(!is.na(.))) %>% 
-  select(-1) 
-  
-modeled_historical <- bind_cols(histAves, histTotals) 
-
-modeled_historical <- t(modeled_historical)
-colnames(modeled_historical) <- "Modeled Historical"
-
 ```
 
 
