@@ -51,7 +51,7 @@ library(viridis)
 library(mapview)
 library(tmap)
 library(tmaptools)
-library(kableExtra)
+#library(kableExtra)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
 library(conflicted)
@@ -1197,28 +1197,24 @@ The next chunk creates summary tables
 
 ```{r tables}
 
-# input: monthSum
+# input: csv object from monthSum
 
 # select relevant values from csv object
 
 histTotals <- csv[14,]
 histTotals <- histTotals %>%
   select_if(~ all(!is.na(.))) %>%
-
+  select(-1) 
 
 histAves <- csv[13,]
 histAves <- histAves %>%
-  select_if(~ all(!is.na(.))) %>%
-  remove_rownames() %>%
-  select(-1) %>% 
-  t()
+  select_if(~ all(!is.na(.))) %>% 
+  select(-1) 
   
-colnames(histAves) <- "Modeled Historical"
+modeled_historical <- bind_cols(histAves, histTotals) 
 
-t(histAves)
-
-
-
+modeled_historical <- t(modeled_historical)
+colnames(modeled_historical) <- "Modeled Historical"
 
 ```
 
