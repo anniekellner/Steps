@@ -1109,6 +1109,15 @@ ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 6.5, heig
 
 ```
 
+The following chunk produces a summary table comparing historical averages/totals of select variables to near- and far-term projected values
+
+```{r table1}
+
+
+
+```
+
+
 
 ```{r remove-objects}
 
@@ -1199,13 +1208,9 @@ source('./Code/Plots/Comparison_Bar_Charts.R')
 
 ```
 
-The next chunk creates summary tables
 
-```{r tables}
 
-# input: csv object from monthSum
 
-```
 
 
 
