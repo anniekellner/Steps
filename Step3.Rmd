@@ -38,7 +38,7 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE)
  # echo = FALSE means R will not print the code along with the results. 
 ```
 
-The next chunk loads the libraries required for use with this script. All required libraries are loaded here except those contained in 'source' scripts.
+The next chunk loads the libraries required for use with this script. 
 
 ```{r load-libraries}
 
@@ -76,6 +76,15 @@ NOTE: If you clear the workspace but save the environment for later use (i.e., a
 
 These scripts contain objects and functions required to run the script.
 
+*If you are running a new base (one that has not been run using this script previously), you will need to enter the following information into the character_vectors.R script.*:
+
+  1) Shapefile name (this is usually an abbreviation for the base name, such as JBER for Joint Base Elmendorf Richardson)
+  
+  2) Official base name (per the example above, this would be "Joint Base Elmendorf Richardson")
+
+
+This script can be found in './Code/Misc/character_vectors.R'. Once you open the script, it should be self-explanatory where to enter the information. If you do not have this information, contact Trevor Even at trevor.even@colostate.edu (or on Microsoft Teams). 
+
 
 
 ```{r functions}
@@ -104,13 +113,13 @@ source('./Code/Misc/character_vectors.R') This code will not run, so please re-r
 
 ```{r enter-base-and-model}
 
-installation <- installation_names[28] 
+installation <- installation_names[29] 
 
-official_name <- official_base_names_for_plots[12] # These names serve as titles for the climatograph and Walter-Lieth plots
+official_name <- official_base_names_for_plots[13] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 model <- models[7] 
 
-cat(paste("The model you have selected is", model,". The installation is", installation, "and its official name is", official_name))
+cat(paste("The model you have selected is", model,". The abbreviated name for the installation is", installation, "and its official name is", official_name))
 
 ```
 
@@ -406,13 +415,12 @@ cat("The object used for data extraction is ", class(extract_obj))
 
 ## DATA EXTRACTION
 
-The following chunk extracts raw data from the ncdf files of interest. 
+The following chunk extracts raw data from the ncdf files of interest. It then saves the global environment to the Workspace Images folder ("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\"). 
 
-It assumes the centroid is being used for data extraction. It has not been tested for use with a spatial object. It may still work, but might be quite slow. If you are running several large bases sequentially, it will be worth exploring an alternate coding strategy.
+As written, this code assumes the centroid is being used for data extraction. It has not been tested for use with a spatial object. It may still work, but might be quite slow. If you are running several large bases sequentially, it will be worth exploring an alternative coding strategy.
 
-This is the most time-consuming chunk of the entire script. If you will need to refer back to this data, you can save the entire environment (all objects) as an .RData file (save.image()) after the chunk has run. Alternatively, you can save individual objects with the function (saveRDS()). *In order to load and run chunks from the .RData file, it is necessary to save the rx raster object separately, because it won't load from the .RData file.* In order to do this, use the code:
+This is the most time-consuming chunk of the entire script. To avoid repeating this step, the global environment is saved upon extraction. As of the time this script was written (9-26-2024), the {raster} package is unable to save objects into .RData images, so {raster} objects must be saved separately. Because The raster stack (object 'rx') is required to run the chunk 'add-derived-variables', so the raster stack is saved alongside the .RData file.    
 
-```writeRaster(rx, filename = '/path/to/dir')```
 
 ```{r extract-values}
 
@@ -494,14 +502,51 @@ for(i in 1:length(files_s2f2)){
   rm(r)
 }
 
+
+# Create directory and save raw extracted data along with associated raster stack in the event the installation needs to be re-run. 
+
+# Filenames
+
 timestamp <- format(today(), "%Y%m%d")
+
 image_filename <-  paste(installation,model,timestamp, sep = "_")
-directory <- "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\"
+rawData_filename <- paste0(image_filename,".RData")
+rasterStack_filename <- paste0("rx_",image_filename,".Rds")
 
+# Directory for Workspace Images
 
-save.image(file = paste0(directory,image_filename,".RData"))
+rawDataDir <- paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\",installation)
+
+if (!dir.exists(rawDataDir)){
+  dir.create(rawDataDir)}
+
+# Local Directory
+
+localDir <- paste0('./Data/',installation)
+
+if (!dir.exists(localDir)){
+  dir.create(localDir)}
+
+# Save workspace image to N: drive and local data folder
+
+save.image(file = paste0("\\",rawDataDir,image_filename,".RData")) # save to N: drive
+save.image(file = paste0(localDir,"/",image_filename,".RData"))
+
+# Save raster stacks
+
+saveRDS(rx, file = rasterStack_filename)
 
 ```
+# This chunk is unnecessary if the remainder of the script is run immediately following data extraction, so it is commented out. *If the base is being re-run from the saved image (.RData file), remove the '#' and run the chunk. After doing do, please remember to comment out again once the chunk has been run*  
+
+```{r load-extracted-data}
+
+load()
+
+```
+
+
+
 
 The next chunk reorganizes the extracted data into a more workable dataframe ("tibble", from the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
 

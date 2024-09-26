@@ -40,7 +40,11 @@ installation_names <- c("Homestead_ARB",
               "Ascension_Proxy",
               "Eareckson_AFB",
               "Eielson_AFB",
-              "Eglin_Niceville") 
+              "Eglin_Niceville",
+              "CapeCanaveral_45th",
+              "Malibar_45th",
+              "JDTMA_45th",
+              "JBER") 
 
 official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "NAVBASE San Diego",
@@ -53,6 +57,10 @@ official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "Ascension Island",
                                    "Eareckson AFB",
                                    "Eielson AFB",
-                                   "Eglin Air Force Base") 
+                                   "Eglin Air Force Base",
+                                   "Cape Canaveral Space Force Station",
+                                   "Malibar Transmitter Annex",
+                                   "Jonathan Dickinson Missile Tracking Annex",
+                                   "Joint Base Elmendorf-Richardson") 
 
 
