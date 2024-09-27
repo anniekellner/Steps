@@ -544,10 +544,9 @@ The two chunks that follow are commented out, assuming the chunks are being run 
 
 ```{r get-saved-files}
 
-installation <- "CapeCanaveral_45th" # CHANGE THIS TO INSTALLATION OF INTEREST
+#installation <- "CapeCanaveral_45th" # CHANGE THIS TO INSTALLATION OF INTEREST
 
-list.files(path = paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\",installation),
-          full.names = TRUE)
+#list.files(path = paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\",installation), full.names = TRUE)
 
 ```
 
@@ -557,11 +556,11 @@ list.files(path = paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace 
 
 # Load workspace image
 
-load("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.RData")
+#load("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.RData")
 
 # Load raster stack
 
-rx <- readRDS(file = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/rasterStack_CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.Rds")
+#rx <- readRDS(file = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/rasterStack_CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.Rds")
 
 ```
 
@@ -1182,6 +1181,7 @@ rm(list=setdiff(ls(), c("monthSum",
                         "installation", 
                         "model", 
                         "scenarios",
+                        "scenario_plotNames",
                         "results_folder",
                         "plots_dir",
                         "years",
@@ -1255,7 +1255,7 @@ add_month <- function(df){
 }
 
 source('./Code/Plots/Bar_Charts/Hist_Bar_Charts.R')
-source('./Code/Plots/Bar_Charts/Comparison_Bar_Charts.R')
+source('./Code/Plots/Bar_Charts/Compare_Bar_Charts.R')
 
 ```
 
