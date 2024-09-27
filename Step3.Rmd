@@ -419,8 +419,7 @@ The following chunk extracts raw data from the ncdf files of interest. It then s
 
 As written, this code assumes the centroid is being used for data extraction. It has not been tested for use with a spatial object. It may still work, but might be quite slow. If you are running several large bases sequentially, it will be worth exploring an alternative coding strategy.
 
-This is the most time-consuming chunk of the entire script. To avoid repeating this step, the global environment is saved upon extraction. As of the time this script was written (9-26-2024), the {raster} package is unable to save objects into .RData images, so {raster} objects must be saved separately. Because The raster stack (object 'rx') is required to run the chunk 'add-derived-variables', so the raster stack is saved alongside the .RData file.    
-
+This is the most time-consuming chunk of the entire script. To avoid repeating this step, the global environment is saved upon extraction. As of the time this script was written (9-26-2024), the {raster} package is unable to save objects into .RData images, so {raster} objects must be saved separately. Because The raster stack (object 'rx') is required to run the chunk 'add-derived-variables', the raster stack is saved alongside the .RData file.    
 
 ```{r extract-values}
 
@@ -502,13 +501,6 @@ for(i in 1:length(files_s2f2)){
   rm(r)
 }
 
-```
-
-
-```{r}
-
-## MOVE TO ABOVE ONCE THIS WORKS ##
-
 # Create directory and save raw extracted data along with associated raster stack in the event the installation needs to be re-run. 
 
 # Filenames
@@ -517,7 +509,7 @@ timestamp <- format(today(), "%Y%m%d")
 
 image_filename <-  paste(installation,model,timestamp, sep = "_")
 rawData_filename <- paste0(image_filename,".RData")
-rasterStack_filename <- paste0("rx_",image_filename,".Rds")
+rasterStack_filename <- paste0("rasterStack_",image_filename,".Rds")
 
 # Directory for Workspace Images
 
@@ -526,27 +518,11 @@ rawDataDir <- paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Imag
 if (!dir.exists(rawDataDir)){
   dir.create(rawDataDir)}
 
-# Local Directory
+save.image(file = paste0(rawDataDir,"\\",rawData_filename)) # save workspace image to N: drive
 
-#localDir <- paste0('./Data/',installation)
+saveRDS(rx, file = paste0(rawDataDir,"\\",rasterStack_filename)) # save raster stack to N: drive
 
-if (!dir.exists(localDir)){
-  dir.create(localDir)}
-
-# Save workspace image to N: drive and local data folder
-
-save.image(file = paste0(rawDataDir,"\\",rawData_filename)) # save to N: drive
-save.image(file = paste0(localDir,"/",rawData_filename))
-
-# Save raster stacks
-
-saveRDS(rx, file = rasterStack_filename)
 ```
-
-
-
-
-
 
 
 # This chunk is unnecessary if the remainder of the script is run immediately following data extraction, so it is commented out. *If the base is being re-run from the saved image (.RData file), remove the '#' and run the chunk. After doing do, please remember to comment out again once the chunk has been run*  
