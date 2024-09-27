@@ -43,7 +43,7 @@ s2f2 <- diffs[[4]]
 s2f2 <- s2f2 %>%
   mutate(Future = "F2")
 
-S2 <- full_join(s1f1, s1f2) 
+S2 <- full_join(s2f1, s2f2) 
 
 
 # ----  Prep Plot Items ------------  #
@@ -141,7 +141,7 @@ prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
   scale_y_continuous(limits = c(-1.2, 2), 
                      breaks = seq(from=-1.2, to=2, by=0.4), 
                      labels = scales::number_format(accuracy = 0.1)) +
-  scale_fill_manual(values = custom_fill_prcp, labels = custom_labelsS2) +
+  scale_fill_manual(values = custom_fill_prcp, labels = custom_labelsS1) +
   theme(element_text(family = "serif", hjust = 0.5),
         plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
         axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
@@ -182,7 +182,7 @@ tempTitles85 <- c(
 ## Loop ##
 
 for(y_col in y_cols){
-  p = ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = !!sym(y_col), fill = Future)) + 
+  p = ggplot(S2, aes(x = factor(Month, levels = c(month.abb)), y = !!sym(y_col), fill = Future)) + 
     geom_bar(stat = "identity", position = "dodge", color = "black", width = 0.7) + # code for the y column points ggplot2 to the correct column within the df
     xlab(paste0("\n", "Month")) +
     ylab(paste0("Change in temperature (\u00B0F)", "\n"))
@@ -195,7 +195,7 @@ for(i in 1:length(plotList_S2)){
   p = plotList_S2[[i]] +
     labs(title = tempTitles85[i]) +
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
-    scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
+    scale_fill_manual(values = custom_fill_temp, labels = custom_labelsS2) +
     theme(element_text(family = "serif", hjust = 0.5),
           plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
           axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
@@ -235,7 +235,7 @@ prcpS2 <- ggplot(S2, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
   scale_y_continuous(limits = c(-1.2, 2), 
                      breaks = seq(from=-1.2, to=2, by=0.4), 
                      labels = scales::number_format(accuracy = 0.1)) +
-  scale_fill_manual(values = custom_fill_prcp, labels = custom_labels) +
+  scale_fill_manual(values = custom_fill_prcp, labels = custom_labelsS2) +
   theme(element_text(family = "serif", hjust = 0.5),
         plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
         axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
