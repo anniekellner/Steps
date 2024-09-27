@@ -544,10 +544,10 @@ The two chunks that follow are commented out, assuming the chunks are being run 
 
 ```{r get-saved-files}
 
-#installation <- "CapeCanaveral_45th" # CHANGE THIS TO INSTALLATION OF INTEREST
+installation <- "CapeCanaveral_45th" # CHANGE THIS TO INSTALLATION OF INTEREST
 
-#list.files(path = paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\",installation),
-#           full.names = TRUE)
+list.files(path = paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\",installation),
+          full.names = TRUE)
 
 ```
 
@@ -557,11 +557,11 @@ The two chunks that follow are commented out, assuming the chunks are being run 
 
 # Load workspace image
 
-#load("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.RData")
+load("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.RData")
 
 # Load raster stack
 
-#readRDS(file = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/rasterStack_CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.Rds")
+rx <- readRDS(file = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/rasterStack_CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.Rds")
 
 ```
 
