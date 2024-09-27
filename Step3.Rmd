@@ -502,6 +502,12 @@ for(i in 1:length(files_s2f2)){
   rm(r)
 }
 
+```
+
+
+```{r}
+
+## MOVE TO ABOVE ONCE THIS WORKS ##
 
 # Create directory and save raw extracted data along with associated raster stack in the event the installation needs to be re-run. 
 
@@ -522,21 +528,27 @@ if (!dir.exists(rawDataDir)){
 
 # Local Directory
 
-localDir <- paste0('./Data/',installation)
+#localDir <- paste0('./Data/',installation)
 
 if (!dir.exists(localDir)){
   dir.create(localDir)}
 
 # Save workspace image to N: drive and local data folder
 
-save.image(file = paste0("\\",rawDataDir,image_filename,".RData")) # save to N: drive
-save.image(file = paste0(localDir,"/",image_filename,".RData"))
+save.image(file = paste0(rawDataDir,"\\",rawData_filename)) # save to N: drive
+save.image(file = paste0(localDir,"/",rawData_filename))
 
 # Save raster stacks
 
 saveRDS(rx, file = rasterStack_filename)
-
 ```
+
+
+
+
+
+
+
 # This chunk is unnecessary if the remainder of the script is run immediately following data extraction, so it is commented out. *If the base is being re-run from the saved image (.RData file), remove the '#' and run the chunk. After doing do, please remember to comment out again once the chunk has been run*  
 
 ```{r load-extracted-data}
