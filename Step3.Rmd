@@ -215,6 +215,11 @@ future2_end_year <- 2080 # End year of interest for the second future time perio
 
 From this point forward, all you need to do is press the green 'run' arrow for each chunk. DO NOT ALTER THE CODE BELOW. 
 
+###############################################################################################
+###     PART TWO: Data Extraction                                         #####################  
+###############################################################################################
+
+
 ## CREATE VECTORS FOR YEAR-SCENARIO COMBOS
 
 ```{r character-vectors}
@@ -525,15 +530,43 @@ saveRDS(rx, file = paste0(rawDataDir,"\\",rasterStack_filename)) # save raster s
 ```
 
 
-# This chunk is unnecessary if the remainder of the script is run immediately following data extraction, so it is commented out. *If the base is being re-run from the saved image (.RData file), remove the '#' and run the chunk. After doing do, please remember to comment out again once the chunk has been run*  
+###############################################################################################
+###     PART THREE: Add Derived Variables                                 #####################  
+###############################################################################################
 
-```{r load-extracted-data}
+## IF RE-RUNNING SCRIPT FROM SAVED WORKSPACE IMAGE, RUN THE NEXT TWO CHUNKS. 
 
-load()
+## IF RUNNING IMMEDIATELY AFTER DATA EXTRACTION (i.e., the environment still contains all previously defined objects), SKIP TO THE CHUNK CALLED {allvaluesdf-dataframes} 
+
+The two chunks that follow are commented out, assuming the chunks are being run while the global environment still contains all defined objects from the first part of the script (i.e., through data extraction)
+
+*If the base is being re-run from the saved image (.RData file), remove the '#' and run the first chunk. This will retrieve the filenames to enter for the second chunk, which will load the files. If you are re-running the installation from an empty environment, you will need to re-enter the installation name first.*
+
+```{r get-saved-files}
+
+#installation <- "CapeCanaveral_45th" # CHANGE THIS TO INSTALLATION OF INTEREST
+
+#list.files(path = paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\",installation),
+#           full.names = TRUE)
+
+```
+
+*Now, use the filenames above to load the data. You can copy-paste from the output directly into the script* I have used Cape Canaveral as an example, but remember to replace the example filenames with the output above.
+
+```{r load-saved-files}
+
+# Load workspace image
+
+#load("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.RData")
+
+# Load raster stack
+
+#readRDS(file = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/rasterStack_CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.Rds")
 
 ```
 
 
+*If you are re-running the installation from saved data, you will need to re-run all chunks prior to ### PART ONE ### in order to re-load the necessary libraries and functions. If not, just proceed to the {allvaluesdf-dataframes} chunk*
 
 
 The next chunk reorganizes the extracted data into a more workable dataframe ("tibble", from the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
