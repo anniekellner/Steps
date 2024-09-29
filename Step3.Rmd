@@ -495,15 +495,71 @@ for(i in 1:length(files_s2f2)){
 }
 
 timestamp <- format(today(), "%Y%m%d")
-image_filename <-  paste(installation,model,timestamp, sep = "_")
-directory <- "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\"
 
+image_filename <-  paste(installation,model,timestamp, sep = "_")
+rawData_filename <- paste0(image_filename,".RData")
+rasterStack_filename <- paste0("rasterStack_",image_filename,".Rds")
+
+# Directory for Workspace Images
 
 save.image(file = paste0(directory,image_filename,".RData"))
 
+rawDataDir <- paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\",installation)
+
+if (!dir.exists(rawDataDir)){
+  dir.create(rawDataDir)}
+
+save.image(file = paste0(rawDataDir,"\\",rawData_filename)) # save workspace image to N: drive
+
+saveRDS(rx, file = paste0(rawDataDir,"\\",rasterStack_filename)) # save raster stack to N: drive
+
 ```
 
-The next chunk reorganizes the extracted data into a more workable dataframe ("tibble", from the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
+
+#################################################################
+###       PART THREE:  ADD DERIVED VARIABLES        #############
+#################################################################
+
+## IF RE-RUNNING SCRIPT FROM SAVED WORKSPACE IMAGE, RUN THE NEXT TWO CHUNKS. 
+
+## IF RUNNING IMMEDIATELY AFTER DATA EXTRACTION (i.e., the environment still contains all previously defined objects), SKIP TO THE CHUNK CALLED {allvaluesdf-dataframes} 
+
+The two chunks that follow are commented out, assuming the chunks are being run while the global environment still contains all defined objects from the first part of the script (i.e., through data extraction). If not, read the *orange* chunk below and follow instructions.
+
+*If the base is being re-run from the saved image (.RData file) on the N: drive, remove the '#' to un-comment out the code chunks and run.* 
+
+*The first chunk will retrieve the filenames to enter for the second chunk, which will load the files. If you are re-running the installation from an empty environment, you will need to re-enter the installation name first (you don't need to run from the top of the script; there is a portion within the first chunk that allows you to do this).* 
+
+*Also, if you're running within a new RStudio session, don't forget to run the {r setup} and {r load-libraries} chunks at the top, to ensure the required packages are installed. You will get errors if you forget to do this.*
+
+Get file names:
+                            
+```{r get-saved-files}
+
+#installation <- "CapeCanaveral_45th" # CHANGE THIS TO INSTALLATION OF INTEREST
+
+#list.files(path = paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\",installation), full.names = TRUE)
+```
+
+*Copy-paste the paths printed in the output after the `load()` and `readRDS()` commands to load the data. These will load the .RData file (global environment) and raster stack, respectively). The code below is sample code from Cape Canaveral.*
+
+```{r load-saved-environment}
+
+# Load workspace image
+
+#load("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.RData")
+
+# Load raster stack
+
+#rx <- readRDS(file = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/rasterStack_CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.Rds")
+
+```
+
+FYI, the raster is loaded separately because as of the date this script was written (9-29-24), raster objects do not save correctly during the `save.image()` process. If the raster does not load, you will get an error about a missing 'pointer'. The above retrieval process should take care of this problem, but if not, you can also re-run the portion of the {r spatial-check} chunk through to the creation of the object 'rx' (this is a raster stack). The raster stack is required to create the avdf dataframe in the next chunk.
+
+# AVDF data frame
+
+This chunk reorganizes the extracted data into a more workable dataframe ("tibble", from the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
 
 ```{r allvaluesdf-dataframes, message=FALSE}
 
