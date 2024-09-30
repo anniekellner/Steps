@@ -43,7 +43,7 @@ installation_names <- c("Homestead_ARB",
               "Eglin_Niceville",
               "CapeCanaveral_45th",
               "Malibar_45th",
-              "JDTMA_45th",
+              "JDMTA_45th",
               "JBER") 
 
 official_base_names_for_plots <- c("NAVBASE Kitsap",
