@@ -537,7 +537,9 @@ for(i in 1:length(files_s2f2)){
   rm(r)
 }
 
-## Save raw data and raster stack to N: Drive
+## Create directory and save raw extracted data along with associated raster stack in the event the installation needs to be re-run. 
+
+# Filenames
 
 timestamp <- format(today(), "%Y%m%d")
 
@@ -547,9 +549,7 @@ rasterStack_filename <- paste0("rasterStack_",image_filename,".Rds")
 
 # Directory for Workspace Images
 
-save.image(file = paste0(directory,image_filename,".RData"))
-
-rawDataDir <- paste0("/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Workspace Images/",installation) # Mac location
+rawDataDir <- paste0('/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Workspace Images',installation) # Mac notation
 
 if (!dir.exists(rawDataDir)){
   dir.create(rawDataDir)}
