@@ -537,6 +537,18 @@ for(i in 1:length(files_s2f2)){
   rm(r)
 }
 
+## Save raw data and raster stack to N: Drive
+
+timestamp <- format(today(), "%Y%m%d")
+
+image_filename <-  paste(installation,model,timestamp, sep = "_")
+rawData_filename <- paste0(image_filename,".RData")
+rasterStack_filename <- paste0("rasterStack_",image_filename,".Rds")
+
+# Directory for Workspace Images
+
+save.image(file = paste0(directory,image_filename,".RData"))
+
 ```
 
 The next chunk reorganizes the extracted data into a more workable dataframe ("tibble", from the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
