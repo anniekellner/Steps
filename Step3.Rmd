@@ -549,6 +549,15 @@ rasterStack_filename <- paste0("rasterStack_",image_filename,".Rds")
 
 save.image(file = paste0(directory,image_filename,".RData"))
 
+rawDataDir <- paste0("/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Workspace Images/",installation) # Mac location
+
+if (!dir.exists(rawDataDir)){
+  dir.create(rawDataDir)}
+
+save.image(file = paste0(rawDataDir,"/",rawData_filename)) # save workspace image to N: drive
+
+saveRDS(rx, file = paste0(rawDataDir,"/",rasterStack_filename)) # save raster stack to N: drive
+
 ```
 
 The next chunk reorganizes the extracted data into a more workable dataframe ("tibble", from the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
