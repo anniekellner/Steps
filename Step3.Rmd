@@ -549,8 +549,21 @@ The two chunks that follow are commented out, assuming the chunks are being run 
 
 #rx <- readRDS(file = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/rasterStack_CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.Rds")
 
+```
+
+FOR MAC ONLY:
+
+```{r rename-directories}
+
+results_folder <- paste0("/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Results/", installation, "/") # MAC
+
+
+
 
 ```
+
+
+
 
 ```{r allvaluesdf-dataframes, message=FALSE}
 
@@ -1164,6 +1177,7 @@ rm(list=setdiff(ls(), c("monthSum",
                         "model", 
                         "scenarios",
                         "results_folder",
+                        "plots_dir",
                         "years",
                         "RasterUnitConvert")))
 
@@ -1220,6 +1234,23 @@ write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = 
 
 ```
 
+```{r bar-charts}
+
+bar_charts_dir <- paste(plots_dir,"Bar_Charts", sep = "/")
+
+if (!dir.exists(bar_charts_dir)){
+  dir.create(bar_charts_dir)}
+
+add_month <- function(df){
+  df = df[1:12,]
+  df = select(df, -month)
+  df = mutate(df, Month = month.abb)
+}
+
+source('./Code/Plots/Bar_Charts/Hist_Bar_Charts.R')
+source('./Code/Plots/Bar_Charts/Compare_Bar_Charts.R')
+
+```
 
 
 

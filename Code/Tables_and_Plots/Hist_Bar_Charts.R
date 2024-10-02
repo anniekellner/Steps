@@ -62,12 +62,16 @@ for(i in 1:length(plot_list)){
 
 ### PRECIP
 
+upper_value <- ceiling(max(df$Avg_PPT_in))
+upper_limit <- upper_value + 1
+breaks <- upper_limit + 1 # add 1 so that y-axis scale starts at zero
+
 prcp <- ggplot(df) + 
   geom_col(aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in), color="#0083BE", fill="#0083BE", width = 0.7) + 
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Average Precipitation (inches)", "\n")) +
   labs(title = "Historical Average Precipitation") +
-  scale_y_continuous(limits = c(0,6), n.breaks = 7) + 
+  scale_y_continuous(limits = c(0,upper_limit), n.breaks = breaks) + 
   theme(element_text(family = "serif", hjust = 0.5),
         plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
         axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
@@ -75,7 +79,7 @@ prcp <- ggplot(df) +
         panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
         axis.ticks = element_blank(),
         axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
-        axis.text.y = element_text(size = 8)) so
+        axis.text.y = element_text(size = 8)) 
 
 ggsave(filename = "Hist Avg_PPT_in.png",
        plot = prcp,
