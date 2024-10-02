@@ -239,7 +239,7 @@ years <- c(baseline_start_year, # vector for easy reference
   #paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_',model,"/",installation,"/")
   #}
 
-results_folder <- paste0("/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Results", installation, "/") # MAC
+results_folder <- paste0("/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Results/", installation, "/") # MAC
 ```
 
 
@@ -325,49 +325,6 @@ for(i in 1:length(variables)){
 ## SPATIAL CHECK
 
 The next chunk checks that the spatial files are aligned and appear in the correct location on the globe. An interactive map will appear below the code chunk, and you can zoom in or out as needed to view the AFB's (the easiest way is to scroll with your mouse). You can press the 'show in new window' button (the white square with an arrow) to open the map in another page if you prefer a larger view. You may have to wait a few moments for the map to produce. *Make sure the installation boundary aligns with one or more raster cells*. If it doesn't, you might have a difference in spatial projections between the installation boundary and the raster/ncdf files.  
-
-
-*When loading .RData files, you need to re-run the raster (variable name = rx)* The following code is for MAC ONLY:
-
-```{r MAC-rerun-rasters}
-
-model_dir <- paste("/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Data/", model, sep = "") # Directory for model data
-
-# Create files_s1f1_MAC for precip only
-
-dir = paste(model_dir, scenario1, sep = '/')
-fileNames = list.files(dir, pattern = 
-                        "hurs_d", full.names = TRUE)
-fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
-fileNames = fileNames[!duplicated(fileNames)]
-dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
-dt2 = dplyr::filter(dt, result == TRUE)
-files_s1f1_MAC = dt2$fileNames
-
-# Create Rasterstack
-
-stackX <- rast(files_s1f1_MAC)
-
-random_raster <- as.numeric(sample(1:nlyr(stackX), 1)) # get a random raster layer from StackX to use as an example
-
-rx <- stackX[[random_raster]]
-
-#saveRDS - save this if necessary to call rx object without re-running raster part of script
-
-## There might be a quicker way to get an example raster without creating a stack
-
-#fileNumber = as.numeric(sample(1:length(files_s1f1_MAC), 1))
-
-#rx <- rast(files_s1f1_MAC[6])
-
-```
-
-```{r raw-ncdf data}
-
-x <- rast(files_s1f1_MAC[1])
-
-```
-
 
 
 ```{r spatial-check}
