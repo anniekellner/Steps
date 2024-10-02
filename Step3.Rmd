@@ -126,8 +126,8 @@ We use the next chunk to set the path to the correct directory for the installat
 Navy = FALSE
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
-                                       "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
-                                      "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
+                                       "/Volumes/wcnr-network-1/RStor/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
+                                      "/Volumes/wcnr-network-1/RStor/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
 
 ```
 
