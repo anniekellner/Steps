@@ -141,7 +141,7 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 
 # Directories
 
-model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "") 
+model_dir <- paste("/Volumes/wcnr-network-1/RStor/mindyc/afccm/Climate Modeling/Data/", model, sep = "") 
 
 scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
 
