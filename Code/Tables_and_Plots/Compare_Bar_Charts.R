@@ -56,16 +56,16 @@ f2_midyear <- floor((years[5] + years[6])/2)
 # Colors and labels
 
 custom_fill_temp <- c("F1" = "#D4B83A", "F2" = "#BB5145") # colors for temp plots
-custom_labelsS1 <- c(paste(scenario_plotNames[2], f1_midyear, sep = " "), paste(scenario_plotNames[2], f2_midyear, sep = " "))
+custom_labelsS1 <- c(paste(scenario_plotNames[2], f1_midyear, sep = " "), paste(scenario_plotNames[2], f2_midyear, sep = " ")) ### COME BACK TO THIS
 
 
 ## PLOTS FOR SCENARIO 1 ##
 
-plotList_S1 <- list()
+temp_plotList_S1 <- list()
 
-fileNames45 <- c("Change in TAve 4.5",
-                 "Change in TMax 4.5",
-                 "Change in TMin 4.5")
+#fileNames45 <- c("Change in TAve 4.5",
+                 #"Change in TMax 4.5",
+                 #"Change in TMin 4.5")
 
 tempTitles45 <- c(
   paste(scenario_plotNames[2],"Change in Average Temperature", sep = " "),
@@ -84,12 +84,15 @@ for(y_col in y_cols){
     xlab(paste0("\n", "Month")) +
     ylab(paste0("Change in temperature (\u00B0F)", "\n"))
   
-  plotList_S1[[y_col]] <- p
+  temp_plotList_S1[[y_col]] <- p
   
 }
 
-for(i in 1:length(plotList_S1)){  
-  p = plotList_S1[[i]] +
+temp_plots_S1 <- list()
+
+
+for(i in 1:length(temp_plotList_S1)){  
+  p = temp_plotList_S1[[i]] +
     labs(title = tempTitles45[i]) +
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
     scale_fill_manual(values = custom_fill_temp, labels = custom_labelsS1) +
@@ -107,15 +110,19 @@ for(i in 1:length(plotList_S1)){
           legend.key.spacing.x = unit(0.5, "in")) + 
     guides(fill = guide_legend(byrow = TRUE))
   
-  ggsave(filename = paste0(fileNames45[i],'.png'), 
-         plot = p,
-         path = bar_charts_dir,
-         width = 5.5,
-         height = 3,
-         units = "in",
-         dpi = 300) 
-  
+  temp_plots_S1[[i]] <- p 
+
 }
+  
+  #ggsave(filename = paste0(fileNames45[i],'.png'), 
+         #plot = p,
+         #path = bar_charts_dir,
+         #width = 5.5,
+         #height = 3,
+         #units = "in",
+         #dpi = 300) 
+  
+
 
 
 ##  Precip Plot  ##
@@ -133,13 +140,27 @@ custom_labelsS2 <- c(paste(scenario_plotNames[3], f1_midyear, sep = " "), paste(
 
 # Plot
 
+max_prcpS1 <- max(S1$Avg_PPT_in)
+min_prcpS1 <- min(S1$Avg_PPT_in)
+
+upper_limitS1 <- case_when(
+  max_prcpS1 < 2 ~ 2,
+  max_prcpS1 > 2 ~ 2.4
+)
+
+lower_limitS1 <- case_when(
+  min_prcpS1 > -1.2 ~ -1.2,
+  min_prcpS1 < -1.2 ~ -1.6
+)
+
+
 prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in, fill = Future)) +
   geom_bar(stat = "identity", color = "black", position = "dodge", width = 0.7) +
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Change in precipitation (inches)", "\n")) + 
   labs(title = title_prcpS1) +
-  scale_y_continuous(limits = c(-1.2, 2), 
-                     breaks = seq(from=-1.2, to=2, by=0.4), 
+  scale_y_continuous(limits = c(lower_limit, upper_limit), 
+                     breaks = seq(from = lower_limit, to = upper_limit, by=0.4), 
                      labels = scales::number_format(accuracy = 0.1)) +
   scale_fill_manual(values = custom_fill_prcp, labels = custom_labelsS1) +
   theme(element_text(family = "serif", hjust = 0.5),
@@ -156,22 +177,22 @@ prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
         legend.key.spacing.x = unit(0.5, "in")) + 
   guides(fill = guide_legend(byrow = TRUE))
 
-ggsave(filename = paste0(fileName_prcpS1,'.png'), 
-       plot = prcpS1,
-       path = bar_charts_dir,
-       width = 5.5,
-       height = 3,
-       units = "in",
-       dpi = 300) 
+#ggsave(filename = paste0(fileName_prcpS1,'.png'), 
+       #plot = prcpS1,
+       #path = bar_charts_dir,
+       #width = 5.5,
+       #height = 3,
+       #units = "in",
+       #dpi = 300) 
 
 
 ##   --------- PLOTS FOR SCENARIO 2  ---------------------------    ##
 
-plotList_S2 <- list()
+temp_plotList_S2 <- list()
 
-fileNames85 <- c("Change in TAve 8.5",
-                 "Change in TMax 8.5",
-                 "Change in TMin 8.5")
+#fileNames85 <- c("Change in TAve 8.5",
+                 #"Change in TMax 8.5",
+                 #"Change in TMin 8.5")
 
 tempTitles85 <- c(
   paste(scenario_plotNames[3],"Change in Average Temperature", sep = " "),
@@ -187,12 +208,12 @@ for(y_col in y_cols){
     xlab(paste0("\n", "Month")) +
     ylab(paste0("Change in temperature (\u00B0F)", "\n"))
   
-  plotList_S2[[y_col]] <- p
+  temp_plotList_S2[[y_col]] <- p
   
 }
 
-for(i in 1:length(plotList_S2)){  
-  p = plotList_S2[[i]] +
+for(i in 1:length(temp_plotList_S2)){  
+  p = temp_plotList_S2[[i]] +
     labs(title = tempTitles85[i]) +
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
     scale_fill_manual(values = custom_fill_temp, labels = custom_labelsS2) +
@@ -209,31 +230,44 @@ for(i in 1:length(plotList_S2)){
           legend.box.margin = margin(t = 0, r = 50, b = 0, l = 50),
           legend.key.spacing.x = unit(0.5, "in")) + 
     guides(fill = guide_legend(byrow = TRUE))
+}  
+  #ggsave(filename = paste0(fileNames85[i],'.png'), 
+         #plot = p,
+         #path = bar_charts_dir,
+         #width = 5.5,
+         #height = 3,
+         #units = "in",
+         #dpi = 300) 
   
-  ggsave(filename = paste0(fileNames85[i],'.png'), 
-         plot = p,
-         path = bar_charts_dir,
-         width = 5.5,
-         height = 3,
-         units = "in",
-         dpi = 300) 
-  
-}
+
 
 
 ##  Precip Plot  ##
 
 title_prcpS2 <- paste(scenario_plotNames[3],"Change in Average Precipitation", sep = " ")
 
-fileName_prcpS2 <- "Change in Avg_PPT_in 8.5"
+max_prcpS2 <- max(S2$Avg_PPT_in)
+min_prcpS2 <- min(S2$Avg_PPT_in)
+
+upper_limitS2 <- case_when(
+  max_prcpS2 < 2 ~ 2,
+  max_prcpS2 > 2 ~ 2.4
+)
+
+lower_limitS2 <- case_when(
+  min_prcpS2 > -1.2 ~ -1.2,
+  min_prcpS2 < -1.2 ~ -1.6
+)
+
+#fileName_prcpS2 <- "Change in Avg_PPT_in 8.5"
 
 prcpS2 <- ggplot(S2, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in, fill = Future)) +
   geom_bar(stat = "identity", color = "black", position = "dodge", width = 0.7) +
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Change in precipitation (inches)", "\n")) + 
   labs(title = title_prcpS2) +
-  scale_y_continuous(limits = c(-1.2, 2), 
-                     breaks = seq(from=-1.2, to=2, by=0.4), 
+  scale_y_continuous(limits = c(lower_limitS2, upper_limitS2), 
+                     breaks = seq(from = lower_limitS2, to = upper_limitS2, by=0.4), 
                      labels = scales::number_format(accuracy = 0.1)) +
   scale_fill_manual(values = custom_fill_prcp, labels = custom_labelsS2) +
   theme(element_text(family = "serif", hjust = 0.5),
@@ -250,10 +284,10 @@ prcpS2 <- ggplot(S2, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
         legend.key.spacing.x = unit(0.5, "in")) + 
   guides(fill = guide_legend(byrow = TRUE))
 
-ggsave(filename = paste0(fileName_prcpS2,'.png'), 
-       plot = prcpS2,
-       path = bar_charts_dir,
-       width = 5.5,
-       height = 3,
-       units = "in",
-       dpi = 300) 
+#ggsave(filename = paste0(fileName_prcpS2,'.png'), 
+       #plot = prcpS2,
+       #path = bar_charts_dir,
+       #width = 5.5,
+       #height = 3,
+       #units = "in",
+       #dpi = 300) 
