@@ -52,6 +52,7 @@ library(tmap)
 library(tmaptools)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
+library(patchwork)
 library(conflicted)
 
 conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
@@ -1176,6 +1177,7 @@ rm(list=setdiff(ls(), c("monthSum",
                         "installation", 
                         "model", 
                         "scenarios",
+                        "scenario_plotNames",
                         "results_folder",
                         "plots_dir",
                         "years",
@@ -1247,8 +1249,9 @@ add_month <- function(df){
   df = mutate(df, Month = month.abb)
 }
 
-source('./Code/Plots/Bar_Charts/Hist_Bar_Charts.R')
-source('./Code/Plots/Bar_Charts/Compare_Bar_Charts.R')
+source('./Code/Tables_and_Plots/Bar_Charts/Hist_Bar_Charts.R')
+source('./Code/Tables_and_Plots/Bar_Charts/Compare_Bar_Charts.R')
+source('./Code/Tables_and_Plots/Bar_Charts/Format_Bar_Charts.R') # Formatting plots 
 
 ```
 
