@@ -45,7 +45,7 @@ for(i in 1:length(plot_list)){
   p = plot_list[[i]] +
     labs(title = titles[i]) +
     scale_y_continuous(limits = c(0,100), n.breaks = 11) +
-    theme(element_text(family = "serif", hjust = 0.5),
+    theme(element_text(family = "serif", face = "bold", hjust = 0.5),
           plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
           axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
@@ -73,7 +73,7 @@ upper_limit <- upper_value + 1
 breaks <- upper_limit + 1 # add 1 so that y-axis scale starts at zero
 
 prcp_hist <- ggplot(df) + 
-  geom_col(aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in), color="#0083BE", fill="#0083BE", width = 0.7) + 
+  geom_col(aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in), color="#65B2A7", fill="#65B2A7", width = 0.7) + 
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Average Precipitation (inches)", "\n")) +
   labs(title = "Historical Average Precipitation") +
