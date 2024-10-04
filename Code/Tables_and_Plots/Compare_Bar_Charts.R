@@ -50,28 +50,36 @@ S2 <- full_join(s2f1, s2f2)
 
 # Get mid-range values for years
 
-f1_midyear <- floor((years[3] + years[4])/2)
-f2_midyear <- floor((years[5] + years[6])/2)
+#f1_midyear <- floor((years[3] + years[4])/2)
+#f2_midyear <- floor((years[5] + years[6])/2)
 
-# Colors and labels
+# Titles and subtitles
+
+tempTitles <- c(
+  "Change in Average Temperature",
+  "Change in Average Maximum Temperature",
+  "Change in Average Minimum Temperature"
+)
+
+tempSubtitles_S1 <- c(
+  paste(scenario_plotNames[2], "(Moderate Emissions)", sep = " "),
+  paste(scenario_plotNames[2], "(High Emissions)", sep = " ")
+)
+
+tempSubtitles_S2 <- c(
+  paste(scenario_plotNames[3], "(Moderate Emissions)", sep = " "),
+  paste(scenario_plotNames[3], "(High Emissions)", sep = " ")
+)
+
+# Colors and Labels
 
 custom_fill_temp <- c("F1" = "#D4B83A", "F2" = "#BB5145") # colors for temp plots
-custom_labelsS1 <- c(paste(scenario_plotNames[2], f1_midyear, sep = " "), paste(scenario_plotNames[2], f2_midyear, sep = " ")) ### COME BACK TO THIS
+custom_labels <- c("Near Term", "Far Term") 
 
 
 ## PLOTS FOR SCENARIO 1 ##
 
 temp_plotList_S1 <- list()
-
-#fileNames45 <- c("Change in TAve 4.5",
-                 #"Change in TMax 4.5",
-                 #"Change in TMin 4.5")
-
-tempTitles45 <- c(
-  paste(scenario_plotNames[2],"Change in Average Temperature", sep = " "),
-  paste(scenario_plotNames[2],"Change in Average Maximum Temperature", sep = " "),
-  paste(scenario_plotNames[2], "Change in Average Minimum Temperature", sep = " ")
-)
 
 y_cols <- c("Avg_TMeanF", "Avg_TMaxF", "Avg_TMinF")
 
@@ -93,11 +101,12 @@ temp_plots_S1 <- list()
 
 for(i in 1:length(temp_plotList_S1)){  
   p = temp_plotList_S1[[i]] +
-    labs(title = tempTitles45[i]) +
+    labs(title = tempTitles[i], subtitle = tempSubtitles_S1[i]) +
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
     scale_fill_manual(values = custom_fill_temp, labels = custom_labelsS1) +
     theme(element_text(family = "serif", hjust = 0.5),
           plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
+          plot.subtitle = element_text(family = "serif", hjust = 0, size = 11),
           axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
           panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
@@ -135,7 +144,7 @@ fileName_prcpS1 <- "Change in Avg_PPT_in 4.5"
 
 custom_fill_prcp <- c("F1" = "#BDD7EE", "F2" = "#0083BE") 
 
-custom_labelsS2 <- c(paste(scenario_plotNames[3], f1_midyear, sep = " "), paste(scenario_plotNames[3], f2_midyear, sep = " "))
+custom_labelsS2 <- c(paste(scenario_plotNames[3], "Moderate Emissions", sep = " "), paste(scenario_plotNames[3], "High Emissions", sep = " "))
 
 
 # Plot
@@ -194,11 +203,11 @@ temp_plotList_S2 <- list()
                  #"Change in TMax 8.5",
                  #"Change in TMin 8.5")
 
-tempTitles85 <- c(
-  paste(scenario_plotNames[3],"Change in Average Temperature", sep = " "),
-  paste(scenario_plotNames[3],"Change in Average Maximum Temperature", sep = " "),
-  paste(scenario_plotNames[3], "Change in Average Minimum Temperature", sep = " ")
-)
+#tempTitles85 <- c(
+  #paste(scenario_plotNames[3],"Change in Average Temperature", sep = " "),
+  #paste(scenario_plotNames[3],"Change in Average Maximum Temperature", sep = " "),
+  #paste(scenario_plotNames[3], "Change in Average Minimum Temperature", sep = " ")
+#)
 
 ## Loop ##
 
@@ -214,11 +223,11 @@ for(y_col in y_cols){
 
 for(i in 1:length(temp_plotList_S2)){  
   p = temp_plotList_S2[[i]] +
-    labs(title = tempTitles85[i]) +
+    labs(subtitle = tempSubtitles_S2[i]) +
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
     scale_fill_manual(values = custom_fill_temp, labels = custom_labelsS2) +
     theme(element_text(family = "serif", hjust = 0.5),
-          plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
+          plot.subtitle = element_text(family = "serif", hjust = 0, size = 11),
           axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
           panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
