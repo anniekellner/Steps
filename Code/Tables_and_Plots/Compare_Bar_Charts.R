@@ -199,14 +199,16 @@ for(y_col in y_cols){
   
 }
 
+temp_plots_S2 <- list()
+
 for(i in 1:length(temp_plotList_S2)){  
   p = temp_plotList_S2[[i]] +
-    labs(subtitle = tempSubtitles_S2[i]) +
+    labs(subtitle = subtitles[2]) +
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
-    scale_fill_manual(values = custom_fill_temp, labels = custom_labelsS2) +
+    scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
     theme(element_text(family = "serif", hjust = 0.5),
           plot.subtitle = element_text(family = "serif", hjust = 0, size = 11),
-          axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
+          axis.title = element_blank(),
           panel.background = element_blank(), 
           panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
           axis.ticks = element_blank(),
@@ -217,6 +219,8 @@ for(i in 1:length(temp_plotList_S2)){
           legend.box.margin = margin(t = 0, r = 50, b = 0, l = 50),
           legend.key.spacing.x = unit(0.5, "in")) + 
     guides(fill = guide_legend(byrow = TRUE))
+  
+  temp_plots_S2[[i]] <- p 
 }  
 
 
@@ -226,13 +230,14 @@ prcpS2 <- ggplot(S2, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
   geom_bar(stat = "identity", color = "black", position = "dodge", width = 0.7) +
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Change in precipitation (inches)", "\n")) + 
-  labs(title = title_prcpS2) +
-  scale_y_continuous(limits = c(lower_limitS2, upper_limitS2), 
-                     breaks = seq(from = lower_limitS2, to = upper_limitS2, by=0.4), 
+  labs(subtitle = subtitles[2]) +
+  scale_y_continuous(limits = c(prcp_lower_limit, prcp_upper_limit), 
+                     breaks = seq(from = prcp_lower_limit, to = prcp_upper_limit, by=0.4), 
                      labels = scales::number_format(accuracy = 0.1)) +
-  scale_fill_manual(values = custom_fill_prcp, labels = custom_labelsS2) +
+  scale_fill_manual(values = custom_fill_prcp, labels = custom_labels) +
   theme(element_text(family = "serif", hjust = 0.5),
-        plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
+        plot.title = element_blank(),
+        plot.subtitle = element_text(family = "serif", hjust = 0, size = 11),
         axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
         panel.background = element_blank(), 
         panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
