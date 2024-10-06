@@ -30,7 +30,7 @@ plot_list <- list() # Need to create list in order to run plots through a loop
 for(y_col in y_cols){
   
   p <- ggplot(df) +
-    geom_col(aes(x = factor(Month, levels = c(month.abb)), y = !!sym(y_col)), color="#D4B83A", fill="#D4B83A", width = 0.7) + # code for the y column points ggplot2 to the correct column within the dataframe
+    geom_col(aes(x = factor(Month, levels = c(month.abb)), y = !!sym(y_col)), color="#CBC598", fill="#CBC598", width = 0.7) + # code for the y column points ggplot2 to the correct column within the dataframe
     xlab(paste0("\n", "Month")) +
     ylab(paste0("Average Temperature (\u00B0F)", "\n"))
   
@@ -38,8 +38,8 @@ for(y_col in y_cols){
   
 }
 
-hist_plots <- list()
 
+hist_plots <- list()
 
 for(i in 1:length(plot_list)){  
   p = plot_list[[i]] +
@@ -57,14 +57,6 @@ for(i in 1:length(plot_list)){
   hist_plots[[i]] <- p
 }
   
-  #ggsave(filename = paste0(plots[i],'.png'), 
-         #plot = p,
-         #path = './Results/Test-Excel_Plots',
-         #width = 5.5,
-         #height = 3,
-         #units = "in",
-         #dpi = 300) 
-
 
 ### PRECIP
 
@@ -87,10 +79,3 @@ prcp_hist <- ggplot(df) +
         axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
         axis.text.y = element_text(size = 8)) 
 
-#ggsave(filename = "Hist Avg_PPT_in.png",
-       #plot = prcp,
-       #path = './Results/Test-Excel_Plots',
-       #width = 5.5,
-       #height = 3,
-       #units = "in",
-       #dpi = 300)
