@@ -4,7 +4,7 @@
 #########################################################################
 
 # written by Annie Kellner for CEMML, annie.kellner@colostate.edu
-# 8-30-24
+# 10-04-24
 
 
 ##  ------  Prep Data  ------------ ##
@@ -46,12 +46,8 @@ s2f2 <- s2f2 %>%
 S2 <- full_join(s2f1, s2f2) 
 
 
-# ----  Prep Plot Items ------------  #
+# ---- Plotting Prep ------------  #
 
-# Get mid-range values for years
-
-#f1_midyear <- floor((years[3] + years[4])/2)
-#f2_midyear <- floor((years[5] + years[6])/2)
 
 # Titles and subtitles
 
@@ -61,23 +57,59 @@ tempTitles <- c(
   "Change in Average Minimum Temperature"
 )
 
-tempSubtitles_S1 <- c(
-  paste(scenario_plotNames[2], "(Moderate Emissions)", sep = " "),
-  paste(scenario_plotNames[2], "(High Emissions)", sep = " ")
+prcpTitle <- "Change in Average Precipitation"
+
+subtitles <- c(
+  paste0("\n", scenario_plotNames[2], " ", "(Moderate Emissions)"),
+  paste0("\n", scenario_plotNames[3], " ", "(High Emissions)")
 )
 
-tempSubtitles_S2 <- c(
-  paste(scenario_plotNames[3], "(Moderate Emissions)", sep = " "),
-  paste(scenario_plotNames[3], "(High Emissions)", sep = " ")
-)
 
 # Colors and Labels
 
 custom_fill_temp <- c("F1" = "#D4B83A", "F2" = "#BB5145") # colors for temp plots
 custom_labels <- c("Near Term", "Far Term") 
 
+custom_fill_prcp <- c("F1" = "#BDD7EE", "F2" = "#0083BE") 
+
+
+# Set y-axis for precip
+
+# y-axis should be the same for both plots (S1 and S2)
+# Axis limits will be considered based on all values (both S1 and S2)
+
+# Determine highest and lowest precip values 
+
+max_prcpS1 <- max(S1$Avg_PPT_in)
+min_prcpS1 <- min(S1$Avg_PPT_in)
+
+max_prcpS2 <- max(S2$Avg_PPT_in)
+min_prcpS2 <- min(S2$Avg_PPT_in)
+
+# Assign max/min values
+
+max_pr_value <- if_else(max_prcpS1 > max_prcpS2, max_prcpS1, max_prcpS2)
+min_pr_value <- if_else(min_prcpS1 < min_prcpS2, min_prcpS1, min_prcpS2)
+
+# Assign plot limits
+
+prcp_upper_limit <- case_when(
+  max_pr_value < 2 ~ 2,
+  max_pr_value > 2 ~ 2.4
+)
+
+prcp_lower_limit <- case_when(
+  min_prcpS2 > -1.2 ~ -1.2,
+  min_prcpS2 < -1.2 ~ -1.6
+)
+
+
+##  ------------  PLOT  ----------------------  ##
+
 
 ## PLOTS FOR SCENARIO 1 ##
+
+# Temperatures
 
 temp_plotList_S1 <- list()
 
@@ -101,11 +133,11 @@ temp_plots_S1 <- list()
 
 for(i in 1:length(temp_plotList_S1)){  
   p = temp_plotList_S1[[i]] +
-    labs(title = tempTitles[i], subtitle = tempSubtitles_S1[i]) +
+    labs(title = tempTitles[i], subtitle = subtitles[1])+
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
-    scale_fill_manual(values = custom_fill_temp, labels = custom_labelsS1) +
+    scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
     theme(element_text(family = "serif", hjust = 0.5),
-          plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
+          plot.title = element_text(family = "serif", face = "bold", hjust = 0.5, size = 12),
           plot.subtitle = element_text(family = "serif", hjust = 0, size = 11),
           axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
@@ -123,53 +155,15 @@ for(i in 1:length(temp_plotList_S1)){
 
 }
   
-  #ggsave(filename = paste0(fileNames45[i],'.png'), 
-         #plot = p,
-         #path = bar_charts_dir,
-         #width = 5.5,
-         #height = 3,
-         #units = "in",
-         #dpi = 300) 
-  
-
-
-
-##  Precip Plot  ##
-
-# Graph names and aesthetics
-
-title_prcpS1 <- paste(scenario_plotNames[2],"Change in Average Precipitation", sep = " ")
-
-fileName_prcpS1 <- "Change in Avg_PPT_in 4.5"
-
-custom_fill_prcp <- c("F1" = "#BDD7EE", "F2" = "#0083BE") 
-
-custom_labelsS2 <- c(paste(scenario_plotNames[3], "Moderate Emissions", sep = " "), paste(scenario_plotNames[3], "High Emissions", sep = " "))
-
-
-# Plot
-
-max_prcpS1 <- max(S1$Avg_PPT_in)
-min_prcpS1 <- min(S1$Avg_PPT_in)
-
-upper_limitS1 <- case_when(
-  max_prcpS1 < 2 ~ 2,
-  max_prcpS1 > 2 ~ 2.4
-)
-
-lower_limitS1 <- case_when(
-  min_prcpS1 > -1.2 ~ -1.2,
-  min_prcpS1 < -1.2 ~ -1.6
-)
-
+# Precip 
 
 prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in, fill = Future)) +
   geom_bar(stat = "identity", color = "black", position = "dodge", width = 0.7) +
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Change in precipitation (inches)", "\n")) + 
-  labs(title = title_prcpS1) +
-  scale_y_continuous(limits = c(lower_limit, upper_limit), 
-                     breaks = seq(from = lower_limit, to = upper_limit, by=0.4), 
+  labs(title = prcpTitle, subtitle = Subtitles_S1[i]) +
+  scale_y_continuous(limits = c(prcp_lower_limit, prcp_upper_limit), 
+                     breaks = seq(from = prcp_lower_limit, to = prcp_upper_limit, by=0.4), 
                      labels = scales::number_format(accuracy = 0.1)) +
   scale_fill_manual(values = custom_fill_prcp, labels = custom_labelsS1) +
   theme(element_text(family = "serif", hjust = 0.5),
@@ -186,30 +180,13 @@ prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
         legend.key.spacing.x = unit(0.5, "in")) + 
   guides(fill = guide_legend(byrow = TRUE))
 
-#ggsave(filename = paste0(fileName_prcpS1,'.png'), 
-       #plot = prcpS1,
-       #path = bar_charts_dir,
-       #width = 5.5,
-       #height = 3,
-       #units = "in",
-       #dpi = 300) 
 
+##  PLOTS FOR SCENARIO 2 ##
 
-##   --------- PLOTS FOR SCENARIO 2  ---------------------------    ##
+# Temperatures 
+
 
 temp_plotList_S2 <- list()
-
-#fileNames85 <- c("Change in TAve 8.5",
-                 #"Change in TMax 8.5",
-                 #"Change in TMin 8.5")
-
-#tempTitles85 <- c(
-  #paste(scenario_plotNames[3],"Change in Average Temperature", sep = " "),
-  #paste(scenario_plotNames[3],"Change in Average Maximum Temperature", sep = " "),
-  #paste(scenario_plotNames[3], "Change in Average Minimum Temperature", sep = " ")
-#)
-
-## Loop ##
 
 for(y_col in y_cols){
   p = ggplot(S2, aes(x = factor(Month, levels = c(month.abb)), y = !!sym(y_col), fill = Future)) + 
@@ -240,35 +217,9 @@ for(i in 1:length(temp_plotList_S2)){
           legend.key.spacing.x = unit(0.5, "in")) + 
     guides(fill = guide_legend(byrow = TRUE))
 }  
-  #ggsave(filename = paste0(fileNames85[i],'.png'), 
-         #plot = p,
-         #path = bar_charts_dir,
-         #width = 5.5,
-         #height = 3,
-         #units = "in",
-         #dpi = 300) 
-  
 
 
-
-##  Precip Plot  ##
-
-title_prcpS2 <- paste(scenario_plotNames[3],"Change in Average Precipitation", sep = " ")
-
-max_prcpS2 <- max(S2$Avg_PPT_in)
-min_prcpS2 <- min(S2$Avg_PPT_in)
-
-upper_limitS2 <- case_when(
-  max_prcpS2 < 2 ~ 2,
-  max_prcpS2 > 2 ~ 2.4
-)
-
-lower_limitS2 <- case_when(
-  min_prcpS2 > -1.2 ~ -1.2,
-  min_prcpS2 < -1.2 ~ -1.6
-)
-
-#fileName_prcpS2 <- "Change in Avg_PPT_in 8.5"
+# Precip
 
 prcpS2 <- ggplot(S2, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in, fill = Future)) +
   geom_bar(stat = "identity", color = "black", position = "dodge", width = 0.7) +
@@ -293,10 +244,3 @@ prcpS2 <- ggplot(S2, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
         legend.key.spacing.x = unit(0.5, "in")) + 
   guides(fill = guide_legend(byrow = TRUE))
 
-#ggsave(filename = paste0(fileName_prcpS2,'.png'), 
-       #plot = prcpS2,
-       #path = bar_charts_dir,
-       #width = 5.5,
-       #height = 3,
-       #units = "in",
-       #dpi = 300) 
