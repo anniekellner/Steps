@@ -161,13 +161,14 @@ prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
   geom_bar(stat = "identity", color = "black", position = "dodge", width = 0.7) +
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Change in precipitation (inches)", "\n")) + 
-  labs(title = prcpTitle, subtitle = Subtitles_S1[i]) +
+  labs(title = prcpTitle, subtitle = subtitles[1]) +
   scale_y_continuous(limits = c(prcp_lower_limit, prcp_upper_limit), 
                      breaks = seq(from = prcp_lower_limit, to = prcp_upper_limit, by=0.4), 
                      labels = scales::number_format(accuracy = 0.1)) +
-  scale_fill_manual(values = custom_fill_prcp, labels = custom_labelsS1) +
+  scale_fill_manual(values = custom_fill_prcp, labels = custom_labels) +
   theme(element_text(family = "serif", hjust = 0.5),
-        plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
+        plot.title = element_text(family = "serif", face = "bold", hjust = 0.5, size = 12),
+        plot.subtitle = element_text(family = "serif", hjust = 0, size = 11),
         axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
         panel.background = element_blank(), 
         panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
