@@ -145,11 +145,11 @@ for(i in 1:length(temp_plotList_S1)){
           axis.ticks = element_blank(),
           axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
           axis.text.y = element_text(size = 8),
-          legend.position = "bottom",
-          legend.title = element_blank(), 
-          legend.box.margin = margin(t = 0, r = 50, b = 0, l = 50),
-          legend.key.spacing.x = unit(0.5, "in")) + 
-    guides(fill = guide_legend(byrow = TRUE))
+          legend.position = "none"))
+          #legend.title = element_blank(), 
+          #legend.box.margin = margin(t = 0, r = 50, b = 0, l = 50),
+          #legend.key.spacing.x = unit(0.5, "in")) + 
+    #guides(fill = guide_legend(byrow = TRUE))
   
   temp_plots_S1[[i]] <- p 
 
@@ -175,11 +175,11 @@ prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
         axis.ticks = element_blank(),
         axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
         axis.text.y = element_text(size = 8),
-        legend.position = "bottom",
-        legend.title = element_blank(), 
-        legend.box.margin = margin(t = 0, r = 50, b = 0, l = 50),
-        legend.key.spacing.x = unit(0.5, "in")) + 
-  guides(fill = guide_legend(byrow = TRUE))
+        legend.position = "none")
+        #legend.title = element_blank(), 
+        #legend.box.margin = margin(t = 0, r = 50, b = 0, l = 50),
+        #legend.key.spacing.x = unit(0.5, "in")) + 
+  #guides(fill = guide_legend(byrow = TRUE))
 
 
 ##  PLOTS FOR SCENARIO 2 ##
