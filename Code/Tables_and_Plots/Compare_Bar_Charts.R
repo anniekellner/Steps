@@ -133,11 +133,11 @@ temp_plots_S1 <- list()
 
 for(i in 1:length(temp_plotList_S1)){  
   p = temp_plotList_S1[[i]] +
-    labs(title = tempTitles[i], subtitle = subtitles[1])+
+    labs(subtitle = subtitles[1])+
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
     scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
     theme(element_text(family = "serif", hjust = 0.5),
-          plot.title = element_text(family = "serif", face = "bold", hjust = 0.5, size = 12),
+          #plot.title = element_text(family = "serif", face = "bold", hjust = 0.5, size = 12),
           plot.subtitle = element_text(family = "serif", hjust = 0, size = 11),
           axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
@@ -145,7 +145,7 @@ for(i in 1:length(temp_plotList_S1)){
           axis.ticks = element_blank(),
           axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
           axis.text.y = element_text(size = 8),
-          legend.position = "none"))
+          legend.position = "none")
           #legend.title = element_blank(), 
           #legend.box.margin = margin(t = 0, r = 50, b = 0, l = 50),
           #legend.key.spacing.x = unit(0.5, "in")) + 
@@ -208,7 +208,7 @@ for(i in 1:length(temp_plotList_S2)){
     scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
     theme(element_text(family = "serif", hjust = 0.5),
           plot.subtitle = element_text(family = "serif", hjust = 0, size = 11),
-          axis.title = element_blank(),
+          axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
           panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
           axis.ticks = element_blank(),
