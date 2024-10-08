@@ -45,8 +45,8 @@ for(i in 1:length(plot_list)){
   p = plot_list[[i]] +
     labs(title = titles[i]) +
     scale_y_continuous(limits = c(0,100), n.breaks = 11) +
-    theme(element_text(family = "serif", face = "bold", hjust = 0.5),
-          plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
+    theme(element_text(family = "serif", hjust = 0.5),
+          plot.title = element_text(family = "serif", face = "bold", hjust = 0.5, size = 12),
           axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
           panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print

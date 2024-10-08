@@ -19,13 +19,21 @@ theme_border <- theme_gray() +
 
 # Combine futures into single plot
 futures <- ({rcp45AvgTemp / rcp85AvgTemp}) +
-  plot_annotation(theme = theme_border)
-
+  plot_annotation(theme = theme_border) +
+  plot_layout(axis_titles = "collect")  # make single axis label
+  
+  
+  
 # Use wrap_elements() function to limit border to futures plots
 
 wrap_elements(panel = Hist_AvgTemp) / 
-  wrap_elements(panel = futures)
-
+  wrap_elements(panel = grid.text(tempTitles[1],
+                                  just = "centre",
+                                  gp = gpar(fontsize = 12,
+                                            fontfamily = "serif",
+                                            fontface = "bold"))) /
+  wrap_elements(panel = futures) + 
+  plot_layout(heights = c(2,0.1,2))
 
 
 
