@@ -53,6 +53,7 @@ library(tmaptools)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
 library(patchwork)
+library(showtext) # to use calibri font with Mac
 library(conflicted)
 
 conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
