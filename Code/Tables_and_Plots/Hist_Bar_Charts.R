@@ -13,9 +13,7 @@ df <- df
 df <- add_month(df)  ## Make sure this works
 df <- select(df, Month, Avg_TMeanF, Avg_TMaxF, Avg_TMinF, Avg_PPT_in)
 
-titles <- c("Historical Average Temperature", 
-            "Historical Average Maximum Temperature", 
-            "Historical Average Minimum Temperature")
+
 
 plots <- c("Hist Avg_TMeanF", "Hist Avg_TMaxF", "Hist Avg_TMinF")
 
@@ -45,9 +43,9 @@ for(i in 1:length(plot_list)){
   p = plot_list[[i]] +
     labs(title = titles[i]) +
     scale_y_continuous(limits = c(0,100), n.breaks = 11) +
-    theme(element_text(family = "serif", hjust = 0.5),
-          plot.title = element_text(family = "serif", face = "bold", hjust = 0.5, size = 12),
-          axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
+    theme(element_text(family = "calibri", hjust = 0.5),
+          plot.title = element_text(family = "calibri", face = "bold", hjust = 0.5, size = 12),
+          axis.title = element_text(family = "calibri", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
           panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
           axis.ticks = element_blank(),
@@ -70,9 +68,9 @@ prcp_hist <- ggplot(df) +
   ylab(paste0("Average Precipitation (inches)", "\n")) +
   labs(title = "Historical Average Precipitation") +
   scale_y_continuous(limits = c(0,upper_limit), n.breaks = breaks) + 
-  theme(element_text(family = "serif", hjust = 0.5),
-        plot.title = element_text(family = "serif", hjust = 0.5, size = 12),
-        axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
+  theme(element_text(family = "calibri", hjust = 0.5),
+        plot.title = element_text(family = "calibri", hjust = 0.5, size = 12),
+        axis.title = element_text(family = "calibri", hjust = 0.5, size = 10),
         panel.background = element_blank(), 
         panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
         axis.ticks = element_blank(),

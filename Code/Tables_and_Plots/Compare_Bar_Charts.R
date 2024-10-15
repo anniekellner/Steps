@@ -48,16 +48,7 @@ S2 <- full_join(s2f1, s2f2)
 
 # ---- Plotting Prep ------------  #
 
-
-# Titles and subtitles
-
-tempTitles <- c(
-  "Change in Average Temperature",
-  "Change in Average Maximum Temperature",
-  "Change in Average Minimum Temperature"
-)
-
-prcpTitle <- "Change in Average Precipitation"
+# Subtitles
 
 subtitles <- c(
   paste0("\n", scenario_plotNames[2], " ", "(Moderate Emissions)"),
@@ -136,10 +127,10 @@ for(i in 1:length(temp_plotList_S1)){
     labs(subtitle = subtitles[1])+
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
     scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
-    theme(element_text(family = "serif", hjust = 0.5),
-          #plot.title = element_text(family = "serif", face = "bold", hjust = 0.5, size = 12),
-          plot.subtitle = element_text(family = "serif", hjust = 0, size = 11),
-          axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
+    theme(element_text(family = "calibri", hjust = 0.5),
+          #plot.title = element_text(family = "calibri", face = "bold", hjust = 0.5, size = 12),
+          plot.subtitle = element_text(family = "calibri", hjust = 0, size = 11),
+          axis.title = element_text(family = "calibri", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
           panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
           axis.ticks = element_blank(),
@@ -161,15 +152,15 @@ prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
   geom_bar(stat = "identity", color = "black", position = "dodge", width = 0.7) +
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Change in precipitation (inches)", "\n")) + 
-  labs(title = prcpTitle, subtitle = subtitles[1]) +
+  labs(subtitle = subtitles[1]) +
   scale_y_continuous(limits = c(prcp_lower_limit, prcp_upper_limit), 
                      breaks = seq(from = prcp_lower_limit, to = prcp_upper_limit, by=0.4), 
                      labels = scales::number_format(accuracy = 0.1)) +
   scale_fill_manual(values = custom_fill_prcp, labels = custom_labels) +
-  theme(element_text(family = "serif", hjust = 0.5),
-        plot.title = element_text(family = "serif", face = "bold", hjust = 0.5, size = 12),
-        plot.subtitle = element_text(family = "serif", hjust = 0, size = 11),
-        axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
+  theme(element_text(family = "calibri", hjust = 0.5),
+        plot.title = element_text(family = "calibri", face = "bold", hjust = 0.5, size = 12),
+        plot.subtitle = element_text(family = "calibri", hjust = 0, size = 11),
+        axis.title = element_text(family = "calibri", hjust = 0.5, size = 10),
         panel.background = element_blank(), 
         panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
         axis.ticks = element_blank(),
@@ -206,9 +197,9 @@ for(i in 1:length(temp_plotList_S2)){
     labs(subtitle = subtitles[2]) +
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
     scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
-    theme(element_text(family = "serif", hjust = 0.5),
-          plot.subtitle = element_text(family = "serif", hjust = 0, size = 11),
-          axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
+    theme(element_text(family = "calibri", hjust = 0.5),
+          plot.subtitle = element_text(family = "calibri", hjust = 0, size = 11),
+          axis.title = element_text(family = "calibri", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
           panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
           axis.ticks = element_blank(),
@@ -235,10 +226,10 @@ prcpS2 <- ggplot(S2, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
                      breaks = seq(from = prcp_lower_limit, to = prcp_upper_limit, by=0.4), 
                      labels = scales::number_format(accuracy = 0.1)) +
   scale_fill_manual(values = custom_fill_prcp, labels = custom_labels) +
-  theme(element_text(family = "serif", hjust = 0.5),
+  theme(element_text(family = "calibri", hjust = 0.5),
         plot.title = element_blank(),
-        plot.subtitle = element_text(family = "serif", hjust = 0, size = 11),
-        axis.title = element_text(family = "serif", hjust = 0.5, size = 10),
+        plot.subtitle = element_text(family = "calibri", hjust = 0, size = 11),
+        axis.title = element_text(family = "calibri", hjust = 0.5, size = 10),
         panel.background = element_blank(), 
         panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
         axis.ticks = element_blank(),
