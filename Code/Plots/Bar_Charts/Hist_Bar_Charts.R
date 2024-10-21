@@ -23,7 +23,7 @@ df <- select(df, Month, Avg_TMeanF, Avg_TMaxF, Avg_TMinF, Avg_PPT_in)
 
 
 
-plots <- c("Hist Avg_TMeanF", "Hist Avg_TMaxF", "Hist Avg_TMinF")
+#plots <- c("Hist Avg_TMeanF", "Hist Avg_TMaxF", "Hist Avg_TMinF")
 
 y_cols <- c("Avg_TMeanF", "Avg_TMaxF", "Avg_TMinF")
 
@@ -49,11 +49,11 @@ hist_plots <- list()
 
 for(i in 1:length(plot_list)){  
   p = plot_list[[i]] +
-    labs(title = titles[i]) +
+    labs(title = histTitles[i]) +
     scale_y_continuous(limits = c(0,100), n.breaks = 11) +
-    theme(element_text(family = "calibri", hjust = 0.5),
-          plot.title = element_text(family = "calibri", face = "bold", hjust = 0.5, size = 12),
-          axis.title = element_text(family = "calibri", hjust = 0.5, size = 10),
+    theme(element_text(family = "Calibri", hjust = 0.5),
+          plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
+          axis.title = element_text(family = "Calibri", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
           panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
           axis.ticks = element_blank(),
