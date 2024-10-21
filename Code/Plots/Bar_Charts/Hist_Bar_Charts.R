@@ -5,6 +5,14 @@
 # 8-18-2024
 # written by Annie Kellner, annie.kellner@colostate.edu
 
+
+# Chart Elements
+
+histTitles <- c("Modeled Historical Average Temperature", 
+                "Modeled Historical Average Maximum Temperature", 
+                "Modeled Historical Average Minimum Temperature")
+
+
 # ------------- Prep data ----------------------------- #
 
 df <- monthSum[[1]] # Historical data
@@ -66,7 +74,7 @@ prcp_hist <- ggplot(df) +
   geom_col(aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in), color="#74CFE4", fill="#74CFE4", width = 0.7) + 
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Average Precipitation (inches)", "\n")) +
-  labs(title = "Historical Average Precipitation") +
+  labs(title = "Modeled Historical Average Precipitation") +
   scale_y_continuous(limits = c(0,upper_limit), n.breaks = breaks) + 
   theme(element_text(family = "calibri", hjust = 0.5),
         plot.title = element_text(family = "calibri", hjust = 0.5, size = 12),

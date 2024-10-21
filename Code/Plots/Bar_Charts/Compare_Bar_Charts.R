@@ -7,6 +7,18 @@
 # 10-04-24
 
 
+##  ----- Plot Elements ------- ##  
+
+
+tempTitles <- c(
+  "Projected Change in Average Temperature",
+  "Projected Change in Average Maximum Temperature",
+  "Projected Change in Average Minimum Temperature"
+)
+
+
+
+
 ##  ------  Prep Data  ------------ ##
 
 # Add month (character) to diffHist and create new df
