@@ -2,34 +2,35 @@
 #####     FORMATTING PLOTS    #########################
 #######################################################
 
-# Use package {patchwork}
-
-# Set plot elements
-
+# Creates side-by-side plots for demonstrating historical vs future scenarios
+# Uses package {patchwork} for plot layout (already loaded at the script start)
 
 
+##  ---------------  FORMATTING  -------------------  ##  
 
 
-prcpTitle <- "Projected Change in Average Precipitation"
-
-
-# Change in Average Temperature
-
-Hist_AvgTemp <- hist_plots[[1]]
-rcp45AvgTemp <- temp_plots_S1[[1]]
-rcp85AvgTemp <- temp_plots_S2[[1]]
-
-# Define theme
-
-theme_border <- theme_gray() + 
-  theme(plot.background = element_rect(fill = NA, 
-                                       color = "#899691", 
-                                       linewidth = 1))
 
 # Combine futures into single plot
-futures <- ({rcp45AvgTemp / rcp85AvgTemp}) +
-  plot_annotation(theme = theme_border) +
-  plot_layout(axis_titles = "collect")  # make single axis label
+
+futurePlots <- list()
+
+for(i in length(temp_plots_S1)){
+  FAvg = ({temp_plots_S1[[i]] / temp_plots_S2[[i]]}) +
+    plot_layout(axis_titles = "collect") # combines duplicate axis labels 
+  futurePlots[[i]] = FAvg
+  
+  FMax = ({temp_plots_S1[[i]] / temp_plots_S2[[i]]}) + 
+    plot_layout(axis_titles = "collect")
+  futurePlots[[i]] = FMax
+  
+  FMin = ({temp_plots_S1[[i]] / temp_plots_S2[[i]]}) + 
+    plot_layout(axis_titles = "collect")
+  futurePlots[[i]] = FMin
+}
+
+
+
+
 
 
 
