@@ -44,7 +44,8 @@ installation_names <- c("Homestead_ARB",
               "CapeCanaveral_45th",
               "Malibar_45th",
               "JDMTA_45th",
-              "JBER") 
+              "JBER",
+              "Edwards_AFB") 
 
 official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "NAVBASE San Diego",
@@ -61,6 +62,7 @@ official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "Cape Canaveral Space Force Station",
                                    "Malibar Transmitter Annex",
                                    "Jonathan Dickinson Missile Tracking Annex",
-                                   "Joint Base Elmendorf-Richardson") 
+                                   "Joint Base Elmendorf-Richardson",
+                                   "Edwards Air Force Base") 
 
 
