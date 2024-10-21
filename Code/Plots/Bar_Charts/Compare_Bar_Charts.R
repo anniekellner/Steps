@@ -9,6 +9,7 @@
 
 ##  ----- Plot Elements ------- ##  
 
+# Titles and subtitles
 
 tempTitles <- c(
   "Projected Change in Average Temperature",
@@ -16,8 +17,20 @@ tempTitles <- c(
   "Projected Change in Average Minimum Temperature"
 )
 
+# Subtitles
+
+subtitles <- c(
+  paste0("\n", scenario_plotNames[2], " ", "(Moderate Emissions)"),
+  paste0("\n", scenario_plotNames[3], " ", "(High Emissions)")
+)
 
 
+# Colors and Labels
+
+custom_fill_temp <- c("F1" = "#D4B83A", "F2" = "#BB5145") 
+custom_labels <- c("Near Term", "Far Term") 
+
+custom_fill_prcp <- c("F1" = "#BDD7EE", "F2" = "#0083BE") 
 
 ##  ------  Prep Data  ------------ ##
 
@@ -59,22 +72,6 @@ S2 <- full_join(s2f1, s2f2)
 
 
 # ---- Plotting Prep ------------  #
-
-# Subtitles
-
-subtitles <- c(
-  paste0("\n", scenario_plotNames[2], " ", "(Moderate Emissions)"),
-  paste0("\n", scenario_plotNames[3], " ", "(High Emissions)")
-)
-
-
-# Colors and Labels
-
-custom_fill_temp <- c("F1" = "#D4B83A", "F2" = "#BB5145") # colors for temp plots
-custom_labels <- c("Near Term", "Far Term") 
-
-custom_fill_prcp <- c("F1" = "#BDD7EE", "F2" = "#0083BE") 
-
 
 # Set y-axis for precip
 
@@ -136,11 +133,11 @@ temp_plots_S1 <- list()
 
 for(i in 1:length(temp_plotList_S1)){  
   p = temp_plotList_S1[[i]] +
-    labs(subtitle = subtitles[1])+
+    labs(title = tempTitles[i], subtitle = subtitles[1])+
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
     scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
     theme(element_text(family = "calibri", hjust = 0.5),
-          #plot.title = element_text(family = "calibri", face = "bold", hjust = 0.5, size = 12),
+          plot.title = element_text(family = "calibri", face = "bold", hjust = 0.5, size = 12),
           plot.subtitle = element_text(family = "calibri", hjust = 0, size = 11),
           axis.title = element_text(family = "calibri", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
@@ -206,12 +203,13 @@ temp_plots_S2 <- list()
 
 for(i in 1:length(temp_plotList_S2)){  
   p = temp_plotList_S2[[i]] +
-    labs(subtitle = subtitles[2]) +
+    labs(title = tempTitles[i], subtitle = subtitles[2]) +
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
     scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
-    theme(element_text(family = "calibri", hjust = 0.5),
-          plot.subtitle = element_text(family = "calibri", hjust = 0, size = 11),
-          axis.title = element_text(family = "calibri", hjust = 0.5, size = 10),
+    theme(element_text(family = "Calibri", hjust = 0.5),
+          plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
+          plot.subtitle = element_text(family = "Calibri", hjust = 0, size = 11),
+          axis.title = element_text(family = "Calibri", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
           panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
           axis.ticks = element_blank(),
