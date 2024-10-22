@@ -95,7 +95,9 @@ min_pr_value <- if_else(min_prcpS1 < min_prcpS2, min_prcpS1, min_prcpS2)
 
 prcp_upper_limit <- case_when(
   max_pr_value < 2 ~ 2,
-  max_pr_value > 2 ~ 2.4
+  max_pr_value > 2 & max_pr_value < 2.4 ~ 2.4,
+  max_pr_value > 2.4 & max_pr_value < 2.8 ~ 2.8,
+  max_pr_value > 2.8 & max_pr_value < 3.2 ~ 3.2
 )
 
 prcp_lower_limit <- case_when(
