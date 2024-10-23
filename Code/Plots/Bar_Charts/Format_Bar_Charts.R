@@ -32,7 +32,7 @@ for(i in 1:length(temp_plots_S1)){
 
 # Precip plot
 
-Fprcp <- ({prcpS1 / prcpS2})
+futurePrcp <- ({prcpS1 / prcpS2})
 
 # Final plots
 
@@ -41,21 +41,3 @@ pMax <- hist_plots[[2]] + FMax
 pMin <- hist_plots[[3]] + FMin
 
 
-
-
-# Use wrap_elements() function to limit border to futures plots
-
-wrap_elements(panel = grid.text(histTitles[1],
-                                just = "centre",
-                                gp = gpar(fontsize = 12,
-                                          fontfamily = "calibri",
-                                          fontface = "bold"))) /
-  
-  wrap_elements(panel = Hist_AvgTemp) / 
-  wrap_elements(panel = grid.text(tempTitles[1],
-                                  just = "centre",
-                                  gp = gpar(fontsize = 12,
-                                            fontfamily = "serif",
-                                            fontface = "bold"))) /
-  wrap_elements(panel = futures) + 
-  plot_layout(heights = c(0.1,2,0.1,2))

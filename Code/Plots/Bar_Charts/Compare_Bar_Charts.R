@@ -9,7 +9,7 @@
 
 ##  ----- Plot Elements ------- ##  
 
-# Titles and subtitles
+## Titles 
 
 tempTitles <- c(
   "Projected Change in Average Temperature",
@@ -17,7 +17,7 @@ tempTitles <- c(
   "Projected Change in Average Minimum Temperature"
 )
 
-# Subtitles
+## Subtitles
 
 subtitles <- c(
   paste0("\n", scenario_plotNames[2], " ", "(Moderate Emissions)"),
@@ -25,12 +25,14 @@ subtitles <- c(
 )
 
 
-# Colors and Labels
+## Colors and Labels
 
 custom_fill_temp <- c("F1" = "#D4B83A", "F2" = "#BB5145") 
 custom_labels <- c("Near Term", "Far Term") 
 
 custom_fill_prcp <- c("F1" = "#BDD7EE", "F2" = "#0083BE") 
+
+
 
 ##  ------  Prep Data  ------------ ##
 
@@ -73,10 +75,29 @@ S2 <- full_join(s2f1, s2f2)
 
 # ---- Plotting Prep ------------  #
 
-# Set y-axis for precip
-
+## Set y-axes for both temp and precip (negative values may occur rarely in temp when predictions are very wet)
 # y-axis should be the same for both plots (S1 and S2)
 # Axis limits will be considered based on all values (both S1 and S2)
+
+
+# Temp - negative values can occur (rarely) with very wet predictions
+
+min_TminS1 <- min(S1$Avg_TMinF) # assuming average TMin would be lower than TMax or TAve
+min_TminS2 <- min(S2$Avg_TMinF)
+
+min_TAveS1 <- min(S1$Avg_TMeanF)
+min_TAveS2 <- min(S2$Avg_TMeanF)
+
+min_TMaxS1 <- min(S1$Avg_TMaxF)
+min_TMaxS2 <- min(S2$Avg_TMaxF)
+
+min_tempChange_value <- if_else(min_TminS1 < min_TminS2, min_TminS1, min_TminS2)
+
+
+temp_lowerLimit <- if_else(min_tempChange_value < 0, -2, 0) # assuming the temp change will never be < -2 degrees F
+temp_nBreaks <- if_else(temp_lowerLimit == 0, 6, 7)
+
+# Precip
 
 # Determine highest and lowest precip values 
 
@@ -136,7 +157,7 @@ temp_plots_S1 <- list()
 for(i in 1:length(temp_plotList_S1)){  
   p = temp_plotList_S1[[i]] +
     labs(title = tempTitles[i], subtitle = subtitles[1])+
-    scale_y_continuous(limits = c(0,10), n.breaks = 6) +
+    scale_y_continuous(limits = c(temp_lowerLimit, 10), n.breaks = temp_nBreaks) +
     scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
     theme(element_text(family = "Calibri", hjust = 0.5),
           plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),

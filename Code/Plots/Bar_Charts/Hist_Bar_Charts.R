@@ -75,9 +75,9 @@ prcp_hist <- ggplot(df) +
   ylab(paste0("Average Precipitation (inches)", "\n")) +
   labs(title = "Modeled Historical Average Precipitation") +
   scale_y_continuous(limits = c(0,upper_limit), n.breaks = breaks) + 
-  theme(element_text(family = "calibri", hjust = 0.5),
-        plot.title = element_text(family = "calibri", hjust = 0.5, size = 12),
-        axis.title = element_text(family = "calibri", hjust = 0.5, size = 10),
+  theme(element_text(family = "Calibri", hjust = 0.5),
+        plot.title = element_text(family = "Calibri", hjust = 0.5, size = 12),
+        axis.title = element_text(family = "Calibri", hjust = 0.5, size = 10),
         panel.background = element_blank(), 
         panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
         axis.ticks = element_blank(),
