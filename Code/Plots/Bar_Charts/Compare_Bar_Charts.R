@@ -76,7 +76,7 @@ S2 <- full_join(s2f1, s2f2)
 # ---- Plotting Prep ------------  #
 
 
-# Precip
+# Set y-axis limits for precip
 
 # Determine highest and lowest precip values 
 
@@ -106,7 +106,7 @@ prcp_lower_limit <- case_when(
 )
 
 
-##  ------------  PLOT  ----------------------  ##
+##  ------------  PLOTS  ----------------------  ##
 
 
 ## PLOTS FOR SCENARIO 1 ##
@@ -136,7 +136,7 @@ temp_plots_S1 <- list()
 for(i in 1:length(temp_plotList_S1)){  
   p = temp_plotList_S1[[i]] +
     labs(title = tempTitles[i], subtitle = subtitles[1])+
-    scale_y_continuous(limits = c(temp_lowerLimit, 10), n.breaks = temp_nBreaks) +
+    scale_y_continuous(limits = c(0, 10), n.breaks = 6) +
     scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
     theme(element_text(family = "Calibri", hjust = 0.5),
           plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
@@ -159,7 +159,7 @@ prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
   geom_bar(stat = "identity", color = "black", position = "dodge", width = 0.7) +
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Change in precipitation (inches)", "\n")) + 
-  labs(subtitle = subtitles[1]) +
+  labs(title = "Projected Change in Average Precipitation", subtitle = subtitles[1]) +
   scale_y_continuous(limits = c(prcp_lower_limit, prcp_upper_limit), 
                      breaks = seq(from = prcp_lower_limit, to = prcp_upper_limit, by=0.4), 
                      labels = scales::number_format(accuracy = 0.1)) +
@@ -174,10 +174,6 @@ prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
         axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
         axis.text.y = element_text(size = 8),
         legend.position = "none")
-#legend.title = element_blank(), 
-#legend.box.margin = margin(t = 0, r = 50, b = 0, l = 50),
-#legend.key.spacing.x = unit(0.5, "in")) + 
-#guides(fill = guide_legend(byrow = TRUE))
 
 
 ##  PLOTS FOR SCENARIO 2 ##
@@ -205,7 +201,6 @@ for(i in 1:length(temp_plotList_S2)){
     scale_y_continuous(limits = c(0,10), n.breaks = 6) +
     scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
     theme(element_text(family = "Calibri", hjust = 0.5),
-          #plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
           plot.subtitle = element_text(family = "Calibri", hjust = 0, size = 11),
           axis.title = element_text(family = "Calibri", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
