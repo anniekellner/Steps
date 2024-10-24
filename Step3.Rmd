@@ -1018,6 +1018,7 @@ add_month <- function(df){
 
 source('./Code/Plots/Bar_Charts/Hist_Bar_Charts.R')
 source('./Code/Plots/Bar_Charts/Compare_Bar_Charts.R')
+source('./Code/Plots/Bar_Charts/Format_Bar_Charts.R')
 
 ```
 
