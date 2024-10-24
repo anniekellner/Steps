@@ -16,19 +16,21 @@
 
 futurePlots <- list()
 
-for(i in 1:length(temp_plots_S1)){
-  FAvg = ({temp_plots_S1[[i]] / temp_plots_S2[[i]]}) +
-    plot_layout(axis_titles = "collect") # combines duplicate axis labels 
-  futurePlots[[i]] = FAvg
+FAvg = ({temp_plots_S1[[1]] / temp_plots_S2[[1]]}) +
+  plot_layout(axis_titles = "collect") # combines duplicate axis labels 
+
+FAvg -> futurePlots[[1]]
   
-  FMax = ({temp_plots_S1[[i]] / temp_plots_S2[[i]]}) + 
-    plot_layout(axis_titles = "collect")
-  futurePlots[[i]] = FMax
+FMax = ({temp_plots_S1[[2]] / temp_plots_S2[[2]]}) + 
+  plot_layout(axis_titles = "collect")
+
+FMax -> futurePlots[[2]]
   
-  FMin = ({temp_plots_S1[[i]] / temp_plots_S2[[i]]}) + 
-    plot_layout(axis_titles = "collect")
-  futurePlots[[i]] = FMin
-}
+FMin = ({temp_plots_S1[[3]] / temp_plots_S2[[3]]}) + 
+  plot_layout(axis_titles = "collect")
+
+FMin -> futurePlots[[3]]
+
 
 # Precip plot
 
@@ -40,4 +42,37 @@ pAvg <- hist_plots[[1]] + FAvg
 pMax <- hist_plots[[2]] + FMax
 pMin <- hist_plots[[3]] + FMin
 
+##  --------    SAVE TO FOLDER    -----------------   ##
+
+# Filenames
+
+filename_TAve <- paste(installation,"TAvg.png", sep = "_")
+filename_TMax <- paste(installation,"TMax.png", sep = "_")
+filename_TMin <- paste(installation,"TMin.png", sep = "_")
+
+# Save
+
+ggsave(filename = filename_TAve,
+       plot = pAvg,
+       path = bar_charts_dir,
+       width = 8.5,
+       height = 5.5,
+       units = "in",
+       dpi = 300)
+
+ggsave(filename = filename_TMax,
+       plot = pMax,
+       path = bar_charts_dir,
+       width = 8.5,
+       height = 5.5,
+       units = "in",
+       dpi = 300)
+
+ggsave(filename = filename_TMin,
+       plot = pMin,
+       path = bar_charts_dir,
+       width = 8.5,
+       height = 5.5,
+       units = "in",
+       dpi = 300)
 
