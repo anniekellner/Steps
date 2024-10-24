@@ -18,7 +18,7 @@ histTitles <- c("Modeled Historical Average Temperature",
 hist_df <- monthSum[[1]] # Historical data
 
 hist_df <- add_month(hist_df)  ## Make sure this works
-hist_df <- select(df, Month, Avg_TMeanF, Avg_TMaxF, Avg_TMinF, Avg_PPT_in)
+hist_df <- select(hist_df, Month, Avg_TMeanF, Avg_TMaxF, Avg_TMinF, Avg_PPT_in)
 
 
 y_cols <- c("Avg_TMeanF", "Avg_TMaxF", "Avg_TMinF")
