@@ -48,6 +48,8 @@ for(i in 1:length(diffHist)){
   names(diffs)[[i]] = names(diffHist[i])
 }
 
+rm(df)
+
 # Scenario 1 (e.g., SSP2-4.5)
 
 s1f1 <- diffs[[1]] # eliminate summary rows
@@ -78,7 +80,7 @@ S2 <- full_join(s2f1, s2f2)
 
 # Set y-axis limits for precip
 
-# Determine highest and lowest precip values 
+# Determine highest and lowest precip delta values 
 
 max_prcpS1 <- max(S1$Avg_PPT_in)
 min_prcpS1 <- min(S1$Avg_PPT_in)

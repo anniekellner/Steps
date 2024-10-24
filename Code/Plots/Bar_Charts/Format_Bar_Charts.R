@@ -34,13 +34,16 @@ FMin -> futurePlots[[3]]
 
 # Precip plot
 
-futurePrcp <- ({prcpS1 / prcpS2})
+futurePrcp <- ({prcpS1 / prcpS2}) + 
+  plot_layout(axis_titles = "collect")
 
 # Final plots
 
 pAvg <- hist_plots[[1]] + FAvg
 pMax <- hist_plots[[2]] + FMax
 pMin <- hist_plots[[3]] + FMin
+
+pPrcp <- prcp_hist + futurePrcp
 
 ##  --------    SAVE TO FOLDER    -----------------   ##
 
@@ -49,6 +52,7 @@ pMin <- hist_plots[[3]] + FMin
 filename_TAve <- paste(installation,"TAvg.png", sep = "_")
 filename_TMax <- paste(installation,"TMax.png", sep = "_")
 filename_TMin <- paste(installation,"TMin.png", sep = "_")
+filename_Prcp <- paste(installation,"Prcp.png", sep = "_")
 
 # Save
 
@@ -70,6 +74,14 @@ ggsave(filename = filename_TMax,
 
 ggsave(filename = filename_TMin,
        plot = pMin,
+       path = bar_charts_dir,
+       width = 8.5,
+       height = 5.5,
+       units = "in",
+       dpi = 300)
+
+ggsave(filename = filename_Prcp,
+       plot = pPrcp,
        path = bar_charts_dir,
        width = 8.5,
        height = 5.5,
