@@ -75,27 +75,6 @@ S2 <- full_join(s2f1, s2f2)
 
 # ---- Plotting Prep ------------  #
 
-## Set y-axes for both temp and precip (negative values may occur rarely in temp when predictions are very wet)
-# y-axis should be the same for both plots (S1 and S2)
-# Axis limits will be considered based on all values (both S1 and S2)
-
-
-# Temp - negative values can occur (rarely) with very wet predictions
-
-#min_TminS1 <- min(S1$Avg_TMinF) # assuming average TMin would be lower than TMax or TAve
-#min_TminS2 <- min(S2$Avg_TMinF)
-
-#min_TAveS1 <- min(S1$Avg_TMeanF)
-#min_TAveS2 <- min(S2$Avg_TMeanF)
-
-#min_TMaxS1 <- min(S1$Avg_TMaxF)
-#min_TMaxS2 <- min(S2$Avg_TMaxF)
-
-#min_tempChange_value <- if_else(min_TminS1 < min_TminS2, min_TminS1, min_TminS2)
-
-
-#temp_lowerLimit <- if_else(min_tempChange_value < 0, -2, 0) # assuming the temp change will never be < -2 degrees F
-#temp_nBreaks <- if_else(temp_lowerLimit == 0, 6, 7)
 
 # Precip
 
