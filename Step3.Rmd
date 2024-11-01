@@ -42,17 +42,18 @@ The next chunk loads the libraries required for use with this script. All requir
 
 ```{r load-libraries}
 
-library(terra)
+library(terra) # for spatial data
 library(sf)
 library(tidyverse)
 library(data.table)
 library(viridis)
-library(mapview)
+library(mapview) # for maps
 library(tmap)
 library(tmaptools)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
-library(patchwork)
+library(patchwork) # for bar plots
+library(grid)
 library(showtext) # to use calibri font with Mac
 library(conflicted)
 
@@ -1243,6 +1244,10 @@ bar_charts_dir <- paste(plots_dir,"Bar_Charts", sep = "/")
 
 if (!dir.exists(bar_charts_dir)){
   dir.create(bar_charts_dir)}
+
+showtext_auto()
+
+title2 <- "Change in Projected Average Temperature"
 
 add_month <- function(df){
   df = df[1:12,]
