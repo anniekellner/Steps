@@ -5,6 +5,8 @@
 # 8-18-2024
 # written by Annie Kellner, annie.kellner@colostate.edu
 
+title <- "Modeled Historical Average Temperature"
+
 # ------------- Prep data ----------------------------- #
 
 df <- monthSum[[1]] # Historical data
@@ -41,11 +43,11 @@ hist_plots <- list()
 
 for(i in 1:length(plot_list)){  
   p = plot_list[[i]] +
-    labs(title = titles[i]) +
+    labs(title = title) +
     scale_y_continuous(limits = c(0,100), n.breaks = 11) +
-    theme(element_text(family = "calibri", hjust = 0.5),
+    theme(element_text(family = "Calibri", face = "plain", hjust = 0.5),
           plot.title = element_text(family = "calibri", face = "bold", hjust = 0.5, size = 12),
-          axis.title = element_text(family = "calibri", hjust = 0.5, size = 10),
+          axis.title = element_text(family = "Calibri", face = "plain", hjust = 0.5, size = 10),
           panel.background = element_blank(), 
           panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
           axis.ticks = element_blank(),
@@ -66,11 +68,11 @@ prcp_hist <- ggplot(df) +
   geom_col(aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in), color="#74CFE4", fill="#74CFE4", width = 0.7) + 
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Average Precipitation (inches)", "\n")) +
-  labs(title = "Historical Average Precipitation") +
+  #labs(title = "Historical Average Precipitation") +
   scale_y_continuous(limits = c(0,upper_limit), n.breaks = breaks) + 
-  theme(element_text(family = "calibri", hjust = 0.5),
-        plot.title = element_text(family = "calibri", hjust = 0.5, size = 12),
-        axis.title = element_text(family = "calibri", hjust = 0.5, size = 10),
+  theme(element_text(family = "calibri", face = "plain", hjust = 0.5),
+        #plot.title = element_text(family = "calibri", hjust = 0.5, size = 12),
+        axis.title = element_text(family = "calibri", face = "plain", hjust = 0.5, size = 10),
         panel.background = element_blank(), 
         panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
         axis.ticks = element_blank(),
