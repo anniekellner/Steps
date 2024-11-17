@@ -46,10 +46,12 @@ library(terra)
 library(sf)
 library(tidyverse)
 library(data.table)
+library(scales)
 library(viridis)
 library(mapview)
 library(tmap)
 library(tmaptools)
+#library(kableExtra)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
 library(conflicted)
@@ -151,7 +153,7 @@ cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for reada
 
 ```
 
-*Enter the scenarios of interest below*. You only need to input values between the quotation marks ("") for 'baseline', 'scenario1', and 'scenario2'.
+*Enter the scenarios of interest below*. Input values between the quotation marks ("") for 'baseline', 'scenario1', and 'scenario2'.
 
 ```{r enter-scenarios}
 
@@ -842,7 +844,9 @@ for(i in 1:length(AllDays)){
   names(monthSum)[i] = names(AllDays[i])
 }
 
-# Add summary rows (YrAverage and YrTotals)
+# Add summary rows (YrAverage and YrTotals) and save for table construction
+
+Avs_and_Totals <- list() # saving for summary table
 
 for(i in 1:length(monthSum)){
   YrAverage = colMeans(monthSum[[i]][,2:ncol(monthSum[[i]])]) # converts columns to characters 
@@ -877,9 +881,12 @@ for(i in 1:length(monthSum)){
   csv[13,1] = "YrAverage"
   csv[14,1] = "YrTotals"
   
+  Avs_and_Totals[[i]] = csv %>% slice_tail(n = 2) 
+  names(Avs_and_Totals)[i] = names(AllDays[i])
+  
   monthSum[[i]] = csv # will write over original monthSum df that did not have final two columns
   names(monthSum)[i] = names(AllDays[i])
-  }
+}
   
 # Write csv files 
 
@@ -1165,6 +1172,15 @@ ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 6.5, heig
 
 ```
 
+The following chunk produces a summary table comparing historical averages/totals of select variables to near- and far-term projected values
+
+```{r table1}
+
+
+
+```
+
+
 
 ```{r remove-objects}
 
@@ -1172,8 +1188,10 @@ rm(list=setdiff(ls(), c("monthSum",
                         "installation", 
                         "model", 
                         "scenarios",
+                        "scenario_plotNames",
                         "results_folder",
                         "years",
+                        "csv",
                         "RasterUnitConvert")))
 
 ```
@@ -1228,6 +1246,32 @@ write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = 
 }
 
 ```
+
+The following chunk uses the monthSum and diffHist lists to create summary plots (bar charts).
+
+Inputs: monthSum list, diffHist list
+Outputs: .png files into ./results_folder/Plots/Bar_Charts
+
+
+```{r bar-charts}
+
+bar_charts_dir <- paste(plots_dir,"Bar_Charts", sep = "/") 
+
+if (!dir.exists(bar_charts_dir)){
+  dir.create(bar_charts_dir)}
+
+add_month <- function(df){
+  df = df[1:12,]
+  df = select(df, -month)
+  df = mutate(df, Month = month.abb)
+}
+
+source('./Code/Plots/Hist_Bar_Charts.R')
+source('./Code/Plots/Comparison_Bar_Charts.R')
+
+```
+
+
 
 
 
