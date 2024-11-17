@@ -42,13 +42,13 @@ The next chunk loads the libraries required for use with this script.
 
 ```{r load-libraries}
 
-library(terra)
+library(terra) # for spatial data
 library(sf)
 library(tidyverse)
 library(data.table)
 library(scales)
 library(viridis)
-library(mapview)
+library(mapview) # for maps
 library(tmap)
 library(tmaptools)
 #library(kableExtra)
@@ -139,8 +139,8 @@ We use the next chunk to set the path to the correct directory for the installat
 Navy = FALSE
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
-                                       "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
-                                      "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
+                                       "/Volumes/wcnr-network-1/RStor/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
+                                      "/Volumes/wcnr-network-1/RStor/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
 
 ```
 
@@ -154,7 +154,7 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 
 # Directories
 
-model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "") 
+model_dir <- paste("/Volumes/wcnr-network-1/RStor/mindyc/afccm/Climate Modeling/Data/", model, sep = "") 
 
 scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
 
@@ -251,11 +251,13 @@ years <- c(baseline_start_year, # vector for easy reference
 
 ```{r set-output-directory}
 
-results_folder <- if(model == "LOCA_CCSM4") {
-  paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2',"/",installation,"/")
-  } else {
-  paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_',model,"/",installation,"/")
-  }
+#results_folder <- if(model == "LOCA_CCSM4") {
+  #paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2',"/",installation,"/")
+  #} else {
+  #paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_',model,"/",installation,"/")
+  #}
+
+results_folder <- paste0("/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Results/", installation, "/") # MAC
 ```
 
 
@@ -342,13 +344,13 @@ for(i in 1:length(variables)){
 
 The next chunk checks that the spatial files are aligned and appear in the correct location on the globe. An interactive map will appear below the code chunk, and you can zoom in or out as needed to view the AFB's (the easiest way is to scroll with your mouse). You can press the 'show in new window' button (the white square with an arrow) to open the map in another page if you prefer a larger view. You may have to wait a few moments for the map to produce. *Make sure the installation boundary aligns with one or more raster cells*. If it doesn't, you might have a difference in spatial projections between the installation boundary and the raster/ncdf files.  
 
-```{r spatial-check}
 
-# Raster
+```{r spatial-check}
 
 stackX <- rast(files_s1f1[[1]]) # creates raster stack for first variable in s1f1 list (using s1f1 because has fewer files than baseline)
 
 random_raster <- as.numeric(sample(1:nlyr(stackX), 1)) # get a random raster layer from StackX to use as an example
+
 rx <- stackX[[random_raster]]
 
 # AFB 
@@ -1079,21 +1081,14 @@ add_month <- function(df){
   df = mutate(df, Month = month.abb)
 }
 
-source('./Code/Plots/Bar_Charts/Hist_Bar_Charts.R')
-source('./Code/Plots/Bar_Charts/Compare_Bar_Charts.R')
-source('./Code/Plots/Bar_Charts/Format_Bar_Charts.R')
+
+source('./Code/Tables_and_Plots/Bar_Charts/Hist_Bar_Charts.R')
+source('./Code/Tables_and_Plots/Bar_Charts/Compare_Bar_Charts.R')
+source('./Code/Tables_and_Plots/Bar_Charts/Format_Bar_Charts.R') # Formatting plots 
 
 ```
 
-source('./Code/Plots/Hist_Bar_Charts.R')
-source('./Code/Plots/Comparison_Bar_Charts.R')
-
 ```
-
-
-
-
-
 
 
 
