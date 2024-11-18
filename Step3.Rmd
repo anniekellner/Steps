@@ -38,22 +38,24 @@ knitr::opts_chunk$set(echo = FALSE, message = FALSE)
  # echo = FALSE means R will not print the code along with the results. 
 ```
 
-The next chunk loads the libraries required for use with this script. All required libraries are loaded here except those contained in 'source' scripts.
+The next chunk loads the libraries required for use with this script. 
 
 ```{r load-libraries}
 
-library(terra)
+library(terra) # for spatial data
 library(sf)
 library(tidyverse)
 library(data.table)
 library(scales)
 library(viridis)
-library(mapview)
+library(mapview) # for maps
 library(tmap)
 library(tmaptools)
 #library(kableExtra)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
+library(extrafont) # for using Calibri font in plots
+library(patchwork)
 library(conflicted)
 
 conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
@@ -77,6 +79,15 @@ NOTE: If you clear the workspace but save the environment for later use (i.e., a
 ```
 
 These scripts contain objects and functions required to run the script.
+
+*If you are running a new base (one that has not been run using this script previously), you will need to enter the following information into the character_vectors.R script.*:
+
+  1) Shapefile name (this is usually an abbreviation for the base name, such as JBER for Joint Base Elmendorf Richardson)
+  
+  2) Official base name (per the example above, this would be "Joint Base Elmendorf Richardson")
+
+
+This script can be found in './Code/Misc/character_vectors.R'. Once you open the script, it should be self-explanatory where to enter the information. If you do not have this information, contact Trevor Even at trevor.even@colostate.edu (or on Microsoft Teams). 
 
 
 
@@ -106,13 +117,13 @@ source('./Code/Misc/character_vectors.R') This code will not run, so please re-r
 
 ```{r enter-base-and-model}
 
-installation <- installation_names[28] 
+installation <- installation_names[24] 
 
-official_name <- official_base_names_for_plots[12] # These names serve as titles for the climatograph and Walter-Lieth plots
+official_name <- official_base_names_for_plots[8] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 model <- models[7] 
 
-cat(paste("The model you have selected is", model,". The installation is", installation, "and its official name is", official_name))
+cat(paste("The model you have selected is", model,". The abbreviated name for the installation is", installation, "and its official name is", official_name))
 
 ```
 
@@ -128,8 +139,8 @@ We use the next chunk to set the path to the correct directory for the installat
 Navy = FALSE
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
-                                       "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
-                                      "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
+                                       "/Volumes/wcnr-network-1/RStor/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
+                                      "/Volumes/wcnr-network-1/RStor/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
 
 ```
 
@@ -143,7 +154,7 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 
 # Directories
 
-model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "") 
+model_dir <- paste("/Volumes/wcnr-network-1/RStor/mindyc/afccm/Climate Modeling/Data/", model, sep = "") 
 
 scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
 
@@ -208,6 +219,11 @@ future2_end_year <- 2080 # End year of interest for the second future time perio
 
 From this point forward, all you need to do is press the green 'run' arrow for each chunk. DO NOT ALTER THE CODE BELOW. 
 
+###############################################################################################
+###     PART TWO: Data Extraction                                         #####################  
+###############################################################################################
+
+
 ## CREATE VECTORS FOR YEAR-SCENARIO COMBOS
 
 ```{r character-vectors}
@@ -235,11 +251,13 @@ years <- c(baseline_start_year, # vector for easy reference
 
 ```{r set-output-directory}
 
-results_folder <- if(model == "LOCA_CCSM4") {
-  paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2',"/",installation,"/")
-  } else {
-  paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_',model,"/",installation,"/")
-  }
+#results_folder <- if(model == "LOCA_CCSM4") {
+  #paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2',"/",installation,"/")
+  #} else {
+  #paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_',model,"/",installation,"/")
+  #}
+
+results_folder <- paste0("/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Results/", installation, "/") # MAC
 ```
 
 
@@ -326,13 +344,13 @@ for(i in 1:length(variables)){
 
 The next chunk checks that the spatial files are aligned and appear in the correct location on the globe. An interactive map will appear below the code chunk, and you can zoom in or out as needed to view the AFB's (the easiest way is to scroll with your mouse). You can press the 'show in new window' button (the white square with an arrow) to open the map in another page if you prefer a larger view. You may have to wait a few moments for the map to produce. *Make sure the installation boundary aligns with one or more raster cells*. If it doesn't, you might have a difference in spatial projections between the installation boundary and the raster/ncdf files.  
 
-```{r spatial-check}
 
-# Raster
+```{r spatial-check}
 
 stackX <- rast(files_s1f1[[1]]) # creates raster stack for first variable in s1f1 list (using s1f1 because has fewer files than baseline)
 
 random_raster <- as.numeric(sample(1:nlyr(stackX), 1)) # get a random raster layer from StackX to use as an example
+
 rx <- stackX[[random_raster]]
 
 # AFB 
@@ -408,13 +426,11 @@ cat("The object used for data extraction is ", class(extract_obj))
 
 ## DATA EXTRACTION
 
-The following chunk extracts raw data from the ncdf files of interest. 
+The following chunk extracts raw data from the ncdf files of interest. It then saves the global environment to the Workspace Images folder ("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\"). 
 
-It assumes the centroid is being used for data extraction. It has not been tested for use with a spatial object. It may still work, but might be quite slow. If you are running several large bases sequentially, it will be worth exploring an alternate coding strategy.
+As written, this code assumes the centroid is being used for data extraction. It has not been tested for use with a spatial object. It may still work, but might be quite slow. If you are running several large bases sequentially, it will be worth exploring an alternative coding strategy.
 
-This is the most time-consuming chunk of the entire script. If you will need to refer back to this data, you can save the entire environment (all objects) as an .RData file (save.image()) after the chunk has run. Alternatively, you can save individual objects with the function (saveRDS()). *In order to load and run chunks from the .RData file, it is necessary to save the rx raster object separately, because it won't load from the .RData file.* In order to do this, use the code:
-
-```writeRaster(rx, filename = '/path/to/dir')```
+This is the most time-consuming chunk of the entire script. To avoid repeating this step, the global environment is saved upon extraction. As of the time this script was written (9-26-2024), the {raster} package is unable to save objects into .RData images, so {raster} objects must be saved separately. Because The raster stack (object 'rx') is required to run the chunk 'add-derived-variables', the raster stack is saved alongside the .RData file.    
 
 ```{r extract-values}
 
@@ -496,6 +512,10 @@ for(i in 1:length(files_s2f2)){
   rm(r)
 }
 
+# Create directory and save raw extracted data along with associated raster stack in the event the installation needs to be re-run. 
+
+# Filenames
+
 timestamp <- format(today(), "%Y%m%d")
 
 image_filename <-  paste(installation,model,timestamp, sep = "_")
@@ -503,8 +523,6 @@ rawData_filename <- paste0(image_filename,".RData")
 rasterStack_filename <- paste0("rasterStack_",image_filename,".Rds")
 
 # Directory for Workspace Images
-
-save.image(file = paste0(directory,image_filename,".RData"))
 
 rawDataDir <- paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\",installation)
 
@@ -517,6 +535,46 @@ saveRDS(rx, file = paste0(rawDataDir,"\\",rasterStack_filename)) # save raster s
 
 ```
 
+
+###############################################################################################
+###     PART THREE: Add Derived Variables                                 #####################  
+###############################################################################################
+
+## IF RE-RUNNING SCRIPT FROM SAVED WORKSPACE IMAGE, RUN THE NEXT TWO CHUNKS. 
+
+## IF RUNNING IMMEDIATELY AFTER DATA EXTRACTION (i.e., the environment still contains all previously defined objects), SKIP TO THE CHUNK CALLED {allvaluesdf-dataframes} 
+
+The two chunks that follow are commented out, assuming the chunks are being run while the global environment still contains all defined objects from the first part of the script (i.e., through data extraction)
+
+*If the base is being re-run from the saved image (.RData file), remove the '#' and run the first chunk. This will retrieve the filenames to enter for the second chunk, which will load the files. If you are re-running the installation from an empty environment, you will need to re-enter the installation name first.*
+
+```{r get-saved-files}
+
+#installation <- "CapeCanaveral_45th" # CHANGE THIS TO INSTALLATION OF INTEREST
+
+#list.files(path = paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\",installation), full.names = TRUE)
+
+```
+
+*Now, use the filenames above to load the data. You can copy-paste from the output directly into the script* I have used Cape Canaveral as an example, but remember to replace the example filenames with the output above.
+
+```{r load-saved-files}
+
+# Load workspace image
+
+#load("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.RData")
+
+# Load raster stack
+
+#rx <- readRDS(file = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/rasterStack_CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.Rds")
+
+```
+
+
+*If you are re-running the installation from saved data, you will need to re-run all chunks prior to ### PART ONE ### in order to re-load the necessary libraries and functions. If not, just proceed to the {allvaluesdf-dataframes} chunk*
+
+
+The next chunk reorganizes the extracted data into a more workable dataframe ("tibble", from the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
 
 #################################################################
 ###       PART THREE:  ADD DERIVED VARIABLES        #############
@@ -729,7 +787,7 @@ This chunk creates all climograph plots and places them within the results folde
 
 ```{r climographs, message=FALSE}
 
-plots_dir <- paste0(results_folder,"Plots")
+plots_dir <- paste0(results_folder,"Plots_and_Tables")
 
 if (!dir.exists(plots_dir)){
   dir.create(plots_dir)}
@@ -929,247 +987,7 @@ wl_dir <- paste(plots_dir,"Walter-Lieth", sep = "/")
 if (!dir.exists(wl_dir)){
   dir.create(wl_dir)}
 
-# Calculate Celsius values before running function for plot creation
-
-for(i in 1:length(monthSum)){
-
-# Format data
-  
-wlC = monthSum[[i]] %>%
-  mutate(Avg_TMaxC = RasterUnitConvert(Avg_TMaxF, "FtoC")) %>%
-  mutate(Avg_TMinC = RasterUnitConvert(Avg_TMinF, "FtoC")) %>%
-  mutate(Abs_TminC = RasterUnitConvert(Abs_TminF, "FtoC")) %>%
-  select(Avg_PPT_mm, Avg_TMaxC, Avg_TMinC, Abs_TminC) 
-
-wlC = wlC[1:12,]
-wlC = data.table::transpose(wlC)
-
-# ----------  Celsius plot  ----------------- #
-
-# per is 'period' and is an argument in the ggclimat_walter_lieth() function
-
-per_scenario = if (str_detect(names(monthSum[i]), "baseline")){
-    scenario_plotNames[1]
-  } else if(str_detect(names(monthSum[i]),"s1")) {
-    scenario_plotNames[2]
-  } else {
-    scenario_plotNames[3]
-  }
-
-per_years = if(str_detect(names(monthSum[i]), "baseline")){ 
-  as.character(paste(years[1], years[2], sep = " - "))
-} else if(str_detect(names(monthSum[i]),"f1")){
-  as.character(paste(years[3],years[4], sep = " - "))
-} else {
-  as.character(paste(years[5], years[6], sep = " - "))
-}
-  
-  
-per = paste(per_scenario,per_years,sep = ", ")
-
-per_length = nchar(per) # to calculate where to put the "subtitle" on the plot
-
-
-wlCplot = ggclimat_walter_lieth(wlC, 
-                      est = official_name, 
-                      per = per,
-                      mlab = "en", # English language 
-                      pcol = "blue", # precip color
-                      tcol = "red", # temp color
-                      pfcol = "lightblue", # probable freeze
-                      sfcol = "steelblue") # certain freeze
-
-
-# Save plot in results_folder/Plots/Walter-Lieth 
-
-wl_scenario = if (str_detect(names(monthSum[i]), "baseline")){
-    "historical"
-  } else if(str_detect(names(monthSum[i]),"s1")) {
-    scenarios[2]
-  } else {
-    scenarios[3]
-  }
-
-midyear = if (str_detect(names(monthSum[i]), "baseline")){
-  floor((years[1] + years[2])/2)
-} else if (str_detect(names(monthSum[i]),"f1")) {
-  floor((years[3] + years[4])/2)
-} else if (str_detect(names(monthSum[i]),"f2")) {
-  floor((years[5] + years[6])/2)
-}
-  
-
-filenameC = paste0(installation,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Celsius.png")
-
-ggsave(filenameC, plot = wlCplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
-
-
-# ----------   Fahrenheit Plot  --------------  #
-
-# Create Fahrenheit dataframe 
-
-dat_long_endF = dat_long_end %>%
-    mutate(p_mesIN = p_mes/25.4) %>%
-    mutate(tm_maxF = tm_max*(9/5) + 32) %>%
-    mutate(tm_minF = tm_min *(9/5) + 32) %>%
-    mutate(ta_minF = ta_min*(9/5) + 32) %>%
-    mutate(tmF = (tm_maxF + tm_minF) / 2)
-
-  ## Vert. Axis range - temp ----
-  ymaxF <- 140
-  
-  # Min range
-  yminF <- min(dat_long_endF$tmF)
-  
-  #range_tm <- seq(0, ymax, 10)
-  range_tmF <- seq(32, ymaxF, 18)
-  
-  if (yminF < 26.6) {
-    yminF <- floor(yminF / 10) * 10 # min Temp rounded
-    # Labels
-    range_tmF <- seq(yminF, ymaxF, 18)
-  }
-
-# Helper for ticks
-  
-ticks = data.frame(
-    x = seq(0, 12),
-    ymin = -3,
-    ymax = 0
-  )
-
-# Precip labels
-
-preclabs2 <- as.numeric(as.character(preclabs))
-preclabs2 <- na.omit(preclabs2)
-preclabsF <- as.numeric() 
-  
-  for(j in 1:length(preclabs2)){
-    preclabsF[j] = preclabs2[j]/25.4
-  }
-
-# In the event the temp and precip vectors are not of equal size, add values
-
-if (length(preclabsF) > length(range_tm)){
-  append(-10, range_tm) -> range_tm
-}
-
-if(length(range_tm) > length(preclabsF)){
-  append(preclabsF, 15.7) -> preclabsF
-}
-
-  
-wlFplot = wandlplot + 
-    geom_hline(yintercept = c(0, 50)) + # removed 'size' argument (CEMML/AK 09-14-23)
-    geom_segment(data = ticks, aes(
-      x = x,
-      xend = x,
-      y = ymin,
-      yend = ymax
-    )) +
-    scale_x_continuous(
-      breaks = month_breaks,
-      name = "",
-      labels = month_labs,
-      expand = c(0, 0)
-      ) +
-    scale_y_continuous(
-    "°F",
-    labels = function(x) x* (9/5) + 32,
-    breaks = range_tm, # Celsius breaks are kept so that precip axis is aligned
-    sec.axis = dup_axis(name = "in",
-                        labels = round(preclabsF, digits = 1)))
-
-
-# Subtitle (aka, time period and precip/temp values)
-
-sub = paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
-               "°F        ",
-               prettyNum(
-                 round(sum(
-                   dat_long_endF[dat_long_endF$interpolate == FALSE, ]$p_mesIN
-                 )),
-                 big.mark = ","
-               ),
-               " in",
-               sep = ""
-  )
-  
-  sub_length = nchar(sub)
-  sub_placement = 78 - per_length - sub_length # 1 in = ~10 character-spaces in Times New Roman font, so an image of 6.5" in width contains 78 character-spaces per line. This right-aligns the "subtitle" (i.e., the righthand temp/precip values)
-  
-  
-  sub2 = paste0(
-  per, 
-  paste0(rep(" ",sub_placement), collapse = ""), 
-  sub,
-  "\n" # linebreak between "subtitle" and plot
-  )
-  
-  # Vertical tags 
-  
-  maxtmF = prettyNum(round(max(dat_long_endF$tm_maxF), 1))
-  mintmF = prettyNum(round(min(dat_long_endF$tm_minF), 1))
-  
-  tags = paste0(
-    paste0(rep(" \n", 6), collapse = ""),
-    maxtmF,
-    paste0(rep(" \n", 10), collapse = ""),
-    mintmF
-  )
-
-  # Add tags and theme
-  
-wlFplot = wlFplot +
-    ggplot2::labs(
-      title = title,
-      subtitle = sub2,
-      tag = tags
-    ) +
-    ggplot2::theme_classic() +
-    ggplot2::theme(
-      plot.title = element_text(
-        lineheight = 1,
-        size = 14,
-        face = "bold"
-      ),
-      plot.subtitle = element_text(
-        lineheight = 1,
-        size = 14,
-        face = "plain"
-      ),
-      plot.tag = element_text(size = 10),
-      plot.tag.position = "left",
-      axis.ticks.length.x.bottom = unit(0, "pt"),
-      axis.line.x.bottom = element_blank(),
-      axis.title.y.left = element_text(
-        angle = 0,
-        vjust = 0.9,
-        size = 10,
-        colour = tcol,
-        margin = unit(rep(10, 4), "pt")
-      ),
-      axis.text.x.bottom = element_text(size = 10),
-      axis.text.y.left = element_text(colour = tcol, size = 10),
-      axis.title.y.right = element_text(
-        angle = 0,
-        vjust = 0.9,
-        size = 10,
-        colour = pcol,
-        margin = unit(rep(10, 4), "pt")
-      ),
-      axis.text.y.right = element_text(colour = pcol, size = 10)
-    ) +
-      ggplot2::theme(text=element_text(family="serif")) # Times New Roman
-
-# Save Fahrenheit plot
-
-filenameF = paste0(installation,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Fahrenheit.png")
-
-ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
-
-}
-
+source('./Code/Plots/Walter-Lieth.R')
 ```
 
 The following chunk produces a summary table comparing historical averages/totals of select variables to near- and far-term projected values
@@ -1190,6 +1008,7 @@ rm(list=setdiff(ls(), c("monthSum",
                         "scenarios",
                         "scenario_plotNames",
                         "results_folder",
+                        "plots_dir",
                         "years",
                         "csv",
                         "RasterUnitConvert")))
@@ -1249,10 +1068,6 @@ write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = 
 
 The following chunk uses the monthSum and diffHist lists to create summary plots (bar charts).
 
-Inputs: monthSum list, diffHist list
-Outputs: .png files into ./results_folder/Plots/Bar_Charts
-
-
 ```{r bar-charts}
 
 bar_charts_dir <- paste(plots_dir,"Bar_Charts", sep = "/") 
@@ -1266,21 +1081,14 @@ add_month <- function(df){
   df = mutate(df, Month = month.abb)
 }
 
-source('./Code/Plots/Hist_Bar_Charts.R')
-source('./Code/Plots/Comparison_Bar_Charts.R')
+
+source('./Code/Tables_and_Plots/Bar_Charts/Hist_Bar_Charts.R')
+source('./Code/Tables_and_Plots/Bar_Charts/Compare_Bar_Charts.R')
+source('./Code/Tables_and_Plots/Bar_Charts/Format_Bar_Charts.R') # Formatting plots 
 
 ```
 
-
-
-
-
-
-
-
-
-
-
+```
 
 
 
