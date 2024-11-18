@@ -14,37 +14,40 @@ models <- c("HADGEM2-ES",
             "EC-Earth3-Veg-LR")
 
 installation_names <- c("Homestead_ARB", 
-                        "Guam_Proxy_v1", # Navy
-                        "CNMI_Proxy_v1", # Navy
-                        "Indianhead_Proxy", # Navy
-                        "JBER",
-                        "Dugway_Proving_Grounds",
-                        "Hill_AFB_Boundary",
-                        "LMTF_Boundary",
-                        "HAMOTS_Boundary",
-                        "Park_City_Property_Boundary",
-                        "PSRF_Boundary",
-                        "South_Range_Boundary",
-                        "Carter_Creek_Recreation_Center_Boundary",
-                        "JBLE",
-                        "Edwards_AFB",
-                        "Malmstrom_AFB_Proxy",
-                        "Kitsap_Proxy",
-                        "NB_SanDiego_Proxy",
-                        "NAS Oceana",
-                        "Nellis_AFB",
-                        "Rainier_Mesa",
-                        "Antelope_Lake",
-                        "West_of_Quartz_Peak",
-                        "Creech_AFB",
-                        "Ascension_Proxy",
-                        "Eareckson_AFB",
-                        "Eielson_AFB",
-                        "Eglin_Niceville",
-                        "CapeCanaveral_45th",
-                        "Malibar_45th",
-                        "JDMTA_45th",
-                        "JBER") 
+<<<<<<< HEAD
+              "Guam_Proxy_v1", # Navy
+              "CNMI_Proxy_v1", # Navy
+              "Indianhead_Proxy", # Navy
+              "JBER",
+              "Dugway_Proving_Grounds",
+              "Hill_AFB_Boundary",
+              "LMTF_Boundary",
+              "HAMOTS_Boundary",
+              "Park_City_Property_Boundary",
+              "PSRF_Boundary",
+              "South_Range_Boundary",
+              "Carter_Creek_Recreation_Center_Boundary",
+              "JBLE",
+              "Edwards_AFB",
+              "Malmstrom_AFB_Proxy",
+              "Kitsap_Proxy",
+              "NB_SanDiego_Proxy",
+              "NAS Oceana",
+              "Nellis_AFB",
+              "Rainier_Mesa",
+              "Antelope_Lake",
+              "West_of_Quartz_Peak",
+              "Creech_AFB",
+              "Ascension_Proxy",
+              "Eareckson_AFB",
+              "Eielson_AFB",
+              "Eglin_Niceville",
+              "CapeCanaveral_45th",
+              "Malibar_45th",
+              "JDMTA_45th",
+              "JBER",
+              "Edwards_AFB",
+              "JBMDL") 
 
 official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "NAVBASE San Diego",
@@ -61,6 +64,8 @@ official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "Cape Canaveral Space Force Station",
                                    "Malibar Transmitter Annex",
                                    "Jonathan Dickinson Missile Tracking Annex",
-                                   "Joint Base Elmendorf-Richardson") 
+                                   "Joint Base Elmendorf-Richardson",
+                                   "Edwards Air Force Base",
+                                   "Joint Base McGuire-Dix-Lakehurst") 
 
 
