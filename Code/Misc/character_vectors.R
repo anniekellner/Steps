@@ -14,7 +14,6 @@ models <- c("HADGEM2-ES",
             "EC-Earth3-Veg-LR")
 
 installation_names <- c("Homestead_ARB", 
-<<<<<<< HEAD
               "Guam_Proxy_v1", # Navy
               "CNMI_Proxy_v1", # Navy
               "Indianhead_Proxy", # Navy
@@ -47,7 +46,8 @@ installation_names <- c("Homestead_ARB",
               "JDMTA_45th",
               "JBER",
               "Edwards_AFB",
-              "JBMDL") 
+              "JBMDL",
+              "Edwards_AFB_v2") 
 
 official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "NAVBASE San Diego",

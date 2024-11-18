@@ -51,7 +51,6 @@ library(viridis)
 library(mapview) # for maps
 library(tmap)
 library(tmaptools)
-#library(kableExtra)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
 library(extrafont) # for using Calibri font in plots
@@ -117,13 +116,13 @@ source('./Code/Misc/character_vectors.R') This code will not run, so please re-r
 
 ```{r enter-base-and-model}
 
-installation <- installation_names[24] 
+installation <- installation_names[35] 
 
-official_name <- official_base_names_for_plots[8] # These names serve as titles for the climatograph and Walter-Lieth plots
+official_name <- official_base_names_for_plots[17] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 model <- models[7] 
 
-cat(paste("The model you have selected is", model,". The abbreviated name for the installation is", installation, "and its official name is", official_name))
+cat(paste("The model you have selected is", model,". The abbreviated name for the installation shapefile is", installation, "and its official name is", official_name))
 
 ```
 
@@ -139,8 +138,8 @@ We use the next chunk to set the path to the correct directory for the installat
 Navy = FALSE
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
-                                       "/Volumes/wcnr-network-1/RStor/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
-                                      "/Volumes/wcnr-network-1/RStor/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
+                      "/Volumes/wcnr-network-1/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/",
+                      "/Volumes/wcnr-network-1/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY")
 
 ```
 
@@ -154,7 +153,7 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 
 # Directories
 
-model_dir <- paste("/Volumes/wcnr-network-1/RStor/mindyc/afccm/Climate Modeling/Data/", model, sep = "") 
+model_dir <- paste("/Volumes/wcnr-network-1/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/", model, sep = "") 
 
 scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
 
