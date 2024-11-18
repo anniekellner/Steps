@@ -533,86 +533,58 @@ saveRDS(rx, file = paste0(rawDataDir,"/",rasterStack_filename)) # save raster st
 ```
 
 
-###############################################################################################
-###     PART THREE: Add Derived Variables                                 #####################  
-###############################################################################################
+##############################################################################
+###     PART THREE: Add Derived Variables    ###                        
+##############################################################################
 
-## IF RE-RUNNING SCRIPT FROM SAVED WORKSPACE IMAGE, RUN THE NEXT TWO CHUNKS. 
+Typically, this script will be run immediately following data extraction (i.e., the global environment still contains all objects defined in Parts One and Two)  
 
 ## IF RUNNING IMMEDIATELY AFTER DATA EXTRACTION (i.e., the environment still contains all previously defined objects), SKIP TO THE CHUNK CALLED {allvaluesdf-dataframes} 
 
-The two chunks that follow are commented out, assuming the chunks are being run while the global environment still contains all defined objects from the first part of the script (i.e., through data extraction)
+However, if you are re- specific segments of the script using previously extracted data, you will need to manually enter the required information and re-run Part One of the script. Then you will need to load the data from a workspace image and raster stack saved to the N:/ drive. Instructions to follow.  
 
-*If the base is being re-run from the saved image (.RData file), remove the '#' and run the first chunk. This will retrieve the filenames to enter for the second chunk, which will load the files. If you are re-running the installation from an empty environment, you will need to re-enter the installation name first.*
+
+#### INSTRUCTIONS FOR RUNNING FROM WORKSPACE IMAGE  #####
+
+
+*1. Remove the #'s that precede the code for the following two chunks.*
+
+*2. Enter the installation of interest where prompted in the first code chunk*
+
+*3. Run the first chunk (get-saved-files)* This will give you the pathnames to enter for the second chunk, which will load the files. 
+
+*3. In the second chunk (load-saved-files), copy-paste the full paths to the .RData and .Rds files where instructed* 
+
+*4. Run the second chunk*
+
+*5. Comment out (#) the code for both chunks after running*
+
+*6. Proceed to the portion of the script that starts with "AVDF data frame"*
 
 ```{r get-saved-files}
 
 #installation <- "CapeCanaveral_45th" # CHANGE THIS TO INSTALLATION OF INTEREST
 
-#list.files(path = paste0("N:/RStor/mindyc/afccm/Climate Modeling/Workspace Images/",installation), full.names = TRUE)
+#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/",installation), full.names = TRUE)
 
 ```
 
-*Now, use the filenames above to load the data. You can copy-paste from the output directly into the script* I have used Cape Canaveral as an example, but remember to replace the example filenames with the output above.
 
 ```{r load-saved-files}
 
 # Load workspace image
 
-#load("N:/RStor/mindyc/afccm/Climate Modeling/Workspace Images/CapeCanaveral_45th/CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.RData")
+#load("") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- readRDS(file = "N:/RStor/mindyc/afccm/Climate Modeling/Workspace Images/CapeCanaveral_45th/rasterStack_CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.Rds")
+#rx <- readRDS(file = "") INSERT COPY-PASTED PATH TO .RDS FILE
 
 ```
 
-
-*If you are re-running the installation from saved data, you will need to re-run all chunks prior to ### PART ONE ### in order to re-load the necessary libraries and functions. If not, just proceed to the {allvaluesdf-dataframes} chunk*
-
-
-The next chunk reorganizes the extracted data into a more workable dataframe ("tibble", from the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
-
-#################################################################
-###       PART THREE:  ADD DERIVED VARIABLES        #############
-#################################################################
-
-## IF RE-RUNNING SCRIPT FROM SAVED WORKSPACE IMAGE, RUN THE NEXT TWO CHUNKS. 
-
-## IF RUNNING IMMEDIATELY AFTER DATA EXTRACTION (i.e., the environment still contains all previously defined objects), SKIP TO THE CHUNK CALLED {allvaluesdf-dataframes} 
-
-The two chunks that follow are commented out, assuming the chunks are being run while the global environment still contains all defined objects from the first part of the script (i.e., through data extraction). If not, read the *orange* chunk below and follow instructions.
-
-*If the base is being re-run from the saved image (.RData file) on the N: drive, remove the '#' to un-comment out the code chunks and run.* 
-
-*The first chunk will retrieve the filenames to enter for the second chunk, which will load the files. If you are re-running the installation from an empty environment, you will need to re-enter the installation name first (you don't need to run from the top of the script; there is a portion within the first chunk that allows you to do this).* 
-
-*Also, if you're running within a new RStudio session, don't forget to run the {r setup} and {r load-libraries} chunks at the top, to ensure the required packages are installed. You will get errors if you forget to do this.*
-
-Get file names:
-                            
-```{r get-saved-files}
-
-#installation <- "CapeCanaveral_45th" # CHANGE THIS TO INSTALLATION OF INTEREST
-
-#list.files(path = paste0("N:/RStor/mindyc/afccm/Climate Modeling/Workspace Images/",installation), full.names = TRUE)
-```
-
-*Copy-paste the paths printed in the output after the `load()` and `readRDS()` commands to load the data. These will load the .RData file (global environment) and raster stack, respectively). The code below is sample code from Cape Canaveral.*
-
-```{r load-saved-environment}
-
-# Load workspace image
-
-#load("N:/RStor/mindyc/afccm/Climate Modeling/Workspace Images/CapeCanaveral_45th/CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.RData")
-
-# Load raster stack
-
-#rx <- readRDS(file = "N:/RStor/mindyc/afccm/Climate Modeling/Workspace Images/CapeCanaveral_45th/rasterStack_CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.Rds")
-
-```
 
 FYI, the raster is loaded separately because as of the date this script was written (9-29-24), raster objects do not save correctly during the `save.image()` process. If the raster does not load, you will get an error about a missing 'pointer'. The above retrieval process should take care of this problem, but if not, you can also re-run the portion of the {r spatial-check} chunk through to the creation of the object 'rx' (this is a raster stack). The raster stack is required to create the avdf dataframe in the next chunk.
+
 
 # AVDF data frame
 
@@ -986,15 +958,6 @@ if (!dir.exists(wl_dir)){
 
 source('./Code/Plots/Walter-Lieth.R')
 ```
-
-The following chunk produces a summary table comparing historical averages/totals of select variables to near- and far-term projected values
-
-```{r table1}
-
-
-
-```
-
 
 
 ```{r remove-objects}
