@@ -117,9 +117,15 @@ source('./Code/Misc/character_vectors.R') This code will not run, so please re-r
 
 ```{r enter-base-and-model}
 
+<<<<<<< Updated upstream
 installation <- installation_names[24] 
 
 official_name <- official_base_names_for_plots[8] # These names serve as titles for the climatograph and Walter-Lieth plots
+=======
+installation <- installation_names[29] 
+
+official_name <- official_base_names_for_plots[13] # These names serve as titles for the climatograph and Walter-Lieth plots
+>>>>>>> Stashed changes
 
 model <- models[7] 
 
