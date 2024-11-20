@@ -120,7 +120,7 @@ installation <- installation_names[35]
 
 official_name <- official_base_names_for_plots[17] # These names serve as titles for the climatograph and Walter-Lieth plots
 
-model <- models[7] 
+model <- models[8] 
 
 cat(paste("The model you have selected is", model,". The abbreviated name for the installation shapefile is", installation, "and its official name is", official_name))
 
