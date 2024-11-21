@@ -43,10 +43,13 @@ for(y_col in y_cols){
 
 hist_plots <- list()
 
+upper_value_temp <- ifelse(hist_df$Avg_TMaxF > 100, 110, 100)
+numBreaks <- ifelse(upper_value_temp == 110, 12, 11)
+
 for(i in 1:length(plot_list)){  
   p = plot_list[[i]] +
     labs(title = histTitles[i]) +
-    scale_y_continuous(limits = c(0,100), n.breaks = 11) +
+    scale_y_continuous(limits = c(0,upper_value_temp), n.breaks = numBreaks) +
     theme(element_text(family = "Calibri", hjust = 0.5),
           plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
           axis.title = element_text(family = "Calibri", hjust = 0.5, size = 10),
