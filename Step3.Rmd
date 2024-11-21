@@ -960,7 +960,7 @@ wl_dir <- paste(plots_dir,"Walter-Lieth", sep = "/")
 if (!dir.exists(wl_dir)){
   dir.create(wl_dir)}
 
-source('./Code/Plots/Walter-Lieth.R')
+source('./Code/Tables_and_Plots/Walter-Lieth.R')
 ```
 
 
