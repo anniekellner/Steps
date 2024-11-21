@@ -116,7 +116,7 @@ source('./Code/Misc/character_vectors.R') This code will not run, so please re-r
 
 ```{r enter-base-and-model}
 
-installation <- installation_names[35] 
+installation <- installation_names[36] 
 
 official_name <- official_base_names_for_plots[17] # These names serve as titles for the climatograph and Walter-Lieth plots
 
@@ -254,7 +254,11 @@ years <- c(baseline_start_year, # vector for easy reference
   #paste0('N:/RStor/mindyc/afccm/Climate Modeling/Results_',model,"/",installation,"/")
   #}
 
-results_folder <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/", installation, "/") 
+results_folder <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_",model,"/", installation) 
+
+if (!dir.exists(results_folder)){
+  dir.create(results_folder)}
+
 ```
 
 
@@ -703,7 +707,7 @@ for(i in 1:length(AllDays)){
     }
     
     # Write csv to folder
-    write_csv(csv, file = paste0(results_folder,csv_fileName,".csv"))
+    write_csv(csv, file = paste0(results_folder,"/",csv_fileName,".csv"))
 
     } # end write to csv
 
@@ -756,7 +760,7 @@ This chunk creates all climograph plots and places them within the results folde
 
 ```{r climographs, message=FALSE}
 
-plots_dir <- paste0(results_folder,"Plots_and_Tables")
+plots_dir <- paste0(results_folder,"/","Plots_and_Tables")
 
 if (!dir.exists(plots_dir)){
   dir.create(plots_dir)}
@@ -1020,7 +1024,7 @@ csv_years = if (str_detect(names(diffHist[i]), "f1")){
   } 
     
 csv_fileName = paste(installation,csv_scenario,csv_years,"DiffHist",sep = '_')
-write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = ""))
+write_csv(diffHist[[i]], file = paste0(results_folder,"/",csv_fileName,".csv",sep = ""))
 
 }
 
