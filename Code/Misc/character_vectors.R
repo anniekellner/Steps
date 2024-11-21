@@ -6,69 +6,70 @@
 # It is used with the 'steps' script to enable easy variable naming
 
 
-models <- c("HADGEM2-ES", #1
+models <- c("HADGEM2-ES", 
             "LOCA_CCSM4", 
             "MACA_CCSM4",
             "MACA_CCSM4_Monthly",
-            "MIROC6",     #5
+            "MIROC6",     
             "MPI-ESM1-2-HR",
             "EC-Earth3-Veg-LR",
             "ACCESS-ESM1-5")
 
 
-installation_names <- c("Homestead_ARB", #1
+installation_names <- c("Homestead_ARB", 
               "Guam_Proxy_v1", # Navy
               "CNMI_Proxy_v1", # Navy
               "Indianhead_Proxy", # Navy
-              "JBER",                   #5
+              "JBER",                   
               "Dugway_Proving_Grounds",
               "Hill_AFB_Boundary",
               "LMTF_Boundary",
               "HAMOTS_Boundary",
-              "Park_City_Property_Boundary", #10
+              "Park_City_Property_Boundary", 
               "PSRF_Boundary",
               "South_Range_Boundary",
               "Carter_Creek_Recreation_Center_Boundary",
               "JBLE",
-              "Edwards_AFB",                 #15
+              "Edwards_AFB",                 
               "Malmstrom_AFB_Proxy",
               "Kitsap_Proxy",
               "NB_SanDiego_Proxy",
               "NAS Oceana",
-              "Nellis_AFB",                  #20
+              "Nellis_AFB",                  
               "Rainier_Mesa",
               "Antelope_Lake",
               "West_of_Quartz_Peak",
               "Creech_AFB",
-              "Ascension_Proxy",             #25
+              "Ascension_Proxy",             
               "Eareckson_AFB",
               "Eielson_AFB",
               "Eglin_Niceville",
               "CapeCanaveral_45th",
-              "Malibar_45th",                #30
+              "Malibar_45th",              
               "JDMTA_45th",
               "JBER",
               "Edwards_AFB",
               "JBMDL", 
-              "Edwards_AFB_v2")              #35
+              "Edwards_AFB_v2",
+              "Edwards_AFB_v3_EastofBarstow")             
 
 
-official_base_names_for_plots <- c("NAVBASE Kitsap",     #1
+official_base_names_for_plots <- c("NAVBASE Kitsap",     
                                    "NAVBASE San Diego",
                                    "Naval Air Station Oceana",
                                    "Nellis Air Force Base",
-                                   "NTTR Central - Rainier Mesa",   #5
+                                   "NTTR Central - Rainier Mesa",   
                                    "NTTR North - Antelope Lake",
                                    "NTTR South - West of Quartz Peak",
                                    "Creech Air Force Base",
                                    "Ascension Island",
-                                   "Eareckson AFB",                 #10 
+                                   "Eareckson AFB",                 
                                    "Eielson AFB",
                                    "Eglin Air Force Base",
                                    "Cape Canaveral Space Force Station",
                                    "Malibar Transmitter Annex",
                                    "Jonathan Dickinson Missile Tracking Annex",
-                                   "Joint Base Elmendorf-Richardson", #15
+                                   "Joint Base Elmendorf-Richardson", 
                                    "Edwards Air Force Base",
                                    "Joint Base McGuire-Dix-Lakehurst") 
 
