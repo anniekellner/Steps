@@ -559,7 +559,7 @@ However, if you are re- specific segments of the script using previously extract
 
 *3. In the second chunk (load-saved-files), copy-paste the full paths to the .RData and .Rds files where instructed* 
 
-*4. Run the second chunk*
+*4. Run the second chunk* You will receive an error about the rx file, but you can ignore it. The second line of code takes care of it. 
 
 *5. Comment out (#) the code for both chunks after running*
 
@@ -567,9 +567,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-#installation <- "CapeCanaveral_45th" # CHANGE THIS TO INSTALLATION OF INTEREST
+installation <- installation_names[36] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/",installation), full.names = TRUE)
+list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/",installation), full.names = TRUE)
 
 ```
 
@@ -578,11 +578,11 @@ However, if you are re- specific segments of the script using previously extract
 
 # Load workspace image
 
-#load("") # INSERT COPY-PASTED PATH TO .RDATA FILE
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/Edwards_AFB_v3_EastofBarstow/Edwards_AFB_v3_EastofBarstow_ACCESS-ESM1-5_20241120.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- readRDS(file = "") INSERT COPY-PASTED PATH TO .RDS FILE
+rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/Edwards_AFB_v3_EastofBarstow/rasterStack_Edwards_AFB_v3_EastofBarstow_ACCESS-ESM1-5_20241120.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ```
 
