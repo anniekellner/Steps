@@ -62,6 +62,8 @@ s1f2 <- s1f2 %>%
 
 S1 <- full_join(s1f1, s1f2) 
 
+S1 <- S1 %>% mutate(across(where(is.numeric), round, digits = 1)) # rounding because makes plotting easier
+
 # Scenario 2 (e.g., SSP2-8.5)
 
 s2f1 <- diffs[[3]] # eliminate summary rows
@@ -74,8 +76,28 @@ s2f2 <- s2f2 %>%
 
 S2 <- full_join(s2f1, s2f2) 
 
+S2 <- S2 %>% mutate(across(where(is.numeric), round, digits = 1))
+
 
 # ---- Plotting Prep ------------  #
+
+# Set y-axis limits for temp
+
+maxT_S1Delta <- S1 %>%
+  select(Avg_TMeanF, Avg_TMaxF, Avg_TMinF) %>%
+  reframe(max(across(everything())))
+
+maxT_S2Delta <- S2 %>%
+  select(Avg_TMeanF, Avg_TMaxF, Avg_TMinF) %>%
+  reframe(max(across(everything())))
+
+minT_S1Delta <- S1 %>%
+  select(Avg_TMeanF, Avg_TMaxF, Avg_TMinF) %>%
+  reframe(min(across(everything())))
+
+minT_S2Delta <- S2 %>%
+  select(Avg_TMeanF, Avg_TMaxF, Avg_TMinF) %>%
+  reframe(min(across(everything())))
 
 
 # Set y-axis limits for precip
