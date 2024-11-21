@@ -43,7 +43,7 @@ for(y_col in y_cols){
 
 hist_plots <- list()
 
-upper_value_temp <- ifelse(hist_df$Avg_TMaxF > 100, 110, 100)
+upper_value_temp <- ifelse(max(hist_df$Avg_TMaxF) > 100, 110, 100)
 numBreaks <- ifelse(upper_value_temp == 110, 12, 11)
 
 for(i in 1:length(plot_list)){  

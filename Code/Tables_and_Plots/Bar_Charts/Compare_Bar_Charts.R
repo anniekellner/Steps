@@ -82,7 +82,6 @@ S2 <- S2 %>% mutate(across(where(is.numeric), round, digits = 1))
 # ---- Plotting Prep ------------  #
 
 
-
 # Set y-axis limits for precip
 
 # Determine highest and lowest precip delta values 
