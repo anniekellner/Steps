@@ -51,7 +51,8 @@ installation_names <- c("Homestead_ARB",
               "Edwards_AFB",
               "JBMDL", 
               "Edwards_AFB_v2",
-              "Edwards_AFB_v3_EastofBarstow")             
+              "Edwards_AFB_v3_EastofBarstow",
+              "Edwards_AFB_v3_Renoville")             
 
 
 official_base_names_for_plots <- c("NAVBASE Kitsap",     
