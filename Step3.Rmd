@@ -1052,7 +1052,7 @@ source('./Code/Tables_and_Plots/Bar_Charts/Format_Bar_Charts.R') # Formatting pl
 
 ```
 
-```
+
 
 
 
