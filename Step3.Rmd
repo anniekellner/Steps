@@ -116,15 +116,41 @@ source('./Code/Misc/character_vectors.R') This code will not run, so please re-r
 
 ```{r enter-base-and-model}
 
-installation <- installation_names[37] 
+installation <- installation_names[32] 
 
-official_name <- official_base_names_for_plots[17] # These names serve as titles for the climatograph and Walter-Lieth plots
+official_name <- official_base_names_for_plots[16] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 model <- models[8] 
 
 cat(paste("The model you have selected is", model,". The abbreviated name for the installation shapefile is", installation, "and its official name is", official_name))
 
 ```
+
+Because the installation-specific directory names for NOAA's historical data do not always match the names for the installation boundary shapefiles, we need to make sure we're pulling from the right folder.
+
+```{r list-NOAA-folders}
+
+NOAA_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/"
+
+list.files(path = NOAA_dir, pattern = installation)
+
+```
+
+*If there is more than one .csv file for the installation in question, please speak to Trevor Even (trevor.even@colostate.edu) to determine which to use*
+
+*If only one file is listed or you know which .csv you need, please copy-paste the filename from above into the second argument of the function below*
+
+```{r get-NOAA-data}
+
+noaa_filepath <- paste0(NOAA_dir, "JBER - Anchorage International.csv")
+
+noaa <- read.csv(file = noaa_filepath)
+
+```
+
+
+
+
 
 We use the next chunk to set the path to the correct directory for the installation boundary (shapefile).
 
@@ -209,16 +235,35 @@ future2_end_year <- 2080 # End year of interest for the second future time perio
 
 ```
 
-####################################################################################################
-###     THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT            ################################
-###     The rest of the script should be able to be run automatically     ################################
-####################################################################################################
+######################################################
+######################################################
 
-From this point forward, all you need to do is press the green 'run' arrow for each chunk. DO NOT ALTER THE CODE BELOW. 
+THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT
 
-###############################################################################################
-###     PART TWO: Data Extraction                                         #####################  
-###############################################################################################
+
+The rest of the script should be able to be run automatically. From this point forward, all you need to do is press the green 'run' arrow for each chunk. DO NOT ALTER THE CODE BELOW. 
+
+
+#######################################################             PART TWO: Data Extraction                 #######################################################
+
+
+## HISTORICAL DATA (NOAA)
+
+```{r NOAA-historical-data}
+
+noaa_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/"
+
+
+
+
+```
+
+
+
+
+
+
+
 
 
 ## CREATE VECTORS FOR YEAR-SCENARIO COMBOS
