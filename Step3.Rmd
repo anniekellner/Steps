@@ -149,9 +149,6 @@ noaa <- read.csv(file = noaa_filepath)
 ```
 
 
-
-
-
 We use the next chunk to set the path to the correct directory for the installation boundary (shapefile).
 
 *If the AFB is managed by the Navy, set Navy = TRUE*
@@ -251,7 +248,7 @@ The rest of the script should be able to be run automatically. From this point f
 
 ```{r NOAA-historical-data}
 
-noaa_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/"
+
 
 
 
