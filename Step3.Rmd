@@ -138,13 +138,13 @@ list.files(path = NOAA_dir, pattern = installation)
 
 *If there is more than one .csv file for the installation in question, please speak to Trevor Even (trevor.even@colostate.edu) to determine which to use*
 
-*If only one file is listed or you know which .csv you need, please copy-paste the filename from above into the 'weather_station object (include the quotation marks)*
+*If only one file is listed or you know which .csv you need, please copy-paste the filename from above WITHOUT THE ".csv" SUFFIX into the 'weather_station object (include the quotation marks)*
 
 ```{r NOAA-filePaths}
 
-weather_station <- "JBER - Anchorage International.csv"
+weather_station <- "JBER - Anchorage International"
 
-noaa_filepath <- paste0(NOAA_dir, weather_station)
+noaa_dataFilepath <- paste0(NOAA_dir, weather_station,".csv")
 
 # Create directory for results
 
@@ -152,13 +152,7 @@ noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Resu
 
 
 if (!dir.exists(noaa_resultsDir)){
-  dir.create(results_folder)}
-
-```
-
-```{r get-NOAA-data}
-
-noaa <- read.csv(file = noaa_filepath)
+  dir.create(noaa_resultsDir)}
 
 ```
 
@@ -867,7 +861,7 @@ for(i in 1:length(AllDays)){
     dplyr::select(!c('date','PPT_in', 'PPT_mm', 'GDDF')) %>% # Exclude variables for which the result is not simply a monthly average
     dplyr::select(!(contains("days"))) %>%
     group_by(year, month) %>%
-    summarise(across(where(is.double), mean))
+    summarise(across(where(is.numeric), mean))
   
   Abs_TminF = df %>%
   select(date, year, month, TMinF) %>%
