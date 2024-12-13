@@ -138,11 +138,19 @@ list.files(path = NOAA_dir, pattern = installation)
 
 *If there is more than one .csv file for the installation in question, please speak to Trevor Even (trevor.even@colostate.edu) to determine which to use*
 
-*If only one file is listed or you know which .csv you need, please copy-paste the filename from above into the second argument of the function below*
+*If only one file is listed or you know which .csv you need, please copy-paste the filename from above into the 'weather_station object (include the quotation marks)*
+
+```{r NOAA-filePaths}
+
+weather_station <- "JBER - Anchorage International.csv"
+
+noaa_filepath <- paste0(NOAA_dir, weather_station)
+
+noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_NOAA_Hist/", weather_station)
+
+```
 
 ```{r get-NOAA-data}
-
-noaa_filepath <- paste0(NOAA_dir, "JBER - Anchorage International.csv")
 
 noaa <- read.csv(file = noaa_filepath)
 
@@ -249,7 +257,7 @@ The rest of the script should be able to be run automatically. From this point f
 ```{r NOAA-historical-data}
 
 
-
+source("./Code/")
 
 
 
