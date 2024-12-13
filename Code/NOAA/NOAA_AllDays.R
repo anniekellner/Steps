@@ -49,18 +49,38 @@ df <- df %>%
                                freezethresh = -2.2, 
                                thawthresh = 1.2)) 
 
+df <- select(df,  # remove Celsius temps
+             year,
+             Station_ID, 
+             Station_Name,
+             date,
+             PPT_in, 
+             PPT_mm, 
+             TMaxF, 
+             TMinF, 
+             TMeanF, 
+             GDDF, 
+             hotdays, 
+             colddays, 
+             wetdays, 
+             drydays, 
+             ftdays)
+
 # ---  ASSORT DATA GROUPS BY YEAR AND SAVE   -----   #
 
 # Sort into groups by year
 
 grp1 <- df %>%
-  filter(year > 1980 & year < 2011)
+  filter(year > 1980 & year < 2011) %>%
+  select(-year) 
 
 grp2 <- df %>%
-  filter(year > 1984 & year < 2015)
+  filter(year > 1984 & year < 2015) %>%
+  select(-year)
 
 grp3 <- df %>%
-  filter(year > 1990 & year < 2021)
+  filter(year > 1990 & year < 2021) %>%
+  select(-year)
 
 # Save .csv's to Results folder
 
@@ -76,10 +96,14 @@ write.csv(grp1, file = filePath_grp1)
 fileName_grp2 <- paste(weather_station,"1985-2014","AllDays", sep = "_")
 filePath_grp2 <- paste0(noaa_resultsDir,"/",fileName_grp2,".csv")
 
+write.csv(grp2, file = filePath_grp2)
+
 # Group 3
 
 fileName_grp3 <- paste(weather_station,"1991-2020","AllDays", sep = "_")
 filePath_grp3 <- paste0(noaa_resultsDir,"/",fileName_grp3,".csv")
+
+write.csv(grp3, file = filePath_grp3)
 
  
 
