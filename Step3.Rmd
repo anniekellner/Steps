@@ -146,7 +146,13 @@ weather_station <- "JBER - Anchorage International.csv"
 
 noaa_filepath <- paste0(NOAA_dir, weather_station)
 
+# Create directory for results
+
 noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_NOAA_Hist/", weather_station)
+
+
+if (!dir.exists(noaa_resultsDir)){
+  dir.create(results_folder)}
 
 ```
 
@@ -257,7 +263,7 @@ The rest of the script should be able to be run automatically. From this point f
 ```{r NOAA-historical-data}
 
 
-source("./Code/")
+source("./Code/NOAA/NOAA_AllDays.R")
 
 
 
