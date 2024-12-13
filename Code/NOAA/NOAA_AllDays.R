@@ -62,9 +62,24 @@ grp2 <- df %>%
 grp3 <- df %>%
   filter(year > 1990 & year < 2021)
 
-# Save as .csv to Results folder
+# Save .csv's to Results folder
 
+# Group 1
 
+fileName_grp1 <- paste(weather_station,"1981-2010","AllDays", sep = "_")
+filePath_grp1 <- paste0(noaa_resultsDir,"/",fileName_grp1,".csv")
+
+write.csv(grp1, file = filePath_grp1)
+
+# Group 2
+
+fileName_grp2 <- paste(weather_station,"1985-2014","AllDays", sep = "_")
+filePath_grp2 <- paste0(noaa_resultsDir,"/",fileName_grp2,".csv")
+
+# Group 3
+
+fileName_grp3 <- paste(weather_station,"1991-2020","AllDays", sep = "_")
+filePath_grp3 <- paste0(noaa_resultsDir,"/",fileName_grp3,".csv")
 
  
 
