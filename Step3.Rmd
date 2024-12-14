@@ -140,7 +140,7 @@ list.files(path = NOAA_dir, pattern = installation)
 
 *If only one file is listed or you know which .csv you need, please copy-paste the filename from above WITHOUT THE ".csv" SUFFIX into the 'weather_station object (include the quotation marks)*
 
-```{r NOAA-filePaths}
+```{r NOAA}
 
 weather_station <- "JBER - Anchorage International"
 
@@ -153,6 +153,11 @@ noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Resu
 
 if (!dir.exists(noaa_resultsDir)){
   dir.create(noaa_resultsDir)}
+
+# ADD NOAA analyses here bc environment gets messy. Easier to just do now. 
+
+
+
 
 ```
 
@@ -910,7 +915,7 @@ for(i in 1:length(AllDays)){
          Avg_colddays,
          Avg_wetdays,
          Avg_drydays,
-         Avg_ftdays,
+         Avg_ftdays
          )
   
   # As above, MACA-related code is a placeholder for future integration

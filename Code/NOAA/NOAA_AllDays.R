@@ -86,27 +86,34 @@ grp3 <- df %>%
 
 # Group 1
 
-fileName_grp1 <- paste(weather_station,"1981-2010","AllDays", sep = "_")
+fileName_grp1 <- paste(weather_station,"1981-2010","historical","AllDays", sep = "_")
 filePath_grp1 <- paste0(noaa_resultsDir,"/",fileName_grp1,".csv")
 
 write.csv(grp1, file = filePath_grp1)
 
 # Group 2
 
-fileName_grp2 <- paste(weather_station,"1985-2014","AllDays", sep = "_")
+fileName_grp2 <- paste(weather_station,"1985-2014","historical","AllDays", sep = "_")
 filePath_grp2 <- paste0(noaa_resultsDir,"/",fileName_grp2,".csv")
 
 write.csv(grp2, file = filePath_grp2)
 
 # Group 3
 
-fileName_grp3 <- paste(weather_station,"1991-2020","AllDays", sep = "_")
+fileName_grp3 <- paste(weather_station,"1991-2020","historical","AllDays", sep = "_")
 filePath_grp3 <- paste0(noaa_resultsDir,"/",fileName_grp3,".csv")
 
 write.csv(grp3, file = filePath_grp3)
 
- 
+##  --  PREPARE FOR MONTHLY SUMMARY --  ##
 
+AllDays_hist <- list()
+
+AllDays_hist[[1]] <- grp1
+AllDays_hist[[2]] <- grp2
+AllDays_hist[[3]] <- grp3
+
+rm(list = c("df", "noaa", "grp1", "grp2", "grp3")) ## FIGURE OUT WHAT TO KEEP/REMOVE
 
 
 
