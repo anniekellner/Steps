@@ -10,9 +10,7 @@
     # the original LOCA_summarize.R script
 
 
-# ------  PREP DATA   ------------------  #
-
-noaa <- read.csv(file = noaa_filepath) # delete this once script is set
+# ----- PREP DATA ------------------  #
 
 noaa$DATE <- mdy(noaa$DATE) # format date using lubridate pkg
 
@@ -113,7 +111,10 @@ AllDays_hist[[1]] <- grp1
 AllDays_hist[[2]] <- grp2
 AllDays_hist[[3]] <- grp3
 
-rm(list = c("df", "noaa", "grp1", "grp2", "grp3")) ## FIGURE OUT WHAT TO KEEP/REMOVE
+rm(list = c("df","noaa")) 
+rm(list = ls(pattern = "^grp"))
+rm(list = ls(pattern = "^fileName"))
+rm(list = ls(pattern = "^filePath"))
 
 
 
