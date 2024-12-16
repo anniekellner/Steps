@@ -101,20 +101,24 @@ source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude sys
 
 ```
 
-###############################################################################################
-### PART ONE: User settings - choose AFB, AFB manager, model, scenarios, years of interest  ###
-###############################################################################################
+####################################################################################################
+###                PART ONE: USER SETTINGS I - SELECT OR ADD INSTALLATION NAME                   ###
+####################################################################################################
 
-First, let's *select which base (AFB, etc.) and model you wish to run.*  To choose from a list, highlight the word `installation_names`, `models`, or `official_base_names_for_plots` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"). The available models correspond to numbers in the vector (e.g., the model HADGEM2-ES is [1]). 
+First, let's *select which base (AFB, etc.) you wish to run.* You will need to select the name that corresponds with the correct shapefile as well as the official name of the installation for use with plot titles.  
 
+To choose from an existing list, you can either a) enter "abbrev_name_shp" and "official_base_names" (without the quotation marks) into the console, and select the appropriate number that corresponds with the installation of interest. You can then enter that number between the brackets ([]) below. 
 
-In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest.* 
+Alternatively (b), you can highlight the following code and run it (ctrl + enter) and do the same thing.
 
-Official base names are used for plot titles. *If the base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the installation_names and official_base_names vectors and save. You will then have to re-run the following line above:*
+`abbrev_name_shp`
+`official_base_names`
 
-source('./Code/Misc/character_vectors.R') This code will not run, so please re-run above
+For example, in the code chunk below ({enter-base-name}) Homestead_ARB would be abbrev_name_shp[1], and NAVBASE San Diego would be official_base_names[2].
 
-```{r enter-base-and-model}
+The output following the code chunk will confirm your selections. You can easily revise as necessary if you entered anything incorrectly. If your installation of interest does not appear in the list, see the orange text below the code chunk.
+
+```{r enter-base-name}
 
 shp <- abbrev_name_shp[14] 
 
@@ -125,13 +129,27 @@ cat(paste("The official name for the installation you are running is",official_n
 
 ```
 
+ *If your base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the installation_names and official_base_names vectors. If you do not know what those entries should be, please contact Trevor Even (trevor.even@colostate.edu).*
+ 
+*IMPORTANT: If you added new names to the vector lists, you will then need to re-run the line the imports the character vector names into the global environment. If you still do not see your new entries, return to the file and make sure to save it. Then run the line of code again. It is included below for easy reference. You can just highlight the code below and run it. You DO NOT NEED TO RE-RUN THE LINE if the appropriate names were already included in the character_vectors.R script, and you did not add new entries.*
+
+`source('./Code/Misc/character_vectors.R')`
+
+##################################################################################################################
+###           PART TWO: RUN ANALYSES OF HISTORICAL DATA                                                       ###
+##################################################################################################################
+
+Typically, the analysis portion would follow the user entries. However, because the historical analysis uses a different dataset from the rest of the script, we are running it before adding settings that pertain to later stages of the analysis.
+
+##    ----        ANALYSIS OF NOAA HISTORICAL DATA    ---       ##
+
 Because the installation-specific directory names for NOAA's historical data do not always match the names for the installation boundary shapefiles, we need to make sure we're pulling from the right folder.
 
 ```{r list-NOAA-folders}
 
 NOAA_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/"
 
-list.files(path = NOAA_dir, pattern = installation)
+list.files(path = NOAA_dir, pattern = shp)
 
 ```
 
@@ -159,6 +177,10 @@ if (!dir.exists(noaa_resultsDir)){
 
 
 ```
+
+
+Similar to what you did above, now *enter the number between the brackets ([]) that corresponds with the model of interest.*
+
 
 ```{r select-model}
 
