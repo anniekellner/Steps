@@ -105,27 +105,34 @@ source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude sys
 ###                PART ONE: USER SETTINGS I - SELECT OR ADD INSTALLATION NAME                   ###
 ####################################################################################################
 
-First, let's *select which base (AFB, etc.) you wish to run.* You will need to select the name that corresponds with the correct shapefile as well as the official name of the installation for use with plot titles.  
+First, let's *select which base (AFB, etc.) you wish to run.* You will need to select or input the following:
 
-To choose from an existing list, you can either a) enter "abbrev_name_shp" and "official_base_names" (without the quotation marks) into the console, and select the appropriate number that corresponds with the installation of interest. You can then enter that number between the brackets ([]) below. 
+1) *The general acronym* associated with the installation of interest (e.g., "JBLE" for "JBLE_E" or "JBLE_L"). This is required to locate the historical data associated with local weather stations, as the filenames associated with historical data are often different from those associated with the model data.  
 
-Alternatively (b), you can highlight the following code and run it (ctrl + enter) and do the same thing.
+2) *The name of the shapefile* that corresponds with the installation. For various reasons, identifying the appropriate area/grid cell for a given model can require trial-and-error, so occasionally there is more than one shapefile per base. This information will be provided by Trevor Even (trevor.even@colostate.edu)
 
-`abbrev_name_shp`
+3) *The official name of the installation*. This name is used for plot titles, and will also be provided by Trevor Even (see above) 
+
+In some cases, you can select these names from an existing list, located in './Code/Misc/character_vectors.R'. To see the list, you can either type the following phrases into the console, or simply select the phrases below and run them (ctrl + enter). 
+
+`base_abbreviations`
+`shp_names`
 `official_base_names`
 
-For example, in the code chunk below ({enter-base-name}) Homestead_ARB would be abbrev_name_shp[1], and NAVBASE San Diego would be official_base_names[2].
+You would then identify the number associated with the installation of interest, and enter that number between the brackets in the code chunk below. (For example, Homestead_ARB would be shp_names[1], and NAVBASE San Diego would be official_base_names[2]).
 
 The output following the code chunk will confirm your selections. You can easily revise as necessary if you entered anything incorrectly. If your installation of interest does not appear in the list, see the orange text below the code chunk.
 
 ```{r enter-base-name}
 
-shp <- abbrev_name_shp[14] 
+shp <- shp_names[14] 
+
+base_abbrev <- base_abbreviations[1] 
 
 official_name <- official_base_names[19] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 
-cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
+cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"and the general ancroym associated with the installation is", base_abbrev,"."))
 
 ```
 
@@ -149,7 +156,7 @@ Because the installation-specific directory names for NOAA's historical data do 
 
 NOAA_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/"
 
-list.files(path = NOAA_dir, pattern = shp)
+list.files(path = NOAA_dir, pattern = base_abbrev)
 
 ```
 
@@ -159,7 +166,7 @@ list.files(path = NOAA_dir, pattern = shp)
 
 ```{r NOAA}
 
-weather_station <- "JBER - Anchorage International"
+weather_station <- "JBLE_NewportLangley"
 
 noaa_dataFilepath <- paste0(NOAA_dir, weather_station,".csv")
 
@@ -171,9 +178,9 @@ noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Resu
 if (!dir.exists(noaa_resultsDir)){
   dir.create(noaa_resultsDir)}
 
-# ADD NOAA analyses here bc environment gets messy. Easier to just do now. 
+# Historical Analyses 
 
-
+source("./Code/NOAA/NOAA_AllDays.R")
 
 
 ```
@@ -291,7 +298,7 @@ The rest of the script should be able to be run automatically. From this point f
 ```{r NOAA-historical-data}
 
 
-source("./Code/NOAA/NOAA_AllDays.R")
+
 
 
 

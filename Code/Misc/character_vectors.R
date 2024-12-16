@@ -15,8 +15,10 @@ models <- c("HADGEM2-ES",
             "EC-Earth3-Veg-LR",
             "ACCESS-ESM1-5")
 
+base_abbreviations <- c("JBLE")
 
-abbrev_name_shp <- c("Homestead_ARB", 
+
+shp_names <- c("Homestead_ARB", 
               "Guam_Proxy_v1", # Navy
               "CNMI_Proxy_v1", # Navy
               "Indianhead_Proxy", # Navy
