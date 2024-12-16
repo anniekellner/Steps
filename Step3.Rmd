@@ -162,10 +162,10 @@ if (!dir.exists(noaa_resultsDir)){
 
 ```{r select-model}
 
-model <- models[8] 
+model <- models[7] 
 
 
-cat(paste("The model you have selected is", model,"for the installation", official_base_names_for_plots))
+cat(paste("The model you have selected is", model,"for the installation", official_name))
 
 ```
 
