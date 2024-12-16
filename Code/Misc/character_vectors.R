@@ -16,7 +16,7 @@ models <- c("HADGEM2-ES",
             "ACCESS-ESM1-5")
 
 
-installation_names <- c("Homestead_ARB", 
+abbrev_name_shp <- c("Homestead_ARB", 
               "Guam_Proxy_v1", # Navy
               "CNMI_Proxy_v1", # Navy
               "Indianhead_Proxy", # Navy
@@ -29,7 +29,7 @@ installation_names <- c("Homestead_ARB",
               "PSRF_Boundary",
               "South_Range_Boundary",
               "Carter_Creek_Recreation_Center_Boundary",
-              "JBLE",
+              "JBLE_L",
               "Edwards_AFB",                 
               "Malmstrom_AFB_Proxy",
               "Kitsap_Proxy",
@@ -55,7 +55,7 @@ installation_names <- c("Homestead_ARB",
               "Edwards_AFB_v3_Renoville")             
 
 
-official_base_names_for_plots <- c("NAVBASE Kitsap",     
+official_base_names <- c("NAVBASE Kitsap",     
                                    "NAVBASE San Diego",
                                    "Naval Air Station Oceana",
                                    "Nellis Air Force Base",
@@ -72,7 +72,8 @@ official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "Jonathan Dickinson Missile Tracking Annex",
                                    "Joint Base Elmendorf-Richardson", 
                                    "Edwards Air Force Base",
-                                   "Joint Base McGuire-Dix-Lakehurst") 
+                                   "Joint Base McGuire-Dix-Lakehurst",
+                                   "JBLE - Langley") 
 
 
 
