@@ -77,7 +77,7 @@ for(i in 1:length(AllDays_hist)){
   
 }
 
-
+    
 # Add summary rows (YrAverage and YrTotals) and save for table construction
 
 Avs_and_Totals <- list() # saving for summary table
@@ -106,7 +106,7 @@ for(i in 1:length(noaa_monthSum)){
   
   csv = csv %>%
     slice(1:(n()-2)) %>% # remove summary rows
-    bind_rows(NAs, NAs_Totals) %>% # replace with NA's included
+    bind_rows(NAs_Avgs, NAs_Totals) %>% # replace with NA's included
     rename(month = Avg_month) %>%
     mutate(month = as.character(month))
   
@@ -124,14 +124,14 @@ for(i in 1:length(noaa_monthSum)){
 fileName_grp1 <- paste(weather_station,"1981-2010","historical","MonthSum", sep = "_")
 filePath_grp1 <- paste0(noaa_resultsDir,"/",fileName_grp1,".csv")
 
-write.csv(grp1, file = filePath_grp1)
+write_csv(Avs_and_Totals[[1]], file = filePath_grp1)
 
 # Group 2
 
 fileName_grp2 <- paste(weather_station,"1985-2014","historical","MonthSum", sep = "_")
 filePath_grp2 <- paste0(noaa_resultsDir,"/",fileName_grp2,".csv")
 
-write.csv(grp2, file = filePath_grp2)
+write_csv(Avs_and_Totals[[2]], file = filePath_grp2)
 
 # Group 3
 
@@ -139,20 +139,17 @@ fileName_grp3 <- paste(weather_station,"1991-2020","historical","MonthSum", sep 
 filePath_grp3 <- paste0(noaa_resultsDir,"/",fileName_grp3,".csv")
 
 
-#### STOPPED HERE BC FEEL LIKE SHIT
-write.csv(grp3, file = filePath_grp3)
+write_csv(Avs_and_Totals[[3]], file = filePath_grp3)
 
   
-write.csv(Avs_and_Totals[[1]], )  
-  
-## MONTHSUM CODE FROM RMD SCRIPT
-
 
   
 
 
 
   
+
+
 
   
 
@@ -163,9 +160,4 @@ write.csv(Avs_and_Totals[[1]], )
   
 
   
-  #Avs_and_Totals[[i]] = csv %>% slice_tail(n = 2) 
-  #names(Avs_and_Totals)[i] = names(AllDays[i])
-  
- # monthSum[[i]] = csv # will write over original monthSum df that did not have final two columns
-  #names(monthSum)[i] = names(AllDays[i])
-#}
+
