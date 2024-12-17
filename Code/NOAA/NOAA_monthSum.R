@@ -16,7 +16,7 @@ for(i in 1:length(AllDays_hist)){
     mutate(year = year(date)) 
   
   yearAvg = df %>%
-    dplyr::select(!c('date','PPT_in', 'PPT_mm', 'GDDF')) %>% # Exclude variables for which the result is not simply a monthly average
+    dplyr::select(!c('date','PPT_in', 'PPT_mm', 'GDDF')) %>% # exclude variables for which the result is not simply a monthly average
     dplyr::select(!(contains("days"))) %>%
     group_by(year, month) %>%
     summarise(across(where(is.numeric), mean))
@@ -51,7 +51,7 @@ for(i in 1:length(AllDays_hist)){
   monthAvg = all %>%
     dplyr::select(!year) %>%
     group_by(month) %>%
-    summarise(across(everything(), mean)) %>%
+    summarise(across(where(is.numeric), mean, na.rm = TRUE)) %>%
     setNames(paste0('Avg_', names(.))) %>%
     rename(Abs_TminF = Avg_Abs_TminF) %>%
     select(Avg_month, # put in order on MonthSum csv
@@ -70,6 +70,8 @@ for(i in 1:length(AllDays_hist)){
            Avg_drydays,
            Avg_ftdays
     ) 
+  
+  monthAvg = round(monthAvg, digits = 2)
  
   noaa_monthSum[[i]] <- monthAvg 
   
