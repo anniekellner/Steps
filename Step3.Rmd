@@ -73,7 +73,7 @@ NOTE: If you clear the workspace but save the environment for later use (i.e., a
 
 ```{r clear-workspace}
 
-#rm(list = ls()) # clear workspace - this can be commented out as needed
+rm(list = ls()) # clear workspace - this can be commented out as needed
 
 ```
 
@@ -168,7 +168,11 @@ list.files(path = NOAA_dir, pattern = base_abbrev)
 
 weather_station <- "JBLE_NewportLangley"
 
+# Read in data
+
 noaa_dataFilepath <- paste0(NOAA_dir, weather_station,".csv")
+
+noaa <- read.csv(file = noaa_dataFilepath) # delete this once script is set
 
 # Create directory for results
 
@@ -181,7 +185,7 @@ if (!dir.exists(noaa_resultsDir)){
 # Historical Analyses 
 
 source("./Code/NOAA/NOAA_AllDays.R")
-
+source("./Code/NOAA/NOAA_monthSum.R")
 
 ```
 
@@ -292,17 +296,6 @@ The rest of the script should be able to be run automatically. From this point f
 
 #######################################################             PART TWO: Data Extraction                 #######################################################
 
-
-## HISTORICAL DATA (NOAA)
-
-```{r NOAA-historical-data}
-
-
-
-
-
-
-```
 
 
 
