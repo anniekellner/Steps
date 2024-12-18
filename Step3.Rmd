@@ -73,7 +73,7 @@ NOTE: If you clear the workspace but save the environment for later use (i.e., a
 
 ```{r clear-workspace}
 
-rm(list = ls()) # clear workspace - this can be commented out as needed
+#rm(list = ls()) # clear workspace - this can be commented out as needed
 
 ```
 
@@ -132,7 +132,7 @@ base_abbrev <- base_abbreviations[1]
 official_name <- official_base_names[19] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 
-cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"and the general ancroym associated with the installation is", base_abbrev,"."))
+cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"and the general acronym associated with the installation is", base_abbrev,"."))
 
 ```
 
@@ -187,7 +187,12 @@ if (!dir.exists(noaa_resultsDir)){
 source("./Code/NOAA/NOAA_AllDays.R")
 source("./Code/NOAA/NOAA_monthSum.R")
 
+## INSERT CLIMOGRAPHS HERE
+
 ```
+
+
+
 
 
 Similar to what you did above, now *enter the number between the brackets ([]) that corresponds with the model of interest.*
@@ -196,7 +201,6 @@ Similar to what you did above, now *enter the number between the brackets ([]) t
 ```{r select-model}
 
 model <- models[7] 
-
 
 cat(paste("The model you have selected is", model,"for the installation", official_name))
 
@@ -338,7 +342,7 @@ years <- c(baseline_start_year, # vector for easy reference
   #paste0('N:/RStor/mindyc/afccm/Climate Modeling/Results_',model,"/",installation,"/")
   #}
 
-results_folder <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_",model,"/", installation) 
+results_folder <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_",model,"/", shp) 
 
 if (!dir.exists(results_folder)){
   dir.create(results_folder)}
@@ -440,7 +444,7 @@ rx <- stackX[[random_raster]]
 
 # AFB 
 
-afb_dir <- (paste(dir_installation_boundaries, installation, sep = '/'))
+afb_dir <- (paste(dir_installation_boundaries, shp, sep = '/'))
 afb_filename <- paste(afb_dir, '.shp', sep = "")
 
 afbSF <- st_read(afb_filename) # Because plotting package (tmap) doesn't take terra vectors
