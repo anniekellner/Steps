@@ -187,8 +187,6 @@ if (!dir.exists(noaa_resultsDir)){
 source("./Code/NOAA/NOAA_AllDays.R")
 source("./Code/NOAA/NOAA_monthSum.R")
 
-## INSERT CLIMOGRAPHS HERE
-
 ```
 
 
@@ -607,13 +605,13 @@ for(i in 1:length(files_s2f2)){
 
 timestamp <- format(today(), "%Y%m%d")
 
-image_filename <-  paste(installation,model,timestamp, sep = "_")
+image_filename <-  paste(shp,model,timestamp, sep = "_")
 rawData_filename <- paste0(image_filename,".RData")
 rasterStack_filename <- paste0("rasterStack_",image_filename,".Rds")
 
 # Directory for Workspace Images
 
-rawDataDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/",installation)
+rawDataDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp)
 
 if (!dir.exists(rawDataDir)){
   dir.create(rawDataDir)}
@@ -655,9 +653,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-#installation <- installation_names[36] # CHANGE THIS TO INSTALLATION OF INTEREST
+#shp <- shp_names[36] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/",installation), full.names = TRUE)
+#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
 ```
 
@@ -666,11 +664,11 @@ However, if you are re- specific segments of the script using previously extract
 
 # Load workspace image
 
-#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/Edwards_AFB_v3_EastofBarstow/Edwards_AFB_v3_EastofBarstow_ACCESS-ESM1-5_20241120.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Edwards_AFB_v3_EastofBarstow/Edwards_AFB_v3_EastofBarstow_ACCESS-ESM1-5_20241120.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/Edwards_AFB_v3_EastofBarstow/rasterStack_Edwards_AFB_v3_EastofBarstow_ACCESS-ESM1-5_20241120.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Edwards_AFB_v3_EastofBarstow/rasterStack_Edwards_AFB_v3_EastofBarstow_ACCESS-ESM1-5_20241120.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ```
 
