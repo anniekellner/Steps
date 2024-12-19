@@ -80,7 +80,7 @@ for(i in 1:length(monthSum)){
   }
   
   
-  filenameC = paste0(installation,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Celsius.png")
+  filenameC = paste0(shp,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Celsius.png")
   
   ggsave(filenameC, plot = wlCplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
   
@@ -245,7 +245,7 @@ for(i in 1:length(monthSum)){
   
   # Save Fahrenheit plot
   
-  filenameF = paste0(installation,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Fahrenheit.png")
+  filenameF = paste0(shp,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Fahrenheit.png")
   
   ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
   

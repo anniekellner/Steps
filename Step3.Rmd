@@ -653,9 +653,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-#shp <- shp_names[36] # CHANGE THIS TO INSTALLATION OF INTEREST
+shp <- shp_names[14] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
 ```
 
@@ -664,11 +664,11 @@ However, if you are re- specific segments of the script using previously extract
 
 # Load workspace image
 
-#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Edwards_AFB_v3_EastofBarstow/Edwards_AFB_v3_EastofBarstow_ACCESS-ESM1-5_20241120.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBLE_L/JBLE_L_EC-Earth3-Veg-LR_20241217.RData" ) # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Edwards_AFB_v3_EastofBarstow/rasterStack_Edwards_AFB_v3_EastofBarstow_ACCESS-ESM1-5_20241120.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBLE_L/rasterStack_JBLE_L_EC-Earth3-Veg-LR_20241217.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ```
 
@@ -782,7 +782,7 @@ for(i in 1:length(AllDays)){
   } else {
     paste(baseline_start_year,"-",baseline_end_year)
   }
-    csv_fileName = paste(installation, csv_scenario, csv_years,"AllDays",sep = '_')
+    csv_fileName = paste(shp, csv_scenario, csv_years,"AllDays",sep = '_')
     
     # Create directory for files if it does not already exist
     
@@ -803,7 +803,7 @@ Now that the AllDays.csv files have been created, it is no longer necessary to r
 
 ```{r remove-extraneous-stuff}
 
-rm(list=setdiff(ls(), c("installation", # These are the objects we want to keep
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
                         "model", 
                         "scenarios",
@@ -828,7 +828,7 @@ source('Code/Ecosystems_Climate_Data.R')
 
 ```{r remove-extraneous-stuff, warning=FALSE}
 
-rm(list=setdiff(ls(), c("installation", # These are the objects we want to keep
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
                         "model", 
                         "scenarios",
@@ -857,7 +857,7 @@ source("./Code/Climographs.R")
 
 ```{r remove-extraneous-stuff}
 
-rm(list=setdiff(ls(), c("installation", # These are the objects we want to keep
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
                         "model", 
                         "scenarios",
@@ -1025,7 +1025,7 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
   } else {
     paste(first(year(AllDays$results_baseline$date)),"-",last(year(AllDays$results_baseline$date)))
   }
-    csv_fileName = paste(installation,csv_scenario,csv_years,"MonthSum",sep = '_')
+    csv_fileName = paste(shp,csv_scenario,csv_years,"MonthSum",sep = '_')
     write_csv(monthSum[[i]], file = paste0(results_folder,"/",csv_fileName,".csv",sep = ""))
 }
 
@@ -1053,7 +1053,7 @@ source('./Code/Tables_and_Plots/Walter-Lieth.R')
 ```{r remove-objects}
 
 rm(list=setdiff(ls(), c("monthSum", 
-                        "installation", 
+                        "shp", 
                         "model", 
                         "scenarios",
                         "scenario_plotNames",
@@ -1109,7 +1109,7 @@ csv_years = if (str_detect(names(diffHist[i]), "f1")){
     paste0(years[5],"-",years[6])
   } 
     
-csv_fileName = paste(installation,csv_scenario,csv_years,"DiffHist",sep = '_')
+csv_fileName = paste(shp,csv_scenario,csv_years,"DiffHist",sep = '_')
 write_csv(diffHist[[i]], file = paste0(results_folder,"/",csv_fileName,".csv",sep = ""))
 
 }

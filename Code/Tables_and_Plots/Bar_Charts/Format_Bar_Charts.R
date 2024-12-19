@@ -49,10 +49,10 @@ pPrcp <- prcp_hist + futurePrcp
 
 # Filenames
 
-filename_TAve <- paste(installation,"TAvg.png", sep = "_")
-filename_TMax <- paste(installation,"TMax.png", sep = "_")
-filename_TMin <- paste(installation,"TMin.png", sep = "_")
-filename_Prcp <- paste(installation,"Prcp.png", sep = "_")
+filename_TAve <- paste(shp,"TAvg.png", sep = "_")
+filename_TMax <- paste(shp,"TMax.png", sep = "_")
+filename_TMin <- paste(shp,"TMin.png", sep = "_")
+filename_Prcp <- paste(shp,"Prcp.png", sep = "_")
 
 # Save
 
