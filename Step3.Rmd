@@ -299,14 +299,6 @@ The rest of the script should be able to be run automatically. From this point f
 #######################################################             PART TWO: Data Extraction                 #######################################################
 
 
-
-
-
-
-
-
-
-
 ## CREATE VECTORS FOR YEAR-SCENARIO COMBOS
 
 ```{r character-vectors}
@@ -851,7 +843,7 @@ plots_dir <- paste0(results_folder,"/","Plots_and_Tables")
 if (!dir.exists(plots_dir)){
   dir.create(plots_dir)}
 
-source("./Code/Climographs.R")
+source("./Code/Climographs.R") 
 
 ```
 
