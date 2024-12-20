@@ -9,6 +9,10 @@
 
 # df = AllDays[[1]] - just for trial and error. Eventually will be a loop. 
 
+
+## NEED TO MAKE SCALES AT THE OUTSET SO THAT THE HIGHEST TEMP SETS THE SCALE ##
+## SEE BAR CHART PLOTS  ##
+
 # ---- PLOT NAMES AND SUBTITLES ------------    #
 
 plot_subtitles <- c(paste0("Historical, ",years[1],"-",years[2],"\n"),
@@ -51,7 +55,7 @@ subtitle <- pick_subtitle(AllDays[i])
 plot_name <- pick_plotname(AllDays[i])
 
 
-
+##  ------------------- PLOT  -------------------   ##
 
 ggplot(df) +
   geom_bar(aes(x=factor(month, level =c(month.abb)), y = precip*5), 
@@ -64,14 +68,53 @@ ggplot(df) +
             linetype=1,
             linewidth = 1.25,
             color="#0083BE",
-            group=1) + # 10-15-23 removed 'size' argument because is deprecated. If default is not OK use linewidth to adjust
+            group=1) +
   geom_point(aes(x=factor(month, level =c(month.abb)), y = tmin),
              shape = 23, # filled diamond
              color="#0083BE",
              fill = "#0083BE",
              size = 3) + 
-  scale_shape_identity()
+  geom_line(aes(x=factor(month, level =c(month.abb)), y = quan.min.75),
+            linetype = "dashed",
+            linewidth = 1,
+            color = "#0083BE")
+  geom_line(aes(x=factor(month, level =c(month.abb)),y = tmax),
+            linetype = 1,
+            linewidth = 1.25,
+            color = "#C00000",
+            group = 2) +
+  geom_point(aes(x=factor(month, level =c(month.abb)), y = tmax),
+             shape = 17, # filled triangle
+             color= "#C00000",
+             fill = "#C00000",
+             size = 3) + 
+  geom_line(aes(x=factor(month, level =c(month.abb)), y = quan.max.75),
+            linetype = "dashed",
+            linewidth = 1,
+            color = "#C00000",
+            group = 3) + 
+  geom_point(aes(x=factor(month, level =c(month.abb)), y = quan.max.75),
+             shape = 17,
+             color = "#C00000",
+             fill = "#C00000",
+             size = 3)
+
             
+
+## Niah code
+
+tmonp <- tmon %>%
+  map(~ ggplot(.x, aes(x = month)) + 
+        geom_line(aes(y = tvalue, group = temperature, color = temperature)) + #the averages as lines
+        geom_point(aes(y = extvalue, group = extremes, color = extremes, shape = extremes, fill = extremes)) + #the extremes as points
+        scale_shape_manual(values = c(24, 25, 24, 25), guide = "none") +
+        scale_fill_manual(values = c("#BB5145", "#BB5145","#0083BE","#0083BE"), guide = "none") +
+        scale_linetype_manual(values = c("solid", "solid", "solid")) +
+        scale_color_manual(labels = c("Average Maximum", "Average Mean", "Average Minimum", "Maximum Daily Maximum Extreme", "Minimum Daily Maximum Extreme", "Maximum Daily Minimum Extreme", "Minimum Daily Minimum Extreme"), values = c("#BB5145", "#557A3F","#0083BE", "#BB5145", "#BB5145","#0083BE","#0083BE"), guide = guide_legend(override.aes = list(linetype = c("solid", "solid", "solid", "blank", "blank", "blank", "blank"), shape = c(NA, NA, NA, 24, 25, 24, 25), fill = c(NA, NA, NA, "#BB5145", "#BB5145","#74CFE4","#74CFE4")))) +
+        labs(title = paste(.x$filecode, "Scenario Temperature at", .x$location, .x$range, sep = " "), x = "Month", y = expression("Temperature ("*~degree*F*")"), colour = "Monthly Mean \nTemperatures and Extremes") +
+        coord_cartesian(ylim = c(mondlimits$tmin, mondlimits$tmax)) +
+        theme_set(theme_bw(base_size = 16, base_family = "Times New Roman")) +
+        theme(panel.grid.major.x = element_blank(),plot.title = element_text(hjust = 0.5))) 
 
 
 # Example code (https://www.sthda.com/english/wiki/ggplot2-line-types-how-to-change-line-types-of-a-graph-in-r-software#:~:text=Visualization%20in%20R-,Line%20types%20in%20R,for%20%E2%80%9Cdashed%E2%80%9D%2C%20%E2%80%A6.)
