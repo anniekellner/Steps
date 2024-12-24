@@ -3,7 +3,8 @@
 ####################################################################
 
 
-# This script creates climatographs for observed historical data (e.g., NOAA)
+# This script creates the data frame from which the historical (observed) 
+  # climatographs will be plotted
 
 # inputs: 
     # AllDays_hist dataframe
@@ -17,7 +18,7 @@
 ##    ----  PREP DATA   -------   ##
 
 
-# Unify labeling of months
+## Unify labeling of months
 
 # Create function for adding month label (e.g., "Jan") to AllDays_hist dataframe
 
@@ -45,7 +46,8 @@ for(i in 1:length(noaa_monthSum)){
   }
 
 
-##    ---   COMBINE DATAFRAMES  --    ##
+### PREP ALLDAYS_HIST  ###
+
 
 ## Extract max and min values from AllDays_hist list
 
@@ -70,28 +72,32 @@ for(i in 1:length(AllDays_hist)){
 }
 
 
+### SELECT RELEVANT COLUMNS FROM NOAA_MONTHSUM  ###
+
+
+noaaClim <- list()
+
+
+for(i in 1:length(noaa_monthSum)){
+  
+  noaaClimDF = select(noaa_monthSum[[i]], Avg_month, Avg_PPT_in, Avg_TMaxF, Avg_TMinF)
+  
+  noaaClimDF = noaaClimDF %>%
+    rename(month = Avg_month) %>%
+    rename(PPT_in = Avg_PPT_in) %>%
+    rename(TMaxF = Avg_TMaxF) %>%
+    rename(TMinF = Avg_TMinF) 
+  
+  # Combine with AbsMinMax data
+  
+  noaaClim[[i]] = full_join(noaaClimDF, Abs_minMax[[i]])
+
+  }
 
 
 
 
-Abs_TMaxF <- adX %>%
-  group_by(month) %>%
-  summarize(AbsTMaxF = max(TMaxF, na.rm = TRUE))
-
-
-## Select relevant columns from noaa_monthSum and rename
-
-df_msX <- noaa_monthSum[[1]]
-
-from_MS <- select(df_msX, Avg_month, Avg_PPT_in, Avg_TMaxF, Avg_TMinF)
-
-from_MS <- from_MS %>% 
-  rename(month = Avg_month) %>%
-  rename(PPT_in = Avg_PPT_in) %>%
-  rename(TMaxF = Avg_TMaxF) %>%
-  rename(TMinF = Avg_TMinF) 
-
-## Combine to create dataframe for plot
+##  ----  COMBINE TO CREATE DATAFRAME FOR PLOT  ----  ##
 
 noaa_clim <- from_MS %>%
   full_join(Abs_TMaxF) %>%

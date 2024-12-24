@@ -172,7 +172,7 @@ weather_station <- "JBLE_NewportLangley"
 
 noaa_dataFilepath <- paste0(NOAA_dir, weather_station,".csv")
 
-noaa <- read.csv(file = noaa_dataFilepath) # delete this once script is set
+noaa <- read.csv(file = noaa_dataFilepath) 
 
 # Create directory for results
 
@@ -186,7 +186,7 @@ if (!dir.exists(noaa_resultsDir)){
 
 source("./Code/NOAA/NOAA_AllDays.R")
 source("./Code/NOAA/NOAA_monthSum.R")
-source()
+source("./COde/NOAA/NOAA_Climographs_createDF.R")
 
 ```
 
