@@ -17,7 +17,7 @@
 ##    ----  PREP DATA   -------   ##
 
 
-# Unify labeling 
+# Unify labeling of months
 
 # Create function for adding month label (e.g., "Jan") to AllDays_hist dataframe
 
@@ -40,8 +40,9 @@ for(i in 1:length(AllDays_hist)){
 
 ## Add month label to noaa_monthSum dataframe
 
-df_msX$Avg_month <- month.abb[df_msX$Avg_month]
-
+for(i in 1:length(noaa_monthSum)){
+  noaa_monthSum[[i]]$Avg_month <- month.abb[noaa_monthSum[[i]]$Avg_month]
+  }
 
 
 ##    ---   COMBINE DATAFRAMES  --    ##
@@ -59,15 +60,27 @@ Abs_TMaxF <- adX %>%
   summarize(AbsTMaxF = max(TMaxF, na.rm = TRUE))
 
 
-## Select relevant columns from noaa_monthSum
+## Select relevant columns from noaa_monthSum and rename
 
 df_msX <- noaa_monthSum[[1]]
 
-from_MS <- df_msX %>%
-  select(Avg_month, Avg_PPT_in, Avg_TMaxF, Avg_TMinF)
+from_MS <- select(df_msX, Avg_month, Avg_PPT_in, Avg_TMaxF, Avg_TMinF)
+
+from_MS <- from_MS %>% 
+  rename(month = Avg_month) %>%
+  rename(PPT_in = Avg_PPT_in) %>%
+  rename(TMaxF = Avg_TMaxF) %>%
+  rename(TMinF = Avg_TMinF) 
+
+## Combine to create dataframe for plot
+
+noaa_clim <- from_MS %>%
+  full_join(Abs_TMaxF) %>%
+  full_join(Abs_TMinF)
+  
 
 
-##  Combine dataframes
+
 
 
 
