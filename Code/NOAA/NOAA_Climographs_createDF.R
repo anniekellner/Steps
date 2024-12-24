@@ -96,12 +96,6 @@ for(i in 1:length(noaa_monthSum)){
 
 
 
-
-##  ----  COMBINE TO CREATE DATAFRAME FOR PLOT  ----  ##
-
-noaa_clim <- from_MS %>%
-  full_join(Abs_TMaxF) %>%
-  full_join(Abs_TMinF)
   
 
 
