@@ -47,13 +47,32 @@ for(i in 1:length(noaa_monthSum)){
 
 ##    ---   COMBINE DATAFRAMES  --    ##
 
-## Extract max and min values from AllDays_hist 
+## Extract max and min values from AllDays_hist list
 
-adX <- AllDays_hist[[1]]
+Abs_minMax <- list()
 
-Abs_TMinF <- adX %>%
-  group_by(month) %>%
-  summarize(AbsMin = min(TMinF, na.rm = TRUE))
+for(i in 1:length(AllDays_hist)){
+  
+  df = AllDays_hist[[i]]
+  
+  Abs_TMaxF = df %>%
+    group_by(month) %>%
+    summarize(AbsMax = max(TMaxF, na.rm = TRUE))
+  
+  Abs_TMinF = df %>%
+    group_by(month) %>%
+    summarize(AbsMin = min(TMinF, na.rm = TRUE))
+  
+  Abs_minMaxDF = full_join(Abs_TMaxF, Abs_TMinF)
+  
+  Abs_minMax[[i]] = Abs_minMaxDF 
+  
+}
+
+
+
+
+
 
 Abs_TMaxF <- adX %>%
   group_by(month) %>%
