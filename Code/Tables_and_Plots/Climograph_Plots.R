@@ -77,7 +77,7 @@ ggplot(df) +
   geom_line(aes(x=factor(month, level =c(month.abb)), y = quan.min.75),
             linetype = "dashed",
             linewidth = 1,
-            color = "#0083BE")
+            color = "#0083BE") +
   geom_line(aes(x=factor(month, level =c(month.abb)),y = tmax),
             linetype = 1,
             linewidth = 1.25,
