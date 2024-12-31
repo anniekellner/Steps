@@ -17,7 +17,9 @@ titles <- c("Observed Historical Climate - 1981-2010",
             "Observed Historical Climate - 1991-2020")
 
 
-# Axis limits
+## Axis limits
+
+# Get max and min temps
 
 maxTemps <- c(as.numeric(max(noaaClim[[1]]$AbsMax)),
               as.numeric(max(noaaClim[[2]]$AbsMax)),
@@ -30,12 +32,13 @@ minTemps <- c(as.numeric(min(noaaClim[[1]]$AbsMin)),
 maxTemp <- max(maxTemps)
 minTemp <- min(minTemps)
 
-
+# Axis limits
 
 upper_value <- case_when(
   maxTemp < 100 ~ 100,
   maxTemp < 110 & maxTemp > 100 ~ 110, 
-  maxTemp < 120 & maxTemp > 110 ~ 120
+  maxTemp < 120 & maxTemp > 110 ~ 120,
+  maxTemp > 120 & maxTemp < 130 ~ 130
 )
 
 lower_value <- case_when(
@@ -44,9 +47,9 @@ lower_value <- case_when(
   minTemp < -10 ~ -20
 )
 
+# Breaks
 
-
-
+numBreaks = (upper_value + lower_value)/10 + 3 # 3 is for the min, max, and 0 values)
 
 ## Plot
 
@@ -103,6 +106,28 @@ ggplot(df) +
              size = 3) +
   labs(title = titles[i],
        subtitle = official_name) +
+  xlab(paste0("\n", "Month"))     +                  
+  ylab(paste0("Temperature (\u00B0F)", "\n")) +
+  scale_y_continuous(limits = c(lower_value, upper_value), 
+                     n.breaks = numBreaks,
+                     sec.axis = sec_axis(~ . /5, name = "Precipitation (in)")) + 
+  theme(element_text(family = "Calibri", hjust = 0.5),
+        plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
+        plot.subtitle = element_text(family = "Calibri", hjust = 0.5, size = 11),
+        axis.title = element_text(family = "Calibri", hjust = 0.5, size = 10),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25),
+        axis.ticks = element_blank(),
+        axis.text.x = element_text(size = 8),
+        axis.text.y = element_text(size = 8),
+        legend.position = "center")
+ 
+
+xlab(paste0("\n", "Month")) +
+  ylab(paste0("Change in temperature (\u00B0F)", "\n"))
+ 
+  
+  ## from original climograph script
   xlab(paste0("\n","Month"))     +                  
   ylab("Average Temperature (\u00B0F)") +
   theme_minimal() +
@@ -114,5 +139,24 @@ ggplot(df) +
   theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0))) +
   theme(axis.title.y.right = element_text(margin = margin(t = 0, r = 0, b = 0, l = 15))) +
   scale_y_continuous(limits = c(0, 100), n.breaks = 6, sec.axis = sec_axis(~./5, name = "Average Precip (in/month)")) +
-  theme(legend.position = "right")
+  theme(legend.position = "right"),
   
+  
+
+## from bar chart code
+
+p = temp_plotList_S1[[i]] +
+  labs(title = tempTitles[i], subtitle = subtitles[1])+
+  scale_y_continuous(limits = c(0, 10), n.breaks = 6) +
+  scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
+  theme(element_text(family = "Calibri", hjust = 0.5),
+        plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
+        plot.subtitle = element_text(family = "Calibri", hjust = 0, size = 11),
+        axis.title = element_text(family = "Calibri", hjust = 0.5, size = 10),
+        panel.background = element_blank(), 
+        panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
+        axis.ticks = element_blank(),
+        axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
+        axis.text.y = element_text(size = 8),
+        legend.position = "none")
+
