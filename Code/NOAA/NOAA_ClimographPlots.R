@@ -10,20 +10,52 @@
   # Each list component corresponds to the selected historical time period
     # e.g., noaaClim[[1]] is 1981 - 2010
 
-## Titles and subtitles
+## Titles 
 
 titles <- c("Observed Historical Climate - 1981-2010",
             "Observed Historical Climate - 1985-2014",
             "Observed Historical Climate - 1991-2020")
 
-subtitle <- official_name
+
+# Axis limits
+
+maxTemps <- c(as.numeric(max(noaaClim[[1]]$AbsMax)),
+              as.numeric(max(noaaClim[[2]]$AbsMax)),
+              as.numeric(max(noaaClim[[3]]$AbsMax)))
+
+minTemps <- c(as.numeric(min(noaaClim[[1]]$AbsMin)),
+              as.numeric(min(noaaClim[[2]]$AbsMin)),
+              as.numeric(min(noaaClim[[3]]$AbsMin)))
+
+maxTemp <- max(maxTemps)
+minTemp <- min(minTemps)
+
+
+
+upper_value <- case_when(
+  maxTemp < 100 ~ 100,
+  maxTemp < 110 & maxTemp > 100 ~ 110, 
+  maxTemp < 120 & maxTemp > 110 ~ 120
+)
+
+lower_value <- case_when(
+  minTemp >= 0 ~ 0,
+  minTemp < 0 & minTemp > -10 ~ -10,
+  minTemp < -10 ~ -20
+)
+
+
+
+
+
+## Plot
 
 
 
 df <- noaaClim[[1]]
 
 ggplot(df) +
-  geom_bar(aes(x=factor(month, level =c(month.abb)), y = PPT_in), 
+  geom_bar(aes(x=factor(month, level =c(month.abb)), y = PPT_in*5), 
            color="#0083BE", 
            fill= "#9DC3E6", 
            stat = "identity",
@@ -68,4 +100,19 @@ ggplot(df) +
              shape = 17,
              color = "#C00000",
              fill = "#C00000",
-             size = 3)
+             size = 3) +
+  labs(title = titles[i],
+       subtitle = official_name) +
+  xlab(paste0("\n","Month"))     +                  
+  ylab("Average Temperature (\u00B0F)") +
+  theme_minimal() +
+  theme(text=element_text(color = "black", family = "serif")) +
+  theme(title=element_text(size=17)) +
+  theme(axis.title=element_text(size=15)) +
+  theme(axis.text.x=element_text(size=15)) +
+  theme(axis.text.y=element_text(size=15)) +
+  theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0))) +
+  theme(axis.title.y.right = element_text(margin = margin(t = 0, r = 0, b = 0, l = 15))) +
+  scale_y_continuous(limits = c(0, 100), n.breaks = 6, sec.axis = sec_axis(~./5, name = "Average Precip (in/month)")) +
+  theme(legend.position = "right")
+  
