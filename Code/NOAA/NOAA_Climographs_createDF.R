@@ -49,25 +49,25 @@ for(i in 1:length(noaa_monthSum)){
 ### PREP ALLDAYS_HIST  ###
 
 
-## Extract max and min values from AllDays_hist list
+## Extract top and bottom 10% of temps
 
-Abs_minMax <- list()
+quantiles <- list()
 
 for(i in 1:length(AllDays_hist)){
   
   df = AllDays_hist[[i]]
   
-  Abs_TMaxF = df %>%
+  high10 = df %>%
     group_by(month) %>%
-    summarize(AbsMax = max(TMaxF, na.rm = TRUE))
+    summarize(high10 = quantile(TMaxF, probs = 0.90, na.rm = TRUE))
   
-  Abs_TMinF = df %>%
+  low10 = df %>%
     group_by(month) %>%
-    summarize(AbsMin = min(TMinF, na.rm = TRUE))
+    summarize(low10 = quantile(TMinF, probs = 0.10, na.rm = TRUE))
   
-  Abs_minMaxDF = full_join(Abs_TMaxF, Abs_TMinF)
+  high10low10 = full_join(high10, low10)
   
-  Abs_minMax[[i]] = Abs_minMaxDF 
+  quantiles[[i]] = high10low10 
   
 }
 
@@ -90,7 +90,7 @@ for(i in 1:length(noaa_monthSum)){
   
   # Combine with AbsMinMax data
   
-  noaaClim[[i]] = full_join(noaaClimDF, Abs_minMax[[i]])
+  noaaClim[[i]] = full_join(noaaClimDF, quantiles[[i]])
 
   }
 
