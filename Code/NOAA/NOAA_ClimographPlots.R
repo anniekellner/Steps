@@ -21,13 +21,13 @@ titles <- c("Observed Historical Climate - 1981-2010",
 
 # Get max and min temps
 
-maxTemps <- c(as.numeric(max(noaaClim[[1]]$AbsMax)),
-              as.numeric(max(noaaClim[[2]]$AbsMax)),
-              as.numeric(max(noaaClim[[3]]$AbsMax)))
+maxTemps <- c(as.numeric(max(noaaClim[[1]]$high10)),
+              as.numeric(max(noaaClim[[2]]$high10)),
+              as.numeric(max(noaaClim[[3]]$high10)))
 
-minTemps <- c(as.numeric(min(noaaClim[[1]]$AbsMin)),
-              as.numeric(min(noaaClim[[2]]$AbsMin)),
-              as.numeric(min(noaaClim[[3]]$AbsMin)))
+minTemps <- c(as.numeric(min(noaaClim[[1]]$low10)),
+              as.numeric(min(noaaClim[[2]]$low10)),
+              as.numeric(min(noaaClim[[3]]$low10)))
 
 maxTemp <- max(maxTemps)
 minTemp <- min(minTemps)
@@ -49,7 +49,7 @@ lower_value <- case_when(
 
 # Breaks
 
-numBreaks = (upper_value + lower_value)/10 + 3 # 3 is for the min, max, and 0 values)
+numBreaks <- (upper_value + lower_value)/10 + 3 # 3 is for the min, max, and 0 values)
 
 ## Plot
 
@@ -64,6 +64,12 @@ ggplot(df) +
            stat = "identity",
            position = "dodge",
            width = 0.7) + # creates space between bars
+  geom_text(aes(x=factor(month, level =c(month.abb)), y = PPT_in*5, label = round(PPT_in, digits = 1)), 
+                family = "Calibri", 
+                fontface = "plain",
+                size = 4, # arbitrary based on visualization
+                vjust = 1.75) + # + values are below the bar; - values are above the bar
+  coord_cartesian(ylim = c(lower_value, upper_value)) +
   geom_line(aes(x=factor(month, level =c(month.abb)), y = TMinF), 
             linetype=1,
             linewidth = 1.25,
@@ -74,12 +80,12 @@ ggplot(df) +
              color="#0083BE",
              fill = "#0083BE",
              size = 3) + 
-  geom_line(aes(x=factor(month, level =c(month.abb)), y = AbsMin),
+  geom_line(aes(x=factor(month, level =c(month.abb)), y = low10),
             linetype = "dashed",
             linewidth = 1,
             color = "#0083BE",
             group = 2) + 
-  geom_point(aes(x=factor(month, level =c(month.abb)), y = AbsMin),
+  geom_point(aes(x=factor(month, level =c(month.abb)), y = low10),
              shape = 23, # filled diamond
              color="#0083BE",
              fill = "#9DC3E6",
@@ -94,12 +100,12 @@ ggplot(df) +
              color= "#C00000",
              fill = "#C00000",
              size = 3) + 
-  geom_line(aes(x=factor(month, level =c(month.abb)), y = AbsMax),
+  geom_line(aes(x=factor(month, level =c(month.abb)), y = high10),
             linetype = "dashed",
             linewidth = 1,
             color = "#C00000",
             group = 4) + 
-  geom_point(aes(x=factor(month, level =c(month.abb)), y = AbsMax),
+  geom_point(aes(x=factor(month, level =c(month.abb)), y = high10),
              shape = 17,
              color = "#C00000",
              fill = "#C00000",
@@ -121,6 +127,15 @@ ggplot(df) +
         axis.text.x = element_text(size = 8),
         axis.text.y = element_text(size = 8),
         legend.position = "center")
+
+
+# Example for putting text on bar plot
+mpg %>%
+  dplyr::count(drv) %>%
+  ggplot(aes(x = drv, y = n)) +
+  geom_col() +
+  geom_text(aes(label = n), vjust = -0.5) +
+  coord_cartesian(ylim = c(0, 110))
  
 
 xlab(paste0("\n", "Month")) +
