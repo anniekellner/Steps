@@ -57,30 +57,32 @@ numBreaks <- (upper_value + lower_value)/10 + 3 # 3 is for the min, max, and 0 v
 
 df <- noaaClim[[1]]
 
-ggplot(df) +
-  geom_bar(aes(x=factor(month, level =c(month.abb)), y = PPT_in*5), 
+ggplot(df, aes(x=factor(month, level =c(month.abb)))) +
+  geom_bar(aes(y = PPT_in*5), 
            color="#0083BE", 
            fill= "#9DC3E6", 
            stat = "identity",
            position = "dodge",
-           width = 0.7) + # creates space between bars
-  geom_text(aes(x=factor(month, level =c(month.abb)), y = PPT_in*5, label = round(PPT_in, digits = 1)), 
+           width = 0.7,  # creates space between bars
+           show.legend = TRUE) +
+  geom_text(aes(y = PPT_in*5, label = round(PPT_in, digits = 1)), 
                 family = "Calibri", 
                 fontface = "plain",
                 size = 4, # arbitrary based on visualization
-                vjust = 1.75) + # + values are below the bar; - values are above the bar
-  coord_cartesian(ylim = c(lower_value, upper_value)) +
-  geom_line(aes(x=factor(month, level =c(month.abb)), y = TMinF), 
+                vjust = 1.75,  # + values are below the bar; - values are above the bar
+                show.legend = FALSE) +
+  geom_line(aes(y = TMinF), 
             linetype=1,
             linewidth = 1.25,
             color="#0083BE",
-            group=1) +
-  geom_point(aes(x=factor(month, level =c(month.abb)), y = TMinF),
+            group = 1) +
+  geom_point(aes(y = TMinF),
              shape = 23, # filled diamond
              color="#0083BE",
              fill = "#0083BE",
-             size = 3) + 
-  geom_line(aes(x=factor(month, level =c(month.abb)), y = low10),
+             size = 3,
+             group = 1) + 
+  geom_line(aes(y = low10),
             linetype = "dashed",
             linewidth = 1,
             color = "#0083BE",
@@ -126,16 +128,18 @@ ggplot(df) +
         axis.ticks = element_blank(),
         axis.text.x = element_text(size = 8),
         axis.text.y = element_text(size = 8),
-        legend.position = "center")
+        legend.position = "bottom",
+        legend.title = element_blank(),
+        )
 
 
-# Example for putting text on bar plot
-mpg %>%
-  dplyr::count(drv) %>%
-  ggplot(aes(x = drv, y = n)) +
-  geom_col() +
-  geom_text(aes(label = n), vjust = -0.5) +
-  coord_cartesian(ylim = c(0, 110))
+# From barplots script - legend
+
+legend.position = "bottom",
+legend.title = element_blank(), 
+legend.box.margin = margin(t = 0, r = 50, b = 0, l = 50),
+legend.key.spacing.x = unit(0.5, "in")) + 
+  guides(fill = guide_legend(byrow = TRUE))
  
 
 xlab(paste0("\n", "Month")) +
