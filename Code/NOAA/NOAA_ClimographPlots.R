@@ -10,6 +10,10 @@
   # Each list component corresponds to the selected historical time period
     # e.g., noaaClim[[1]] is 1981 - 2010
 
+
+##    ---   SET UP PLOT   ---   ##
+
+
 ## Titles 
 
 titles <- c("Observed Historical Climate - 1981-2010",
@@ -32,7 +36,7 @@ minTemps <- c(as.numeric(min(noaaClim[[1]]$low10)),
 maxTemp <- max(maxTemps)
 minTemp <- min(minTemps)
 
-# Axis limits
+# Get limits
 
 upper_value <- case_when(
   maxTemp < 100 ~ 100,
@@ -51,20 +55,22 @@ lower_value <- case_when(
 
 numBreaks <- (upper_value + lower_value)/10 + 3 # 3 is for the min, max, and 0 values)
 
+
+## Colors
+
 ## Plot
 
 
 
 df <- noaaClim[[1]]
 
-ggplot(df, aes(x=factor(month, level =c(month.abb)))) +
+ggplot(data = df, aes(x=factor(month, level =c(month.abb)))) +
   geom_bar(aes(y = PPT_in*5), 
            color="#0083BE", 
            fill= "#9DC3E6", 
            stat = "identity",
            position = "dodge",
-           width = 0.7,  # creates space between bars
-           show.legend = TRUE) +
+           width = 0.7) +  # creates space between bars
   geom_text(aes(y = PPT_in*5, label = round(PPT_in, digits = 1)), 
                 family = "Calibri", 
                 fontface = "plain",
@@ -74,43 +80,44 @@ ggplot(df, aes(x=factor(month, level =c(month.abb)))) +
   geom_line(aes(y = TMinF), 
             linetype=1,
             linewidth = 1.25,
-            color="#0083BE",
-            group = 1) +
+            color="TMinF",
+            group = 1,
+            show.legend = TRUE) +
   geom_point(aes(y = TMinF),
              shape = 23, # filled diamond
-             color="#0083BE",
-             fill = "#0083BE",
+             color="TMinF",
+             fill = "TMinF",
              size = 3,
              group = 1) + 
   geom_line(aes(y = low10),
             linetype = "dashed",
             linewidth = 1,
-            color = "#0083BE",
+            color = "TMinF",
             group = 2) + 
   geom_point(aes(x=factor(month, level =c(month.abb)), y = low10),
              shape = 23, # filled diamond
-             color="#0083BE",
-             fill = "#9DC3E6",
+             color= "TMinF",
+             fill = "TMinF",
              size = 3) + 
   geom_line(aes(x=factor(month, level =c(month.abb)),y = TMaxF),
             linetype = 1,
             linewidth = 1.25,
-            color = "#C00000",
+            color = "TMaxF",
             group = 3) +
   geom_point(aes(x=factor(month, level =c(month.abb)), y = TMaxF),
              shape = 17, # filled triangle
-             color= "#C00000",
-             fill = "#C00000",
+             color= "TMaxF",
+             fill = "TMaxF",
              size = 3) + 
   geom_line(aes(x=factor(month, level =c(month.abb)), y = high10),
             linetype = "dashed",
             linewidth = 1,
-            color = "#C00000",
+            color = "TMaxF",
             group = 4) + 
   geom_point(aes(x=factor(month, level =c(month.abb)), y = high10),
              shape = 17,
-             color = "#C00000",
-             fill = "#C00000",
+             color = "TMaxF",
+             fill = "TMaxF",
              size = 3) +
   labs(title = titles[i],
        subtitle = official_name) +
@@ -119,6 +126,7 @@ ggplot(df, aes(x=factor(month, level =c(month.abb)))) +
   scale_y_continuous(limits = c(lower_value, upper_value), 
                      n.breaks = numBreaks,
                      sec.axis = sec_axis(~ . /5, name = "Precipitation (in)")) + 
+  scale_color_manual(breaks = "TMinF", "TMaxF", values = c("blue", "red")) +
   theme(element_text(family = "Calibri", hjust = 0.5),
         plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
         plot.subtitle = element_text(family = "Calibri", hjust = 0.5, size = 11),
@@ -132,7 +140,31 @@ ggplot(df, aes(x=factor(month, level =c(month.abb)))) +
         legend.title = element_blank(),
         )
 
+  
+ggplot(data = df, aes(x=factor(month, level =c(month.abb)))) +  ## THIS WORKS
+  geom_line(aes(y = TMaxF, color = "TMaxF", group = 1)) + 
+  geom_line(aes(y = TMinF, color = "TMinF", group = 2)) + 
+  scale_color_manual(breaks = c("TMinF", "TMaxF"),
+                     values = c("blue", "red"))
 
+
+
+
+
+
+
+ggplot(data = datos, aes(x = fecha)) +
+    geom_line(aes(y = TempMax, colour = "TempMax")) +
+    geom_line(aes(y = TempMedia, colour = "TempMedia")) +
+    geom_line(aes(y = TempMin, colour = "TempMin")) +
+    scale_colour_manual("", 
+                        breaks = c("TempMax", "TempMedia", "TempMin"),
+                        values = c("red", "green", "blue"))
+  
+  
+  
+  
+  
 # From barplots script - legend
 
 legend.position = "bottom",
