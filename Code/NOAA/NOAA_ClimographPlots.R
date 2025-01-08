@@ -11,7 +11,7 @@
     # e.g., noaaClim[[1]] is 1981 - 2010
 
 
-##    ---   SET UP PLOT   ---   ##
+##    ---   SET UP PLOT ELEMENTS   ---   ##
 
 
 ## Titles 
@@ -56,13 +56,32 @@ lower_value <- case_when(
 numBreaks <- (upper_value + lower_value)/10 + 3 # 3 is for the min, max, and 0 values)
 
 
-## Colors
+##  --        --    ##
+
+colors <- c("colGroup1" = "red", "colGroup2" = "blue")
+shapes <- c("cold" = 17, "hot" = 23)
+linetypes <- c("Avg" = 1, "quant" = "dashed")
+
 
 ## Plot
 
+df <- noaaClim[[1]] ## erase after writing loop
 
+ggplot(data = df, aes(x=factor(month, level =c(month.abb)))) +  ## THIS WORKS
+  geom_line(aes(y = TMaxF, color = "", group = 1),
+            linetype = 1,
+            linewidth = 1.25) + 
+  geom_point(aes(y = TMaxF, color = "TMaxF", group = 1),
+             )
+  geom_line(aes(y = TMinF, color = "TMinF", group = 2)) + 
+  scale_color_manual(breaks = c("TMinF", "TMaxF"),
+                     values = c("blue", "red"))
 
-df <- noaaClim[[1]]
+  geom_point(aes(x=factor(month, level =c(month.abb)), y = TMaxF),
+             shape = 17, # filled triangle
+             color= "TMaxF",
+             fill = "TMaxF",
+             size = 3) + 
 
 ggplot(data = df, aes(x=factor(month, level =c(month.abb)))) +
   geom_bar(aes(y = PPT_in*5), 
@@ -104,11 +123,7 @@ ggplot(data = df, aes(x=factor(month, level =c(month.abb)))) +
             linewidth = 1.25,
             color = "TMaxF",
             group = 3) +
-  geom_point(aes(x=factor(month, level =c(month.abb)), y = TMaxF),
-             shape = 17, # filled triangle
-             color= "TMaxF",
-             fill = "TMaxF",
-             size = 3) + 
+
   geom_line(aes(x=factor(month, level =c(month.abb)), y = high10),
             linetype = "dashed",
             linewidth = 1,
@@ -141,11 +156,7 @@ ggplot(data = df, aes(x=factor(month, level =c(month.abb)))) +
         )
 
   
-ggplot(data = df, aes(x=factor(month, level =c(month.abb)))) +  ## THIS WORKS
-  geom_line(aes(y = TMaxF, color = "TMaxF", group = 1)) + 
-  geom_line(aes(y = TMinF, color = "TMinF", group = 2)) + 
-  scale_color_manual(breaks = c("TMinF", "TMaxF"),
-                     values = c("blue", "red"))
+
 
 
 
