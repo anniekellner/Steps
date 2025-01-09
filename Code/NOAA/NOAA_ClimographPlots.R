@@ -56,7 +56,44 @@ lower_value <- case_when(
 numBreaks <- (upper_value + lower_value)/10 + 3 # 3 is for the min, max, and 0 values)
 
 
-##  --        --    ##
+##  --  MANIPULATE DATAFRAME      --    ##
+
+df2 <- df %>%
+  mutate(PPT_in5 = PPT_in*5) 
+
+# Use pivot_longer from tidyverse to melt dataframe
+
+meltDF <- df2 %>%
+  pivot_longer(!month, names_to = "Variable", values_to = "Value")
+
+# Add columns to designate colors, shapes, and linetypes
+
+meltDF <- meltDF %>%
+  mutate(color = case_when(
+    Variable == "TMaxF" | Variable == "high10" ~ "R",
+    Variable == "TMinF" | Variable == "low10" ~ "B"
+  ))
+
+
+
+
+ggplot(data = meltDF_temp, aes(x = factor(month, level =c(month.abb)), y = Value)) + 
+  geom_line(aes())
+  
+
+
+
+
+
+
+# Examples
+# dt - https://stackoverflow.com/questions/65930458/ggplot-melted-data-sharing-common-aesthetics
+
+
+ 
+
+
+
 
 colors <- c("colGroup1" = "red", "colGroup2" = "blue")
 shapes <- c("cold" = 17, "hot" = 23)
