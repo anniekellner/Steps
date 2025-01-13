@@ -83,23 +83,21 @@ meltDF_temp <- meltDF_temp %>%
 
 
 ggplot(data = meltDF_temp, aes(x = factor(month, level =c(month.abb)), 
-                               y = Value, 
-                               color = color, 
-                               linetype = linetype)) + 
-  geom_line(aes(group = Variable, linetype = linetype, color = color)) + 
-  geom_point(aes(group = Variable, color = color)) + 
+                               y = Value)) + 
+  geom_line(aes(group = Variable, linetype = Variable, color = Variable)) + 
+  geom_point(aes(group = Variable, color = Variable)) + 
   scale_linetype_manual(name = element_blank(),
                         labels = c("90% Quantile (Avg Max Temp)",
+                                   "10% Quantile (Avg Min Temp)",
                                    "Average Maximum Daily Temperature",
-                                   "Average Minimum Daily Temperature",
-                                   "10% Quantile (Avg Min Temp)"),
-                        values = c("dashed", "solid", "solid", "dashed")) +
+                                   "Average Minimum Daily Temperature"),
+                        values = c("dashed", "dashed", "solid", "solid")) +
   scale_color_manual(name = element_blank(), 
                      labels = c("90% Quantile (Avg Max Temp)",
+                                "10% Quantile (Avg Min Temp)",
                                 "Average Maximum Daily Temperature",
-                                "Average Minimum Daily Temperature",
-                                "10% Quantile (Avg Min Temp)"),
-                     values = c("#0083BE", "#0083BE","#C00000", "#C00000"))
+                                "Average Minimum Daily Temperature"),
+                     values = c("#C00000","#0083BE", "#C00000", "#0083BE"))
   
 
 
