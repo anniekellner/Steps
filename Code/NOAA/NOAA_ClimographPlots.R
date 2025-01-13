@@ -68,17 +68,38 @@ meltDF <- df2 %>%
 
 # Add columns to designate colors, shapes, and linetypes
 
-meltDF <- meltDF %>%
+meltDF_temp <- meltDF_temp %>%
   mutate(color = case_when(
     Variable == "TMaxF" | Variable == "high10" ~ "R",
     Variable == "TMinF" | Variable == "low10" ~ "B"
+  )) %>%
+  mutate(linetype = case_when(
+    Variable == "high10" | Variable == "low10" ~ "dashed",
+    Variable == "TMaxF" | Variable == "TMinF" ~ "solid"
   ))
 
 
 
 
-ggplot(data = meltDF_temp, aes(x = factor(month, level =c(month.abb)), y = Value)) + 
-  geom_line(aes())
+
+ggplot(data = meltDF_temp, aes(x = factor(month, level =c(month.abb)), 
+                               y = Value, 
+                               color = color, 
+                               linetype = linetype)) + 
+  geom_line(aes(group = Variable, linetype = linetype, color = color)) + 
+  geom_point(aes(group = Variable, color = color)) + 
+  scale_linetype_manual(name = element_blank(),
+                        labels = c("90% Quantile (Avg Max Temp)",
+                                   "Average Maximum Daily Temperature",
+                                   "Average Minimum Daily Temperature",
+                                   "10% Quantile (Avg Min Temp)"),
+                        values = c("dashed", "solid", "solid", "dashed")) +
+  scale_color_manual(name = element_blank(), 
+                     labels = c("90% Quantile (Avg Max Temp)",
+                                "Average Maximum Daily Temperature",
+                                "Average Minimum Daily Temperature",
+                                "10% Quantile (Avg Min Temp)"),
+                     values = c("#0083BE", "#0083BE","#C00000", "#C00000"))
   
 
 
@@ -96,8 +117,8 @@ ggplot(data = meltDF_temp, aes(x = factor(month, level =c(month.abb)), y = Value
 
 
 colors <- c("colGroup1" = "red", "colGroup2" = "blue")
-shapes <- c("cold" = 17, "hot" = 23)
-linetypes <- c("Avg" = 1, "quant" = "dashed")
+#shapes <- c("cold" = 17, "hot" = 23)
+linetypes <- c("solid" = 1, "quant" = "dashed")
 
 
 ## Plot
