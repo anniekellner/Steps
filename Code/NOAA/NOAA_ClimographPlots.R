@@ -76,8 +76,8 @@ meltDF_temp$Variable <- factor(meltDF_temp$Variable, levels = c("high10", "TMaxF
 
 ggplot(data = meltDF_temp, aes(x = factor(month, level =c(month.abb)), 
                                y = Value)) + 
-  geom_line(aes(group = Variable, linetype = Variable, color = Variable)) + 
-  geom_point(aes(group = Variable, color = Variable)) + 
+  geom_line(aes(group = Variable, linetype = Variable, color = Variable), linewidth = 1.25) + 
+  geom_point(aes(group = Variable, color = Variable, shape = Variable, fill = Variable), size = 3) + 
   scale_linetype_manual(name = element_blank(),
                         labels = c("90% Quantile (Avg Max Temp)",
                                    "Average Maximum Daily Temperature",
@@ -89,10 +89,37 @@ ggplot(data = meltDF_temp, aes(x = factor(month, level =c(month.abb)),
                                   "Average Maximum Daily Temperature",
                                   "Average Minimum Daily Temperature",
                                   "10% Quantile (Avg Min Temp)"),
-                     values = c("#C00000","#C00000", "#0083BE", "#0083BE"))
+                     values = c("#C00000","#C00000", "#0083BE", "#0083BE")) + 
+  scale_shape_manual(name = element_blank(),
+                     labels = c("90% Quantile (Avg Max Temp)",
+                                "Average Maximum Daily Temperature",
+                                "Average Minimum Daily Temperature",
+                                "10% Quantile (Avg Min Temp)"),
+                     values = c(23, 23, 17, 17)) + # 17 = filled triangle; 23 = filled diamond
+  scale_fill_manual(name = element_blank(),
+                    labels = c("90% Quantile (Avg Max Temp)",
+                               "Average Maximum Daily Temperature",
+                               "Average Minimum Daily Temperature",
+                               "10% Quantile (Avg Min Temp)"),
+                    values = c("#C00000","#C00000", "#0083BE", "#0083BE")) + 
+  labs(title = titles[i],
+       subtitle = official_name) +
+  xlab(paste0("\n", "Month"))     +                  
+  ylab(paste0("Temperature (\u00B0F)", "\n")) +
+  theme(element_text(family = "Calibri", hjust = 0.5),
+        plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
+        plot.subtitle = element_text(family = "Calibri", hjust = 0.5, size = 11),
+        axis.title = element_text(family = "Calibri", hjust = 0.5, size = 10),
+        panel.background = element_blank(),
+        panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25),
+        axis.ticks = element_blank(),
+        axis.text.x = element_text(size = 8),
+        axis.text.y = element_text(size = 8),
+        legend.position = "bottom",
+        legend.direction = "vertical",
+        legend.title = element_blank())
+
   
-
-
 
 
 
@@ -101,14 +128,6 @@ ggplot(data = meltDF_temp, aes(x = factor(month, level =c(month.abb)),
 # dt - https://stackoverflow.com/questions/65930458/ggplot-melted-data-sharing-common-aesthetics
 
 
- 
-
-
-
-
-colors <- c("colGroup1" = "red", "colGroup2" = "blue")
-#shapes <- c("cold" = 17, "hot" = 23)
-linetypes <- c("solid" = 1, "quant" = "dashed")
 
 
 ## Plot
@@ -201,6 +220,7 @@ ggplot(data = df, aes(x=factor(month, level =c(month.abb)))) +
         axis.text.y = element_text(size = 8),
         legend.position = "bottom",
         legend.title = element_blank(),
+        guides(guide_legend(byrow = FALSE))
         )
 
   
@@ -212,14 +232,7 @@ ggplot(data = df, aes(x=factor(month, level =c(month.abb)))) +
 
 
 
-ggplot(data = datos, aes(x = fecha)) +
-    geom_line(aes(y = TempMax, colour = "TempMax")) +
-    geom_line(aes(y = TempMedia, colour = "TempMedia")) +
-    geom_line(aes(y = TempMin, colour = "TempMin")) +
-    scale_colour_manual("", 
-                        breaks = c("TempMax", "TempMedia", "TempMin"),
-                        values = c("red", "green", "blue"))
-  
+
   
   
   
