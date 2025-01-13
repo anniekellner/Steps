@@ -59,27 +59,19 @@ numBreaks <- (upper_value + lower_value)/10 + 3 # 3 is for the min, max, and 0 v
 ##  --  MANIPULATE DATAFRAME      --    ##
 
 df2 <- df %>%
-  mutate(PPT_in5 = PPT_in*5) 
+  mutate(PPT_in5 = PPT_in*5) # for secondary exis
+
+
 
 # Use pivot_longer from tidyverse to melt dataframe
 
 meltDF <- df2 %>%
   pivot_longer(!month, names_to = "Variable", values_to = "Value")
 
-# Add columns to designate colors, shapes, and linetypes
 
-meltDF_temp <- meltDF_temp %>%
-  mutate(color = case_when(
-    Variable == "TMaxF" | Variable == "high10" ~ "R",
-    Variable == "TMinF" | Variable == "low10" ~ "B"
-  )) %>%
-  mutate(linetype = case_when(
-    Variable == "high10" | Variable == "low10" ~ "dashed",
-    Variable == "TMaxF" | Variable == "TMinF" ~ "solid"
-  ))
+# Refactor so legend appears as desired
 
-
-
+meltDF_temp$Variable <- factor(meltDF_temp$Variable, levels = c("high10", "TMaxF", "TMinF", "low10"))
 
 
 ggplot(data = meltDF_temp, aes(x = factor(month, level =c(month.abb)), 
@@ -88,16 +80,16 @@ ggplot(data = meltDF_temp, aes(x = factor(month, level =c(month.abb)),
   geom_point(aes(group = Variable, color = Variable)) + 
   scale_linetype_manual(name = element_blank(),
                         labels = c("90% Quantile (Avg Max Temp)",
-                                   "10% Quantile (Avg Min Temp)",
                                    "Average Maximum Daily Temperature",
-                                   "Average Minimum Daily Temperature"),
-                        values = c("dashed", "dashed", "solid", "solid")) +
+                                   "Average Minimum Daily Temperature",
+                                   "10% Quantile (Avg Min Temp)"),
+                        values = c("dashed", "solid", "solid", "dashed")) +
   scale_color_manual(name = element_blank(), 
-                     labels = c("90% Quantile (Avg Max Temp)",
-                                "10% Quantile (Avg Min Temp)",
-                                "Average Maximum Daily Temperature",
-                                "Average Minimum Daily Temperature"),
-                     values = c("#C00000","#0083BE", "#C00000", "#0083BE"))
+                      labels = c("90% Quantile (Avg Max Temp)",
+                                  "Average Maximum Daily Temperature",
+                                  "Average Minimum Daily Temperature",
+                                  "10% Quantile (Avg Min Temp)"),
+                     values = c("#C00000","#C00000", "#0083BE", "#0083BE"))
   
 
 
