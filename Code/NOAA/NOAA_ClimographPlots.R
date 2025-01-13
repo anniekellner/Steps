@@ -66,29 +66,46 @@ df2 <- df %>%
 # Use pivot_longer from tidyverse to melt dataframe
 
 meltDF <- df2 %>%
-  pivot_longer(!month, names_to = "Variable", values_to = "Value")
+  pivot_longer(!month, names_to = "Variable", values_to = "Value") 
 
 
 # Refactor so legend appears as desired
 
-meltDF_temp$Variable <- factor(meltDF_temp$Variable, levels = c("high10", "TMaxF", "TMinF", "low10"))
+meltDF$Variable <- factor(meltDF$Variable, levels = c("high10", "TMaxF", "TMinF", "low10", "PPT_in", "PPT_in5"))
 
+ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)), 
+                                       y = Value)) + 
+  geom_col(data = subset(meltDF, Variable == "PPT_in5"),
+           color = "#0083BE", fill= "#9DC3E6",
+           position = "dodge",
+           width = 0.7,
+           show.legend = FALSE)  +
 
-ggplot(data = meltDF_temp, aes(x = factor(month, level =c(month.abb)), 
-                               y = Value)) + 
-  geom_line(aes(group = Variable, linetype = Variable, color = Variable), linewidth = 1.25) + 
-  geom_point(aes(group = Variable, color = Variable, shape = Variable, fill = Variable), size = 3) + 
+  geom_text(data = subset(meltDF, Variable == "PPT_in5"), 
+            aes(label = round(Value/5, digits = 1)),
+            family = "Calibri", 
+            fontface = "plain",
+            size = 4, # arbitrary based on visualization
+            vjust = 1.75,  # + values are below the bar; - values are above the bar
+            show.legend = FALSE) +
+  geom_line(data = subset(meltDF, Variable %in% c("high10", "TMaxF", "TMinF", "low10")),
+            aes(group = Variable, linetype = Variable, color = Variable), linewidth = 1.25) + 
+  geom_point(data = subset(meltDF, Variable %in% c("high10", "low10", "TMaxF", "TMinF")),
+             aes(group = Variable, color = Variable, shape = Variable, fill = Variable), size = 3) + 
+  scale_y_continuous(limits = c(lower_value, upper_value), 
+                     n.breaks = numBreaks,
+                     sec.axis = sec_axis(~ . /5, name = "Precipitation (in)")) + 
   scale_linetype_manual(name = element_blank(),
                         labels = c("90% Quantile (Avg Max Temp)",
                                    "Average Maximum Daily Temperature",
                                    "Average Minimum Daily Temperature",
                                    "10% Quantile (Avg Min Temp)"),
-                        values = c("dashed", "solid", "solid", "dashed")) +
+                        values = c("dashed", "solid", "solid", "dashed", "blank", "blank")) +
   scale_color_manual(name = element_blank(), 
-                      labels = c("90% Quantile (Avg Max Temp)",
-                                  "Average Maximum Daily Temperature",
-                                  "Average Minimum Daily Temperature",
-                                  "10% Quantile (Avg Min Temp)"),
+                     labels = c("90% Quantile (Avg Max Temp)",
+                                "Average Maximum Daily Temperature",
+                                "Average Minimum Daily Temperature",
+                                "10% Quantile (Avg Min Temp)"),
                      values = c("#C00000","#C00000", "#0083BE", "#0083BE")) + 
   scale_shape_manual(name = element_blank(),
                      labels = c("90% Quantile (Avg Max Temp)",
@@ -102,7 +119,7 @@ ggplot(data = meltDF_temp, aes(x = factor(month, level =c(month.abb)),
                                "Average Minimum Daily Temperature",
                                "10% Quantile (Avg Min Temp)"),
                     values = c("#C00000","#C00000", "#0083BE", "#0083BE")) + 
-  labs(title = titles[i],
+  labs(title = "Observed Historical Climate - 1985-2014",
        subtitle = official_name) +
   xlab(paste0("\n", "Month"))     +                  
   ylab(paste0("Temperature (\u00B0F)", "\n")) +
@@ -119,8 +136,10 @@ ggplot(data = meltDF_temp, aes(x = factor(month, level =c(month.abb)),
         legend.direction = "vertical",
         legend.title = element_blank())
 
-  
 
+
+  
+  
 
 
 
@@ -129,157 +148,4 @@ ggplot(data = meltDF_temp, aes(x = factor(month, level =c(month.abb)),
 
 
 
-
-## Plot
-
-df <- noaaClim[[1]] ## erase after writing loop
-
-ggplot(data = df, aes(x=factor(month, level =c(month.abb)))) +  ## THIS WORKS
-  geom_line(aes(y = TMaxF, color = "", group = 1),
-            linetype = 1,
-            linewidth = 1.25) + 
-  geom_point(aes(y = TMaxF, color = "TMaxF", group = 1),
-             )
-  geom_line(aes(y = TMinF, color = "TMinF", group = 2)) + 
-  scale_color_manual(breaks = c("TMinF", "TMaxF"),
-                     values = c("blue", "red"))
-
-  geom_point(aes(x=factor(month, level =c(month.abb)), y = TMaxF),
-             shape = 17, # filled triangle
-             color= "TMaxF",
-             fill = "TMaxF",
-             size = 3) + 
-
-ggplot(data = df, aes(x=factor(month, level =c(month.abb)))) +
-  geom_bar(aes(y = PPT_in*5), 
-           color="#0083BE", 
-           fill= "#9DC3E6", 
-           stat = "identity",
-           position = "dodge",
-           width = 0.7) +  # creates space between bars
-  geom_text(aes(y = PPT_in*5, label = round(PPT_in, digits = 1)), 
-                family = "Calibri", 
-                fontface = "plain",
-                size = 4, # arbitrary based on visualization
-                vjust = 1.75,  # + values are below the bar; - values are above the bar
-                show.legend = FALSE) +
-  geom_line(aes(y = TMinF), 
-            linetype=1,
-            linewidth = 1.25,
-            color="TMinF",
-            group = 1,
-            show.legend = TRUE) +
-  geom_point(aes(y = TMinF),
-             shape = 23, # filled diamond
-             color="TMinF",
-             fill = "TMinF",
-             size = 3,
-             group = 1) + 
-  geom_line(aes(y = low10),
-            linetype = "dashed",
-            linewidth = 1,
-            color = "TMinF",
-            group = 2) + 
-  geom_point(aes(x=factor(month, level =c(month.abb)), y = low10),
-             shape = 23, # filled diamond
-             color= "TMinF",
-             fill = "TMinF",
-             size = 3) + 
-  geom_line(aes(x=factor(month, level =c(month.abb)),y = TMaxF),
-            linetype = 1,
-            linewidth = 1.25,
-            color = "TMaxF",
-            group = 3) +
-
-  geom_line(aes(x=factor(month, level =c(month.abb)), y = high10),
-            linetype = "dashed",
-            linewidth = 1,
-            color = "TMaxF",
-            group = 4) + 
-  geom_point(aes(x=factor(month, level =c(month.abb)), y = high10),
-             shape = 17,
-             color = "TMaxF",
-             fill = "TMaxF",
-             size = 3) +
-  labs(title = titles[i],
-       subtitle = official_name) +
-  xlab(paste0("\n", "Month"))     +                  
-  ylab(paste0("Temperature (\u00B0F)", "\n")) +
-  scale_y_continuous(limits = c(lower_value, upper_value), 
-                     n.breaks = numBreaks,
-                     sec.axis = sec_axis(~ . /5, name = "Precipitation (in)")) + 
-  scale_color_manual(breaks = "TMinF", "TMaxF", values = c("blue", "red")) +
-  theme(element_text(family = "Calibri", hjust = 0.5),
-        plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
-        plot.subtitle = element_text(family = "Calibri", hjust = 0.5, size = 11),
-        axis.title = element_text(family = "Calibri", hjust = 0.5, size = 10),
-        panel.background = element_blank(),
-        panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25),
-        axis.ticks = element_blank(),
-        axis.text.x = element_text(size = 8),
-        axis.text.y = element_text(size = 8),
-        legend.position = "bottom",
-        legend.title = element_blank(),
-        guides(guide_legend(byrow = FALSE))
-        )
-
-  
-
-
-
-
-
-
-
-
-
-  
-  
-  
-  
-# From barplots script - legend
-
-legend.position = "bottom",
-legend.title = element_blank(), 
-legend.box.margin = margin(t = 0, r = 50, b = 0, l = 50),
-legend.key.spacing.x = unit(0.5, "in")) + 
-  guides(fill = guide_legend(byrow = TRUE))
- 
-
-xlab(paste0("\n", "Month")) +
-  ylab(paste0("Change in temperature (\u00B0F)", "\n"))
- 
-  
-  ## from original climograph script
-  xlab(paste0("\n","Month"))     +                  
-  ylab("Average Temperature (\u00B0F)") +
-  theme_minimal() +
-  theme(text=element_text(color = "black", family = "serif")) +
-  theme(title=element_text(size=17)) +
-  theme(axis.title=element_text(size=15)) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.text.y=element_text(size=15)) +
-  theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0))) +
-  theme(axis.title.y.right = element_text(margin = margin(t = 0, r = 0, b = 0, l = 15))) +
-  scale_y_continuous(limits = c(0, 100), n.breaks = 6, sec.axis = sec_axis(~./5, name = "Average Precip (in/month)")) +
-  theme(legend.position = "right"),
-  
-  
-
-## from bar chart code
-
-p = temp_plotList_S1[[i]] +
-  labs(title = tempTitles[i], subtitle = subtitles[1])+
-  scale_y_continuous(limits = c(0, 10), n.breaks = 6) +
-  scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
-  theme(element_text(family = "Calibri", hjust = 0.5),
-        plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
-        plot.subtitle = element_text(family = "Calibri", hjust = 0, size = 11),
-        axis.title = element_text(family = "Calibri", hjust = 0.5, size = 10),
-        panel.background = element_blank(), 
-        panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25), # linetype = 1 is a solid line. Not sure why it appears dashed, but won't be very noticeable in print
-        axis.ticks = element_blank(),
-        axis.text.x = element_text(margin = margin(t = 0.1, r = 0, b = 0, l = 0), size = 8),
-        axis.text.y = element_text(size = 8),
-        legend.position = "none")
 
