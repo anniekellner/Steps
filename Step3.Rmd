@@ -125,11 +125,11 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[14] 
+shp <- shp_names[28] 
 
-base_abbrev <- base_abbreviations[1] 
+base_abbrev <- base_abbreviations[2] 
 
-official_name <- official_base_names[19] # These names serve as titles for the climatograph and Walter-Lieth plots
+official_name <- official_base_names[12] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"and the general acronym associated with the installation is", base_abbrev,"."))
@@ -166,7 +166,7 @@ list.files(path = NOAA_dir, pattern = base_abbrev)
 
 ```{r NOAA}
 
-weather_station <- "JBLE_NewportLangley"
+weather_station <- "Eglin_NicevilleOnly"
 
 # Read in data
 
