@@ -658,7 +658,7 @@ list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspac
 
 # Load workspace image
 
-#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBLE_L/JBLE_L_EC-Earth3-Veg-LR_20241217.RData" ) # INSERT COPY-PASTED PATH TO .RDATA FILE
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/Eglin_Niceville_EC-Earth3-Veg-LR_20250123.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
@@ -677,6 +677,8 @@ This chunk reorganizes the extracted data into a more workable dataframe ("tibbl
 ```{r allvaluesdf-dataframes, message=FALSE}
 
 rm(list = ls(pattern = "^files")) # remove lists from the environment that aren't extracted data
+
+#rm(noaa_monthSum) ######## THIS NEEDS TO BE DEALT WITH - THROWS AN ERROR. THE NOAA DATA NEEDS TO BE REMOVED PRIOR TO RUNNING THE REST OF THE SCRIPT
 
 lists <- Filter(function(x) is(x, "list"), mget(ls())) # reads in all remaining lists
 nested_tibbles <- as_tibble(lists) # tibbles are tidy objects
