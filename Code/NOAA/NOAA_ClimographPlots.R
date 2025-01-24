@@ -141,7 +141,7 @@ ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)),
   labs(title = "Observed Historical Climate - 1985-2014",
        subtitle = official_name) +
   xlab(paste0("\n", "Month"))     +                  
-  ylab(paste0("Temperature (\u00B0F)", "\n")) +
+  ylab(paste0("\n", "Temperature (\u00B0F)")) +
   
   theme(element_text(family = "Calibri", hjust = 0.5),
         plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
@@ -149,9 +149,11 @@ ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)),
         axis.title = element_text(family = "Calibri", hjust = 0.5, size = 10),
         panel.background = element_blank(),
         panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25),
+        plot.margin = unit(c(1,2,1,1), "cm"),
         axis.ticks = element_blank(),
         axis.text.x = element_text(size = 8),
         axis.text.y = element_text(size = 8),
+        axis.title.y.right = element_text(vjust = 2),
         legend.position = "bottom",
         legend.direction = "vertical",
         legend.title = element_blank()) +
@@ -169,17 +171,3 @@ ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)),
                                                                  size = 10),
                                      legend.title.position = "right"),
                                order = 1))
-
-
-
-  
-  
-
-
-
-# Examples
-# dt - https://stackoverflow.com/questions/65930458/ggplot-melted-data-sharing-common-aesthetics
-
-
-
-
