@@ -80,6 +80,10 @@ meltDF <- df2 %>%
 
 meltDF$Variable <- factor(meltDF$Variable, levels = c("high10", "TMaxF", "TMinF", "low10", "PPT_in", "PPT_in5"))
 
+
+##  ---- PLOT   ----  ##
+
+
 ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)), 
                                        y = Value)) + 
   geom_col(data = subset(meltDF, Variable == "PPT_in5"),
@@ -150,8 +154,7 @@ ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)),
         axis.text.y = element_text(size = 8),
         legend.position = "bottom",
         legend.direction = "vertical",
-        legend.title = element_blank(),
-        legend.key.spacing.y = unit(0.1, "in")) + 
+        legend.title = element_blank()) +
   guides(scale_linetype_manual = guide_legend(),
          scale_color_manual = guide_legend(),
          scale_shape_manual = guide_legend(),
