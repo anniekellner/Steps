@@ -55,12 +55,15 @@ lower_value <- case_when(
 
 numBreaks <- (upper_value + lower_value)/10 + 3 # 3 is for the min, max, and 0 values)
 
+
 # Define graphical object for legend (precip rectangle)
 
-prcpRect <- grid::rectGrob(gp = gpar(col = "#0083BE", fill = "#65B2A7"))
+prcpRect <- grid::rectGrob(gp = gpar(col = "#0083BE", fill = "#65B2A7")) # will be sized when legend is created
 
 
 ##  --  MANIPULATE DATAFRAME      --    ##
+
+df <- noaaClim[[1]] # This will be part of a loop
 
 df2 <- df %>%
   mutate(PPT_in5 = PPT_in*5) # for secondary exis
@@ -90,43 +93,52 @@ ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)),
             family = "Calibri", 
             fontface = "plain",
             size = 4, # arbitrary based on visualization
-            vjust = 1.75,  # + values are below the bar; - values are above the bar
+            vjust = 2.5,  # + values are below the bar; - values are above the bar
             show.legend = FALSE) +
+  
   geom_line(data = subset(meltDF, Variable %in% c("high10", "TMaxF", "TMinF", "low10")),
             aes(group = Variable, linetype = Variable, color = Variable), linewidth = 1.25) + 
+  
   geom_point(data = subset(meltDF, Variable %in% c("high10", "low10", "TMaxF", "TMinF")),
              aes(group = Variable, color = Variable, shape = Variable, fill = Variable), size = 3) + 
+  
   scale_y_continuous(limits = c(lower_value, upper_value), 
                      n.breaks = numBreaks,
                      sec.axis = sec_axis(~ . /5, name = "Precipitation (in)")) + 
+  
   scale_linetype_manual(name = element_blank(),
                         labels = c("90% Quantile (Avg Max Temp)",
                                    "Average Maximum Daily Temperature",
                                    "Average Minimum Daily Temperature",
                                    "10% Quantile (Avg Min Temp)"),
                         values = c("dashed", "solid", "solid", "dashed", "blank", "blank")) +
+  
   scale_color_manual(name = element_blank(), 
                      labels = c("90% Quantile (Avg Max Temp)",
                                 "Average Maximum Daily Temperature",
                                 "Average Minimum Daily Temperature",
                                 "10% Quantile (Avg Min Temp)"),
                      values = c("#D9782D","#BB5145", "#0083BE", "#74CFE4")) + 
+  
   scale_shape_manual(name = element_blank(),
                      labels = c("90% Quantile (Avg Max Temp)",
                                 "Average Maximum Daily Temperature",
                                 "Average Minimum Daily Temperature",
                                 "10% Quantile (Avg Min Temp)"),
                      values = c(23, 23, 17, 17)) + # 17 = filled triangle; 23 = filled diamond
+  
   scale_fill_manual(name = element_blank(),
                     labels = c("90% Quantile (Avg Max Temp)",
                                "Average Maximum Daily Temperature",
                                "Average Minimum Daily Temperature",
                                "10% Quantile (Avg Min Temp)"),
                     values = c("#D9782D","#BB5145", "#0083BE", "#74CFE4")) + 
+  
   labs(title = "Observed Historical Climate - 1985-2014",
        subtitle = official_name) +
   xlab(paste0("\n", "Month"))     +                  
   ylab(paste0("Temperature (\u00B0F)", "\n")) +
+  
   theme(element_text(family = "Calibri", hjust = 0.5),
         plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
         plot.subtitle = element_text(family = "Calibri", hjust = 0.5, size = 11),
@@ -138,12 +150,21 @@ ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)),
         axis.text.y = element_text(size = 8),
         legend.position = "bottom",
         legend.direction = "vertical",
-        legend.title = element_blank()) + 
-  guides(custom = guide_custom(prcpRect, 
-                               title = "Average Total Precipitation",
-                               width = unit(0.5, "in"),
-                               height = unit(0.5, "in"),
+        legend.title = element_blank(),
+        legend.key.spacing.y = unit(0.1, "in")) + 
+  guides(scale_linetype_manual = guide_legend(),
+         scale_color_manual = guide_legend(),
+         scale_shape_manual = guide_legend(),
+         scale_fill_manual = guide_legend(),
+         custom = guide_custom(title = "Average Total Precipitation",
+                               grob = prcpRect,
+                               width = unit(0.25, "in"),
+                               height = unit(0.12, "in"),
                                position = "bottom",
+                               theme(legend.title = element_text(family = "Calibri",
+                                                                 face = "plain",
+                                                                 size = 10),
+                                     legend.title.position = "right"),
                                order = 1))
 
 
