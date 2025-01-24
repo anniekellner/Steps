@@ -20,6 +20,12 @@ titles <- c("Observed Historical Climate - 1981-2010",
             "Observed Historical Climate - 1985-2014",
             "Observed Historical Climate - 1991-2020")
 
+## Filenames
+
+NOAA_years <- c("1981-2010", # for filenames
+                "1985-2014",
+                "1991-2020")
+
 
 ## Axis limits
 
@@ -79,19 +85,25 @@ for(i in 1:length(noaaClim)){
   noaaMelt[[i]]$Variable = factor(noaaMelt[[i]]$Variable, levels = c("high10", "TMaxF", "TMinF", "low10", "PPT_in", "PPT_in5"))
 }
 
+##  --  FILE NAMING   --  ##
+
+
+
 
 ##  ---- PLOT   ----  ##
 
 
-ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)), 
-                                       y = Value)) + 
-  geom_col(data = subset(meltDF, Variable == "PPT_in5"),
+for(i in 1:length(noaaMelt)){
+
+ggplot(data = noaaMelt[[i]], aes(x = factor(month, level =c(month.abb)), 
+                          y = Value)) + 
+  geom_col(data = subset(noaaMelt[[i]], Variable == "PPT_in5"),
            color = "#0083BE", fill= "#65B2A7",
            position = "dodge",
            width = 0.7,
            show.legend = FALSE)  +
 
-  geom_text(data = subset(meltDF, Variable == "PPT_in5"), 
+  geom_text(data = subset(noaaMelt[[i]], Variable == "PPT_in5"), 
             aes(label = round(Value/5, digits = 1)),
             family = "Calibri", 
             fontface = "plain",
@@ -99,10 +111,10 @@ ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)),
             vjust = 2.5,  # + values are below the bar; - values are above the bar
             show.legend = FALSE) +
   
-  geom_line(data = subset(meltDF, Variable %in% c("high10", "TMaxF", "TMinF", "low10")),
+  geom_line(data = subset(noaaMelt[[i]], Variable %in% c("high10", "TMaxF", "TMinF", "low10")),
             aes(group = Variable, linetype = Variable, color = Variable), linewidth = 1.25) + 
   
-  geom_point(data = subset(meltDF, Variable %in% c("high10", "low10", "TMaxF", "TMinF")),
+  geom_point(data = subset(noaaMelt[[i]], Variable %in% c("high10", "low10", "TMaxF", "TMinF")),
              aes(group = Variable, color = Variable, shape = Variable, fill = Variable), size = 3) + 
   
   scale_y_continuous(limits = c(lower_value, upper_value), 
@@ -137,7 +149,7 @@ ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)),
                                "10% Quantile (Avg Min Temp)"),
                     values = c("#D9782D","#BB5145", "#0083BE", "#74CFE4")) + 
   
-  labs(title = "Observed Historical Climate - 1985-2014",
+  labs(title = titles[i],
        subtitle = official_name) +
   xlab(paste0("\n", "Month"))     +                  
   ylab(paste0("Temperature (\u00B0F)","\n")) +
@@ -171,3 +183,8 @@ ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)),
                                                                  size = 10),
                                      legend.title.position = "right"),
                                order = 1))
+  
+  ggsave(filename = paste("Monthly_Means_Observed_Historical",NOAA_years[i],shp, sep = "_"),
+         path = noaaClim_dir,
+         dpi = 330)
+}
