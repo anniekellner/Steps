@@ -183,3 +183,5 @@ ggplot(data = noaaMelt[[i]], aes(x = factor(month, level =c(month.abb)),
          path = noaaClim_dir,
          dpi = 330)
 }
+
+# Note: saved .png's are 7 in x 7 in
