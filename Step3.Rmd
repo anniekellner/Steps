@@ -103,7 +103,7 @@ source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude sys
 ```
 
 ####################################################################################################
-###                PART ONE: USER SETTINGS I - SELECT OR ADD INSTALLATION NAME                   ###
+###               USER SETTINGS PART I - SELECT OR ADD INSTALLATION NAME                       #####
 ####################################################################################################
 
 First, let's *select which base (AFB, etc.) you wish to run.* You will need to select or input the following:
@@ -133,13 +133,130 @@ base_abbrev <- base_abbreviations[2]
 official_name <- official_base_names[12] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 
-cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"and the general acronym associated with the installation is", base_abbrev,"."))
+cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"and the acronym/shorthand name associated with the installation is", base_abbrev,"."))
 
 ```
 
  *If your base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the installation_names and official_base_names vectors. If you do not know what those entries should be, please contact Trevor Even (trevor.even@colostate.edu).*
  
 *IMPORTANT: If you added new names to the vector lists, you will then need to re-run the line the imports the character vector names into the global environment. If you still do not see your new entries, return to the file and make sure to save it. Then run the line of code again. It is included below for easy reference. You can just highlight the code below and run it. You DO NOT NEED TO RE-RUN THE LINE if the appropriate names were already included in the character_vectors.R script, and you did not add new entries.*
+
+####################################################################################################
+###                USER SETTINGS PART II - SELECT OR ADD MODEL NAME                            #####
+####################################################################################################
+
+Similar to what you did above, now *enter the number between the brackets ([]) that corresponds with the model of interest.* You can type `models` into the console or highlight the blue text and press {cntrl + enter} to see the models already listed 
+
+
+```{r select-model}
+
+model <- models[7] 
+
+cat(paste("The model you have selected is", model,"for the installation", official_name))
+
+```
+
+
+####################################################################################################
+###                USER SETTINGS PART III - GET OBSERVED HISTORICAL DATA                       #####
+####################################################################################################
+
+Observed historical data comes from weather stations in close proximity to a given installation. It is frequently the case that for a single installation, data may be pulled from multiple weather stations.
+
+The following chunk makes use of the 'shorthand' term (or acronym) for a given base (e.g., "JBLE" for JBLE-Langley or "Eglin" for "Eglin Air Force Base") to pull the filenames for all weather station data associated with a given base.
+
+*We need to be sure we are using data from the appropriate weather station, so if more than one file shows up, please ask Trevor Even (trevor.even@colostate.edu) which to use.*
+
+
+```{r list-NOAA-folders}
+
+NOAA_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/"
+
+list.files(path = NOAA_dir, pattern = base_abbrev)
+
+```
+
+
+*If only one file is listed or you know which .csv you need, please copy the filename above (including '.csv')and paste into the 'weather_station' object (include the quotation marks)*
+
+*If more than one filename shows up, refer to Trevor as described above. Then copy-paste the appropriate filename (also described above)*
+
+
+```{r pull-NOAA-data}
+
+weather_station <-  "Eglin_NicevilleOnly.csv"
+
+# Read in data
+
+noaa_dataFilepath <- paste0(NOAA_dir, weather_station)
+
+noaa <- read.csv(file = noaa_dataFilepath) # creates dataframe of observed historical data 
+
+```
+
+####################################################################################################
+###                USER SETTINGS PART IV - INPUT AND OUTPUT DIRECTORIES                        #####
+####################################################################################################
+
+## Input Directories
+
+# Installation Boundaries
+
+The following chunk enables us to access the shapefile (spatially explicit outline) of the base, or occasionally an area nearby that serves as an ecological proxy for the base. This is how we select the grid cell associated with the modeled climate data. 
+
+
+The first step is to determine whether the installation is managed by the Navy (because the Navy spatial data resides in a separate directory). If you don't know the answer, ask Trevor Even (trevor.even@colostate.edu).
+
+*If the AFB is managed by the Navy, set Navy = TRUE*
+*If the AFB is NOT managed by the Navy, set Navy = FALSE* (This would include the Army, Air Force, Space Force, etc.)
+
+```{r installation-boundaries}
+
+# Is the AFB managed by the Navy?
+
+Navy = FALSE
+
+dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
+                                  "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
+                            "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY")
+
+```
+
+
+## Output Directories
+
+This section does NOT require any inputs, as it draws from existing information.
+
+```{r Output-directories}
+
+# Observed Historical - csv's
+
+noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_NOAA_Hist/", weather_station)
+
+if (!dir.exists(noaa_resultsDir)){
+  dir.create(noaa_resultsDir)}
+
+
+# Modeled Futures
+
+results_folder <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_",model,"/", shp) 
+
+if (!dir.exists(results_folder)){
+  dir.create(results_folder)}
+
+
+# Plots and Tables - Modeled
+
+plots_dir <- paste0(results_folder,"/","Plots_and_Tables")
+
+if (!dir.exists(plots_dir)){
+  dir.create(plots_dir)}
+
+#  Plots and Tables - Observed Historical (NOAA climographs)
+
+noaaClim_dir <- paste0(plots_dir,"/","NOAA_Climographs")
+
+```
 
 
 
@@ -151,38 +268,8 @@ Typically, the analysis portion would follow the user entries. However, because 
 
 ##    ----        ANALYSIS OF NOAA HISTORICAL DATA    ---       ##
 
-Because the installation-specific directory names for NOAA's historical data do not always match the names for the installation boundary shapefiles, we need to make sure we're pulling from the right folder.
 
-```{r list-NOAA-folders}
-
-NOAA_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/"
-
-list.files(path = NOAA_dir, pattern = base_abbrev)
-
-```
-
-*If there is more than one .csv file for the installation in question, please speak to Trevor Even (trevor.even@colostate.edu) to determine which to use*
-
-*If only one file is listed or you know which .csv you need, please copy-paste the filename from above WITHOUT THE ".csv" SUFFIX into the 'weather_station object (include the quotation marks)*
-
-```{r NOAA}
-
-weather_station <-  "Eglin_NicevilleOnly.csv"
-
-# Read in data
-
-noaa_dataFilepath <- paste0(NOAA_dir, weather_station)
-
-noaa <- read.csv(file = noaa_dataFilepath) 
-
-# Create directory for results
-
-noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_NOAA_Hist/", weather_station)
-
-
-if (!dir.exists(noaa_resultsDir)){
-  dir.create(noaa_resultsDir)}
-
+```{r Observed-historical}
 # Historical Analyses 
 
 source("./Code/NOAA/NOAA_AllDays.R")
@@ -197,35 +284,7 @@ source("./Code/NOAA/NOAA_ClimographPlots.R")
 
 
 
-Similar to what you did above, now *enter the number between the brackets ([]) that corresponds with the model of interest.*
 
-
-```{r select-model}
-
-model <- models[7] 
-
-cat(paste("The model you have selected is", model,"for the installation", official_name))
-
-```
-
-We use the next chunk to set the path to the correct directory for the installation boundary (shapefile).
-
-*If the AFB is managed by the Navy, set Navy = TRUE*
-*If the AFB is managed by the Air Force, set Navy = FALSE*
-
-```{r set-directory-to-access-installation-boundaries}
-
-# Is the AFB managed by the Navy?
-
-Navy = FALSE
-
-dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
-                                  "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
-                            "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY")
-
-```
-
-Now let's see what scenarios and variables are available for that model.
 
 The next chunk checks what scenarios (subfolders) are contained in the 'Data' folder associated with the model of interest.
 
@@ -336,10 +395,7 @@ years <- c(baseline_start_year, # vector for easy reference
   #paste0('N:/RStor/mindyc/afccm/Climate Modeling/Results_',model,"/",installation,"/")
   #}
 
-results_folder <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_",model,"/", shp) 
 
-if (!dir.exists(results_folder)){
-  dir.create(results_folder)}
 
 ```
 
@@ -842,10 +898,7 @@ This chunk creates all climograph plots and places them within the results folde
 
 ```{r climographs, message=FALSE}
 
-plots_dir <- paste0(results_folder,"/","Plots_and_Tables")
 
-if (!dir.exists(plots_dir)){
-  dir.create(plots_dir)}
 
 source("./Code/Climographs.R") 
 

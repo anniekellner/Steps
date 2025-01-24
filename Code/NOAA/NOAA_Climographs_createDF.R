@@ -4,7 +4,7 @@
 
 
 # This script creates the data frame from which the historical (observed) 
-  # climatographs will be plotted
+  # climographs will be plotted
 
 # inputs: 
     # AllDays_hist dataframe
