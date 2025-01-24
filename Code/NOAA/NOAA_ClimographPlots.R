@@ -20,7 +20,6 @@ titles <- c("Observed Historical Climate - 1981-2010",
             "Observed Historical Climate - 1985-2014",
             "Observed Historical Climate - 1991-2020")
 
-## Filenames
 
 NOAA_years <- c("1981-2010", # for filenames
                 "1985-2014",
