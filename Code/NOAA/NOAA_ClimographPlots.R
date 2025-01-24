@@ -55,6 +55,10 @@ lower_value <- case_when(
 
 numBreaks <- (upper_value + lower_value)/10 + 3 # 3 is for the min, max, and 0 values)
 
+# Define graphical object for legend (precip rectangle)
+
+prcpRect <- grid::rectGrob(gp = gpar(col = "#0083BE", fill = "#65B2A7"))
+
 
 ##  --  MANIPULATE DATAFRAME      --    ##
 
@@ -76,7 +80,7 @@ meltDF$Variable <- factor(meltDF$Variable, levels = c("high10", "TMaxF", "TMinF"
 ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)), 
                                        y = Value)) + 
   geom_col(data = subset(meltDF, Variable == "PPT_in5"),
-           color = "#0083BE", fill= "#9DC3E6",
+           color = "#0083BE", fill= "#65B2A7",
            position = "dodge",
            width = 0.7,
            show.legend = FALSE)  +
@@ -106,7 +110,7 @@ ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)),
                                 "Average Maximum Daily Temperature",
                                 "Average Minimum Daily Temperature",
                                 "10% Quantile (Avg Min Temp)"),
-                     values = c("#C00000","#C00000", "#0083BE", "#0083BE")) + 
+                     values = c("#D9782D","#BB5145", "#0083BE", "#74CFE4")) + 
   scale_shape_manual(name = element_blank(),
                      labels = c("90% Quantile (Avg Max Temp)",
                                 "Average Maximum Daily Temperature",
@@ -118,7 +122,7 @@ ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)),
                                "Average Maximum Daily Temperature",
                                "Average Minimum Daily Temperature",
                                "10% Quantile (Avg Min Temp)"),
-                    values = c("#C00000","#C00000", "#0083BE", "#0083BE")) + 
+                    values = c("#D9782D","#BB5145", "#0083BE", "#74CFE4")) + 
   labs(title = "Observed Historical Climate - 1985-2014",
        subtitle = official_name) +
   xlab(paste0("\n", "Month"))     +                  
@@ -134,7 +138,13 @@ ggplot(data = meltDF, aes(x = factor(month, level =c(month.abb)),
         axis.text.y = element_text(size = 8),
         legend.position = "bottom",
         legend.direction = "vertical",
-        legend.title = element_blank())
+        legend.title = element_blank()) + 
+  guides(custom = guide_custom(prcpRect, 
+                               title = "Average Total Precipitation",
+                               width = unit(0.5, "in"),
+                               height = unit(0.5, "in"),
+                               position = "bottom",
+                               order = 1))
 
 
 
