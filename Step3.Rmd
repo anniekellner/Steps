@@ -256,15 +256,18 @@ if (!dir.exists(plots_dir)){
 
 noaaClim_dir <- paste0(plots_dir,"/","NOAA_Climographs")
 
+if (!dir.exists(noaaClim_dir)){
+  dir.create(noaaClim_dir)}
+
 ```
 
 
 
 ##################################################################################################################
-###           PART TWO: RUN ANALYSES OF HISTORICAL DATA                                                       ###
+###                        ANALYSIS OF HISTORICAL DATA                                                         ###
 ##################################################################################################################
 
-Typically, the analysis portion would follow the user entries. However, because the historical analysis uses a different dataset from the rest of the script, we are running it before adding settings that pertain to later stages of the analysis.
+Typically the analysis portion would follow the user entries, but because the historical analysis uses a different dataset from the rest of the script, we are running it before adding settings that pertain to later stages of the analysis.
 
 ##    ----        ANALYSIS OF NOAA HISTORICAL DATA    ---       ##
 
