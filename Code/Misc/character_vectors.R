@@ -15,7 +15,8 @@ models <- c("HADGEM2-ES",
             "EC-Earth3-Veg-LR",
             "ACCESS-ESM1-5")
 
-base_abbreviations <- c("JBLE")
+base_abbreviations <- c("JBLE",
+                        "Eglin")
 
 
 shp_names <- c("Homestead_ARB", 
