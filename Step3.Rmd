@@ -195,37 +195,13 @@ noaa <- read.csv(file = noaa_dataFilepath) # creates dataframe of observed histo
 ```
 
 ####################################################################################################
-###                USER SETTINGS PART IV - INPUT AND OUTPUT DIRECTORIES                        #####
+###                ANALYSES OF OBSERVED HISTORICAL DATA                                        #####
 ####################################################################################################
 
-## Input Directories
-
-# Installation Boundaries
-
-The following chunk enables us to access the shapefile (spatially explicit outline) of the base, or occasionally an area nearby that serves as an ecological proxy for the base. This is how we select the grid cell associated with the modeled climate data. 
-
-
-The first step is to determine whether the installation is managed by the Navy (because the Navy spatial data resides in a separate directory). If you don't know the answer, ask Trevor Even (trevor.even@colostate.edu).
-
-*If the AFB is managed by the Navy, set Navy = TRUE*
-*If the AFB is NOT managed by the Navy, set Navy = FALSE* (This would include the Army, Air Force, Space Force, etc.)
-
-```{r installation-boundaries}
-
-# Is the AFB managed by the Navy?
-
-Navy = FALSE
-
-dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
-                                  "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
-                            "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY")
-
-```
-
+Because the historical analyses of observed data (NOAA data) use a different dataset from the rest of the script, we are running it here, prior to further user inputs. The following two chunks DO NOT require user input. Simply press the green arrow to run sections {r Output-directories} and {r Observed-historical}
 
 ## Output Directories
 
-This section does NOT require any inputs, as it draws from existing information.
 
 ```{r Output-directories}
 
@@ -262,18 +238,11 @@ if (!dir.exists(noaaClim_dir)){
 ```
 
 
-
-##################################################################################################################
-###                        ANALYSIS OF HISTORICAL DATA                                                         ###
-##################################################################################################################
-
-Typically the analysis portion would follow the user entries, but because the historical analysis uses a different dataset from the rest of the script, we are running it before adding settings that pertain to later stages of the analysis.
-
-##    ----        ANALYSIS OF NOAA HISTORICAL DATA    ---       ##
+## Analyses and plots (Climographs) for observed historical data
 
 
 ```{r Observed-historical}
-# Historical Analyses 
+
 
 source("./Code/NOAA/NOAA_AllDays.R")
 source("./Code/NOAA/NOAA_monthSum.R")
@@ -284,6 +253,28 @@ source("./Code/NOAA/NOAA_ClimographPlots.R")
 ```
 
 
+
+# Installation Boundaries
+
+The following chunk enables us to access the shapefile (spatially explicit outline) of the base, or occasionally an area nearby that serves as an ecological proxy for the base. This is how we select the grid cell associated with the modeled climate data. 
+
+
+The first step is to determine whether the installation is managed by the Navy (because the Navy spatial data resides in a separate directory). If you don't know the answer, ask Trevor Even (trevor.even@colostate.edu).
+
+*If the AFB is managed by the Navy, set Navy = TRUE*
+*If the AFB is NOT managed by the Navy, set Navy = FALSE* (This would include the Army, Air Force, Space Force, etc.)
+
+```{r installation-boundaries}
+
+# Is the AFB managed by the Navy?
+
+Navy = FALSE
+
+dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
+                                  "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
+                            "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY")
+
+```
 
 
 
