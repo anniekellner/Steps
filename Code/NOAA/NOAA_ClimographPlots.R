@@ -84,10 +84,6 @@ for(i in 1:length(noaaClim)){
   noaaMelt[[i]]$Variable = factor(noaaMelt[[i]]$Variable, levels = c("high10", "TMaxF", "TMinF", "low10", "PPT_in", "PPT_in5"))
 }
 
-##  --  FILE NAMING   --  ##
-
-
-
 
 ##  ---- PLOT   ----  ##
 
@@ -183,7 +179,7 @@ ggplot(data = noaaMelt[[i]], aes(x = factor(month, level =c(month.abb)),
                                      legend.title.position = "right"),
                                order = 1))
   
-  ggsave(filename = paste("Monthly_Means_Observed_Historical",NOAA_years[i],shp, sep = "_"),
+  ggsave(filename = paste0("Monthly_Means_Observed_Historical_",NOAA_years[i],"_",shp,".png"),
          path = noaaClim_dir,
          dpi = 330)
 }
