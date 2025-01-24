@@ -253,6 +253,25 @@ source("./Code/NOAA/NOAA_ClimographPlots.R")
 ```
 
 
+## Remove extraneous objects from global environment
+
+```{r}
+
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
+                        "official_name",
+                        "model", 
+                        "plots_dir",
+                        "results_folder",
+                        lsf.str()))) # all functions
+
+```
+
+
+
+####################################################################################################
+###                USER SETTINGS PART IV - MODELED ANALYSES                                    #####
+####################################################################################################
+
 
 # Installation Boundaries
 
