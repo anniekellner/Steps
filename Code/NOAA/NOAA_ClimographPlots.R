@@ -63,22 +63,21 @@ prcpRect <- grid::rectGrob(gp = gpar(col = "#0083BE", fill = "#65B2A7")) # will 
 
 ##  --  MANIPULATE DATAFRAME      --    ##
 
-df <- noaaClim[[1]] # This will be part of a loop
+noaaMelt <- list()
 
-df2 <- df %>%
-  mutate(PPT_in5 = PPT_in*5) # for secondary exis
-
-
-
-# Use pivot_longer from tidyverse to melt dataframe
-
-meltDF <- df2 %>%
-  pivot_longer(!month, names_to = "Variable", values_to = "Value") 
-
-
-# Refactor so legend appears as desired
-
-meltDF$Variable <- factor(meltDF$Variable, levels = c("high10", "TMaxF", "TMinF", "low10", "PPT_in", "PPT_in5"))
+for(i in 1:length(noaaClim)){
+  noaaClim[[i]] = noaaClim[[i]] %>%
+    mutate(PPT_in5 = PPT_in*5) # for secondary axis
+  
+  # Use pivot_longer from tidyverse to melt dataframe
+  
+  noaaMelt[[i]] = noaaClim[[i]] %>%
+    pivot_longer(!month, names_to = "Variable", values_to = "Value") 
+  
+  # Refactor so legend appears as desired
+  
+  noaaMelt[[i]]$Variable = factor(noaaMelt[[i]]$Variable, levels = c("high10", "TMaxF", "TMinF", "low10", "PPT_in", "PPT_in5"))
+}
 
 
 ##  ---- PLOT   ----  ##
