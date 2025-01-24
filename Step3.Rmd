@@ -116,9 +116,9 @@ First, let's *select which base (AFB, etc.) you wish to run.* You will need to s
 
 In some cases, you can select these names from an existing list, located in './Code/Misc/character_vectors.R'. To see the list, you can either type the following phrases into the console, or simply select the phrases below and run them (ctrl + enter). 
 
-`base_abbreviations`
-`shp_names`
-`official_base_names`
+`base_abbreviations` (used for finding NOAA Excel files - could be an abbreviation or name [e.g., 'Eglin'])
+`shp_names`           (used for locating the shapefile associated with the installation. Also identical to the name of the Results folder)
+`official_base_names` (used for plot titles)
 
 You would then identify the number associated with the installation of interest, and enter that number between the brackets in the code chunk below. (For example, Homestead_ARB would be shp_names[1], and NAVBASE San Diego would be official_base_names[2]).
 
@@ -126,11 +126,11 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[14] 
+shp <- shp_names[28] 
 
-base_abbrev <- base_abbreviations[1] 
+base_abbrev <- base_abbreviations[2] 
 
-official_name <- official_base_names[19] # These names serve as titles for the climatograph and Walter-Lieth plots
+official_name <- official_base_names[12] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"and the general acronym associated with the installation is", base_abbrev,"."))
@@ -141,7 +141,7 @@ cat(paste("The official name for the installation you are running is",official_n
  
 *IMPORTANT: If you added new names to the vector lists, you will then need to re-run the line the imports the character vector names into the global environment. If you still do not see your new entries, return to the file and make sure to save it. Then run the line of code again. It is included below for easy reference. You can just highlight the code below and run it. You DO NOT NEED TO RE-RUN THE LINE if the appropriate names were already included in the character_vectors.R script, and you did not add new entries.*
 
-`source('./Code/Misc/character_vectors.R')`
+
 
 ##################################################################################################################
 ###           PART TWO: RUN ANALYSES OF HISTORICAL DATA                                                       ###
@@ -167,11 +167,11 @@ list.files(path = NOAA_dir, pattern = base_abbrev)
 
 ```{r NOAA}
 
-weather_station <- "JBLE_NewportLangley"
+weather_station <-  "Eglin_NicevilleOnly.csv"
 
 # Read in data
 
-noaa_dataFilepath <- paste0(NOAA_dir, weather_station,".csv")
+noaa_dataFilepath <- paste0(NOAA_dir, weather_station)
 
 noaa <- read.csv(file = noaa_dataFilepath) 
 
