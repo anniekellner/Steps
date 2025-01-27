@@ -55,6 +55,56 @@ subtitle <- pick_subtitle(AllDays[i])
 plot_name <- pick_plotname(AllDays[i])
 
 
+##  -----   PLOT SPECS   -----------           ##
+
+# Axis limits
+
+# Get max and min temps
+
+maxTemps <- c(as.numeric(max(AllDays[[1]]$TMaxF)),
+              as.numeric(max(AllDays[[2]]$TMaxF)),
+              as.numeric(max(AllDays[[3]]$TMaxF)))
+
+minTemps <- c(as.numeric(min(AllDays[[1]]$TMinF)),
+              as.numeric(min(AllDays[[2]]$TMinF)),
+              as.numeric(min(AllDays[[3]]$TMinF)))
+
+maxTemp <- max(maxTemps)
+minTemp <- min(minTemps)
+
+# Get limits
+
+upper_value <- case_when(
+  maxTemp < 100 ~ 100,
+  maxTemp < 110 & maxTemp > 100 ~ 110, 
+  maxTemp < 120 & maxTemp > 110 ~ 120,
+  maxTemp > 120 & maxTemp < 130 ~ 130
+)
+
+lower_value <- case_when(
+  minTemp >= 0 ~ 0,
+  minTemp < 0 & minTemp > -10 ~ -10,
+  minTemp < -10 ~ -20
+)
+
+## Breaks
+
+numBreaks <- (upper_value + lower_value)/10 + 3 # 3 is for the min, max, and 0 values)
+
+
+## Define graphical object for legend (precip rectangle)
+
+prcpRect <- grid::rectGrob(gp = gpar(col = "#0083BE", fill = "#65B2A7")) # will be sized when legend is created
+
+
+##  ---------------------  MANIPULATE DATAFRAME   -----------------    ##
+
+
+
+
+
+
+
 ##  ------------------- PLOT  -------------------   ##
 
 ggplot(df) +
