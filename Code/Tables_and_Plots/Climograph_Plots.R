@@ -2,57 +2,38 @@
 ####          PLOT CLIMOGRAPHS                #############
 ###########################################################
 
-# Updated Dec 2024 by Annie Kellner
+# written by Annie Kellner for CEMML Climate Team (annie.kellner@colostate.edu)
+# 1-27-2025
 
-# Uses output from climographs.R script to create updated plots
-
-
-# df = AllDays[[1]] - just for trial and error. Eventually will be a loop. 
+# Uses output from climographsDF.R script to create updated plots
 
 
-## NEED TO MAKE SCALES AT THE OUTSET SO THAT THE HIGHEST TEMP SETS THE SCALE ##
-## SEE BAR CHART PLOTS  ##
+##############################################################################
+
+
+## Create directory for Climographs
+
+path_to_climographs <- paste(plots_dir,"Climographs", sep = "/")
+
+if (!dir.exists(path_to_climographs)){
+  dir.create(path_to_climographs)}
+
 
 # ---- PLOT NAMES AND SUBTITLES ------------    #
 
-plot_subtitles <- c(paste0("Historical, ",years[1],"-",years[2],"\n"),
-                    paste0(scenario_plotNames[2],", ",years[3],"-",years[4],"\n"),
-                    paste0(scenario_plotNames[2],", ",years[5],"-",years[6],"\n"),
-                    paste0(scenario_plotNames[3],", ",years[3],"-",years[4],"\n"),
-                    paste0(scenario_plotNames[3],", ",years[5],"-",years[6],"\n"))
+plot_titles <- c(paste0("Modeled Monthly Means - Historical, ",years[1],"-",years[2]),
+                    paste0("Predicted Monthly Means:"," ", years[3],"-",years[4]," ","(Moderate Emissions)"),
+                    paste0("Predicted Monthly Means:"," ", years[5],"-",years[6]," ","Moderate Emissions)"),
+                    paste0("Predicted Monthly Means:"," ",years[3],"-",years[4]," ","(High Emissions)"),
+                    paste0("Predicted Monthly Means:"," ",years[5],"-",years[6]," ","(High Emissions)"))
 
 # Plot names include "Monthly Means", scenario, and center year (e.g., 2030)
-plot_names <- c("Monthly_Means_Historical.png",
-                paste0("Monthly_Means_",scenarios[2],"_",floor((years[3]+years[4])/2),".png"), # floor() rounds down to the nearest integer
-                paste0("Monthly_Means_",scenarios[2],"_",floor((years[5]+years[6])/2),".png"),
-                paste0("Monthly_Means_",scenarios[3],"_",floor((years[3]+years[4])/2),".png"),
-                paste0("Monthly_Means_",scenarios[3],"_",floor((years[5]+years[6])/2),".png"))
 
-# Plot subtitles include scenario and year span (e.g., 2026 - 2035)
-pick_subtitle <- function(df){
-  case_when(
-    names(df) == "results_baseline" ~ plot_subtitles[1],
-    names(df) == "results_s1f1" ~ plot_subtitles[2],
-    names(df) == "results_s1f2" ~ plot_subtitles[3],
-    names(df) == "results_s2f1" ~ plot_subtitles[4],
-    names(df) == "results_s2f2" ~ plot_subtitles[5]
-  )}
-
-pick_plotname <- function(df){
-  case_when(
-    names(df) == "results_baseline" ~ plot_names[1],
-    names(df) == "results_s1f1" ~ plot_names[2],
-    names(df) == "results_s1f2" ~ plot_names[3],
-    names(df) == "results_s2f1" ~ plot_names[4],
-    names(df) == "results_s2f2" ~ plot_names[5]
-  )
-}
-
-# Determine title, subtitle, and name of plot
-
-title <- str_replace_all(official_name, "_", " ")  
-subtitle <- pick_subtitle(AllDays[i])  
-plot_name <- pick_plotname(AllDays[i])
+plot_names <- c("Modeled_Monthly_Means_Historical",
+                paste0("Monthly_Means_",scenarios[2],"_",floor((years[3]+years[4])/2)), # floor() rounds down to the nearest integer
+                paste0("Monthly_Means_",scenarios[2],"_",floor((years[5]+years[6])/2)),
+                paste0("Monthly_Means_",scenarios[3],"_",floor((years[3]+years[4])/2)),
+                paste0("Monthly_Means_",scenarios[3],"_",floor((years[5]+years[6])/2)))
 
 
 ##  -----   PLOT SPECS   -----------           ##
@@ -61,13 +42,17 @@ plot_name <- pick_plotname(AllDays[i])
 
 # Get max and min temps
 
-maxTemps <- c(as.numeric(max(AllDays[[1]]$TMaxF)),
-              as.numeric(max(AllDays[[2]]$TMaxF)),
-              as.numeric(max(AllDays[[3]]$TMaxF)))
+maxTemps <- c(as.numeric(max(clim[[1]]$high90)),
+              as.numeric(max(clim[[2]]$high90)),
+              as.numeric(max(clim[[3]]$high90)),
+              as.numeric(max(clim[[4]]$high90)),
+              as.numeric(max(clim[[5]]$high90)))
 
-minTemps <- c(as.numeric(min(AllDays[[1]]$TMinF)),
-              as.numeric(min(AllDays[[2]]$TMinF)),
-              as.numeric(min(AllDays[[3]]$TMinF)))
+minTemps <- c(as.numeric(min(clim[[1]]$low10)),
+              as.numeric(min(clim[[2]]$low10)),
+              as.numeric(min(clim[[3]]$low10)),
+              as.numeric(min(clim[[4]]$low10)),
+              as.numeric(min(clim[[5]]$low10)))
 
 maxTemp <- max(maxTemps)
 minTemp <- min(minTemps)
@@ -97,113 +82,125 @@ numBreaks <- (upper_value + lower_value)/10 + 3 # 3 is for the min, max, and 0 v
 prcpRect <- grid::rectGrob(gp = gpar(col = "#0083BE", fill = "#65B2A7")) # will be sized when legend is created
 
 
-##  ---------------------  MANIPULATE DATAFRAME   -----------------    ##
+##  ---------------------  PIVOT DATAFRAME   -----------------    ##
+
+
+climMelt <- list()
+
+for(i in 1:length(clim)){
+  clim[[i]] = clim[[i]] %>%
+    mutate(PPT_in5 = PPT_in*5) # for secondary axis
+  
+  # Use pivot_longer from tidyverse to melt dataframe
+  
+  climMelt[[i]] = clim[[i]] %>%
+    pivot_longer(!month, names_to = "Variable", values_to = "Value") 
+  
+  # Refactor so legend appears as desired
+  
+  climMelt[[i]]$Variable = factor(climMelt[[i]]$Variable, 
+                                  levels = c("high90", "TMaxF", "TMinF", "low10", "PPT_in", "PPT_in5"))
+}
 
 
 
+##  ---- PLOT   ----  ##
 
 
-
-
-##  ------------------- PLOT  -------------------   ##
-
-ggplot(df) +
-  geom_bar(aes(x=factor(month, level =c(month.abb)), y = precip*5), 
-           color="#0083BE", 
-           fill= "#9DC3E6", 
-           stat = "identity",
-           position = "dodge",
-           width = 0.7) + # creates space between bars
-  geom_line(aes(x=factor(month, level =c(month.abb)), y = tmin), 
-            linetype=1,
-            linewidth = 1.25,
-            color="#0083BE",
-            group=1) +
-  geom_point(aes(x=factor(month, level =c(month.abb)), y = tmin),
-             shape = 23, # filled diamond
-             color="#0083BE",
-             fill = "#0083BE",
-             size = 3) + 
-  geom_line(aes(x=factor(month, level =c(month.abb)), y = quan.min.75),
-            linetype = "dashed",
-            linewidth = 1,
-            color = "#0083BE") +
-  geom_line(aes(x=factor(month, level =c(month.abb)),y = tmax),
-            linetype = 1,
-            linewidth = 1.25,
-            color = "#C00000",
-            group = 2) +
-  geom_point(aes(x=factor(month, level =c(month.abb)), y = tmax),
-             shape = 17, # filled triangle
-             color= "#C00000",
-             fill = "#C00000",
-             size = 3) + 
-  geom_line(aes(x=factor(month, level =c(month.abb)), y = quan.max.75),
-            linetype = "dashed",
-            linewidth = 1,
-            color = "#C00000",
-            group = 3) + 
-  geom_point(aes(x=factor(month, level =c(month.abb)), y = quan.max.75),
-             shape = 17,
-             color = "#C00000",
-             fill = "#C00000",
-             size = 3)
-
-            
-
-## Niah code
-
-tmonp <- tmon %>%
-  map(~ ggplot(.x, aes(x = month)) + 
-        geom_line(aes(y = tvalue, group = temperature, color = temperature)) + #the averages as lines
-        geom_point(aes(y = extvalue, group = extremes, color = extremes, shape = extremes, fill = extremes)) + #the extremes as points
-        scale_shape_manual(values = c(24, 25, 24, 25), guide = "none") +
-        scale_fill_manual(values = c("#BB5145", "#BB5145","#0083BE","#0083BE"), guide = "none") +
-        scale_linetype_manual(values = c("solid", "solid", "solid")) +
-        scale_color_manual(labels = c("Average Maximum", "Average Mean", "Average Minimum", "Maximum Daily Maximum Extreme", "Minimum Daily Maximum Extreme", "Maximum Daily Minimum Extreme", "Minimum Daily Minimum Extreme"), values = c("#BB5145", "#557A3F","#0083BE", "#BB5145", "#BB5145","#0083BE","#0083BE"), guide = guide_legend(override.aes = list(linetype = c("solid", "solid", "solid", "blank", "blank", "blank", "blank"), shape = c(NA, NA, NA, 24, 25, 24, 25), fill = c(NA, NA, NA, "#BB5145", "#BB5145","#74CFE4","#74CFE4")))) +
-        labs(title = paste(.x$filecode, "Scenario Temperature at", .x$location, .x$range, sep = " "), x = "Month", y = expression("Temperature ("*~degree*F*")"), colour = "Monthly Mean \nTemperatures and Extremes") +
-        coord_cartesian(ylim = c(mondlimits$tmin, mondlimits$tmax)) +
-        theme_set(theme_bw(base_size = 16, base_family = "Times New Roman")) +
-        theme(panel.grid.major.x = element_blank(),plot.title = element_text(hjust = 0.5))) 
-
-
-# Example code (https://www.sthda.com/english/wiki/ggplot2-line-types-how-to-change-line-types-of-a-graph-in-r-software#:~:text=Visualization%20in%20R-,Line%20types%20in%20R,for%20%E2%80%9Cdashed%E2%80%9D%2C%20%E2%80%A6.)
-library(ggplot2)
-# Line plot with multiple groups
-ggplot(data=df2, aes(x=time, y=bill, group=sex)) +
-  geom_line()+
-  geom_point()
-# Change line types
-ggplot(data=df2, aes(x=time, y=bill, group=sex)) +
-  geom_line(linetype="dashed")+
-  geom_point()
-# Change line colors and sizes
-ggplot(data=df2, aes(x=time, y=bill, group=sex)) +
-  geom_line(linetype="dotted", color="red", size=2)+
-  geom_point(color="blue", size=3)
-
-
-
-  geom_line(aes(x=factor(month, level =c(month.abb)), quan.min.25), linewidth=.5, linetype=2, color="goldenrod3", group=2) +
-  geom_line(aes(x=factor(month, level =c(month.abb)), quan.min.75), linewidth=.5, linetype=2, color="goldenrod3", group=3) +
-  geom_line(aes(x=factor(month, level =c(month.abb)), tmax), linewidth=1, linetype=1, color="red4", group=4) +
-  geom_line(aes(x=factor(month, level =c(month.abb)), quan.max.25), linewidth=.5, linetype=2, color="red4", group=5) +
-  geom_line(aes(x=factor(month, level =c(month.abb)), quan.max.75), linewidth=.5, linetype=2, color="red4", group=6) +
-  labs(title = title, 
-       subtitle = subtitle) +
-  xlab(paste0("\n","Month"))                       +
-  ylab("Average Temperature (\u00B0F)")    + # prints degree symbol before Fahrenheit
-  theme_minimal() +
-  theme(text=element_text(color = "black", family = "serif")) +
-  theme(title=element_text(size=17)) +
-  theme(axis.title=element_text(size=15)) +
-  theme(axis.text.x=element_text(size=15)) +
-  theme(axis.text.y=element_text(size=15)) +
-  theme(axis.title.y = element_text(margin = margin(t = 0, r = 10, b = 0, l = 0))) +
-  theme(axis.title.y.right = element_text(margin = margin(t = 0, r = 0, b = 0, l = 15))) +
-  scale_y_continuous(limits = c(0, 100), n.breaks = 6, sec.axis = sec_axis(~./5, name = "Average Precip (in/month)")) +
-  theme(legend.position = "right")
-
-ggsave(filename = paste(path_to_climographs,plot_name,sep = "/"), dpi = 200)
-
+for(i in 1:length(climMelt)){
+  
+  ggplot(data = climMelt[[i]], aes(x = factor(month, level =c(month.abb)), 
+                                   y = Value)) + 
+    geom_col(data = subset(climMelt[[i]], Variable == "PPT_in5"),
+             color = "#0083BE", fill= "#65B2A7",
+             position = "dodge",
+             width = 0.7,
+             show.legend = FALSE)  +
+    
+    geom_text(data = subset(climMelt[[i]], Variable == "PPT_in5"), 
+              aes(label = round(Value/5, digits = 1)),
+              family = "Calibri", 
+              fontface = "plain",
+              size = 4, # arbitrary based on visualization
+              vjust = 2.5,  # + values are below the bar; - values are above the bar
+              show.legend = FALSE) +
+    
+    geom_line(data = subset(climMelt[[i]], Variable %in% c("high90", "TMaxF", "TMinF", "low10")),
+              aes(group = Variable, linetype = Variable, color = Variable), linewidth = 1.25) + 
+    
+    geom_point(data = subset(climMelt[[i]], Variable %in% c("high90", "low10", "TMaxF", "TMinF")),
+               aes(group = Variable, color = Variable, shape = Variable, fill = Variable), size = 3) + 
+    
+    scale_y_continuous(limits = c(lower_value, upper_value), 
+                       n.breaks = numBreaks,
+                       sec.axis = sec_axis(~ . /5, name = "Precipitation (in)")) + 
+    
+    scale_linetype_manual(name = element_blank(),
+                          labels = c("90% Quantile (Avg Max Temp)",
+                                     "Average Maximum Daily Temperature",
+                                     "Average Minimum Daily Temperature",
+                                     "10% Quantile (Avg Min Temp)"),
+                          values = c("dashed", "solid", "solid", "dashed", "blank", "blank")) +
+    
+    scale_color_manual(name = element_blank(), 
+                       labels = c("90% Quantile (Avg Max Temp)",
+                                  "Average Maximum Daily Temperature",
+                                  "Average Minimum Daily Temperature",
+                                  "10% Quantile (Avg Min Temp)"),
+                       values = c("#D9782D","#BB5145", "#0083BE", "#74CFE4")) + 
+    
+    scale_shape_manual(name = element_blank(),
+                       labels = c("90% Quantile (Avg Max Temp)",
+                                  "Average Maximum Daily Temperature",
+                                  "Average Minimum Daily Temperature",
+                                  "10% Quantile (Avg Min Temp)"),
+                       values = c(23, 23, 17, 17)) + # 17 = filled triangle; 23 = filled diamond
+    
+    scale_fill_manual(name = element_blank(),
+                      labels = c("90% Quantile (Avg Max Temp)",
+                                 "Average Maximum Daily Temperature",
+                                 "Average Minimum Daily Temperature",
+                                 "10% Quantile (Avg Min Temp)"),
+                      values = c("#D9782D","#BB5145", "#0083BE", "#74CFE4")) + 
+    
+    labs(title = plot_titles[i],
+         subtitle = official_name) +
+    xlab(paste0("\n", "Month"))     +                  
+    ylab(paste0("Temperature (\u00B0F)","\n")) +
+    
+    theme(element_text(family = "Calibri", hjust = 0.5),
+          plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
+          plot.subtitle = element_text(family = "Calibri", hjust = 0.5, size = 11),
+          axis.title = element_text(family = "Calibri", hjust = 0.5, size = 10),
+          panel.background = element_blank(),
+          panel.grid.major.y = element_line(color = "grey", linetype = 1, linewidth = 0.25),
+          plot.margin = unit(c(1,2,1,1), "cm"),
+          axis.ticks = element_blank(),
+          axis.text.x = element_text(family = "Calibri", face = "plain", size = 8),
+          axis.text.y = element_text(family = "Calibri", face = "plain", size = 8),
+          axis.title.y.right = element_text(family = "Calibri", face = "plain", vjust = 4),
+          legend.text = element_text(family = "Calibri", face = "plain", size = 10),
+          legend.position = "bottom",
+          legend.direction = "vertical",
+          legend.title = element_blank()) +
+    guides(scale_linetype_manual = guide_legend(),
+           scale_color_manual = guide_legend(),
+           scale_shape_manual = guide_legend(),
+           scale_fill_manual = guide_legend(),
+           custom = guide_custom(title = "Average Total Precipitation",
+                                 grob = prcpRect,
+                                 width = unit(0.25, "in"),
+                                 height = unit(0.12, "in"),
+                                 position = "bottom",
+                                 theme(legend.title = element_text(family = "Calibri",
+                                                                   face = "plain",
+                                                                   size = 10),
+                                       legend.title.position = "right"),
+                                 order = 1))
+  
+  
+  
+  ggsave(filename = paste0(plot_names[i],"_",shp,".png"),
+         path = path_to_climographs,
+         dpi = 330)
 }
