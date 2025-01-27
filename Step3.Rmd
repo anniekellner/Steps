@@ -1113,12 +1113,10 @@ This chunk creates all climograph plots and places them within the results folde
 ```{r climographs, message=FALSE}
 
 
-
-source("./Code/Climographs.R") 
+source("./Code/ClimographsDF.R")
+source("./COde/Tables_and_Plots/Climograph_Plots.R")
 
 ```
-
-
 
 
 
