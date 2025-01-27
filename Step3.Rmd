@@ -102,6 +102,72 @@ source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude sys
 
 ```
 
+
+################################################################################
+####        RUNNING FROM A WORKSPACE IMAGE                                  ####
+################################################################################
+
+
+Typically, this script will be used to run new bases or new proxies for bases (i.e, running an installation or proxy location for the first time). 
+
+However, sometimes you may need to re-run a base from the workspace image stored on the N:/ drive. It takes several hours to extract data for a given installation, so we save the extracted data as a workspace image (.RData file) and an associated rasterstack (.Rds file) to avoid repeating this time-consuming step. 
+
+## ONLY RUN THE FOLLOWING TWO CHUNKS IF YOU ARE USING STORED DATA FROM A WORKSPACE IMAGE!!! ##
+## In other words, if this installation has been run previously and there are NO CHANGES to the location from which the climate data is extracted, FOLLOW DIRECTIONS FOR RUNNING THE SUBSEQUENT TWO CODE CHUNKS ##
+
+          ###       OTHERWISE          ###
+
+## IF YOU ARE RUNNING THIS INSTALLATION (or grid cell/shapefile) FOR THE FIRST TIME, SKIP TO THE SECTION "USER SETTINGS - PART I ## 
+
+However, if you are re- specific segments of the script using previously extracted data, you will need to manually enter the required information and re-run Part One of the script. Then you will need to load the data from a workspace image and raster stack saved to the N:/ drive. Instructions to follow.
+
+
+#### INSTRUCTIONS FOR RUNNING FROM WORKSPACE IMAGE  #####
+
+
+*1. Remove the #'s that precede the code for the following two chunks.*
+
+*2. Enter the installation of interest where prompted in the first code chunk.*
+    To do this, type `shp_names` into the console or highlight the inline code in blue and press ctrl+enter. 
+    Then, find the number associated with the installation and enter it between the brackets where indicated.
+
+*3. Run the first chunk ({r get-saved-files})* This will give you the pathnames to enter for the second chunk, which will load the files. 
+
+*3. In the second chunk ({r load-saved-files}), copy-paste the full paths to the .RData and .Rds files where indicated (including parentheses)* 
+
+*4. Run the second chunk* You will receive an error about the rx file, but you can ignore it. The second line of code takes care of it. 
+
+*5. Comment out (#) the code for both chunks after running (as a future safeguard)*
+
+*6. If you need to re-run the historical (NOAA) analysis, proceed to the section "OBSERVED HISTORICAL ANALYSIS"*
+    *If you do NOT need to re-run the historical (NOAA) analysis, proceed to section "AUTOMATED ANALYSIS PART II -  Add Derived Variables"*
+    
+
+```{r get-saved-files}
+
+#shp <- shp_names[28] # CHANGE THIS TO INSTALLATION OF INTEREST
+
+#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+
+```
+
+
+```{r load-saved-files}
+
+# Load workspace image
+
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/Eglin_Niceville_EC-Earth3-Veg-LR_20250123.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+
+# Load raster stack
+
+#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/rasterStack_Eglin_Niceville_EC-Earth3-Veg-LR_20250123.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+
+```
+
+
+FYI, the raster is loaded separately because as of the date this script was written (9-29-24), raster objects do not save correctly during the `save.image()` process. If the raster does not load, you will get an error about a missing 'pointer'. As stated above, the second line of code should take care of this problem. If for some reason it does not, you can also re-run the portion of the {r spatial-check} chunk through to the creation of the object 'rx' (this is a raster stack). The raster stack is required to create the avdf dataframe.
+
+
 ####################################################################################################
 ###               USER SETTINGS PART I - SELECT OR ADD INSTALLATION NAME                       #####
 ####################################################################################################
@@ -269,7 +335,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
 
 
 ####################################################################################################
-###                USER SETTINGS PART IV - MODELED ANALYSES                                    #####
+###               USER SETTINGS PART IV - ANALYSIS OF MODELED DATA                              ####
 ####################################################################################################
 
 
@@ -294,7 +360,6 @@ dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile 
                             "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY")
 
 ```
-
 
 
 
@@ -363,16 +428,16 @@ future2_end_year <- 2080 # End year of interest for the second future time perio
 
 ```
 
-######################################################
-######################################################
-
-THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT
+################################################################################################################
+###               THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT                                    ####
+################################################################################################################
 
 
 The rest of the script should be able to be run automatically. From this point forward, all you need to do is press the green 'run' arrow for each chunk. DO NOT ALTER THE CODE BELOW. 
 
-
-#######################################################             PART TWO: Data Extraction                 #######################################################
+################################################################################################################
+####            AUTOMATED ANALYSIS PART I - DATA EXTRACTION                                                 ####
+################################################################################################################
 
 
 ## CREATE VECTORS FOR YEAR-SCENARIO COMBOS
@@ -689,56 +754,8 @@ saveRDS(rx, file = paste0(rawDataDir,"/",rasterStack_filename)) # save raster st
 
 
 ##############################################################################
-###     PART THREE: Add Derived Variables    ###                        
+###     AUTOMATED ANALYSIS PART II -  Add Derived Variables               ####                        
 ##############################################################################
-
-Typically, this script will be run immediately following data extraction (i.e., the global environment still contains all objects defined in Parts One and Two)  
-
-## IF RUNNING IMMEDIATELY AFTER DATA EXTRACTION (i.e., the environment still contains all previously defined objects), SKIP TO THE CHUNK CALLED {allvaluesdf-dataframes} 
-
-However, if you are re- specific segments of the script using previously extracted data, you will need to manually enter the required information and re-run Part One of the script. Then you will need to load the data from a workspace image and raster stack saved to the N:/ drive. Instructions to follow.  
-
-
-#### INSTRUCTIONS FOR RUNNING FROM WORKSPACE IMAGE  #####
-
-
-*1. Remove the #'s that precede the code for the following two chunks.*
-
-*2. Enter the installation of interest where prompted in the first code chunk*
-
-*3. Run the first chunk (get-saved-files)* This will give you the pathnames to enter for the second chunk, which will load the files. 
-
-*3. In the second chunk (load-saved-files), copy-paste the full paths to the .RData and .Rds files where instructed* 
-
-*4. Run the second chunk* You will receive an error about the rx file, but you can ignore it. The second line of code takes care of it. 
-
-*5. Comment out (#) the code for both chunks after running*
-
-*6. Proceed to the portion of the script that starts with "AVDF data frame"*
-
-```{r get-saved-files}
-
-shp <- shp_names[14] # CHANGE THIS TO INSTALLATION OF INTEREST
-
-list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
-
-```
-
-
-```{r load-saved-files}
-
-# Load workspace image
-
-load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBLE_L/JBLE_L_EC-Earth3-Veg-LR_20241217.RData" ) # INSERT COPY-PASTED PATH TO .RDATA FILE
-
-# Load raster stack
-
-rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBLE_L/rasterStack_JBLE_L_EC-Earth3-Veg-LR_20241217.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
-
-```
-
-
-FYI, the raster is loaded separately because as of the date this script was written (9-29-24), raster objects do not save correctly during the `save.image()` process. If the raster does not load, you will get an error about a missing 'pointer'. The above retrieval process should take care of this problem, but if not, you can also re-run the portion of the {r spatial-check} chunk through to the creation of the object 'rx' (this is a raster stack). The raster stack is required to create the avdf dataframe in the next chunk.
 
 
 # AVDF data frame
