@@ -81,7 +81,8 @@ for(i in 1:length(noaaClim)){
   
   # Refactor so legend appears as desired
   
-  noaaMelt[[i]]$Variable = factor(noaaMelt[[i]]$Variable, levels = c("high10", "TMaxF", "TMinF", "low10", "PPT_in", "PPT_in5"))
+  noaaMelt[[i]]$Variable = factor(noaaMelt[[i]]$Variable, 
+                                  levels = c("high10", "TMaxF", "TMinF", "low10", "PPT_in", "PPT_in5"))
 }
 
 

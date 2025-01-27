@@ -170,7 +170,7 @@ The following chunk makes use of the 'shorthand' term (or acronym) for a given b
 
 ```{r list-NOAA-folders}
 
-NOAA_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/"
+NOAA_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/" # directory for raw data
 
 list.files(path = NOAA_dir, pattern = base_abbrev)
 
