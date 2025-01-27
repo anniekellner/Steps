@@ -162,6 +162,8 @@ However, if you are re- specific segments of the script using previously extract
 
 #rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/rasterStack_Eglin_Niceville_EC-Earth3-Veg-LR_20250123.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
+##
+
 ```
 
 
@@ -892,6 +894,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "scenario_plotNames",
                         "years",
                         "results_folder",
+                        "plots_dir",
                         "AllDays",
                         "RasterUnitConvert")))
 
@@ -917,37 +920,12 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "scenario_plotNames",
                         "years",
                         "results_folder",
-                        "AllDays",
-                        "RasterUnitConvert")))
-
-```
-
-## Climographs
-
-This chunk creates all climograph plots and places them within the results folder under Plots/Climographs
-
-```{r climographs, message=FALSE}
-
-
-
-source("./Code/Climographs.R") 
-
-```
-
-```{r remove-extraneous-stuff}
-
-rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
-                        "official_name",
-                        "model", 
-                        "scenarios",
-                        "scenario_plotNames",
-                        "years",
-                        "results_folder",
-                        "AllDays",
                         "plots_dir",
+                        "AllDays",
                         "RasterUnitConvert")))
 
 ```
+
 
 ## MonthSum
 
@@ -1109,6 +1087,40 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
 }
 
 ```
+
+
+```{r remove-extraneous-objects}
+
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
+                        "official_name",
+                        "model", 
+                        "scenarios",
+                        "scenario_plotNames",
+                        "years",
+                        "results_folder",
+                        "plots_dir",
+                        "AllDays",
+                        "monthSum",
+                        "plots_dir",
+                        "RasterUnitConvert")))
+
+```
+
+## Climographs
+
+This chunk creates all climograph plots and places them within the results folder under Plots/Climographs
+
+```{r climographs, message=FALSE}
+
+
+
+source("./Code/Climographs.R") 
+
+```
+
+
+
+
 
 ## Walter and Leith Diagrams
 
