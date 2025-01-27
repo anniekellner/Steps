@@ -49,7 +49,7 @@ for(i in 1:length(noaa_monthSum)){
 ### PREP ALLDAYS_HIST  ###
 
 
-## Extract top and bottom 10% of temps
+## Calculate quantiles:  90% TMaxF, 10% TMinF
 
 quantiles <- list()
 
