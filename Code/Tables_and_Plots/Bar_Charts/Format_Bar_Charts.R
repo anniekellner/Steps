@@ -62,7 +62,7 @@ ggsave(filename = filename_TAve,
        width = 8.5,
        height = 5.5,
        units = "in",
-       dpi = 300)
+       dpi = 330)
 
 ggsave(filename = filename_TMax,
        plot = pMax,
@@ -70,7 +70,7 @@ ggsave(filename = filename_TMax,
        width = 8.5,
        height = 5.5,
        units = "in",
-       dpi = 300)
+       dpi = 330)
 
 ggsave(filename = filename_TMin,
        plot = pMin,
@@ -78,7 +78,7 @@ ggsave(filename = filename_TMin,
        width = 8.5,
        height = 5.5,
        units = "in",
-       dpi = 300)
+       dpi = 330)
 
 ggsave(filename = filename_Prcp,
        plot = pPrcp,
@@ -86,5 +86,5 @@ ggsave(filename = filename_Prcp,
        width = 8.5,
        height = 5.5,
        units = "in",
-       dpi = 300)
+       dpi = 330)
 
