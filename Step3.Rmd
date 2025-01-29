@@ -156,11 +156,11 @@ However, if you are re- specific segments of the script using previously extract
 
 # Load workspace image
 
-#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/Eglin_Niceville_EC-Earth3-Veg-LR_20250123.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/Eglin_Niceville_EC-Earth3-Veg-LR_20250123.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/rasterStack_Eglin_Niceville_EC-Earth3-Veg-LR_20250123.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/rasterStack_Eglin_Niceville_EC-Earth3-Veg-LR_20250123.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
@@ -378,7 +378,7 @@ scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE)
 
 cat("The scenarios (subfolders) associated with this model are:", sep = '/n') # cat() basically means 'print' in this context 
 
-cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for readability ('\n' = line)
+cat(paste("-", scenario_dirs), sep = "/n") # names into separate lines for readability ('/n' = line)
 
 ```
 

@@ -9,7 +9,7 @@
 
 # Inputs: 
     # AllDays dataframe (Tibble)
-    # monthSum dataframe (Tibble)
+    # monthAvg dataframe (Tibble)
 
 # Output:
     # clim = list of dataframes with Precip sum (in), Avg TMaxF, Avg TMinF, upper 90% quantile, lower 10% quantile
@@ -17,15 +17,26 @@
 
 # -------------------------------------------------------------------   #
 
-## Add month labels to monthSum dataframe
+## Alter monthSum dataframe to fit climograph analysis
+
 
 for(i in 1:length(monthSum)){
-  monthSum[[i]]$Avg_month <- month.abb[monthSum[[i]]$Avg_month]
+  monthSum[[i]] = monthSum[[i]][1:12,] # remove last two rows 
+  monthSum[[i]]$month = as.numeric(monthSum[[i]]$month)
+  monthSum[[i]]$month = month.abb[monthSum[[i]]$month]
+}
+
+# Add 'month' column to AllDays dataframe
+
+for(i in 1:length(AllDays)){
+  AllDays[[i]]$month = lubridate::month(AllDays[[i]]$date)
 }
 
 
-
 ## Calculate quantiles:  90% TMaxF, 10% TMinF
+
+
+
 
 quantiles <- list()
 
@@ -55,10 +66,9 @@ clim <- list()
 
 for(i in 1:length(monthSum)){
   
-  climDF = select(monthSum[[i]], Avg_month, Avg_PPT_in, Avg_TMaxF, Avg_TMinF)
+  climDF = select(monthSum[[i]], month, Avg_PPT_in, Avg_TMaxF, Avg_TMinF)
   
   climDF = climDF %>%
-    rename(month = Avg_month) %>%
     rename(PPT_in = Avg_PPT_in) %>%
     rename(TMaxF = Avg_TMaxF) %>%
     rename(TMinF = Avg_TMinF) 
