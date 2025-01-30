@@ -15,27 +15,46 @@
     # clim = list of dataframes with Precip sum (in), Avg TMaxF, Avg TMinF, upper 90% quantile, lower 10% quantile
 
 
-# -------------------------------------------------------------------   #
+################################################################################
 
-## Alter monthSum dataframe to fit climograph analysis
+## -------  Create matching 'month' columns between AllDays and monthSum  ----  ##
 
 
 for(i in 1:length(monthSum)){
-  monthSum[[i]] = monthSum[[i]][1:12,] # remove last two rows 
+  monthSum[[i]] = monthSum[[i]][1:12,]} # remove last two rows 
+  
+
+for(i in 1:length(monthSum)){
   monthSum[[i]]$month = as.numeric(monthSum[[i]]$month)
+}
+
+
+for(i in 1:length(monthSum)){
   monthSum[[i]]$month = month.abb[monthSum[[i]]$month]
 }
 
+
 # Add 'month' column to AllDays dataframe
 
+
+for(i in 1:length(AllDays)){ # Convert date column to ymd (year-month-day in {lubridate})
+  df = AllDays[[i]]
+  df$date = ymd(df$date)
+  AllDays[[i]] = df
+}
+  
 for(i in 1:length(AllDays)){
-  AllDays[[i]]$month = lubridate::month(AllDays[[i]]$date)
+  df = AllDays[[i]]
+  df = df %>%
+    mutate(month = month(df$date))
+  AllDays[[i]] = df
 }
 
+for(i in 1:length(AllDays)){
+  AllDays[[i]]$month = month.abb[AllDays[[i]]$month]
+}
 
-## Calculate quantiles:  90% TMaxF, 10% TMinF
-
-
+## -----  Calculate quantiles:  90% TMaxF, 10% TMinF  ------------  ##
 
 
 quantiles <- list()
