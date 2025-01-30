@@ -106,10 +106,11 @@ for(i in 1:length(clim)){
 
 ##  ---- PLOT   ----  ##
 
+climPlots <- list()
 
 for(i in 1:length(climMelt)){
   
-  ggplot(data = climMelt[[i]], aes(x = factor(month, level =c(month.abb)), 
+ p = ggplot(data = climMelt[[i]], aes(x = factor(month, level =c(month.abb)), 
                                    y = Value)) + 
     geom_col(data = subset(climMelt[[i]], Variable == "PPT_in5"),
              color = "#0083BE", fill= "#65B2A7",
@@ -197,8 +198,9 @@ for(i in 1:length(climMelt)){
                                                                    size = 10),
                                        legend.title.position = "right"),
                                  order = 1))
-  
-  
+ 
+ climPlots[[i]] <- p
+ #names(climPlots)[i] = names(plot_names[i]) 
   
   ggsave(filename = paste0(plot_names[i],"_",shp,".png"),
          path = path_to_climographs,
