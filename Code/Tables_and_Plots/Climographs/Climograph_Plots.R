@@ -122,8 +122,9 @@ for(i in 1:length(climMelt)){
               aes(label = round(Value/5, digits = 1)),
               family = "Calibri", 
               fontface = "plain",
-              size = 4, # arbitrary based on visualization
+              size = 3, # arbitrary based on visualization
               vjust = 2.5,  # + values are below the bar; - values are above the bar
+              hjust = 0.5,
               show.legend = FALSE) +
     
     geom_line(data = subset(climMelt[[i]], Variable %in% c("high90", "TMaxF", "TMinF", "low10")),

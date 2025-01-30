@@ -156,11 +156,11 @@ However, if you are re- specific segments of the script using previously extract
 
 # Load workspace image
 
-#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/Eglin_Niceville_EC-Earth3-Veg-LR_20250127.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/Eglin_Niceville_EC-Earth3-Veg-LR_20240904.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/rasterStack_Eglin_Niceville_EC-Earth3-Veg-LR_20250123.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/rasterStack_Eglin_Niceville_EC-Earth3-Veg-LR_20250123.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
@@ -459,23 +459,6 @@ years <- c(baseline_start_year, # vector for easy reference
            future1_end_year, 
            future2_start_year, 
            future2_end_year)
-
-```
-
-
-## SET DIRECTORY FOR RESULTS
-
-*NOTE: Folder names may differ between the 'Data' and 'Results' folders within the Climate Modeling folder. This was the case for LOCA and may be the case for others.* 
-
-```{r set-output-directory}
-
-#results_folder <- if(model == "LOCA_CCSM4") {
-  #paste0('N:/RStor/mindyc/afccm/Climate Modeling/Results_LOCA_V2',"/",installation,"/")
-  #} else {
-  #paste0('N:/RStor/mindyc/afccm/Climate Modeling/Results_',model,"/",installation,"/")
-  #}
-
-
 
 ```
 
