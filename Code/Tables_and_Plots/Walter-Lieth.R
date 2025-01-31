@@ -8,6 +8,14 @@
 # written for CEMML 
 
 
+## This script creates Walter-Lieth diagrams for the installation of interest 
+#    in both Celsius and Fahrenheit
+
+#################################################################################
+
+# Create plot list in case formatting is required (e.g., for climate indices)
+
+WLplots <- list()
 
 
 # Calculate Celsius values before running function for plot creation
@@ -241,12 +249,16 @@ for(i in 1:length(monthSum)){
       ),
       axis.text.y.right = element_text(colour = pcol, size = 10)
     ) +
-    ggplot2::theme(text=element_text(family="serif")) # Times New Roman
+    ggplot2::theme(text=element_text(family="Calibri")) # Times New Roman
   
   # Save Fahrenheit plot
   
   filenameF = paste0(shp,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Fahrenheit.png")
   
   ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
+  
+  # Save plots to list for formatting
+  
+  wlFplot -> WLplots[[i]] # Only saving Fahrenheit plots
   
 }
