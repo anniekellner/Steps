@@ -17,7 +17,9 @@
 
 WLplots <- list()
 
+# Change scenario_plotnames to "Historical", "Moderate Emissions" and "High Emissions"; put years in caption
 
+#scenario_plotNames_WL <- c("Historical", "Moderate, ", "High, ")
 # Calculate Celsius values before running function for plot creation
 
 for(i in 1:length(monthSum)){
@@ -52,6 +54,7 @@ for(i in 1:length(monthSum)){
   } else {
     as.character(paste(years[5], years[6], sep = " - "))
   }
+  
   
   
   per = paste(per_scenario,per_years,sep = ", ")
@@ -185,7 +188,7 @@ for(i in 1:length(monthSum)){
   )
   
   sub_length = nchar(sub)
-  sub_placement = 22 - per_length - sub_length # the character width of size 11 Calibri font is 0.18 in, so 22 characters per line if the image is 4 in wide
+  sub_placement = 65 - per_length - sub_length # the character width of size 11 Calibri font is 0.18 in, so 36 characters per line if the image is 6.5 in wide
                                                 # This right-aligns the "subtitle" (i.e., the righthand temp/precip values)
   sub2 = paste0(
     per, 
