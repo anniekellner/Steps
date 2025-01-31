@@ -188,7 +188,7 @@ for(i in 1:length(monthSum)){
   )
   
   sub_length = nchar(sub)
-  sub_placement = 65 - per_length - sub_length # the character width of size 11 Calibri font is 0.18 in, so 36 characters per line if the image is 6.5 in wide
+  sub_placement = 50 - per_length - sub_length # the character width of size 11 Calibri font is 0.18 in, so 36 characters per line if the image is 6.5 in wide
                                                 # This right-aligns the "subtitle" (i.e., the righthand temp/precip values)
   sub2 = paste0(
     per, 
@@ -213,19 +213,19 @@ for(i in 1:length(monthSum)){
   
   wlFplot = wlFplot +
     ggplot2::labs(
-      title = title,
+      #title = title,
       subtitle = sub2,
       tag = tags
     ) +
     ggplot2::theme_classic() +
     ggplot2::theme(
-      plot.title = element_text(
-        family = "Calibri",
-        face = "bold",
-        hjust = 0.5,
-        lineheight = 1,
-        size = 12
-      ),
+      #plot.title = element_text(
+        #family = "Calibri",
+        #face = "bold",
+        #hjust = 0.5,
+        #lineheight = 1,
+        #size = 12
+      #),
       
       plot.subtitle = element_text(
         family = "Calibri",

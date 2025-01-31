@@ -623,7 +623,8 @@ ggclimat_walter_lieth <- function(dat, est = "", alt = NA, per = NA,
     ggplot2::geom_line(
       data = dat_long_end,
       aes(x = .data$indrow, y = .data$tm),
-      color = tcol
+      color = tcol,
+      linewidth = 1.5 # added this 1-30-25
     )
   
   if (nrow(tm_max_line > 0)) {
