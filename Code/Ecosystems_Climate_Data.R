@@ -2263,7 +2263,7 @@ rownames(env.var) <- c("Annual Mean Diurnal Range, ?F",
 bioclim_results_folder <- paste0(results_folder,"/","Bioclimatics")
 dir.create(path = bioclim_results_folder)
 
-spreadsheetName <- paste(installation,"Bioclimatics.csv", sep = "_")
+spreadsheetName <- paste(shp,"Bioclimatics.csv", sep = "_")
 
 filePath <- paste(bioclim_results_folder,spreadsheetName, sep = "/")
 
