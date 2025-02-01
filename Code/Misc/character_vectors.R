@@ -15,9 +15,17 @@ models <- c("HADGEM2-ES",
             "EC-Earth3-Veg-LR",
             "ACCESS-ESM1-5")
 
+<<<<<<< HEAD
 # These are the names of the shapefiles used for data extraction
 
 shp_names <- c("Homestead_ARB",       
+=======
+base_abbreviations <- c("JBLE",
+                        "Eglin")
+
+
+shp_names <- c("Homestead_ARB", 
+>>>>>>> bb301e676f9a9ff3a77ec7470fda25f7ab8aea81
               "Guam_Proxy_v1", # Navy
               "CNMI_Proxy_v1", # Navy
               "Indianhead_Proxy", # Navy
@@ -30,7 +38,7 @@ shp_names <- c("Homestead_ARB",
               "PSRF_Boundary",
               "South_Range_Boundary",
               "Carter_Creek_Recreation_Center_Boundary",
-              "JBLE",
+              "JBLE_L",
               "Edwards_AFB",                 
               "Malmstrom_AFB_Proxy",
               "Kitsap_Proxy",
@@ -52,10 +60,11 @@ shp_names <- c("Homestead_ARB",
               "Edwards_AFB",
               "JBMDL", 
               "Edwards_AFB_v2",
-              "Edwards_AFB_v3_EastofBarstow")             
+              "Edwards_AFB_v3_EastofBarstow",
+              "Edwards_AFB_v3_Renoville")             
 
 
-official_base_names_for_plots <- c("NAVBASE Kitsap",     
+official_base_names <- c("NAVBASE Kitsap",     
                                    "NAVBASE San Diego",
                                    "Naval Air Station Oceana",
                                    "Nellis Air Force Base",
@@ -72,7 +81,8 @@ official_base_names_for_plots <- c("NAVBASE Kitsap",
                                    "Jonathan Dickinson Missile Tracking Annex",
                                    "Joint Base Elmendorf-Richardson", 
                                    "Edwards Air Force Base",
-                                   "Joint Base McGuire-Dix-Lakehurst") 
+                                   "Joint Base McGuire-Dix-Lakehurst",
+                                   "JBLE - Langley") 
 
 
 
