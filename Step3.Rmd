@@ -116,13 +116,23 @@ source('./Code/Misc/character_vectors.R') This code will not run, so please re-r
 
 ```{r enter-base-and-model}
 
+<<<<<<< HEAD
 installation <- shp_names[24] 
 
 official_name <- official_base_names_for_plots[8] # These names serve as titles for the climatograph and Walter-Lieth plots
+=======
+installation <- installation_names[36] 
 
-model <- models[7] 
+official_name <- official_base_names_for_plots[17] # These names serve as titles for the climatograph and Walter-Lieth plots
+>>>>>>> anniekellner/BarChart_Axis_Adjust
 
+model <- models[8] 
+
+<<<<<<< HEAD
 cat(paste("The model you have selected is", model,". The abbreviated name for the installation is", installation, "and its official name is", official_name))
+=======
+cat(paste("The model you have selected is", model,". The abbreviated name for the installation shapefile is", installation, "and its official name is", official_name))
+>>>>>>> anniekellner/BarChart_Axis_Adjust
 
 ```
 
@@ -138,14 +148,17 @@ We use the next chunk to set the path to the correct directory for the installat
 Navy = FALSE
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
+<<<<<<< HEAD
                                        "/Volumes/wcnr-network-1/RStor/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
                                       "/Volumes/wcnr-network-1/RStor/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
+=======
+                                  "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
+                            "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY")
+>>>>>>> anniekellner/BarChart_Axis_Adjust
 
 ```
 
-
-
-Then let's see what scenarios and variables are available for that model.
+Now let's see what scenarios and variables are available for that model.
 
 The next chunk checks what scenarios (subfolders) are contained in the 'Data' folder associated with the model of interest.
 
@@ -153,11 +166,15 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 
 # Directories
 
+<<<<<<< HEAD
 model_dir <- paste("/Volumes/wcnr-network-1/RStor/mindyc/afccm/Climate Modeling/Data/", model, sep = "") 
+=======
+model_dir <- paste("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Models/", model, sep = "") 
+>>>>>>> anniekellner/BarChart_Axis_Adjust
 
 scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
 
-cat("The scenarios (subfolders) associated with this model are:", sep = '\n') # cat() basically means 'print' in this context 
+cat("The scenarios (subfolders) associated with this model are:", sep = '/n') # cat() basically means 'print' in this context 
 
 cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for readability ('\n' = line)
 
@@ -251,12 +268,25 @@ years <- c(baseline_start_year, # vector for easy reference
 ```{r set-output-directory}
 
 #results_folder <- if(model == "LOCA_CCSM4") {
+<<<<<<< HEAD
   #paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2',"/",installation,"/")
   #} else {
   #paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_',model,"/",installation,"/")
   #}
 
 results_folder <- paste0("/Volumes/wcnr-network/RStor/mindyc/afccm/Climate Modeling/Results/", installation, "/") # MAC
+=======
+  #paste0('N:/RStor/mindyc/afccm/Climate Modeling/Results_LOCA_V2',"/",installation,"/")
+  #} else {
+  #paste0('N:/RStor/mindyc/afccm/Climate Modeling/Results_',model,"/",installation,"/")
+  #}
+
+results_folder <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_",model,"/", installation) 
+
+if (!dir.exists(results_folder)){
+  dir.create(results_folder)}
+
+>>>>>>> anniekellner/BarChart_Axis_Adjust
 ```
 
 
@@ -425,7 +455,11 @@ cat("The object used for data extraction is ", class(extract_obj))
 
 ## DATA EXTRACTION
 
+<<<<<<< HEAD
 The following chunk extracts raw data from the ncdf files of interest. It then saves the global environment to the Workspace Images folder ("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\"). 
+=======
+The following chunk extracts raw data from the ncdf files of interest. It then saves the global environment to the Workspace Images folder ("N:/RStor/mindyc/afccm/Climate Modeling/Workspace Images/"). 
+>>>>>>> anniekellner/BarChart_Axis_Adjust
 
 As written, this code assumes the centroid is being used for data extraction. It has not been tested for use with a spatial object. It may still work, but might be quite slow. If you are running several large bases sequentially, it will be worth exploring an alternative coding strategy.
 
@@ -523,18 +557,23 @@ rasterStack_filename <- paste0("rasterStack_",image_filename,".Rds")
 
 # Directory for Workspace Images
 
+<<<<<<< HEAD
 rawDataDir <- paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\",installation)
+=======
+rawDataDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/",installation)
+>>>>>>> anniekellner/BarChart_Axis_Adjust
 
 if (!dir.exists(rawDataDir)){
   dir.create(rawDataDir)}
 
-save.image(file = paste0(rawDataDir,"\\",rawData_filename)) # save workspace image to N: drive
+save.image(file = paste0(rawDataDir,"/",rawData_filename)) # save workspace image to N: drive
 
-saveRDS(rx, file = paste0(rawDataDir,"\\",rasterStack_filename)) # save raster stack to N: drive
+saveRDS(rx, file = paste0(rawDataDir,"/",rasterStack_filename)) # save raster stack to N: drive
 
 ```
 
 
+<<<<<<< HEAD
 ###############################################################################################
 ###     PART THREE: Add Derived Variables                                 #####################  
 ###############################################################################################
@@ -578,43 +617,60 @@ The next chunk reorganizes the extracted data into a more workable dataframe ("t
 #################################################################
 ###       PART THREE:  ADD DERIVED VARIABLES        #############
 #################################################################
+=======
+##############################################################################
+###     PART THREE: Add Derived Variables    ###                        
+##############################################################################
+>>>>>>> anniekellner/BarChart_Axis_Adjust
 
-## IF RE-RUNNING SCRIPT FROM SAVED WORKSPACE IMAGE, RUN THE NEXT TWO CHUNKS. 
+Typically, this script will be run immediately following data extraction (i.e., the global environment still contains all objects defined in Parts One and Two)  
 
 ## IF RUNNING IMMEDIATELY AFTER DATA EXTRACTION (i.e., the environment still contains all previously defined objects), SKIP TO THE CHUNK CALLED {allvaluesdf-dataframes} 
 
-The two chunks that follow are commented out, assuming the chunks are being run while the global environment still contains all defined objects from the first part of the script (i.e., through data extraction). If not, read the *orange* chunk below and follow instructions.
+However, if you are re- specific segments of the script using previously extracted data, you will need to manually enter the required information and re-run Part One of the script. Then you will need to load the data from a workspace image and raster stack saved to the N:/ drive. Instructions to follow.  
 
-*If the base is being re-run from the saved image (.RData file) on the N: drive, remove the '#' to un-comment out the code chunks and run.* 
 
-*The first chunk will retrieve the filenames to enter for the second chunk, which will load the files. If you are re-running the installation from an empty environment, you will need to re-enter the installation name first (you don't need to run from the top of the script; there is a portion within the first chunk that allows you to do this).* 
+#### INSTRUCTIONS FOR RUNNING FROM WORKSPACE IMAGE  #####
 
-*Also, if you're running within a new RStudio session, don't forget to run the {r setup} and {r load-libraries} chunks at the top, to ensure the required packages are installed. You will get errors if you forget to do this.*
 
-Get file names:
-                            
+*1. Remove the #'s that precede the code for the following two chunks.*
+
+*2. Enter the installation of interest where prompted in the first code chunk*
+
+*3. Run the first chunk (get-saved-files)* This will give you the pathnames to enter for the second chunk, which will load the files. 
+
+*3. In the second chunk (load-saved-files), copy-paste the full paths to the .RData and .Rds files where instructed* 
+
+*4. Run the second chunk* You will receive an error about the rx file, but you can ignore it. The second line of code takes care of it. 
+
+*5. Comment out (#) the code for both chunks after running*
+
+*6. Proceed to the portion of the script that starts with "AVDF data frame"*
+
 ```{r get-saved-files}
 
-#installation <- "CapeCanaveral_45th" # CHANGE THIS TO INSTALLATION OF INTEREST
+installation <- installation_names[36] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-#list.files(path = paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\",installation), full.names = TRUE)
+list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/",installation), full.names = TRUE)
+
 ```
 
-*Copy-paste the paths printed in the output after the `load()` and `readRDS()` commands to load the data. These will load the .RData file (global environment) and raster stack, respectively). The code below is sample code from Cape Canaveral.*
 
-```{r load-saved-environment}
+```{r load-saved-files}
 
 # Load workspace image
 
-#load("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.RData")
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/Edwards_AFB_v3_EastofBarstow/Edwards_AFB_v3_EastofBarstow_ACCESS-ESM1-5_20241120.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- readRDS(file = "N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\CapeCanaveral_45th/rasterStack_CapeCanaveral_45th_EC-Earth3-Veg-LR_20240927.Rds")
+rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/Edwards_AFB_v3_EastofBarstow/rasterStack_Edwards_AFB_v3_EastofBarstow_ACCESS-ESM1-5_20241120.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ```
 
+
 FYI, the raster is loaded separately because as of the date this script was written (9-29-24), raster objects do not save correctly during the `save.image()` process. If the raster does not load, you will get an error about a missing 'pointer'. The above retrieval process should take care of this problem, but if not, you can also re-run the portion of the {r spatial-check} chunk through to the creation of the object 'rx' (this is a raster stack). The raster stack is required to create the avdf dataframe in the next chunk.
+
 
 # AVDF data frame
 
@@ -733,7 +789,7 @@ for(i in 1:length(AllDays)){
     }
     
     # Write csv to folder
-    write_csv(csv, file = paste0(results_folder,csv_fileName,".csv"))
+    write_csv(csv, file = paste0(results_folder,"/",csv_fileName,".csv"))
 
     } # end write to csv
 
@@ -786,7 +842,11 @@ This chunk creates all climograph plots and places them within the results folde
 
 ```{r climographs, message=FALSE}
 
+<<<<<<< HEAD
 plots_dir <- paste0(results_folder,"Plots_and_Tables")
+=======
+plots_dir <- paste0(results_folder,"/","Plots_and_Tables")
+>>>>>>> anniekellner/BarChart_Axis_Adjust
 
 if (!dir.exists(plots_dir)){
   dir.create(plots_dir)}
@@ -986,17 +1046,12 @@ wl_dir <- paste(plots_dir,"Walter-Lieth", sep = "/")
 if (!dir.exists(wl_dir)){
   dir.create(wl_dir)}
 
+<<<<<<< HEAD
 source('./Code/Plots/Walter-Lieth.R')
+=======
+source('./Code/Tables_and_Plots/Walter-Lieth.R')
+>>>>>>> anniekellner/BarChart_Axis_Adjust
 ```
-
-The following chunk produces a summary table comparing historical averages/totals of select variables to near- and far-term projected values
-
-```{r table1}
-
-
-
-```
-
 
 
 ```{r remove-objects}
@@ -1059,7 +1114,7 @@ csv_years = if (str_detect(names(diffHist[i]), "f1")){
   } 
     
 csv_fileName = paste(installation,csv_scenario,csv_years,"DiffHist",sep = '_')
-write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = ""))
+write_csv(diffHist[[i]], file = paste0(results_folder,"/",csv_fileName,".csv",sep = ""))
 
 }
 
