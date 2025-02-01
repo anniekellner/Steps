@@ -18,8 +18,14 @@ models <- c("HADGEM2-ES",
 base_abbreviations <- c("JBLE",
                         "Eglin")
 
+shp_names <- c("Homestead_ARB",       
+=======
+base_abbreviations <- c("JBLE",
+                        "Eglin")
+
 
 shp_names <- c("Homestead_ARB", 
+>>>>>>> bb301e676f9a9ff3a77ec7470fda25f7ab8aea81
               "Guam_Proxy_v1", # Navy
               "CNMI_Proxy_v1", # Navy
               "Indianhead_Proxy", # Navy

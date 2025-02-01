@@ -47,7 +47,7 @@ library(sf)
 library(tidyverse)
 library(data.table)
 library(scales)
-library(viridis)
+#library(viridis)
 library(mapview) # for maps
 library(tmap)
 library(tmaptools)
@@ -358,8 +358,13 @@ The first step is to determine whether the installation is managed by the Navy (
 Navy = FALSE
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
+<<<<<<< HEAD
+                                       "/Volumes/wcnr-network-1/RStor/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
+                                      "/Volumes/wcnr-network-1/RStor/mindyc/afccm/AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
+=======
                                   "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
                             "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY")
+>>>>>>> anniekellner/BarChart_Axis_Adjust
 
 ```
 
@@ -372,7 +377,11 @@ The next chunk checks what scenarios (subfolders) are contained in the 'Data' fo
 
 # Directories
 
+<<<<<<< HEAD
+model_dir <- paste("/Volumes/wcnr-network-1/RStor/mindyc/afccm/Climate Modeling/Data/", model, sep = "") 
+=======
 model_dir <- paste("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Models/", model, sep = "") 
+>>>>>>> anniekellner/BarChart_Axis_Adjust
 
 scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
 
@@ -628,7 +637,11 @@ cat("The object used for data extraction is ", class(extract_obj))
 
 ## DATA EXTRACTION
 
+<<<<<<< HEAD
+The following chunk extracts raw data from the ncdf files of interest. It then saves the global environment to the Workspace Images folder ("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\"). 
+=======
 The following chunk extracts raw data from the ncdf files of interest. It then saves the global environment to the Workspace Images folder ("N:/RStor/mindyc/afccm/Climate Modeling/Workspace Images/"). 
+>>>>>>> anniekellner/BarChart_Axis_Adjust
 
 As written, this code assumes the centroid is being used for data extraction. It has not been tested for use with a spatial object. It may still work, but might be quite slow. If you are running several large bases sequentially, it will be worth exploring an alternative coding strategy.
 
@@ -726,7 +739,15 @@ rasterStack_filename <- paste0("rasterStack_",image_filename,".Rds")
 
 # Directory for Workspace Images
 
+<<<<<<< HEAD
+<<<<<<< HEAD
+rawDataDir <- paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\",installation)
+=======
+rawDataDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/",installation)
+>>>>>>> anniekellner/BarChart_Axis_Adjust
+=======
 rawDataDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp)
+>>>>>>> bb301e676f9a9ff3a77ec7470fda25f7ab8aea81
 
 if (!dir.exists(rawDataDir)){
   dir.create(rawDataDir)}
@@ -1118,7 +1139,11 @@ wl_dir <- paste(plots_dir,"Walter-Lieth", sep = "/")
 if (!dir.exists(wl_dir)){
   dir.create(wl_dir)}
 
+<<<<<<< HEAD
+source('./Code/Plots/Walter-Lieth.R')
+=======
 source('./Code/Tables_and_Plots/Walter-Lieth.R')
+>>>>>>> anniekellner/BarChart_Axis_Adjust
 ```
 
 
