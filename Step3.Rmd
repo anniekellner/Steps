@@ -51,7 +51,6 @@ library(viridis)
 library(mapview) # for maps
 library(tmap)
 library(tmaptools)
-#library(kableExtra)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
 library(extrafont) # for using Calibri font in plots
@@ -106,18 +105,18 @@ source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude sys
 ### PART ONE: User settings - choose AFB, AFB manager, model, scenarios, years of interest  ###
 ###############################################################################################
 
-First, let's *select which base (AFB, etc.) and model you wish to run.*  To choose from a list, highlight the word `installation_names`, `models`, or `official_base_names_for_plots` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"). The available models correspond to numbers in the vector (e.g., the model HADGEM2-ES is [1]). 
+First, let's *select which base (AFB, etc.) and model you wish to run.*  To choose from a list, highlight the word `shp_names`, `models`, or `official_base_names_for_plots` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"). The available models correspond to numbers in the vector (e.g., the model HADGEM2-ES is [1]). 
 
 
 In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest.* 
 
-Official base names are used for plot titles. *If the base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the installation_names and official_base_names vectors and save. You will then have to re-run the following line above:*
+Official base names are used for plot titles. *If the base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the shp_names and official_base_names vectors and save. You will then have to re-run the following line above:*
 
 source('./Code/Misc/character_vectors.R') This code will not run, so please re-run above
 
 ```{r enter-base-and-model}
 
-installation <- installation_names[24] 
+installation <- shp_names[24] 
 
 official_name <- official_base_names_for_plots[8] # These names serve as titles for the climatograph and Walter-Lieth plots
 

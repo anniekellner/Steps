@@ -13,8 +13,9 @@ models <- c("HADGEM2-ES",
             "MPI-ESM1-2-HR",
             "EC-Earth3-Veg-LR")
 
-installation_names <- c("Homestead_ARB", 
-<<<<<<< HEAD
+# These are the names of the shapefiles used for data extraction
+
+shp_names <- c("Homestead_ARB",       
               "Guam_Proxy_v1", # Navy
               "CNMI_Proxy_v1", # Navy
               "Indianhead_Proxy", # Navy
