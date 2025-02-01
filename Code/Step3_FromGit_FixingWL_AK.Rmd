@@ -1,0 +1,1169 @@
+---
+title: "Steps"
+author: "Annie Kellner"
+date: "2023-05-10"
+output: html_document
+---
+
+## GitHub Integration
+
+This script uses git version control via Github. As of 10-17-2023, the remote repository is housed at https://github.com/anniekellner/Steps. The SSH associated with the repo is git@github.com:anniekellner/Steps.git.
+
+Best practices for using this script require the following:
+
+1. Integrate RStudio with git by following the protocol at https://happygitwithr.com/
+
+2. PULL the script prior to running it so that you are sure to have the most current version
+
+3. Make sure you are running the script on the 'Main' branch, unless you have express reason to use a different branch. You can check what branch you are using by either
+  a) selecting the 'Git' tab in the top-right quadrant of RStudio (assuming RStudio's default layout) and ensuring you see the word "Main" on the right side of the menu bar OR
+  b) opening a Terminal (tab in bottom left quadrant) that is set to Git Bash (this can be changed in the Tools menu). If you type `git branch` (without ``) and press enter, the *Main branch should appear highlighted with an asterisk
+  
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+For this script, it is best to run one chunk (box of R code) at a time to make sure each is working properly. Also, some chunks produce output you will want to inspect. Output will appear below the chunk on this screen rather than in the bottom right window (results appear in the bottom right window for regular .R scripts)
+
+*Throughout the script, instructions you need to follow will appear like this*. You can ignore code in the same color within code chunks, unless it is part of the code that explicitly requires user input. 
+
+*The first chunks (before 'PART ONE') should not require any user input. You just need to run them to set up the script.*   
+
+The first chunk ('setup') allows you to set options that apply to every chunk in the script)
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+ # echo = FALSE means R will not print the code along with the results. 
+```
+
+The next chunk loads the libraries required for use with this script. All required libraries are loaded here except those contained in 'source' scripts.
+
+```{r load-libraries}
+
+library(terra)
+library(sf)
+library(tidyverse)
+library(data.table)
+library(viridis)
+library(mapview)
+library(tmap)
+library(tmaptools)
+library(leaflet)
+library(climatol) # for Walter-Lieth Diagrams
+library(conflicted)
+library(here)
+
+conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
+  lubridate::month(),
+  dplyr::first(),
+  dplyr::last(),
+  dplyr::filter(),
+  dplyr::select(),
+  lubridate::year(),
+)
+```
+
+**NOTE: Only run the next chunk (clear-workspace) if necessary. Code is commented out to avoid accidentally clearing the workspace. If you un-comment to clear the workspace, please remember to reinsert the #**
+
+NOTE: If you clear the workspace but save the environment for later use (i.e., an .RData file), spatial objects created by the {terra} package are not retained. You will need to re-run the code in the chunk {r spatial-check} even if you save all objects in the global environment.
+
+```{r clear-workspace}
+
+rm(list = ls()) # clear workspace - this can be commented out as needed
+
+```
+
+These scripts contain objects and functions required to run the script.
+
+```{r functions}
+
+# The 'source' function reads the following scripts and places associated functions into the global environment
+
+source('./Code/Misc/character_vectors.R')
+source('./Code/CEMML/Functions/Function_General.R')
+source('./Code/Step3Functions.R')
+source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude systems from (-180, 180 ) to (0, 360
+
+```
+
+###############################################################################################
+### PART ONE: User settings - choose AFB, AFB manager, model, scenarios, years of interest  ###
+###############################################################################################
+
+First, let's *select which base (AFB) and model you wish to run.*  To choose from a list, highlight the word `AFB_Names`, `models`, or `official_base_names_for_plots` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"). The available models correspond to numbers in the vector (e.g., the model HADGEM2-ES is [1]). 
+
+
+In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest. Official base names are used for plot titles. If the base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the AFB_Names and official_base_names vectors and save.* 
+
+```{r enter-afb-and-model}
+
+AFB_Name <- AFB_Names[18] 
+
+official_name <- official_base_names_for_plots[2] # These names serve as titles for the climatograph and Walter-Lieth plots
+
+model <- models[7] 
+
+cat(paste("The model you have selected is", model,". The AFB is", AFB_Name, "and its official name is", official_name))
+
+```
+
+We use the next chunk to set the path to the correct directory for the installation boundary (shapefile).
+
+*If the AFB is managed by the Navy, set Navy = TRUE*
+*If the AFB is managed by the Air Force, set Navy = FALSE*
+
+```{r set-directory-to-access-installation-boundaries}
+
+# Is the AFB managed by the Navy?
+
+Navy = TRUE
+
+dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
+                                       "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/",
+                                      "N:\\RStor\\mindyc\\afccm\\AF_CIP_ENV_Data_Phase3/Installation_Boundaries/NAVY/")
+
+```
+
+
+
+Then let's see what scenarios and variables are available for that model.
+
+The next chunk checks what scenarios (subfolders) are contained in the 'Data' folder associated with the model of interest.
+
+```{r scenarios, results='asis'}
+
+# Directories
+
+model_dir <- paste("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Data\\", model, sep = "") 
+
+scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
+
+cat("The scenarios (subfolders) associated with this model are:", sep = '\n') # cat() basically means 'print' in this context 
+
+cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for readability ('\n' = line)
+
+```
+
+*Enter the scenarios of interest below*. You only need to input values between the quotation marks ("") for 'baseline', 'scenario1', and 'scenario2'.
+
+```{r enter-scenarios}
+
+baseline <- "historical"
+scenario1 <- "ssp245"
+scenario2 <- "ssp585"
+
+```
+
+Next, let's see which variables are represented in this dataset. The variables will appear in a list below the code chunk.
+
+```{r}
+
+baseline_dir = paste(model_dir, baseline, sep = "/")
+baseline_filenames <- list.files(baseline_dir, pattern = '.nc', full.names = FALSE) # this line might need to be adjusted if some files are .ncdf or other
+
+variables <- unique(substr(baseline_filenames, 1,6)) # Numbers 1 and 6 refer to character indices within the file names (i.e., the first six letters of the file name)
+
+cat("The variables in this dataset are:", sep = '\n')
+cat(paste("-", variables), sep = "\n")
+
+```
+
+Of the variables listed, which do you want to include in your analysis? *Enter the variables names you want to include between the quotation marks.* 
+
+```{r}
+
+variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin") # an example of how you would choose among the variables if desired
+
+```
+
+*Now, enter the years of interest for each time period*
+1985-2014 (or 1976-2005 if it is LOCAv2 or MACA), 2021-2050, and 2051-2080
+
+```{r enter-years-of-interest}
+
+baseline_start_year <- 1985 # Start year of interest for the historical time period  
+baseline_end_year <- 2014 # End year of interest for the historical time period
+
+future1_start_year <- 2021 # Start year of interest for the first future time period 
+future1_end_year <- 2050 # End year of interest for the first future time period 
+
+future2_start_year <- 2051 # Start year of interest for the second future time period 
+future2_end_year <- 2080 # End year of interest for the second future time period 
+
+```
+
+####################################################################################################
+###     THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT            ################################
+###     The rest of the script should be able to be run automatically     ################################
+####################################################################################################
+
+From this point forward, all you need to do is press the green 'run' arrow for each chunk. DO NOT ALTER THE CODE BELOW. 
+
+## CREATE VECTORS FOR YEAR-SCENARIO COMBOS
+
+```{r character-vectors}
+
+scenarios <- c(baseline, scenario1, scenario2)
+
+scenario1_plotName <- ifelse(str_detect(scenario1, "ssp245"), "SSP2-4.5", "RCP 4.5")
+scenario2_plotName <- ifelse(str_detect(scenario2, "ssp585"), "SSP5-8.5", "RCP 8.5")
+  
+scenario_plotNames <- c("Historical", scenario1_plotName, scenario2_plotName)
+
+years <- c(baseline_start_year, # vector for easy reference
+           baseline_end_year, 
+           future1_start_year, 
+           future1_end_year, 
+           future2_start_year, 
+           future2_end_year)
+
+```
+
+
+## SET DIRECTORY FOR RESULTS
+
+*NOTE: Folder names may differ between the 'Data' and 'Results' folders within the Climate Modeling folder. This was the case for LOCA and may be the case for others.* 
+
+```{r set-output-directory}
+
+results_folder <- if(model == "LOCA_CCSM4") {
+  paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_LOCA_V2',"/",AFB_Name,"/")
+  } else {
+  paste0('N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Results_',model,"/",AFB_Name,"/")
+  }
+```
+
+
+## SUBSET FILES OF INTEREST
+
+In this step, we are creating lists of filenames that will eventually combine into raster stacks. When this chunk is finished running, you can check the objects to make sure the correct number of years have been included. 
+
+```{r list-filenames}
+
+scenarios <- c(baseline, scenario1, scenario2)
+
+baseline_yrs <- paste(seq(baseline_start_year, baseline_end_year, 1), collapse = '|')
+future1_yrs <- paste(seq(future1_start_year, future1_end_year, 1), collapse = '|')
+future2_yrs <- paste(seq(future2_start_year, future2_end_year, 1), collapse = '|')
+
+files_baseline <- list() # historical
+files_s1f1 <- list() # scenario1, future 1
+files_s1f2 <- list() # scenario 1, future 2
+files_s2f1 <- list() # scenario 2, future 1
+files_s2f2 <- list() # scenario 2, future 2
+
+# List files for Baseline Scenario
+
+for(i in 1:length(variables)){ 
+  fileNames = list.files(baseline_dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
+  dt = data.table(fileNames, result = grepl(baseline_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_baseline[[i]] = dt2$fileNames
+}
+
+# List files for S1F1 
+
+for(i in 1:length(variables)){ 
+  dir = paste(model_dir, scenario1, sep = '/')
+  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
+  dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_s1f1[[i]] = dt2$fileNames
+  }
+
+# List files for S1F2
+
+for(i in 1:length(variables)){ 
+  dir = paste(model_dir, scenario1, sep = '/')
+  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
+  dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_s1f2[[i]] = dt2$fileNames
+  }
+
+# List files for S2F1 
+
+for(i in 1:length(variables)){ 
+  dir = paste(model_dir, scenario2, sep = '/')
+  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
+  dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_s2f1[[i]] = dt2$fileNames
+}
+
+# List files for S2F2
+
+for(i in 1:length(variables)){ 
+  dir = paste(model_dir, scenario2, sep = '/')
+  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
+  dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_s2f2[[i]] = dt2$fileNames
+}
+
+```
+
+## SPATIAL CHECK
+
+The next chunk checks that the spatial files are aligned and appear in the correct location on the globe. An interactive map will appear below the code chunk, and you can zoom in or out as needed to view the AFB's (the easiest way is to scroll with your mouse). You can press the 'show in new window' button (the white square with an arrow) to open the map in another page if you prefer a larger view. You may have to wait a few moments for the map to produce. *Make sure the installation boundary aligns with one or more raster cells*. If it doesn't, you might have a difference in spatial projections between the installation boundary and the raster/ncdf files.  
+
+```{r spatial-check}
+
+# Raster
+
+stackX <- rast(files_s1f1[[1]]) # creates raster stack for first variable in s1f1 list (using s1f1 because has fewer files than baseline)
+
+random_raster <- as.numeric(sample(1:nlyr(stackX), 1)) # get a random raster layer from StackX to use as an example
+rx <- stackX[[random_raster]]
+
+# AFB 
+
+afb_dir <- (paste(dir_installation_boundaries, AFB_Name, sep = '/'))
+afb_filename <- paste(afb_dir, '.shp', sep = "")
+
+afbSF <- st_read(afb_filename) # Because plotting package (tmap) doesn't take terra vectors
+afb <- vect(afbSF)
+
+afbSF <- if (xmax(rx) == 360 & xmax(afb) < 0) {st_shift_longitude(afbSF)} else afbSF # adjustment in case ncdf lon scale is 0-360
+
+afb <- vect(afbSF)
+afb <- terra::aggregate(afb)
+
+# Crop single raster to AFB shape
+
+rxCrop <- terra::crop(rx, afb, snap = "out") # snap = "out" shows all cells that overlap AFB polygon
+
+# Quick interactive plot
+
+#tmap_mode('view')
+
+map <- tm_shape(as(rxCrop, "Raster")) + 
+  tm_raster() + 
+  tm_shape(afbSF) + 
+  tm_borders()
+
+lf <- tmap_leaflet(map)
+lf
+
+```
+
+Next, we will check the size of the AFB to see whether we should use its centroid or spatial extent to extract the data we need. If the AFB fits within a single NetCDF cell, it will be much faster to extract data using a single point (the centroid). The script will assume that if the AFB is smaller than the NetCDF cell, you will want to use the centroid, and if it is larger, you will want to use the spatial extent. 
+
+You can override the automatic selection by changing the 'extract_obj' object to 'afb' (spatial extent) or 'cell' (centroid). See the text below the code chunk for additional comments about interpreting and manually altering the output.      
+
+
+```{r decision-to-use-shp-or-centroid-for-extraction, warning=FALSE, results='asis'}
+
+# What is the cell size of the ncdf?
+
+rxCellSize <- cellSize(rxCrop, unit = "km") # size of the cropped raster
+ncdf_cellSize <- mean(values(rxCellSize)) # get mean cell size of ncdf (all cells are not necessarily equally sized)
+
+# How big is the AFB?
+
+afb_area <- expanse(afb, unit = "km")
+
+centroid <- geom(centroids(afb, inside = TRUE)) # inside = TRUE guarantees that the centroid is contained within the boundaries of the AFB (in some cases, depending on the shape of the AFB, the true centroid may be outside)
+centroid_matrix <- cbind(centroid[3], centroid[4]) # used to find cell index. [3] and [4] refer to the values in the 'centroid' object. If a downstream error occurs, make sure these values are actually x and y.
+
+extract_obj <- afb
+cell <- terra::cellFromXY(rx, centroid_matrix) # finds the cell (index) in which the centroid is located
+
+# add an if_else statement to tell R whether to extract raster values from matrix or shapefile
+
+extract_obj <- if(afb_area < ncdf_cellSize) cell else (afb)
+
+afbExt <- ext(afb)
+
+cat("The object used for data extraction is ", class(extract_obj)) 
+
+```
+
+*INTERPRETING THE OUTPUT ABOVE*: If the output of the following code chunk says 'numeric', the script will use the centroid. If it says 'spatVector', it will use the spatial object (afb). 
+
+*If you want to override the automatic choice, manually highlight and run either of the options below:* (if you enter it into the code chunk it will remain there and you risk overriding future choices you may not want to, so just do it here in the main text.) 
+
+`extract_obj <- cell` to use the centroid  -OR-
+`extract_obj <- afb` to use the entire shapefile
+
+
+## DATA EXTRACTION
+
+The following chunk extracts raw data from the ncdf files of interest. 
+
+It assumes the centroid is being used for data extraction. It has not been tested for use with a spatial object. It may still work, but might be quite slow. If you are running several large bases sequentially, it will be worth exploring an alternate coding strategy.
+
+This is the most time-consuming chunk of the entire script. If you will need to refer back to this data, you can save the entire environment (all objects) as an .RData file (save.image()) after the chunk has run. Alternatively, you can save individual objects with the function (saveRDS()). 
+
+```{r extract-values}
+
+# Create lists to store extracted values from ncdf data
+# s1 = scenario1; s2 = scenario2
+# f1 = future1; f2 = future2
+
+results_baseline <- list()
+results_s1f1 <- list()
+results_s1f2 <- list()
+results_s2f1 <- list()
+results_s2f2 <- list()
+
+# Extract data
+
+for(i in 1:length(files_baseline)){
+  r = rast(files_baseline[[i]])
+  times = time(r)
+  varName = varnames(r)[1]
+  vals = values(crop(r, ext(afb)))
+  vals = r[extract_obj]
+  tVals = data.table::transpose(vals) # do not use purrr:transpose
+  colnames(tVals) = varName
+  results_baseline[[i]] = tVals
+  names(results_baseline)[i] = varName
+  results_baseline[[i]]$date = times
+  rm(r)
+}
+
+for(i in 1:length(files_s1f1)){
+  r = rast(files_s1f1[[i]])
+  times = time(r)
+  varName = varnames(r)[1]
+  vals = r[extract_obj]
+  tVals = data.table::transpose(vals) 
+  colnames(tVals) = varName
+  results_s1f1[[i]] = tVals
+  names(results_s1f1)[i] = varName
+  results_s1f1[[i]]$date = times
+  rm(r)
+}
+
+for(i in 1:length(files_s1f2)){
+  r = rast(files_s1f2[[i]])
+  times = time(r)
+  varName = varnames(r)[1]
+  vals = r[extract_obj]
+  tVals = data.table::transpose(vals) 
+  colnames(tVals) = varName
+  results_s1f2[[i]] = tVals
+  names(results_s1f2)[i] <- varName
+  results_s1f2[[i]]$date = times
+  rm(r)
+}
+
+for(i in 1:length(files_s2f1)){
+  r = rast(files_s2f1[[i]])
+  times = time(r)
+  varName = varnames(r)[1]
+  vals = r[extract_obj]
+  tVals = data.table::transpose(vals) 
+  colnames(tVals) = varName
+  results_s2f1[[i]] = tVals
+  names(results_s2f1)[i] <- varName
+  results_s2f1[[i]]$date = times
+  rm(r)
+}
+
+for(i in 1:length(files_s2f2)){
+  r = rast(files_s2f2[[i]])
+  times = time(r)
+  varName = varnames(r)[1]
+  vals = r[extract_obj]
+  tVals = data.table::transpose(vals) 
+  colnames(tVals) = varName
+  results_s2f2[[i]] = tVals
+  names(results_s2f2)[i] <- varName
+  results_s2f2[[i]]$date = times
+  rm(r)
+}
+
+```
+
+The next chunk reorganizes the extracted data into a more workable dataframe ("tibble", from the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
+
+```{r allvaluesdf-dataframes, message=FALSE}
+
+rm(list = ls(pattern = "^files")) # remove lists from the environment that aren't extracted data
+
+lists <- Filter(function(x) is(x, "list"), mget(ls())) # reads in all remaining lists
+nested_tibbles <- as_tibble(lists) # tibbles are tidy objects
+
+avdf <- list() # results mimic allvaluesdf objects created by original script, with the exception of the 'time' column
+
+for(i in 1:length(nested_tibbles)){
+  sf_combo_nested = flatten(nested_tibbles[i]) # scenario-future combo
+  sf = flatten(sf_combo_nested)
+  tbl = tibble(lat = centroid_matrix[2], # will need to be changed when spatial objects are used for extraction
+               lon = centroid_matrix[1],
+               date = pluck(sf_combo_nested, 1, "date")) # pulls date column from first sublist
+  sf_tbl = sf %>%
+    as_tibble(sf, validate = NULL, .name_repair = "unique") %>% # validate argument necessary for running on cluster
+    unnest(cols = where(is.numeric)) %>%
+    dplyr::select(!(contains("date"))) %>%
+    bind_cols(tbl) %>%
+    dplyr::select(lat, 
+                  lon, 
+                  contains("max"), 
+                  contains("min"), 
+                  contains("pr"),
+                  any_of("hurs"), # the 'any_of' helper function should ignore variables if they are not of interest
+                  any_of("sfcWind"), # if it does not and you get an error, let me (Annie) know
+                  date) %>%
+    rename(c(tmax = tasmax, # these names match variable names in the functions that follow
+             tmin = tasmin,
+             prcp = pr))
+  
+  avdf[[i]] = sf_tbl
+  names(avdf)[i] = names(nested_tibbles[i]) 
+}    
+ 
+```
+
+## ADD DERIVED VARIABLES
+
+NOTE: see comments within code. Functions assume the raw ncdf data does NOT use imperial units. 
+
+The next chunk creates AllDays.csv files
+
+```{r add-derived-vars, message=FALSE, warning=FALSE}
+
+# Add derived (recalculated) variables to dataframes
+# All functions are from the original LOCA_summarize.R script
+
+AllDays <- list() # for MonthSum section
+
+for(i in 1:length(avdf)){
+  csv = avdf[[i]]
+  csv = csv %>%
+    mutate(PPT_mm = case_when( # if raster units are "kg-m-2 -1", convert to mm (otherwise keep as is)
+      str_detect(units(rx), "kg") ~ prcp*86400,
+      TRUE ~ as.numeric(prcp))) %>%
+    mutate(PPT_in = RasterUnitConvert(PPT_mm, "MMtoIN")) %>%
+    mutate(TMaxF = case_when(
+      tmax > 200 ~ RasterUnitConvert(tmax, "KtoF"), # Because only values in Kelvin would be > 200
+      TRUE ~ RasterUnitConvert(tmax, "CtoF"))) %>% # assuming if temp units are not Kelvin they are Celsius
+    mutate(TMaxC = case_when(
+      tmax > 200 ~ RasterUnitConvert(tmax, "KtoC"),
+      TRUE ~ tmax)) %>% # assuming if temp units are not Kelvin they are Celsius
+    mutate(TMinF = case_when(
+      tmin > 200 ~ RasterUnitConvert(tmin, "KtoF"),
+      TRUE ~ RasterUnitConvert(tmin, "CtoF"))) %>% # assuming if temp units are not Kelvin they are Celsius
+    mutate(TMinC = case_when(
+      tmin > 200 ~ RasterUnitConvert(tmin, "KtoC"),
+      TRUE ~ tmin)) %>% # assuming if temp are not K they are C
+    mutate(TMeanF = (TMaxF + TMinF)/2) %>%
+    mutate(TmeanC = (TMaxC + TMinC)/2) %>%
+    mutate(GDDF = RasterGDD(TMinF, TMaxF, 50, 86)) %>% # All hard-coded values are from the original CEMML script
+    mutate(hotdays = Rasterhotdays(TMaxC, hottemp = 32.2)) %>% # Hard-coded values may be changed at user discretion
+    mutate(colddays = Rastercolddays(TMinC, coldtemp = 0)) %>%
+    mutate(wetdays = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
+    mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
+    mutate(ftdays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) 
+  
+  AllDays[[i]] = csv # new df for use with MonthSum
+    names(AllDays)[i] = names(avdf[i])
+
+    } # end creation of AllDays dataframe
+  
+# Write output to .csv
+
+for(i in 1:length(AllDays)){
+  csv = AllDays[[i]]
+  csv_scenario = if (str_detect(names(AllDays[i]), "baseline")){
+    "historical"
+  } else if(str_detect(names(AllDays[i]),"s1")) {
+    scenario1
+  } else {
+    scenario2
+  }
+  csv_years = if (str_detect(names(AllDays[i]), "f1")){
+    paste(future1_start_year, "-",future1_end_year)
+  } else if (str_detect(names(AllDays[i]), "f2")) {
+    paste(future2_start_year,"-",future2_end_year)
+  } else {
+    paste(baseline_start_year,"-",baseline_end_year)
+  }
+    csv_fileName = paste(AFB_Name, csv_scenario, csv_years,"AllDays",sep = '_')
+    
+    # Create directory for files if it does not already exist
+    
+    if(!dir.exists(results_folder)){
+      dir.create(results_folder)
+    } else {
+      dir.create(results_folder)
+    }
+    
+    # Write csv to folder
+    write_csv(csv, file = paste0(results_folder,csv_fileName,".csv"))
+
+    } # end write to csv
+
+```
+
+Now that the AllDays.csv files have been created, it is no longer necessary to retain space-intensive objects in the environment. We can routinely remove objects we no longer need.
+
+```{r remove-extraneous-stuff}
+
+rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
+                        "official_name",
+                        "model", 
+                        "scenarios",
+                        "scenario_plotNames",
+                        "years",
+                        "results_folder",
+                        "AllDays",
+                        "RasterUnitConvert")))
+
+```
+
+## Bioclimatic variables
+
+```{r Biolimatic-variables, message=FALSE}
+
+# Formerly Step 9A
+# Writes Bioclimatics csv directly into appropriate results folder on N: drive
+
+source(here("Code", "Ecosystems_Climate_Data.R"))
+
+```
+
+```{r remove-extraneous-stuff, warning=FALSE}
+
+rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
+                        "official_name",
+                        "model", 
+                        "scenarios",
+                        "scenario_plotNames",
+                        "years",
+                        "results_folder",
+                        "AllDays",
+                        "RasterUnitConvert")))
+
+```
+
+## Climographs
+
+This chunk creates all climograph plots and places them within the results folder under Plots/Climographs
+
+```{r climographs, message=FALSE}
+
+plots_dir <- paste0(results_folder,"Plots")
+
+if (!dir.exists(plots_dir)){
+  dir.create(plots_dir)}
+
+source("./Code/Climographs.R")
+
+```
+
+```{r remove-extraneous-stuff}
+
+rm(list=setdiff(ls(), c("AFB_Name", # These are the objects we want to keep
+                        "official_name",
+                        "model", 
+                        "scenarios",
+                        "scenario_plotNames",
+                        "years",
+                        "results_folder",
+                        "AllDays",
+                        "plots_dir",
+                        "RasterUnitConvert")))
+
+```
+
+## MonthSum
+
+The next chunk creates MonthSum.csv files
+
+```{r MonthSum, message=FALSE}
+
+# input: AllDays df
+# output: MonthSum df (and csv's)
+
+monthSum <- list()
+
+MACA = if_else(str_detect(model, "MACA"), # this code is not yet functional, but does not disrupt the process
+                     TRUE,
+                    FALSE)
+
+for(i in 1:length(AllDays)){
+  df = AllDays[[i]]
+  df = df %>%
+    mutate(date = ymd(date)) %>%
+    mutate(month = month(date)) %>%
+    mutate(year = year(date)) %>%
+    dplyr::select(-c(lat, lon))
+  
+  yearAvg = df %>%
+    dplyr::select(!c('date','PPT_in', 'PPT_mm')) %>% # Exclude variables for which the result is not simply a monthly average
+    dplyr::select(!(contains("days"))) %>%
+    group_by(year, month) %>%
+    summarise(across(where(is.double), mean))
+  
+  Abs_TminF = df %>%
+  select(date, year, month, TMinF) %>%
+  group_by(year, month) %>%
+  summarise(Abs_TminF = min(TMinF))
+  
+  ppt = df %>%
+  select(date, year, month, 'PPT_in', 'PPT_mm') %>%
+  group_by(year, month) %>%
+  summarise(across(contains('PPT'), sum))
+  
+  days = df %>%
+  select(date, year, month, contains('days')) %>%
+  group_by(year, month) %>%
+  summarise(across(contains('days'), sum))
+  
+  all = yearAvg %>%
+  full_join(days) %>%
+  full_join(ppt) %>%
+  full_join(Abs_TminF) %>%
+  ungroup()
+  
+  monthAvg = all %>%
+  dplyr::select(!year) %>%
+  group_by(month) %>%
+  summarise(across(everything(), mean)) %>%
+  setNames(paste0('Avg_', names(.))) %>%
+  rename(Abs_TminF = Avg_Abs_TminF) %>%
+  select(Avg_month, # put in order on MonthSum csv
+         Avg_PPT_in, 
+         Avg_PPT_mm, 
+         Avg_TMaxF, 
+         Avg_TMinF, 
+         Avg_TMeanF, 
+         Abs_TminF, 
+         any_of("Avg_hurs"),
+         any_of("Avg_sfcWind"),
+         Avg_GDDF,
+         Avg_hotdays,
+         Avg_colddays,
+         Avg_wetdays,
+         Avg_drydays,
+         Avg_ftdays,
+         )
+  
+  # As above, MACA-related code is a placeholder for future integration
+  
+  macaCols = if(MACA == "TRUE") {getMACAcols(all)} else {NULL} 
+  
+  monthAvg = if(MACA == "TRUE") {bind_cols(monthAvg, macaCols)} else {monthAvg} 
+  
+  # End of MACA code
+  
+  monthSum[[i]] = monthAvg # new df for export and use with DiffHist
+  names(monthSum)[i] = names(AllDays[i])
+}
+
+# Add summary rows (YrAverage and YrTotals)
+
+for(i in 1:length(monthSum)){
+  YrAverage = colMeans(monthSum[[i]][,2:ncol(monthSum[[i]])]) # converts columns to characters 
+  YrTotals = colSums(monthSum[[i]][,2:ncol(monthSum[[i]])])
+  csv = bind_rows(monthSum[[i]], YrAverage, YrTotals)
+  
+  # NA's 
+
+  NAs = csv %>% # YrAverage
+    filter(row_number() == 13) %>% # Because there will always be 12 months irrespective of model
+    mutate(across(.cols = contains("PPT"), ~na_if(.,.))) %>%
+    mutate(across(.cols = contains("days"), ~na_if(.,.))) %>%
+    mutate(across(.cols = contains("Abs"), ~na_if(.,.))) %>%
+    mutate(across(.cols = contains("GDDF"), ~na_if(.,.))) 
+  
+  NAs_Totals = csv %>% # YrTotals
+    filter(row_number() == 14) %>%
+    mutate(across(.cols = contains("Avg_T"), ~na_if(.,.))) %>%
+    mutate(across(.cols = contains("Abs"), ~na_if(.,.))) %>%
+    mutate(across(.cols = any_of("Avg_hurs"), ~na_if(.,.))) %>%
+    mutate(across(.cols = any_of("Avg_sfcWind"), ~na_if(.,.))) 
+    
+  NAs_Totals = if(MACA == "TRUE") {mutate(across(.cols = .cols %in% colnames(macaCols), ~na_if(.,.)))
+    } else {NAs_Totals}
+  
+  csv = csv %>%
+    slice(1:(n()-2)) %>% # remove summary rows
+    bind_rows(NAs, NAs_Totals) %>% # replace with NA's included
+    rename(month = Avg_month) %>%
+    mutate(month = as.character(month))
+  
+  csv[13,1] = "YrAverage"
+  csv[14,1] = "YrTotals"
+  
+  monthSum[[i]] = csv # will write over original monthSum df that did not have final two columns
+  names(monthSum)[i] = names(AllDays[i])
+  }
+  
+# Write csv files 
+
+for(i in 1:length(monthSum)){
+
+csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
+    "historical"
+  } else if(str_detect(names(monthSum[i]),"s1")) {
+    scenarios[2]
+  } else {
+    scenarios[3]
+  }
+  
+  csv_years = if (str_detect(names(monthSum[i]), "f1")){
+    paste(first(year(AllDays$results_s1f1$date)),"-",last(year(AllDays$results_s1f1$date)))
+    
+  } else if (str_detect(names(monthSum[i]), "f2")) {
+    paste(first(year(AllDays$results_s1f2$date)),"-",last(year(AllDays$results_s1f2$date)))
+  } else {
+    paste(first(year(AllDays$results_baseline$date)),"-",last(year(AllDays$results_baseline$date)))
+  }
+    csv_fileName = paste(AFB_Name,csv_scenario,csv_years,"MonthSum",sep = '_')
+    write_csv(monthSum[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = ""))
+}
+
+```
+
+## Walter and Leith Diagrams
+
+This section creates WL Diagrams for both F and C and places the results in the results_folder (under Plots/Walter-Lieth). The specs are set for a 4.5 x 6.5 in plot, so the appearance in the viewer does not appear aligned, but the output should be as desired. 
+
+```{r walter-lieth-diagrams}
+
+source('./Code/Functions/WL_Adapted.R') # Walter-Lieth plots. Adapted from https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R by Annie Kellner 10-15-23  
+  
+# Directory for WL plots
+  
+wl_dir <- paste(plots_dir,"Walter-Lieth", sep = "/")
+
+if (!dir.exists(wl_dir)){
+  dir.create(wl_dir)}
+
+# Calculate Celsius values before running function for plot creation
+
+for(i in 1:length(monthSum)){
+
+# Format data
+  
+wlC = monthSum[[i]] %>%
+  mutate(Avg_TMaxC = RasterUnitConvert(Avg_TMaxF, "FtoC")) %>%
+  mutate(Avg_TMinC = RasterUnitConvert(Avg_TMinF, "FtoC")) %>%
+  mutate(Abs_TminC = RasterUnitConvert(Abs_TminF, "FtoC")) %>%
+  select(Avg_PPT_mm, Avg_TMaxC, Avg_TMinC, Abs_TminC) 
+
+wlC = wlC[1:12,]
+wlC = data.table::transpose(wlC)
+
+# ----------  Celsius plot  ----------------- #
+
+# per is 'period' and is an argument in the ggclimat_walter_lieth() function
+
+per_scenario = if (str_detect(names(monthSum[i]), "baseline")){
+    scenario_plotNames[1]
+  } else if(str_detect(names(monthSum[i]),"s1")) {
+    scenario_plotNames[2]
+  } else {
+    scenario_plotNames[3]
+  }
+
+per_years = if(str_detect(names(monthSum[i]), "baseline")){ 
+  as.character(paste(years[1], years[2], sep = " - "))
+} else if(str_detect(names(monthSum[i]),"f1")){
+  as.character(paste(years[3],years[4], sep = " - "))
+} else {
+  as.character(paste(years[5], years[6], sep = " - "))
+}
+  
+  
+per = paste(per_scenario,per_years,sep = ", ")
+
+per_length = nchar(per) # to calculate where to put the "subtitle" on the plot
+
+
+wlCplot = ggclimat_walter_lieth(wlC, 
+                      est = official_name, 
+                      per = per,
+                      mlab = "en", # English language 
+                      pcol = "blue", # precip color
+                      tcol = "red", # temp color
+                      pfcol = "lightblue", # probable freeze
+                      sfcol = "steelblue") # certain freeze
+
+
+# Save plot in results_folder/Plots/Walter-Lieth 
+
+wl_scenario = if (str_detect(names(monthSum[i]), "baseline")){
+    "historical"
+  } else if(str_detect(names(monthSum[i]),"s1")) {
+    scenarios[2]
+  } else {
+    scenarios[3]
+  }
+
+midyear = if (str_detect(names(monthSum[i]), "baseline")){
+  floor((years[1] + years[2])/2)
+} else if (str_detect(names(monthSum[i]),"f1")) {
+  floor((years[3] + years[4])/2)
+} else if (str_detect(names(monthSum[i]),"f2")) {
+  floor((years[5] + years[6])/2)
+}
+  
+
+filenameC = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Celsius.png")
+
+ggsave(filenameC, plot = wlCplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
+
+
+# ----------   Fahrenheit Plot  --------------  #
+
+# Create Fahrenheit dataframe 
+
+dat_long_endF = dat_long_end %>%
+    mutate(p_mesIN = p_mes/25.4) %>%
+    mutate(tm_maxF = tm_max*(9/5) + 32) %>%
+    mutate(tm_minF = tm_min *(9/5) + 32) %>%
+    mutate(ta_minF = ta_min*(9/5) + 32) %>%
+    mutate(tmF = (tm_maxF + tm_minF) / 2)
+
+  ## Vert. Axis range - temp ----
+  ymaxF <- 140
+  
+  # Min range
+  yminF <- min(dat_long_endF$tmF)
+  
+  #range_tm <- seq(0, ymax, 10)
+  range_tmF <- seq(32, ymaxF, 18)
+  
+  if (yminF < 26.6) {
+    yminF <- floor(yminF / 10) * 10 # min Temp rounded
+    # Labels
+    range_tmF <- seq(yminF, ymaxF, 18)
+  }
+
+# Helper for ticks
+  
+ticks = data.frame(
+    x = seq(0, 12),
+    ymin = -3,
+    ymax = 0
+  )
+
+# Precip labels
+
+preclabs2 <- as.numeric(as.character(preclabs))
+preclabs2 <- na.omit(preclabs2)
+preclabsF <- as.numeric() 
+  
+  for(j in 1:length(preclabs2)){
+    preclabsF[j] = preclabs2[j]/25.4
+  }
+
+# In the event the temp and precip vectors are not of equal size, add values
+
+if (length(preclabsF) > length(range_tm)){
+  append(-10, range_tm) -> range_tm
+}
+
+if(length(range_tm) > length(preclabsF)){
+  append(preclabsF, 15.7) -> preclabsF
+}
+
+  
+wlFplot = wandlplot + 
+    geom_hline(yintercept = c(0, 50)) + # removed 'size' argument (CEMML/AK 09-14-23)
+    geom_segment(data = ticks, aes(
+      x = x,
+      xend = x,
+      y = ymin,
+      yend = ymax
+    )) +
+    scale_x_continuous(
+      breaks = month_breaks,
+      name = "",
+      labels = month_labs,
+      expand = c(0, 0)
+      ) +
+    scale_y_continuous(
+    "°F",
+    labels = function(x) x* (9/5) + 32,
+    breaks = range_tm, # Celsius breaks are kept so that precip axis is aligned
+    sec.axis = dup_axis(name = "in",
+                        labels = round(preclabsF, digits = 1)))
+
+
+# Subtitle (aka, time period and precip/temp values)
+
+sub = paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
+               "°F        ",
+               prettyNum(
+                 round(sum(
+                   dat_long_endF[dat_long_endF$interpolate == FALSE, ]$p_mesIN
+                 )),
+                 big.mark = ","
+               ),
+               " in",
+               sep = ""
+  )
+  
+  sub_length = nchar(sub)
+  sub_placement = 78 - per_length - sub_length # 1 in = ~10 character-spaces in Times New Roman font, so an image of 6.5" in width contains 78 character-spaces per line. This right-aligns the "subtitle" (i.e., the righthand temp/precip values)
+  
+  
+  sub2 = paste0(
+  per, 
+  paste0(rep(" ",sub_placement), collapse = ""), 
+  sub,
+  "\n" # linebreak between "subtitle" and plot
+  )
+  
+  # Vertical tags 
+  
+  maxtmF = prettyNum(round(max(dat_long_endF$tm_maxF), 1))
+  mintmF = prettyNum(round(min(dat_long_endF$tm_minF), 1))
+  
+  tags = paste0(
+    paste0(rep(" \n", 6), collapse = ""),
+    maxtmF,
+    paste0(rep(" \n", 10), collapse = ""),
+    mintmF
+  )
+
+  # Add tags and theme
+  
+wlFplot = wlFplot +
+    ggplot2::labs(
+      title = title,
+      subtitle = sub2,
+      tag = tags
+    ) +
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      plot.title = element_text(
+        lineheight = 1,
+        size = 14,
+        face = "bold"
+      ),
+      plot.subtitle = element_text(
+        lineheight = 1,
+        size = 14,
+        face = "plain"
+      ),
+      plot.tag = element_text(size = 10),
+      plot.tag.position = "left",
+      axis.ticks.length.x.bottom = unit(0, "pt"),
+      axis.line.x.bottom = element_blank(),
+      axis.title.y.left = element_text(
+        angle = 0,
+        vjust = 0.9,
+        size = 10,
+        colour = tcol,
+        margin = unit(rep(10, 4), "pt")
+      ),
+      axis.text.x.bottom = element_text(size = 10),
+      axis.text.y.left = element_text(colour = tcol, size = 10),
+      axis.title.y.right = element_text(
+        angle = 0,
+        vjust = 0.9,
+        size = 10,
+        colour = pcol,
+        margin = unit(rep(10, 4), "pt")
+      ),
+      axis.text.y.right = element_text(colour = pcol, size = 10)
+    ) +
+      ggplot2::theme(text=element_text(family="serif")) # Times New Roman
+
+# Save Fahrenheit plot
+
+filenameF = paste0(AFB_Name,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Fahrenheit.png")
+
+ggsave(filenameF, plot = wlFplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
+
+}
+
+```
+
+
+```{r remove-objects}
+
+rm(list=setdiff(ls(), c("monthSum", 
+                        "AFB_Name", 
+                        "model", 
+                        "scenarios",
+                        "results_folder",
+                        "years",
+                        "RasterUnitConvert")))
+
+```
+
+## DiffHist
+
+The next chunk writes DiffHist.csv files 
+
+```{r DiffHist, warning=FALSE}
+
+# input: monthSum dataframe 
+# output: diffHist dataframe
+
+diffHist <- list() # create diffHist dataframe for later use
+
+# Create historical object
+
+hist <- monthSum[[1]] # separate historical values for use in calculations
+
+# Create dataframe
+
+for(i in 2:length(monthSum)){ # 2 because [[1]] is historical 
+  diff = hist %>%
+  bind_rows(monthSum[[i]]) %>%
+  group_by(month) %>%
+  summarise_each(funs(diff(.))) %>% # this gives warnings because the function is deprecated, but it still works as of 5/9/23. If this breaks, look here first.
+  slice(1,5:12, 2:4,13:14) # arranges rows in the desired order
+  
+  diffHist[[i-1]] = diff # add to DiffHist dataframe for future use
+  names(diffHist)[[i-1]] = names(monthSum[i])
+}
+  
+# Save csv files 
+
+for(i in 1:length(diffHist)){
+
+csv_scenario = if (str_detect(names(diffHist[i]), "s1")){
+    scenarios[2]
+  } else if(str_detect(names(diffHist[i]),"s2")) {
+    scenarios[3]
+  } 
+  
+csv_years = if (str_detect(names(diffHist[i]), "f1")){
+    paste0(years[3],"-",years[4])
+  } else if (str_detect(names(diffHist[i]), "f2")) {
+    paste0(years[5],"-",years[6])
+  } 
+    
+csv_fileName = paste(AFB_Name,csv_scenario,csv_years,"DiffHist",sep = '_')
+write_csv(diffHist[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = ""))
+
+}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
