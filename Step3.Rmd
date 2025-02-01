@@ -47,7 +47,7 @@ library(sf)
 library(tidyverse)
 library(data.table)
 library(scales)
-library(viridis)
+#library(viridis)
 library(mapview) # for maps
 library(tmap)
 library(tmaptools)
@@ -55,6 +55,7 @@ library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
 library(extrafont) # for using Calibri font in plots
 library(patchwork)
+library(grid) # for legend grobs (Climographs)
 library(conflicted)
 
 conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
@@ -101,21 +102,30 @@ source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude sys
 
 ```
 
-###############################################################################################
-### PART ONE: User settings - choose AFB, AFB manager, model, scenarios, years of interest  ###
-###############################################################################################
 
+<<<<<<< HEAD
 First, let's *select which base (AFB, etc.) and model you wish to run.*  To choose from a list, highlight the word `shp_names`, `models`, or `official_base_names_for_plots` (including the ``) and click 'Run' at the top right (or use the shortcut "Ctrl + Enter"). The available models correspond to numbers in the vector (e.g., the model HADGEM2-ES is [1]). 
+=======
+################################################################################
+####        RUNNING FROM A WORKSPACE IMAGE                                  ####
+################################################################################
+>>>>>>> bb301e676f9a9ff3a77ec7470fda25f7ab8aea81
 
 
-In the code chunk below, *enter the number between the brackets ([]) that corresponds with the AFB and model of interest.* 
+Typically, this script will be used to run new bases or new proxies for bases (i.e, running an installation or proxy location for the first time). 
 
+<<<<<<< HEAD
 Official base names are used for plot titles. *If the base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the shp_names and official_base_names vectors and save. You will then have to re-run the following line above:*
+=======
+However, sometimes you may need to re-run a base from the workspace image stored on the N:/ drive. It takes several hours to extract data for a given installation, so we save the extracted data as a workspace image (.RData file) and an associated rasterstack (.Rds file) to avoid repeating this time-consuming step. 
+>>>>>>> bb301e676f9a9ff3a77ec7470fda25f7ab8aea81
 
-source('./Code/Misc/character_vectors.R') This code will not run, so please re-run above
+## ONLY RUN THE FOLLOWING TWO CHUNKS IF YOU ARE USING STORED DATA FROM A WORKSPACE IMAGE!!! ##
+## In other words, if this installation has been run previously and there are NO CHANGES to the location from which the climate data is extracted, FOLLOW DIRECTIONS FOR RUNNING THE SUBSEQUENT TWO CODE CHUNKS ##
 
-```{r enter-base-and-model}
+          ###       OTHERWISE          ###
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 installation <- shp_names[24] 
 
@@ -125,23 +135,251 @@ installation <- installation_names[36]
 
 official_name <- official_base_names_for_plots[17] # These names serve as titles for the climatograph and Walter-Lieth plots
 >>>>>>> anniekellner/BarChart_Axis_Adjust
+=======
+## IF YOU ARE RUNNING THIS INSTALLATION (or grid cell/shapefile) FOR THE FIRST TIME, SKIP TO THE SECTION "USER SETTINGS - PART I ## 
 
-model <- models[8] 
+However, if you are re- specific segments of the script using previously extracted data, you will need to manually enter the required information and re-run Part One of the script. Then you will need to load the data from a workspace image and raster stack saved to the N:/ drive. Instructions to follow.
+>>>>>>> bb301e676f9a9ff3a77ec7470fda25f7ab8aea81
 
+
+<<<<<<< HEAD
 <<<<<<< HEAD
 cat(paste("The model you have selected is", model,". The abbreviated name for the installation is", installation, "and its official name is", official_name))
 =======
 cat(paste("The model you have selected is", model,". The abbreviated name for the installation shapefile is", installation, "and its official name is", official_name))
 >>>>>>> anniekellner/BarChart_Axis_Adjust
+=======
+#### INSTRUCTIONS FOR RUNNING FROM WORKSPACE IMAGE  #####
+
+
+*1. Remove the #'s that precede the code for the following two chunks.*
+
+*2. Enter the installation of interest where prompted in the first code chunk.*
+    To do this, type `shp_names` into the console or highlight the inline code in blue and press ctrl+enter. 
+    Then, find the number associated with the installation and enter it between the brackets where indicated.
+
+*3. Run the first chunk ({r get-saved-files})* This will give you the pathnames to enter for the second chunk, which will load the files. 
+
+*3. In the second chunk ({r load-saved-files}), copy-paste the full paths to the .RData and .Rds files where indicated (including parentheses)* 
+
+*4. Run the second chunk* You will receive an error about the rx file, but you can ignore it. The second line of code takes care of it. 
+
+*5. Comment out (#) the code for both chunks after running (as a future safeguard)*
+
+*6. If you need to re-run the historical (NOAA) analysis, proceed to the section "OBSERVED HISTORICAL ANALYSIS"*
+    *If you do NOT need to re-run the historical (NOAA) analysis, proceed to section "AUTOMATED ANALYSIS PART II -  Add Derived Variables"*
+    
+
+```{r get-saved-files}
+
+#shp <- shp_names[28] # CHANGE THIS TO INSTALLATION OF INTEREST
+
+#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+>>>>>>> bb301e676f9a9ff3a77ec7470fda25f7ab8aea81
 
 ```
 
-We use the next chunk to set the path to the correct directory for the installation boundary (shapefile).
+
+```{r load-saved-files}
+
+# Load workspace image
+
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/Eglin_Niceville_EC-Earth3-Veg-LR_20250129.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+
+# Load raster stack
+
+#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/rasterStack_Eglin_Niceville_EC-Earth3-Veg-LR_20250123.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+
+##
+
+```
+
+
+FYI, the raster is loaded separately because as of the date this script was written (9-29-24), raster objects do not save correctly during the `save.image()` process. If the raster does not load, you will get an error about a missing 'pointer'. As stated above, the second line of code should take care of this problem. If for some reason it does not, you can also re-run the portion of the {r spatial-check} chunk through to the creation of the object 'rx' (this is a raster stack). The raster stack is required to create the avdf dataframe.
+
+
+####################################################################################################
+###               USER SETTINGS PART I - SELECT OR ADD INSTALLATION NAME                       #####
+####################################################################################################
+
+First, let's *select which base (AFB, etc.) you wish to run.* You will need to select or input the following:
+
+1) *The general acronym* associated with the installation of interest (e.g., "JBLE" for "JBLE_E" or "JBLE_L"). This is required to locate the historical data associated with local weather stations, as the filenames associated with historical data are often different from those associated with the model data.  
+
+2) *The name of the shapefile* that corresponds with the installation. For various reasons, identifying the appropriate area/grid cell for a given model can require trial-and-error, so occasionally there is more than one shapefile per base. This information will be provided by Trevor Even (trevor.even@colostate.edu)
+
+3) *The official name of the installation*. This name is used for plot titles, and will also be provided by Trevor Even (see above) 
+
+In some cases, you can select these names from an existing list, located in './Code/Misc/character_vectors.R'. To see the list, you can either type the following phrases into the console, or simply select the phrases below and run them (ctrl + enter). 
+
+`base_abbreviations` (used for finding NOAA Excel files - could be an abbreviation or name [e.g., 'Eglin'])
+`shp_names`           (used for locating the shapefile associated with the installation. Also identical to the name of the Results folder)
+`official_base_names` (used for plot titles)
+
+You would then identify the number associated with the installation of interest, and enter that number between the brackets in the code chunk below. (For example, Homestead_ARB would be shp_names[1], and NAVBASE San Diego would be official_base_names[2]).
+
+The output following the code chunk will confirm your selections. You can easily revise as necessary if you entered anything incorrectly. If your installation of interest does not appear in the list, see the orange text below the code chunk.
+
+```{r enter-base-name}
+
+shp <- shp_names[28] 
+
+base_abbrev <- base_abbreviations[2] 
+
+official_name <- official_base_names[12] # These names serve as titles for the climatograph and Walter-Lieth plots
+
+
+cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"and the acronym/shorthand name associated with the installation is", base_abbrev,"."))
+
+```
+
+ *If your base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the installation_names and official_base_names vectors. If you do not know what those entries should be, please contact Trevor Even (trevor.even@colostate.edu).*
+ 
+*IMPORTANT: If you added new names to the vector lists, you will then need to re-run the line the imports the character vector names into the global environment. If you still do not see your new entries, return to the file and make sure to save it. Then run the line of code again. It is included below for easy reference. You can just highlight the code below and run it. You DO NOT NEED TO RE-RUN THE LINE if the appropriate names were already included in the character_vectors.R script, and you did not add new entries.*
+
+####################################################################################################
+###                USER SETTINGS PART II - SELECT OR ADD MODEL NAME                            #####
+####################################################################################################
+
+Similar to what you did above, now *enter the number between the brackets ([]) that corresponds with the model of interest.* You can type `models` into the console or highlight the blue text and press {cntrl + enter} to see the models already listed 
+
+
+```{r select-model}
+
+model <- models[7] 
+
+cat(paste("The model you have selected is", model,"for the installation", official_name))
+
+```
+
+
+####################################################################################################
+###                USER SETTINGS PART III - GET OBSERVED HISTORICAL DATA                       #####
+####################################################################################################
+
+Observed historical data comes from weather stations in close proximity to a given installation. It is frequently the case that for a single installation, data may be pulled from multiple weather stations.
+
+The following chunk makes use of the 'shorthand' term (or acronym) for a given base (e.g., "JBLE" for JBLE-Langley or "Eglin" for "Eglin Air Force Base") to pull the filenames for all weather station data associated with a given base.
+
+*We need to be sure we are using data from the appropriate weather station, so if more than one file shows up, please ask Trevor Even (trevor.even@colostate.edu) which to use.*
+
+
+```{r list-NOAA-folders}
+
+NOAA_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/" # directory for raw data
+
+list.files(path = NOAA_dir, pattern = base_abbrev)
+
+```
+
+
+*If only one file is listed or you know which .csv you need, please copy the filename above (including '.csv')and paste into the 'weather_station' object (include the quotation marks)*
+
+*If more than one filename shows up, refer to Trevor as described above. Then copy-paste the appropriate filename (also described above)*
+
+
+```{r pull-NOAA-data}
+
+weather_station <-  "Eglin_NicevilleOnly.csv"
+
+# Read in data
+
+noaa_dataFilepath <- paste0(NOAA_dir, weather_station)
+
+noaa <- read.csv(file = noaa_dataFilepath) # creates dataframe of observed historical data 
+
+```
+
+####################################################################################################
+###                ANALYSES OF OBSERVED HISTORICAL DATA                                        #####
+####################################################################################################
+
+Because the historical analyses of observed data (NOAA data) use a different dataset from the rest of the script, we are running it here, prior to further user inputs. The following two chunks DO NOT require user input. Simply press the green arrow to run sections {r Output-directories} and {r Observed-historical}
+
+## Output Directories
+
+
+```{r Output-directories}
+
+# Observed Historical - csv's
+
+noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_NOAA_Hist/", weather_station)
+
+if (!dir.exists(noaa_resultsDir)){
+  dir.create(noaa_resultsDir)}
+
+
+# Modeled Futures
+
+results_folder <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_",model,"/", shp) 
+
+if (!dir.exists(results_folder)){
+  dir.create(results_folder)}
+
+
+# Plots and Tables - Modeled
+
+plots_dir <- paste0(results_folder,"/","Plots_and_Tables")
+
+if (!dir.exists(plots_dir)){
+  dir.create(plots_dir)}
+
+#  Plots and Tables - Observed Historical (NOAA climographs)
+
+noaaClim_dir <- paste0(plots_dir,"/","NOAA_Climographs")
+
+if (!dir.exists(noaaClim_dir)){
+  dir.create(noaaClim_dir)}
+
+```
+
+
+## Analyses and plots (Climographs) for observed historical data
+
+
+```{r Observed-historical}
+
+
+source("./Code/NOAA/NOAA_AllDays.R")
+source("./Code/NOAA/NOAA_monthSum.R")
+source("./COde/NOAA/NOAA_Climographs_createDF.R")
+source("./Code/NOAA/NOAA_ClimographPlots.R")
+
+
+```
+
+
+## Remove extraneous objects from global environment
+
+```{r}
+
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
+                        "official_name",
+                        "model", 
+                        "plots_dir",
+                        "results_folder",
+                        lsf.str()))) # all functions
+
+```
+
+
+
+####################################################################################################
+###               USER SETTINGS PART IV - ANALYSIS OF MODELED DATA                              ####
+####################################################################################################
+
+
+# Installation Boundaries
+
+The following chunk enables us to access the shapefile (spatially explicit outline) of the base, or occasionally an area nearby that serves as an ecological proxy for the base. This is how we select the grid cell associated with the modeled climate data. 
+
+
+The first step is to determine whether the installation is managed by the Navy (because the Navy spatial data resides in a separate directory). If you don't know the answer, ask Trevor Even (trevor.even@colostate.edu).
 
 *If the AFB is managed by the Navy, set Navy = TRUE*
-*If the AFB is managed by the Air Force, set Navy = FALSE*
+*If the AFB is NOT managed by the Navy, set Navy = FALSE* (This would include the Army, Air Force, Space Force, etc.)
 
-```{r set-directory-to-access-installation-boundaries}
+```{r installation-boundaries}
 
 # Is the AFB managed by the Navy?
 
@@ -158,7 +396,8 @@ dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile 
 
 ```
 
-Now let's see what scenarios and variables are available for that model.
+
+
 
 The next chunk checks what scenarios (subfolders) are contained in the 'Data' folder associated with the model of interest.
 
@@ -176,7 +415,7 @@ scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE)
 
 cat("The scenarios (subfolders) associated with this model are:", sep = '/n') # cat() basically means 'print' in this context 
 
-cat(paste("-", scenario_dirs), sep = "\n") # names into separate lines for readability ('\n' = line)
+cat(paste("-", scenario_dirs), sep = "/n") # names into separate lines for readability ('/n' = line)
 
 ```
 
@@ -228,16 +467,16 @@ future2_end_year <- 2080 # End year of interest for the second future time perio
 
 ```
 
-####################################################################################################
-###     THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT            ################################
-###     The rest of the script should be able to be run automatically     ################################
-####################################################################################################
+################################################################################################################
+###               THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT                                    ####
+################################################################################################################
 
-From this point forward, all you need to do is press the green 'run' arrow for each chunk. DO NOT ALTER THE CODE BELOW. 
 
-###############################################################################################
-###     PART TWO: Data Extraction                                         #####################  
-###############################################################################################
+The rest of the script should be able to be run automatically. From this point forward, all you need to do is press the green 'run' arrow for each chunk. DO NOT ALTER THE CODE BELOW. 
+
+################################################################################################################
+####            AUTOMATED ANALYSIS PART I - DATA EXTRACTION                                                 ####
+################################################################################################################
 
 
 ## CREATE VECTORS FOR YEAR-SCENARIO COMBOS
@@ -261,6 +500,7 @@ years <- c(baseline_start_year, # vector for easy reference
 ```
 
 
+<<<<<<< HEAD
 ## SET DIRECTORY FOR RESULTS
 
 *NOTE: Folder names may differ between the 'Data' and 'Results' folders within the Climate Modeling folder. This was the case for LOCA and may be the case for others.* 
@@ -290,6 +530,8 @@ if (!dir.exists(results_folder)){
 ```
 
 
+=======
+>>>>>>> bb301e676f9a9ff3a77ec7470fda25f7ab8aea81
 ## SUBSET FILES OF INTEREST
 
 In this step, we are creating lists of filenames that will eventually combine into raster stacks. When this chunk is finished running, you can check the objects to make sure the correct number of years have been included. 
@@ -384,7 +626,7 @@ rx <- stackX[[random_raster]]
 
 # AFB 
 
-afb_dir <- (paste(dir_installation_boundaries, installation, sep = '/'))
+afb_dir <- (paste(dir_installation_boundaries, shp, sep = '/'))
 afb_filename <- paste(afb_dir, '.shp', sep = "")
 
 afbSF <- st_read(afb_filename) # Because plotting package (tmap) doesn't take terra vectors
@@ -551,17 +793,21 @@ for(i in 1:length(files_s2f2)){
 
 timestamp <- format(today(), "%Y%m%d")
 
-image_filename <-  paste(installation,model,timestamp, sep = "_")
+image_filename <-  paste(shp,model,timestamp, sep = "_")
 rawData_filename <- paste0(image_filename,".RData")
 rasterStack_filename <- paste0("rasterStack_",image_filename,".Rds")
 
 # Directory for Workspace Images
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 rawDataDir <- paste0("N:\\RStor\\mindyc\\afccm\\Climate Modeling\\Workspace Images\\",installation)
 =======
 rawDataDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/",installation)
 >>>>>>> anniekellner/BarChart_Axis_Adjust
+=======
+rawDataDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp)
+>>>>>>> bb301e676f9a9ff3a77ec7470fda25f7ab8aea81
 
 if (!dir.exists(rawDataDir)){
   dir.create(rawDataDir)}
@@ -619,57 +865,9 @@ The next chunk reorganizes the extracted data into a more workable dataframe ("t
 #################################################################
 =======
 ##############################################################################
-###     PART THREE: Add Derived Variables    ###                        
+###     AUTOMATED ANALYSIS PART II -  Add Derived Variables               ####                        
 ##############################################################################
 >>>>>>> anniekellner/BarChart_Axis_Adjust
-
-Typically, this script will be run immediately following data extraction (i.e., the global environment still contains all objects defined in Parts One and Two)  
-
-## IF RUNNING IMMEDIATELY AFTER DATA EXTRACTION (i.e., the environment still contains all previously defined objects), SKIP TO THE CHUNK CALLED {allvaluesdf-dataframes} 
-
-However, if you are re- specific segments of the script using previously extracted data, you will need to manually enter the required information and re-run Part One of the script. Then you will need to load the data from a workspace image and raster stack saved to the N:/ drive. Instructions to follow.  
-
-
-#### INSTRUCTIONS FOR RUNNING FROM WORKSPACE IMAGE  #####
-
-
-*1. Remove the #'s that precede the code for the following two chunks.*
-
-*2. Enter the installation of interest where prompted in the first code chunk*
-
-*3. Run the first chunk (get-saved-files)* This will give you the pathnames to enter for the second chunk, which will load the files. 
-
-*3. In the second chunk (load-saved-files), copy-paste the full paths to the .RData and .Rds files where instructed* 
-
-*4. Run the second chunk* You will receive an error about the rx file, but you can ignore it. The second line of code takes care of it. 
-
-*5. Comment out (#) the code for both chunks after running*
-
-*6. Proceed to the portion of the script that starts with "AVDF data frame"*
-
-```{r get-saved-files}
-
-installation <- installation_names[36] # CHANGE THIS TO INSTALLATION OF INTEREST
-
-list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/",installation), full.names = TRUE)
-
-```
-
-
-```{r load-saved-files}
-
-# Load workspace image
-
-load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/Edwards_AFB_v3_EastofBarstow/Edwards_AFB_v3_EastofBarstow_ACCESS-ESM1-5_20241120.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
-
-# Load raster stack
-
-rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Analysis/Software/R/Workspace Images/Edwards_AFB_v3_EastofBarstow/rasterStack_Edwards_AFB_v3_EastofBarstow_ACCESS-ESM1-5_20241120.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
-
-```
-
-
-FYI, the raster is loaded separately because as of the date this script was written (9-29-24), raster objects do not save correctly during the `save.image()` process. If the raster does not load, you will get an error about a missing 'pointer'. The above retrieval process should take care of this problem, but if not, you can also re-run the portion of the {r spatial-check} chunk through to the creation of the object 'rx' (this is a raster stack). The raster stack is required to create the avdf dataframe in the next chunk.
 
 
 # AVDF data frame
@@ -778,7 +976,7 @@ for(i in 1:length(AllDays)){
   } else {
     paste(baseline_start_year,"-",baseline_end_year)
   }
-    csv_fileName = paste(installation, csv_scenario, csv_years,"AllDays",sep = '_')
+    csv_fileName = paste(shp, csv_scenario, csv_years,"AllDays",sep = '_')
     
     # Create directory for files if it does not already exist
     
@@ -799,13 +997,14 @@ Now that the AllDays.csv files have been created, it is no longer necessary to r
 
 ```{r remove-extraneous-stuff}
 
-rm(list=setdiff(ls(), c("installation", # These are the objects we want to keep
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
                         "model", 
                         "scenarios",
                         "scenario_plotNames",
                         "years",
                         "results_folder",
+                        "plots_dir",
                         "AllDays",
                         "RasterUnitConvert")))
 
@@ -824,13 +1023,14 @@ source('Code/Ecosystems_Climate_Data.R')
 
 ```{r remove-extraneous-stuff, warning=FALSE}
 
-rm(list=setdiff(ls(), c("installation", # These are the objects we want to keep
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
                         "model", 
                         "scenarios",
                         "scenario_plotNames",
                         "years",
                         "results_folder",
+<<<<<<< HEAD
                         "AllDays",
                         "RasterUnitConvert")))
 
@@ -865,10 +1065,14 @@ rm(list=setdiff(ls(), c("installation", # These are the objects we want to keep
                         "years",
                         "results_folder",
                         "AllDays",
+=======
+>>>>>>> bb301e676f9a9ff3a77ec7470fda25f7ab8aea81
                         "plots_dir",
+                        "AllDays",
                         "RasterUnitConvert")))
 
 ```
+
 
 ## MonthSum
 
@@ -897,7 +1101,7 @@ for(i in 1:length(AllDays)){
     dplyr::select(!c('date','PPT_in', 'PPT_mm', 'GDDF')) %>% # Exclude variables for which the result is not simply a monthly average
     dplyr::select(!(contains("days"))) %>%
     group_by(year, month) %>%
-    summarise(across(where(is.double), mean))
+    summarise(across(where(is.numeric), mean))
   
   Abs_TminF = df %>%
   select(date, year, month, TMinF) %>%
@@ -946,7 +1150,7 @@ for(i in 1:length(AllDays)){
          Avg_colddays,
          Avg_wetdays,
          Avg_drydays,
-         Avg_ftdays,
+         Avg_ftdays
          )
   
   # As above, MACA-related code is a placeholder for future integration
@@ -1025,11 +1229,43 @@ csv_scenario = if (str_detect(names(monthSum[i]), "baseline")){
   } else {
     paste(first(year(AllDays$results_baseline$date)),"-",last(year(AllDays$results_baseline$date)))
   }
-    csv_fileName = paste(installation,csv_scenario,csv_years,"MonthSum",sep = '_')
-    write_csv(monthSum[[i]], file = paste0(results_folder,csv_fileName,".csv",sep = ""))
+    csv_fileName = paste(shp,csv_scenario,csv_years,"MonthSum",sep = '_')
+    write_csv(monthSum[[i]], file = paste0(results_folder,"/",csv_fileName,".csv",sep = ""))
 }
 
 ```
+
+
+```{r remove-extraneous-objects}
+
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
+                        "official_name",
+                        "model", 
+                        "scenarios",
+                        "scenario_plotNames",
+                        "years",
+                        "results_folder",
+                        "plots_dir",
+                        "AllDays",
+                        "monthSum",
+                        "plots_dir",
+                        "RasterUnitConvert")))
+
+```
+
+## Climographs
+
+This chunk creates all climograph plots and places them within the results folder under Plots/Climographs
+
+```{r climographs, message=FALSE}
+
+
+source("./Code/ClimographsDF.R")
+source("./COde/Tables_and_Plots/Climograph_Plots.R")
+
+```
+
+
 
 ## Walter and Leith Diagrams
 
@@ -1057,7 +1293,7 @@ source('./Code/Tables_and_Plots/Walter-Lieth.R')
 ```{r remove-objects}
 
 rm(list=setdiff(ls(), c("monthSum", 
-                        "installation", 
+                        "shp", 
                         "model", 
                         "scenarios",
                         "scenario_plotNames",
@@ -1113,7 +1349,7 @@ csv_years = if (str_detect(names(diffHist[i]), "f1")){
     paste0(years[5],"-",years[6])
   } 
     
-csv_fileName = paste(installation,csv_scenario,csv_years,"DiffHist",sep = '_')
+csv_fileName = paste(shp,csv_scenario,csv_years,"DiffHist",sep = '_')
 write_csv(diffHist[[i]], file = paste0(results_folder,"/",csv_fileName,".csv",sep = ""))
 
 }
@@ -1142,7 +1378,7 @@ source('./Code/Tables_and_Plots/Bar_Charts/Format_Bar_Charts.R') # Formatting pl
 
 ```
 
-```
+
 
 
 
