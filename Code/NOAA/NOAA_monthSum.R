@@ -6,11 +6,29 @@
 # annie.kellner@colostate.edu
 
 
-noaa_monthSum <- list()
+# This script creates both a monthSum Climate Viewer spreadsheet as well as 
+  # the monthSum csv used for reports
 
+
+
+# Climate Viewer Column Info
+
+vScenario <- c("Observed Historical Climate",
+                "Modeled Historical Climate",
+                "Moderate Emissions (SSP2-4.5)",
+                "High Emissions (SSP5-8.5)")
+
+ScenID <- c(1,2,3,4,5,6,7,8)
+
+
+#noaa_monthSum <- list()
+
+vars1 <- list()
+ppt_list <- list()
 
 for(i in 1:length(AllDays_hist)){
   df = AllDays_hist[[i]]
+  
   df = df %>%
     mutate(month = month(date)) %>%
     mutate(year = year(date)) 
@@ -29,7 +47,10 @@ for(i in 1:length(AllDays_hist)){
   sum_ppt = df %>%
     select(date, year, month, 'PPT_in', 'PPT_mm') %>%
     group_by(year, month) %>%
-    summarise(across(contains('PPT'), sum))
+    summarise(across(contains('PPT'), sum)) %>%
+    ungroup()
+  
+  ppt_list[[i]] <- sum_ppt 
   
   sum_days = df %>%
     select(date, year, month, contains('days')) %>%
@@ -41,14 +62,130 @@ for(i in 1:length(AllDays_hist)){
     group_by(year, month) %>%
     summarise(GDDF = sum(GDDF))
   
+  ## new variables added 2-3-2025
+  
+  Pctl90_TmaxF = df %>%
+    select(year, month, TMaxF) %>%
+    group_by(year, month) %>%
+    summarize(Pctl90_TmaxF = quantile(TMaxF, probs = 0.90, na.rm = TRUE))
+  
+  Pctl10_TminF = df %>%
+    select(year, month, TMinF) %>%
+    group_by(year, month) %>%
+    summarize(Pctl10_TminF = quantile(TMinF, probs = 0.10, na.rm = TRUE))
+  
+  VHOTDAYS = df %>%
+    select(year, month, TMaxF) %>%
+    group_by(year, month) %>%
+    summarize(VHOTDAYS = sum(TMaxF > 95, na.rm = TRUE))
+  
+  EXHOTDAYS = df %>%
+    select(year, month, TMaxF) %>%
+    group_by(year, month) %>%
+    summarize(EXHOTDAYS = sum(TMaxF > 100, na.rm = TRUE))
+  
+  HELLDAYS = df %>%
+    select(year, month, TMaxF) %>%
+    group_by(year, month) %>%
+    summarize(HELLDAYS = sum(TMaxF > 105, na.rm = TRUE))
+  
+  WARMNIGHTS = df %>%
+    select(year, month, TMinF) %>%
+    group_by(year, month) %>%
+    summarize(WARMNIGHTS = sum(TMinF > 75, na.rm = TRUE))
+  
+  FROSTFREE = df %>%
+    select(year, month, TMinF) %>%
+    group_by(year, month) %>%
+    summarize(FROSTFREE = sum(TMinF > 32, na.rm = TRUE))
+  
   all = yearAvg %>%
     full_join(sum_days) %>%
     full_join(sum_ppt) %>%
     full_join(Abs_TminF) %>%
     full_join(sum_GDDF) %>%
+    full_join(Pctl90_TmaxF) %>%
+    full_join(Pctl10_TminF) %>%
+    full_join(VHOTDAYS) %>%
+    full_join(EXHOTDAYS) %>%
+    full_join(HELLDAYS) %>%
+    full_join(WARMNIGHTS) %>%
+    full_join(FROSTFREE) %>%
     ungroup() 
   
-  monthAvg = all %>%
+  vars1[[i]] = all 
+ 
+   }
+
+rm(df)
+
+##  ------  Additional variables derived from summed precip ----------- ##
+
+sumPPTlist <- list()
+
+
+for(i in 1:length(ppt_list)){
+  
+  df = select(ppt_list[[i]], month, PPT_in)
+  
+  Pctl90_Prcp_in = df %>%
+    group_by(month) %>%
+    summarize("Pctl90_Prcp_in" = quantile(PPT_in, probs = 0.90, na.rm = TRUE))
+  
+  Pctl10_Prcp_in = df %>%
+    group_by(month) %>%
+    summarize("Pctl10_Prcp_in" = quantile(PPT_in, probs = 0.10, na.rm = TRUE)) 
+  
+  VWETDAYS <- df %>%
+    group_by(month) %>%
+    summarize(VWETDAYS = sum(PPT_in > 4, na.rm = TRUE)) 
+  
+  quants = left_join(Pctl90_Prcp_in, Pctl10_Prcp_in)
+  allSumPPT = left_join(quants, VWETDAYS)
+  
+  sumPPTlist[[i]] = allSumPPT
+  
+}
+
+# Join all variables
+
+all <- list()
+
+for(i in 1:length(vars1)){
+  
+  df1 = vars1[[i]]
+  df2 = sumPPTlist[[i]]
+  
+  all[[i]] = left_join(df1, df2, by = "month")
+  
+}
+
+
+
+
+ 
+
+  
+
+
+  
+
+  
+ 
+  
+  newVars = df %>%
+    left_join(pptQ90) %>%
+    left_join(pptQ10) %>%
+    left_join(tmaxFQ90) %>%
+    left_join(tminFQ10) %>%
+    left_join(Vhot) %>%
+    left_join(Xhot) %>%
+    left_join(hell) %>%
+    left_join(warmNights) %>%
+    left_join(frostFree) %>%
+    left_join(Vwet)
+  
+ allVars_monthAvg = newVars %>%
     dplyr::select(!year) %>%
     group_by(month) %>%
     summarise(across(where(is.numeric), mean, na.rm = TRUE)) %>%
@@ -68,7 +205,13 @@ for(i in 1:length(AllDays_hist)){
            Avg_colddays,
            Avg_wetdays,
            Avg_drydays,
-           Avg_ftdays
+           Avg_ftdays, 
+           Avg_pptQ90,
+           Avg_pptQ10,
+           Avg_Vwet,
+           Avg_tmaxFQ90,
+           Avg_tminFQ10,
+           Avg_Vhot
     ) 
   
   monthAvg = round(monthAvg, digits = 2)
