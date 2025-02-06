@@ -145,7 +145,7 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-#shp <- shp_names[28] # CHANGE THIS TO INSTALLATION OF INTEREST
+#shp <- shp_names[14] # CHANGE THIS TO INSTALLATION OF INTEREST
 
 #list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
@@ -156,11 +156,11 @@ However, if you are re- specific segments of the script using previously extract
 
 # Load workspace image
 
-#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/Eglin_Niceville_EC-Earth3-Veg-LR_20250129.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBLE_L/JBLE_L_EC-Earth3-Veg-LR_20250204.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eglin_Niceville/rasterStack_Eglin_Niceville_EC-Earth3-Veg-LR_20250123.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBLE_L/rasterStack_JBLE_L_EC-Earth3-Veg-LR_20250204.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
@@ -194,11 +194,11 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[28] 
+shp <- shp_names[14] 
 
-base_abbrev <- base_abbreviations[2] 
+base_abbrev <- base_abbreviations[1] 
 
-official_name <- official_base_names[12] # These names serve as titles for the climatograph and Walter-Lieth plots
+official_name <- official_base_names[19] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"and the acronym/shorthand name associated with the installation is", base_abbrev,"."))
@@ -224,9 +224,115 @@ cat(paste("The model you have selected is", model,"for the installation", offici
 
 ```
 
+################################################################################
+###               USER SETTINGS PART III - SCENARIOS                        ###
+################################################################################
+
+The next chunk checks what scenarios (subfolders) are contained in the 'Data' folder associated with the model of interest.
+
+```{r scenarios, results='asis'}
+
+# Directories
+
+model_dir <- paste("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Models/", model, sep = "") 
+
+scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
+
+cat("The scenarios (subfolders) associated with this model are:", sep = '/n') # cat() basically means 'print' in this context 
+
+cat(paste("-", scenario_dirs), sep = "/n") # names into separate lines for readability ('/n' = line)
+
+```
+
+*Enter the scenarios of interest below*. Input values between the quotation marks ("") for 'baseline', 'scenario1', and 'scenario2'.
+
+```{r enter-scenarios}
+
+baseline <- "historical"
+scenario1 <- "ssp245"
+scenario2 <- "ssp585"
+
+```
+
+################################################################################
+###           USER SETTINGS PART IV - VARIABLES OF INTEREST                  ###
+################################################################################
+
+
+Next, let's see which variables are represented in this dataset. The variables will appear in a list below the code chunk.
+
+```{r}
+
+baseline_dir = paste(model_dir, baseline, sep = "/")
+baseline_filenames <- list.files(baseline_dir, pattern = '.nc', full.names = FALSE) # this line might need to be adjusted if some files are .ncdf or other
+
+variables <- unique(substr(baseline_filenames, 1,6)) # Numbers 1 and 6 refer to character indices within the file names (i.e., the first six letters of the file name)
+
+cat("The variables in this dataset are:", sep = '\n')
+cat(paste("-", variables), sep = "\n")
+
+```
+
+Of the variables listed, which do you want to include in your analysis? *Enter the variables names you want to include between the quotation marks.* 
+
+```{r}
+
+variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "huss_d", "sfcWin") # an example of how you would choose among the variables if desired
+
+```
+
+################################################################################
+###           USER SETTINGS PART V - YEARS OF INTEREST                       ###
+################################################################################
+
+
+*Now, enter the years of interest for each time period*
+1985-2014 (or 1976-2005 if it is LOCAv2 or MACA), 2021-2050, and 2051-2080
+
+```{r enter-years-of-interest}
+
+baseline_start_year <- 1985 # Start year of interest for the historical time period  
+baseline_end_year <- 2014 # End year of interest for the historical time period
+
+future1_start_year <- 2021 # Start year of interest for the first future time period 
+future1_end_year <- 2050 # End year of interest for the first future time period 
+
+future2_start_year <- 2051 # Start year of interest for the second future time period 
+future2_end_year <- 2080 # End year of interest for the second future time period 
+
+```
+
+
+################################################################################
+###           USER SETTINGS PART VI - INSTALLATION BOUNDARIES                ###
+################################################################################
+
+# Installation Boundaries
+
+The following chunk enables us to access the shapefile (spatially explicit outline) of the base, or occasionally an area nearby that serves as an ecological proxy for the base. This is how we select the grid cell associated with the modeled climate data. 
+
+
+The first step is to determine whether the installation is managed by the Navy (because the Navy spatial data resides in a separate directory). If you don't know the answer, ask Trevor Even (trevor.even@colostate.edu).
+
+*If the AFB is managed by the Navy, set Navy = TRUE*
+*If the AFB is NOT managed by the Navy, set Navy = FALSE* (This would mean it is managed by the Army, Air Force, Space Force, etc.)
+
+```{r installation-boundaries}
+
+# Is the AFB managed by the Navy?
+
+Navy = FALSE
+
+dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
+                                  "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
+                            "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY")
+
+```
+
+
 
 ####################################################################################################
-###                USER SETTINGS PART III - GET OBSERVED HISTORICAL DATA                       #####
+###                USER SETTINGS PART VII - GET OBSERVED HISTORICAL DATA                       #####
 ####################################################################################################
 
 Observed historical data comes from weather stations in close proximity to a given installation. It is frequently the case that for a single installation, data may be pulled from multiple weather stations.
@@ -252,7 +358,7 @@ list.files(path = NOAA_dir, pattern = base_abbrev)
 
 ```{r pull-NOAA-data}
 
-weather_station <-  "Eglin_NicevilleOnly.csv"
+weather_station <- "JBLE_NewportLangley.csv"
 
 # Read in data
 
@@ -262,9 +368,23 @@ noaa <- read.csv(file = noaa_dataFilepath) # creates dataframe of observed histo
 
 ```
 
-####################################################################################################
-###                ANALYSES OF OBSERVED HISTORICAL DATA                                        #####
-####################################################################################################
+
+################################################################################
+###               THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT
+################################################################################
+
+*The remainder of the script runs automatically, but requires manual activation of each chunk to ensure the spatial boundaries are appropriate and the script runs without errors*
+
+*To run each chunk, press the green arrow in the top right*
+
+
+################################################################################
+################################################################################
+
+
+################################################################################
+###                ANALYSES OF OBSERVED HISTORICAL DATA                     ####
+################################################################################
 
 Because the historical analyses of observed data (NOAA data) use a different dataset from the rest of the script, we are running it here, prior to further user inputs. The following two chunks DO NOT require user input. Simply press the green arrow to run sections {r Output-directories} and {r Observed-historical}
 
@@ -336,103 +456,18 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
 
 
 
-####################################################################################################
-###               USER SETTINGS PART IV - ANALYSIS OF MODELED DATA                              ####
-####################################################################################################
-
-
-# Installation Boundaries
-
-The following chunk enables us to access the shapefile (spatially explicit outline) of the base, or occasionally an area nearby that serves as an ecological proxy for the base. This is how we select the grid cell associated with the modeled climate data. 
-
-
-The first step is to determine whether the installation is managed by the Navy (because the Navy spatial data resides in a separate directory). If you don't know the answer, ask Trevor Even (trevor.even@colostate.edu).
-
-*If the AFB is managed by the Navy, set Navy = TRUE*
-*If the AFB is NOT managed by the Navy, set Navy = FALSE* (This would include the Army, Air Force, Space Force, etc.)
-
-```{r installation-boundaries}
-
-# Is the AFB managed by the Navy?
-
-Navy = FALSE
-
-dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
-                                  "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
-                            "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY")
-
-```
 
 
 
 
-The next chunk checks what scenarios (subfolders) are contained in the 'Data' folder associated with the model of interest.
 
-```{r scenarios, results='asis'}
 
-# Directories
 
-model_dir <- paste("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Models/", model, sep = "") 
 
-scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
 
-cat("The scenarios (subfolders) associated with this model are:", sep = '/n') # cat() basically means 'print' in this context 
 
-cat(paste("-", scenario_dirs), sep = "/n") # names into separate lines for readability ('/n' = line)
 
-```
 
-*Enter the scenarios of interest below*. Input values between the quotation marks ("") for 'baseline', 'scenario1', and 'scenario2'.
-
-```{r enter-scenarios}
-
-baseline <- "historical"
-scenario1 <- "ssp245"
-scenario2 <- "ssp585"
-
-```
-
-Next, let's see which variables are represented in this dataset. The variables will appear in a list below the code chunk.
-
-```{r}
-
-baseline_dir = paste(model_dir, baseline, sep = "/")
-baseline_filenames <- list.files(baseline_dir, pattern = '.nc', full.names = FALSE) # this line might need to be adjusted if some files are .ncdf or other
-
-variables <- unique(substr(baseline_filenames, 1,6)) # Numbers 1 and 6 refer to character indices within the file names (i.e., the first six letters of the file name)
-
-cat("The variables in this dataset are:", sep = '\n')
-cat(paste("-", variables), sep = "\n")
-
-```
-
-Of the variables listed, which do you want to include in your analysis? *Enter the variables names you want to include between the quotation marks.* 
-
-```{r}
-
-variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin") # an example of how you would choose among the variables if desired
-
-```
-
-*Now, enter the years of interest for each time period*
-1985-2014 (or 1976-2005 if it is LOCAv2 or MACA), 2021-2050, and 2051-2080
-
-```{r enter-years-of-interest}
-
-baseline_start_year <- 1985 # Start year of interest for the historical time period  
-baseline_end_year <- 2014 # End year of interest for the historical time period
-
-future1_start_year <- 2021 # Start year of interest for the first future time period 
-future1_end_year <- 2050 # End year of interest for the first future time period 
-
-future2_start_year <- 2051 # Start year of interest for the second future time period 
-future2_end_year <- 2080 # End year of interest for the second future time period 
-
-```
-
-################################################################################################################
-###               THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT                                    ####
-################################################################################################################
 
 
 The rest of the script should be able to be run automatically. From this point forward, all you need to do is press the green 'run' arrow for each chunk. DO NOT ALTER THE CODE BELOW. 
