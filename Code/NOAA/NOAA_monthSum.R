@@ -13,12 +13,7 @@
 
 # Climate Viewer Column Info
 
-vScenario <- c("Observed Historical Climate",
-                "Modeled Historical Climate",
-                "Moderate Emissions (SSP2-4.5)",
-                "High Emissions (SSP5-8.5)")
-
-ScenID <- c(1,2,3,4,5,6,7,8)
+#ScenID <- c(1,2,3,4,5,6,7,8)
 
 
 #noaa_monthSum <- list()
@@ -30,88 +25,113 @@ for(i in 1:length(AllDays_hist)){
   df = AllDays_hist[[i]]
   
   df = df %>%
-    mutate(month = month(date)) %>%
+    mutate(MonthNum = month(date)) %>%
     mutate(year = year(date)) 
+    #mutate(SITENAME = official_name) %>%  # will add these later, but no need to add to every day
+   # mutate(Scenario = "Observed Historical Climate")
   
-  yearAvg = df %>%
+   yearAvg = df %>%
     dplyr::select(!c('date','PPT_in', 'PPT_mm', 'GDDF')) %>% # exclude variables for which the result is not simply a monthly average
     dplyr::select(!(contains("days"))) %>%
-    group_by(year, month) %>%
+    group_by(year, MonthNum) %>%
     summarise(across(where(is.numeric), mean))
   
   Abs_TminF = df %>%
-    select(date, year, month, TMinF) %>%
-    group_by(year, month) %>%
+    select(date, year, MonthNum, TMinF) %>%
+    group_by(year, MonthNum) %>%
     summarise(Abs_TminF = min(TMinF))
   
   sum_ppt = df %>%
-    select(date, year, month, 'PPT_in', 'PPT_mm') %>%
-    group_by(year, month) %>%
+    select(date, year, MonthNum, 'PPT_in', 'PPT_mm') %>%
+    group_by(year, MonthNum) %>%
     summarise(across(contains('PPT'), sum)) %>%
     ungroup()
   
   ppt_list[[i]] <- sum_ppt 
   
   sum_days = df %>%
-    select(date, year, month, contains('days')) %>%
-    group_by(year, month) %>%
+    select(date, year, MonthNum, contains('days')) %>%
+    group_by(year, MonthNum) %>%
     summarise(across(contains('days'), sum))
   
   sum_GDDF = df %>%
-    select(date, year, month, GDDF) %>%
-    group_by(year, month) %>%
+    select(date, year, MonthNum, GDDF) %>%
+    group_by(year, MonthNum) %>%
     summarise(GDDF = sum(GDDF))
   
   ## new variables added 2-3-2025
   
   Pctl90_TmaxF = df %>%
-    select(year, month, TMaxF) %>%
-    group_by(year, month) %>%
+    select(year, MonthNum, TMaxF) %>%
+    group_by(year, MonthNum) %>%
     summarize(Pctl90_TmaxF = quantile(TMaxF, probs = 0.90, na.rm = TRUE))
   
   Pctl10_TminF = df %>%
-    select(year, month, TMinF) %>%
-    group_by(year, month) %>%
+    select(year, MonthNum, TMinF) %>%
+    group_by(year, MonthNum) %>%
     summarize(Pctl10_TminF = quantile(TMinF, probs = 0.10, na.rm = TRUE))
   
   VHOTDAYS = df %>%
-    select(year, month, TMaxF) %>%
-    group_by(year, month) %>%
+    select(year, MonthNum, TMaxF) %>%
+    group_by(year, MonthNum) %>%
     summarize(VHOTDAYS = sum(TMaxF > 95, na.rm = TRUE))
   
   EXHOTDAYS = df %>%
-    select(year, month, TMaxF) %>%
-    group_by(year, month) %>%
+    select(year, MonthNum, TMaxF) %>%
+    group_by(year, MonthNum) %>%
     summarize(EXHOTDAYS = sum(TMaxF > 100, na.rm = TRUE))
   
   HELLDAYS = df %>%
-    select(year, month, TMaxF) %>%
-    group_by(year, month) %>%
+    select(year, MonthNum, TMaxF) %>%
+    group_by(year, MonthNum) %>%
     summarize(HELLDAYS = sum(TMaxF > 105, na.rm = TRUE))
   
   WARMNIGHTS = df %>%
-    select(year, month, TMinF) %>%
-    group_by(year, month) %>%
+    select(year, MonthNum, TMinF) %>%
+    group_by(year, MonthNum) %>%
     summarize(WARMNIGHTS = sum(TMinF > 75, na.rm = TRUE))
   
   FROSTFREE = df %>%
-    select(year, month, TMinF) %>%
-    group_by(year, month) %>%
+    select(year, MonthNum, TMinF) %>%
+    group_by(year, MonthNum) %>%
     summarize(FROSTFREE = sum(TMinF > 32, na.rm = TRUE))
   
   all = yearAvg %>%
-    full_join(sum_days) %>%
-    full_join(sum_ppt) %>%
-    full_join(Abs_TminF) %>%
-    full_join(sum_GDDF) %>%
-    full_join(Pctl90_TmaxF) %>%
-    full_join(Pctl10_TminF) %>%
-    full_join(VHOTDAYS) %>%
-    full_join(EXHOTDAYS) %>%
-    full_join(HELLDAYS) %>%
-    full_join(WARMNIGHTS) %>%
-    full_join(FROSTFREE) %>%
+    left_join(sum_days) %>%
+    left_join(sum_ppt) %>%
+    left_join(Abs_TminF) %>%
+    left_join(sum_GDDF) %>%
+    left_join(Pctl90_TmaxF) %>%
+    left_join(Pctl10_TminF) %>%
+    left_join(VHOTDAYS) %>%
+    left_join(EXHOTDAYS) %>%
+    left_join(HELLDAYS) %>%
+    left_join(WARMNIGHTS) %>%
+    left_join(FROSTFREE) %>%
     ungroup() 
+  
+  monthAvg = all %>%
+    dplyr::select(!year) %>%
+    group_by(MonthNum) %>%
+    summarise(across(everything(), mean)) %>%
+    setNames(paste0('Avg_', names(.))) %>%
+    rename(Abs_TminF = Avg_Abs_TminF) %>%
+    select(Avg_MonthNum, 
+           Avg_PPT_in, 
+           Avg_PPT_mm, 
+           Avg_TMaxF, 
+           Avg_TMinF, 
+           Avg_TMeanF, 
+           Abs_TminF, 
+           contains("Avg_hu"),
+           any_of("Avg_sfcWind"),  
+           Avg_GDDF,
+           Avg_hotdays,
+           Avg_colddays,
+           Avg_wetdays,
+           Avg_drydays,
+           Avg_ftdays
+    )
   
   vars1[[i]] = all 
  
@@ -126,18 +146,18 @@ sumPPTlist <- list()
 
 for(i in 1:length(ppt_list)){
   
-  df = select(ppt_list[[i]], month, PPT_in)
+  df = select(ppt_list[[i]], MonthNum, PPT_in)
   
   Pctl90_Prcp_in = df %>%
-    group_by(month) %>%
+    group_by(MonthNum) %>%
     summarize("Pctl90_Prcp_in" = quantile(PPT_in, probs = 0.90, na.rm = TRUE))
   
   Pctl10_Prcp_in = df %>%
-    group_by(month) %>%
+    group_by(MonthNum) %>%
     summarize("Pctl10_Prcp_in" = quantile(PPT_in, probs = 0.10, na.rm = TRUE)) 
   
   VWETDAYS <- df %>%
-    group_by(month) %>%
+    group_by(MonthNum) %>%
     summarize(VWETDAYS = sum(PPT_in > 4, na.rm = TRUE)) 
   
   quants = left_join(Pctl90_Prcp_in, Pctl10_Prcp_in)
@@ -146,6 +166,8 @@ for(i in 1:length(ppt_list)){
   sumPPTlist[[i]] = allSumPPT
   
 }
+
+rm(df)
 
 # Join all variables
 
@@ -156,15 +178,36 @@ for(i in 1:length(vars1)){
   df1 = vars1[[i]]
   df2 = sumPPTlist[[i]]
   
-  all[[i]] = left_join(df1, df2, by = "month")
+  all[[i]] = left_join(df1, df2, by = "MonthNum")
   
 }
 
+rm(df1)
+rm(df2)
+
+# Add Month and Period
+
+for(i in 1:length(all)){
+  all[[i]]$Month = month.abb[all[[i]]$MonthNum]
+  all[[i]]$Period = paste(first(all[[i]]$year),"to",last(all[[i]]$year), sep = " ")
+}
+
+
+monthly = bind_rows(all[[1]], all[[2]], all[[3]])
 
 
 
- 
+# Add ScenID
 
+year1 = first(all[[1]]$year)
+year2 = first(all[[2]]$year)
+year3 = first(all[[3]]$year)
+
+
+  
+
+  
+  
   
 
 
