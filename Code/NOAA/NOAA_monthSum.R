@@ -34,7 +34,9 @@ for(i in 1:length(AllDays_hist)){
     dplyr::select(!c('date','PPT_in', 'PPT_mm', 'GDDF')) %>% # exclude variables for which the result is not simply a monthly average
     dplyr::select(!(contains("days"))) %>%
     group_by(year, MonthNum) %>%
-    summarise(across(where(is.numeric), mean))
+    summarise(across(where(is.numeric), mean)) %>%
+    setNames(paste0('Avg_', names(.)))
+     
   
   Abs_TminF = df %>%
     select(date, year, MonthNum, TMinF) %>%
@@ -62,8 +64,8 @@ for(i in 1:length(AllDays_hist)){
   ## new variables added 2-3-2025
   
   Pctl90_TmaxF = df %>%
-    select(year, MonthNum, TMaxF) %>%
-    group_by(year, MonthNum) %>%
+    select(MonthNum, TMaxF) %>%
+    group_by(MonthNum) %>%
     summarize(Pctl90_TmaxF = quantile(TMaxF, probs = 0.90, na.rm = TRUE))
   
   Pctl10_TminF = df %>%
@@ -96,7 +98,7 @@ for(i in 1:length(AllDays_hist)){
     group_by(year, MonthNum) %>%
     summarize(FROSTFREE = sum(TMinF > 32, na.rm = TRUE))
   
-  all = yearAvg %>%
+  all = yearAvg %>% # Average by year (e.g., for Jan 1981, Feb 1981...)
     left_join(sum_days) %>%
     left_join(sum_ppt) %>%
     left_join(Abs_TminF) %>%
@@ -113,27 +115,9 @@ for(i in 1:length(AllDays_hist)){
   monthAvg = all %>%
     dplyr::select(!year) %>%
     group_by(MonthNum) %>%
-    summarise(across(everything(), mean)) %>%
-    setNames(paste0('Avg_', names(.))) %>%
-    rename(Abs_TminF = Avg_Abs_TminF) %>%
-    select(Avg_MonthNum, 
-           Avg_PPT_in, 
-           Avg_PPT_mm, 
-           Avg_TMaxF, 
-           Avg_TMinF, 
-           Avg_TMeanF, 
-           Abs_TminF, 
-           contains("Avg_hu"),
-           any_of("Avg_sfcWind"),  
-           Avg_GDDF,
-           Avg_hotdays,
-           Avg_colddays,
-           Avg_wetdays,
-           Avg_drydays,
-           Avg_ftdays
-    )
+    summarise(across(everything(), ~ mean(.x, na.rm = TRUE)))
   
-  vars1[[i]] = all 
+  vars1[[i]] = monthAvg 
  
    }
 
@@ -146,7 +130,7 @@ sumPPTlist <- list()
 
 for(i in 1:length(ppt_list)){
   
-  df = select(ppt_list[[i]], MonthNum, PPT_in)
+  df = select(ppt_list[[i]], year, MonthNum, PPT_in)
   
   Pctl90_Prcp_in = df %>%
     group_by(MonthNum) %>%
@@ -157,11 +141,17 @@ for(i in 1:length(ppt_list)){
     summarize("Pctl10_Prcp_in" = quantile(PPT_in, probs = 0.10, na.rm = TRUE)) 
   
   VWETDAYS <- df %>%
-    group_by(MonthNum) %>%
+    group_by(year, MonthNum) %>%
     summarize(VWETDAYS = sum(PPT_in > 4, na.rm = TRUE)) 
   
   quants = left_join(Pctl90_Prcp_in, Pctl10_Prcp_in)
   allSumPPT = left_join(quants, VWETDAYS)
+  
+  monthAvg_PPT = allSumPPT %>%
+    #dplyr::select(!year) %>%
+    group_by(MonthNum) %>%
+    summarise(across(everything(), mean)) %>%
+    
   
   sumPPTlist[[i]] = allSumPPT
   
