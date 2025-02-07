@@ -47,7 +47,6 @@ library(sf)
 library(tidyverse)
 library(data.table)
 library(scales)
-library(viridis)
 library(mapview) # for maps
 library(tmap)
 library(tmaptools)
@@ -238,9 +237,9 @@ model_dir <- paste("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Models/", mode
 
 scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
 
-cat("The scenarios (subfolders) associated with this model are:", sep = '/n') # cat() basically means 'print' in this context 
+cat("The scenarios (subfolders) associated with this model are:  ") # cat() basically means 'print' in this context 
 
-cat(paste("-", scenario_dirs), sep = "/n") # names into separate lines for readability ('/n' = line)
+cat(paste(scenario_dirs), sep = ", ") # ignore the first comma that shows up
 
 ```
 
@@ -370,7 +369,7 @@ noaa <- read.csv(file = noaa_dataFilepath) # creates dataframe of observed histo
 
 
 ################################################################################
-###               THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT
+###               THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT     ###
 ################################################################################
 
 *The remainder of the script runs automatically, but requires manual activation of each chunk to ensure the spatial boundaries are appropriate and the script runs without errors*
@@ -380,6 +379,8 @@ noaa <- read.csv(file = noaa_dataFilepath) # creates dataframe of observed histo
 
 ################################################################################
 ################################################################################
+
+
 
 
 ################################################################################
