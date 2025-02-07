@@ -20,6 +20,8 @@
 
 vars1 <- list()
 ppt_list <- list()
+vars2 <- list()
+noaa_monthSum <- list()
 
 for(i in 1:length(AllDays_hist)){
   df = AllDays_hist[[i]]
@@ -35,7 +37,9 @@ for(i in 1:length(AllDays_hist)){
     dplyr::select(!(contains("days"))) %>%
     group_by(year, MonthNum) %>%
     summarise(across(where(is.numeric), mean)) %>%
-    setNames(paste0('Avg_', names(.)))
+    setNames(paste0('Avg_', names(.))) %>%
+     rename(MonthNum = Avg_MonthNum) %>%
+     rename(year = Avg_year)
      
   
   Abs_TminF = df %>%
@@ -125,19 +129,17 @@ rm(df)
 
 ##  ------  Additional variables derived from summed precip ----------- ##
 
-sumPPTlist <- list()
-
 
 for(i in 1:length(ppt_list)){
   
   df = select(ppt_list[[i]], year, MonthNum, PPT_in)
   
   Pctl90_Prcp_in = df %>%
-    group_by(MonthNum) %>%
+    group_by(year, MonthNum) %>%
     summarize("Pctl90_Prcp_in" = quantile(PPT_in, probs = 0.90, na.rm = TRUE))
   
   Pctl10_Prcp_in = df %>%
-    group_by(MonthNum) %>%
+    group_by(year, MonthNum) %>%
     summarize("Pctl10_Prcp_in" = quantile(PPT_in, probs = 0.10, na.rm = TRUE)) 
   
   VWETDAYS <- df %>%
@@ -145,15 +147,15 @@ for(i in 1:length(ppt_list)){
     summarize(VWETDAYS = sum(PPT_in > 4, na.rm = TRUE)) 
   
   quants = left_join(Pctl90_Prcp_in, Pctl10_Prcp_in)
-  allSumPPT = left_join(quants, VWETDAYS)
+  allSumPPT = left_join(quants, VWETDAYS) %>% ungroup()
   
   monthAvg_PPT = allSumPPT %>%
-    #dplyr::select(!year) %>%
+    dplyr::select(!year) %>%
     group_by(MonthNum) %>%
-    summarise(across(everything(), mean)) %>%
+    summarise(across(everything(), ~mean(.x, na.rm = TRUE))) 
     
   
-  sumPPTlist[[i]] = allSumPPT
+  vars2[[i]] = monthAvg_PPT
   
 }
 
@@ -161,14 +163,13 @@ rm(df)
 
 # Join all variables
 
-all <- list()
 
 for(i in 1:length(vars1)){
   
   df1 = vars1[[i]]
-  df2 = sumPPTlist[[i]]
+  df2 = vars2[[i]]
   
-  all[[i]] = left_join(df1, df2, by = "MonthNum")
+  noaa_monthSum[[i]] = left_join(df1, df2, by = "MonthNum")
   
 }
 
