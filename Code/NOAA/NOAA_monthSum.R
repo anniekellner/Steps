@@ -36,11 +36,7 @@ for(i in 1:length(AllDays_hist)){
     dplyr::select(!c('date','PPT_in', 'PPT_mm', 'GDDF')) %>% # exclude variables for which the result is not simply a monthly average
     dplyr::select(!(contains("days"))) %>%
     group_by(year, MonthNum) %>%
-    summarise(across(where(is.numeric), mean)) %>%
-    setNames(paste0('Avg_', names(.))) %>%
-     rename(MonthNum = Avg_MonthNum) %>%
-     rename(year = Avg_year)
-     
+    summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) 
   
   Abs_TminF = df %>%
     select(date, year, MonthNum, TMinF) %>%
@@ -50,7 +46,7 @@ for(i in 1:length(AllDays_hist)){
   sum_ppt = df %>%
     select(date, year, MonthNum, 'PPT_in', 'PPT_mm') %>%
     group_by(year, MonthNum) %>%
-    summarise(across(contains('PPT'), sum)) %>%
+    summarise(across(contains('PPT'), ~ sum(.x, na.rm = TRUE))) %>%
     ungroup()
   
   ppt_list[[i]] <- sum_ppt 
@@ -58,17 +54,17 @@ for(i in 1:length(AllDays_hist)){
   sum_days = df %>%
     select(date, year, MonthNum, contains('days')) %>%
     group_by(year, MonthNum) %>%
-    summarise(across(contains('days'), sum))
+    summarise(across(contains('days'), ~ sum(.x, na.rm = TRUE)))
   
   sum_GDDF = df %>%
     select(date, year, MonthNum, GDDF) %>%
     group_by(year, MonthNum) %>%
-    summarise(GDDF = sum(GDDF))
+    summarise(GDDF = sum(GDDF, na.rm = TRUE))
   
   ## new variables added 2-3-2025
   
   Pctl90_TmaxF = df %>%
-    select(MonthNum, TMaxF) %>%
+    select(year, MonthNum, TMaxF) %>%
     group_by(MonthNum) %>%
     summarize(Pctl90_TmaxF = quantile(TMaxF, probs = 0.90, na.rm = TRUE))
   
@@ -102,7 +98,7 @@ for(i in 1:length(AllDays_hist)){
     group_by(year, MonthNum) %>%
     summarize(FROSTFREE = sum(TMinF > 32, na.rm = TRUE))
   
-  all = yearAvg %>% # Average by year (e.g., for Jan 1981, Feb 1981...)
+  all = yearAvg %>% # Averages by year (e.g., for Jan 1981, Feb 1981...)
     left_join(sum_days) %>%
     left_join(sum_ppt) %>%
     left_join(Abs_TminF) %>%
@@ -116,10 +112,20 @@ for(i in 1:length(AllDays_hist)){
     left_join(FROSTFREE) %>%
     ungroup() 
   
+
+    #rename(year = Avg_year)
+    
+  Period = paste(first(all$year),"to",last(all$year), sep = " ")
+  
   monthAvg = all %>%
     dplyr::select(!year) %>%
     group_by(MonthNum) %>%
-    summarise(across(everything(), ~ mean(.x, na.rm = TRUE)))
+    summarise(across(TMaxF:FROSTFREE, ~ mean(.x, na.rm = TRUE)))
+  
+  monthAvg = monthAvg %>%
+    setNames(paste0('Avg_', names(.))) %>%
+    rename(MonthNum = Avg_MonthNum) %>%
+    mutate(Period = Period)
   
   vars1[[i]] = monthAvg 
  
@@ -150,7 +156,7 @@ for(i in 1:length(ppt_list)){
   allSumPPT = left_join(quants, VWETDAYS) %>% ungroup()
   
   monthAvg_PPT = allSumPPT %>%
-    dplyr::select(!year) %>%
+    #dplyr::select(!year) %>%
     group_by(MonthNum) %>%
     summarise(across(everything(), ~mean(.x, na.rm = TRUE))) 
     
@@ -178,9 +184,9 @@ rm(df2)
 
 # Add Month and Period
 
-for(i in 1:length(all)){
-  all[[i]]$Month = month.abb[all[[i]]$MonthNum]
-  all[[i]]$Period = paste(first(all[[i]]$year),"to",last(all[[i]]$year), sep = " ")
+for(i in 1:length(noaa_monthSum)){
+  noaa_monthSum[[i]]$Month = month.abb[noaa_monthSum[[i]]$MonthNum]
+  noaa_monthSum[[i]]$Period = paste(first(noaa_monthSum[[i]]$year),"to",last(noaa_monthSum[[i]]$year), sep = " ")
 }
 
 
