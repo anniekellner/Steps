@@ -98,6 +98,7 @@ source('./Code/Misc/character_vectors.R')
 source('./Code/CEMML/Functions/Function_General.R')
 source('./Code/Step3Functions.R')
 source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude systems from (-180, 180 ) to (0, 360)
+source('./Code/Functions/ClimateViewerFns.R')
 
 ```
 
@@ -144,7 +145,7 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-#shp <- shp_names[14] # CHANGE THIS TO INSTALLATION OF INTEREST
+shp <- shp_names[14] # CHANGE THIS TO INSTALLATION OF INTEREST
 
 #list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
