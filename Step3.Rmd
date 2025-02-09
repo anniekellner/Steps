@@ -452,6 +452,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "model", 
                         "plots_dir",
                         "results_folder",
+                        "noaaMonthly", # will add futures to this dataframe later
                         lsf.str()))) # all functions
 
 ```
