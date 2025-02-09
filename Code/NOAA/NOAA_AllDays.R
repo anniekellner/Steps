@@ -45,8 +45,15 @@ df <- df %>%
   mutate(ftdays = RasterFTdays(TMaxC, 
                                TMinC, 
                                freezethresh = -2.2, 
-                               thawthresh = 1.2)) 
-
+                               thawthresh = 1.2)) %>%
+  mutate(VHOTDAYS = fnVHOTDAYS(TMaxC, hottemp = 37.8)) %>%
+  mutate(EXHOTDAYS = fnEXHOTDAYS(TMaxC, hottemp = 37.8)) %>%
+  mutate(HELLDAYS = fnHELLDAYS(TMaxC, hottemp = 40.6)) %>%
+  mutate(WARMIGHTS = fnWARMNIGHTS(TMinC, coldtemp = 23.9)) %>%
+  mutate(FRFRDAYS = fnFRFRDAYS(TMinC, coldtemp = 0)) %>%
+  mutate(VWETDAYS = fnVWETDAYS(preciprast, wetprecip = 101.6))
+           
+  
 df <- select(df,  # remove Celsius temps
              year,
              Station_ID, 
@@ -62,7 +69,13 @@ df <- select(df,  # remove Celsius temps
              colddays, 
              wetdays, 
              drydays, 
-             ftdays)
+             ftdays,
+             VHOTDAYS,
+             EXHOTDAYS,
+             HELLDAYS,
+             WARMNIGHTS, 
+             FRFRDAYS,
+             VWETDAYS)
 
 # ---  ASSORT DATA GROUPS BY YEAR AND SAVE   -----   #
 
