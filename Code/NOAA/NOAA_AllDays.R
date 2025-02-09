@@ -6,8 +6,9 @@
 # annie.kellner@colostate.edu
 
 # Add derived (recalculated) variables to dataframes
-# All functions and hard-coded values are from 
-    # the original LOCA_summarize.R script
+# Functions and hard-coded values are from 
+    # the original LOCA_summarize.R script and
+    # new functions adapted from that script (2-8-2025)
 
 
 # ----- PREP DATA ------------------  #
@@ -54,7 +55,7 @@ df <- df %>%
   mutate(VWETDAYS = fnVWETDAYS(PPT_mm, wetprecip = 101.6))
            
   
-df <- select(df,  # remove Celsius temps
+df <- select(df,  # remove metric units
              year,
              Station_ID, 
              Station_Name,
