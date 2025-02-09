@@ -91,7 +91,7 @@ AllDays_Dash[[1]] <- grp1
 AllDays_Dash[[2]] <- grp2
 AllDays_Dash[[3]] <- grp3
 
-rm(c("df", "noaa")) 
+rm(list = c("df", "noaa")) 
 rm(list = ls(pattern = "^grp"))
 rm(list = ls(pattern = "^fileName"))
 rm(list = ls(pattern = "^filePath"))
