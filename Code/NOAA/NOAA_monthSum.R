@@ -194,7 +194,7 @@ noaaMonthly <- noaaMonthly %>%
           VWETDAYS)
           
           
-      
+    
 
 
 
@@ -204,55 +204,6 @@ noaaMonthly <- noaaMonthly %>%
 
   
 
-  
- 
-  
-  newVars = df %>%
-    left_join(pptQ90) %>%
-    left_join(pptQ10) %>%
-    left_join(tmaxFQ90) %>%
-    left_join(tminFQ10) %>%
-    left_join(Vhot) %>%
-    left_join(Xhot) %>%
-    left_join(hell) %>%
-    left_join(warmNights) %>%
-    left_join(frostFree) %>%
-    left_join(Vwet)
-  
- allVars_monthAvg = newVars %>%
-    dplyr::select(!year) %>%
-    group_by(month) %>%
-    summarise(across(where(is.numeric), mean, na.rm = TRUE)) %>%
-    setNames(paste0('Avg_', names(.))) %>%
-    rename(Abs_TminF = Avg_Abs_TminF) %>%
-    select(Avg_month, # put in order on MonthSum csv
-           Avg_PPT_in, 
-           Avg_PPT_mm, 
-           Avg_TMaxF, 
-           Avg_TMinF, 
-           Avg_TMeanF, 
-           Abs_TminF, 
-           any_of("Avg_hurs"),
-           any_of("Avg_sfcWind"),
-           Avg_GDDF,
-           Avg_hotdays,
-           Avg_colddays,
-           Avg_wetdays,
-           Avg_drydays,
-           Avg_ftdays, 
-           Avg_pptQ90,
-           Avg_pptQ10,
-           Avg_Vwet,
-           Avg_tmaxFQ90,
-           Avg_tminFQ10,
-           Avg_Vhot
-    ) 
-  
-  monthAvg = round(monthAvg, digits = 2)
- 
-  noaa_monthSum[[i]] <- monthAvg 
-  
-}
 
     
 # Add summary rows (YrAverage and YrTotals) and save for table construction
