@@ -49,9 +49,9 @@ df <- df %>%
   mutate(VHOTDAYS = fnVHOTDAYS(TMaxC, hottemp = 37.8)) %>%
   mutate(EXHOTDAYS = fnEXHOTDAYS(TMaxC, hottemp = 37.8)) %>%
   mutate(HELLDAYS = fnHELLDAYS(TMaxC, hottemp = 40.6)) %>%
-  mutate(WARMIGHTS = fnWARMNIGHTS(TMinC, coldtemp = 23.9)) %>%
+  mutate(WARMNIGHTS = fnWARMNIGHTS(TMinC, coldtemp = 23.9)) %>%
   mutate(FRFRDAYS = fnFRFRDAYS(TMinC, coldtemp = 0)) %>%
-  mutate(VWETDAYS = fnVWETDAYS(preciprast, wetprecip = 101.6))
+  mutate(VWETDAYS = fnVWETDAYS(PPT_mm, wetprecip = 101.6))
            
   
 df <- select(df,  # remove Celsius temps
@@ -60,7 +60,6 @@ df <- select(df,  # remove Celsius temps
              Station_Name,
              date,
              PPT_in, 
-             PPT_mm, 
              TMaxF, 
              TMinF, 
              TMeanF, 
