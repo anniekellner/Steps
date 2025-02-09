@@ -11,20 +11,9 @@
     # new functions adapted from that script (2-8-2025)
 
 
-# ----- PREP DATA ------------------  #
+## BEGIN SCRIPT
 
-noaa$DATE <- mdy(noaa$DATE) # format date using lubridate pkg
-
-noaa <- noaa %>%
-  select(STATION, NAME, DATE, PRCP, TMAX, TMIN) %>%
-  rename(Station_ID = STATION) %>%
-  rename(Station_Name = NAME) %>%
-  rename(date = DATE) %>%
-  rename(PPT_in = PRCP) %>%
-  rename(TMaxF = TMAX) %>%
-  rename(TMinF = TMIN) 
-
-df <- noaa # DELETE ONCE SCRIPT IS SET
+df <- noaa # noaa dataframe was altered in NOAA_AllDays script
 
 
 # -----   ADD DERIVED VARIABLES   -------  #
@@ -93,38 +82,16 @@ grp3 <- df %>%
   filter(year > 1990 & year < 2021) %>%
   select(-year)
 
-# Save .csv's to Results folder
-
-# Group 1
-
-fileName_grp1 <- paste(weather_station,"1981-2010","historical","AllDays", sep = "_")
-filePath_grp1 <- paste0(noaa_resultsDir,"/",fileName_grp1,".csv")
-
-write.csv(grp1, file = filePath_grp1)
-
-# Group 2
-
-fileName_grp2 <- paste(weather_station,"1985-2014","historical","AllDays", sep = "_")
-filePath_grp2 <- paste0(noaa_resultsDir,"/",fileName_grp2,".csv")
-
-write.csv(grp2, file = filePath_grp2)
-
-# Group 3
-
-fileName_grp3 <- paste(weather_station,"1991-2020","historical","AllDays", sep = "_")
-filePath_grp3 <- paste0(noaa_resultsDir,"/",fileName_grp3,".csv")
-
-write.csv(grp3, file = filePath_grp3)
 
 ##  --  PREPARE FOR MONTHLY SUMMARY --  ##
 
-AllDays_hist <- list()
+AllDays_Dash <- list()
 
-AllDays_hist[[1]] <- grp1
-AllDays_hist[[2]] <- grp2
-AllDays_hist[[3]] <- grp3
+AllDays_Dash[[1]] <- grp1
+AllDays_Dash[[2]] <- grp2
+AllDays_Dash[[3]] <- grp3
 
-rm(list = c("df","noaa")) 
+rm(c("df", "noaa")) 
 rm(list = ls(pattern = "^grp"))
 rm(list = ls(pattern = "^fileName"))
 rm(list = ls(pattern = "^filePath"))
