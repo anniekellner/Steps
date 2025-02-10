@@ -144,8 +144,9 @@ for(i in 1:length(AllDaysDash)){
     left_join(Pctl10_Prcp_in)
   
   monthAvg$Period <- Period
-  monthAvg$Scenario <- "Modeled Historical Climate"
   monthAvg$SITENAME <- official_name
+  
+  monthAvg$Scenario <- ifelse(first(all$year) == 1985, "Modeled Historical Climate", "Moderate Emissions (SSP2-4.5)")
   
   vars[[i]] = monthAvg 
   
