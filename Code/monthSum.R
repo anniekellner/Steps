@@ -26,7 +26,7 @@ for(i in 1:length(AllDays)){
     mutate(date = ymd(date)) %>%
     mutate(month = month(date)) %>%
     mutate(year = year(date)) %>%
-    dplyr::select(-c(lat, lon))
+    dplyr::select(-c(lat, lon, tmax, tmin, prcp))
   
   yearAvg = df %>%
     dplyr::select(!c('date','PPT_in', 'PPT_mm', 'GDDF')) %>% # exclude variables for which the result is not simply a monthly average
