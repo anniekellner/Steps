@@ -85,11 +85,11 @@ grp3 <- df %>%
 
 ##  --  PREPARE FOR MONTHLY SUMMARY --  ##
 
-AllDays_Dash <- list()
+NOAA_AllDays_Dash <- list()
 
-AllDays_Dash[[1]] <- grp1
-AllDays_Dash[[2]] <- grp2
-AllDays_Dash[[3]] <- grp3
+NOAA_AllDays_Dash[[1]] <- grp1
+NOAA_AllDays_Dash[[2]] <- grp2
+NOAA_AllDays_Dash[[3]] <- grp3
 
 rm(list = c("df", "noaa")) 
 rm(list = ls(pattern = "^grp"))
