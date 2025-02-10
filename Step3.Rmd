@@ -782,14 +782,14 @@ for(i in 1:length(nested_tibbles)){
 
 NOTE: see comments within code. Functions assume the raw ncdf data does NOT use imperial units. 
 
-The next chunk creates AllDays.csv files
+The next chunk creates AllDays.csv files as well as the AllDays dataframe for downstream processing
 
 ```{r add-derived-vars, message=FALSE, warning=FALSE}
 
 # Add derived (recalculated) variables to dataframes
 # All functions are from the original LOCA_summarize.R script
 
-
+source("./Code/Create_AllDaysDF.R")
 
 ```
 
@@ -806,6 +806,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "results_folder",
                         "plots_dir",
                         "AllDays",
+                        "noaaDashboard",
                         "RasterUnitConvert")))
 
 ```
@@ -832,6 +833,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "results_folder",
                         "plots_dir",
                         "AllDays",
+                        "noaaDashboard",
                         "RasterUnitConvert")))
 
 ```
