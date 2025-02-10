@@ -6,14 +6,13 @@
 # annie.kellner@colostate.edu
 
 
-# This script creates both a monthSum Climate Viewer spreadsheet as well as 
-  # the monthSum csv used for reports
+# This script generates the Observed Historical Data portion of the Dashboard Viewer monthly spreadsheet
 
 
 vars <- list()
 
-for(i in 1:length(AllDays_hist)){
-  df = AllDays_hist[[i]]
+for(i in 1:length(AllDays_Dash)){
+  df = AllDays_Dash[[i]]
   
   df = df %>%
     mutate(MonthNum = month(date)) %>%
@@ -40,8 +39,6 @@ for(i in 1:length(AllDays_hist)){
     group_by(year, MonthNum) %>%
     summarise(across(contains('PPT'), ~ sum(.x, na.rm = TRUE))) %>%
     ungroup()
-  
-  #ppt_list[[i]] <- sum_ppt 
   
   sum_days = df %>%
     select(date, year, MonthNum, contains('days')) %>%
@@ -192,92 +189,6 @@ noaaDashboard <- noaaDashboard %>%
           WETDAYS,
           VWETDAYS)
 
-##    ----    NOAA MONTHSUM   -------   ##
-          
-          
- noaa_monthSum <- noaaDashboard %>%
-   select()
-
-
-
-  
-  
-
-
-  
-
-
-    
-# Add summary rows (YrAverage and YrTotals) and save for table construction
-
-Avs_and_Totals <- list() # saving for summary table
-
-for(i in 1:length(noaa_monthSum)){
-  YrAverage = colMeans(noaa_monthSum[[i]][,2:ncol(noaa_monthSum[[i]])]) # converts columns to characters 
-  YrTotals = colSums(noaa_monthSum[[i]][,2:ncol(noaa_monthSum[[i]])])
-  csv = bind_rows(noaa_monthSum[[i]], YrAverage, YrTotals)
-
-  # NA's 
-  
-  NAs_Avgs = csv %>% # YrAverage
-    filter(row_number() == 13) %>% # Because there will always be 12 months irrespective of model
-    mutate(across(.cols = contains("PPT"), ~na_if(.,.))) %>%
-    mutate(across(.cols = contains("days"), ~na_if(.,.))) %>%
-    mutate(across(.cols = contains("Abs"), ~na_if(.,.))) %>%
-    mutate(across(.cols = contains("GDDF"), ~na_if(.,.))) 
-
-
-  NAs_Totals = csv %>% # YrTotals
-    filter(row_number() == 14) %>%
-    mutate(across(.cols = contains("Avg_T"), ~na_if(.,.))) %>%
-    mutate(across(.cols = contains("Abs"), ~na_if(.,.))) %>%
-    mutate(across(.cols = any_of("Avg_hurs"), ~na_if(.,.))) %>%
-    mutate(across(.cols = any_of("Avg_sfcWind"), ~na_if(.,.))) 
-  
-  csv = csv %>%
-    slice(1:(n()-2)) %>% # remove summary rows
-    bind_rows(NAs_Avgs, NAs_Totals) %>% # replace with NA's included
-    rename(month = Avg_month) %>%
-    mutate(month = as.character(month))
-  
-  csv[13,1] = "YrAverage"
-  csv[14,1] = "YrTotals"
-  
-  csv -> Avs_and_Totals[[i]] 
-
-}
-
-# Save .csv's to Results folder
-
-# Group 1
-
-fileName_grp1 <- paste(weather_station,"1981-2010","historical","MonthSum", sep = "_")
-filePath_grp1 <- paste0(noaa_resultsDir,"/",fileName_grp1,".csv")
-
-write_csv(Avs_and_Totals[[1]], file = filePath_grp1)
-
-# Group 2
-
-fileName_grp2 <- paste(weather_station,"1985-2014","historical","MonthSum", sep = "_")
-filePath_grp2 <- paste0(noaa_resultsDir,"/",fileName_grp2,".csv")
-
-write_csv(Avs_and_Totals[[2]], file = filePath_grp2)
-
-# Group 3
-
-fileName_grp3 <- paste(weather_station,"1991-2020","historical","MonthSum", sep = "_")
-filePath_grp3 <- paste0(noaa_resultsDir,"/",fileName_grp3,".csv")
-
-
-write_csv(Avs_and_Totals[[3]], file = filePath_grp3)
-
-  
-
-  
-
-
-
-  
 
 
 

@@ -145,7 +145,7 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[14] # CHANGE THIS TO INSTALLATION OF INTEREST
+#shp <- shp_names[14] # CHANGE THIS TO INSTALLATION OF INTEREST
 
 #list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
@@ -434,8 +434,9 @@ if (!dir.exists(noaaClim_dir)){
 ```{r Observed-historical}
 
 
-source("./Code/NOAA/NOAA_AllDays.R")
-source("./Code/NOAA/NOAA_monthSum.R")
+source("./Code/NOAA/NOAA_AllDays_v2.R") # creates standard outputs (csv files and AllDays_hist dataframe)
+source("./Code/NOAA/NOAA_AllDays_Dashboard.R") # creates AllDays_Dash dataframe for Climate Viewer outputs
+source("./Code/NOAA/NOAA_monthSum_v2.R")
 source("./COde/NOAA/NOAA_Climographs_createDF.R")
 source("./Code/NOAA/NOAA_ClimographPlots.R")
 
