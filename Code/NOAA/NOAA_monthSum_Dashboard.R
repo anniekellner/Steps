@@ -18,8 +18,7 @@ for(i in 1:length(AllDays_Dash)){
     mutate(MonthNum = month(date)) %>%
     mutate(year = year(date)) 
 
-  
-   yearAvg = df %>%
+  yearAvg = df %>%
     dplyr::select(!c('date','PPT_in', 'GDDF')) %>% # exclude variables for which the result is not simply a monthly average
     dplyr::select(!(contains("days"))) %>%
     dplyr::select(!(contains("DAYS"))) %>%

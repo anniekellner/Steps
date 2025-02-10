@@ -6,11 +6,14 @@
 # This script creates the data frame from which the historical (observed) 
   # climographs will be plotted
 
+# written by Annie Kellner for CEMML 12-23-2024
+
 # inputs: 
     # AllDays_hist dataframe
     # noaa_monthSum dataframe
 
-# written by Annie Kellner for CEMML 12-23-2024
+# outputs:
+    # noaaClim list of dataframes for creating climographs
 
 
 ##############################################################################
@@ -59,13 +62,15 @@ for(i in 1:length(AllDays_hist)){
   
   high10 = df %>%
     group_by(month) %>%
-    summarize(high10 = quantile(TMaxF, probs = 0.90, na.rm = TRUE))
+    summarize(high10 = quantile(TMaxF, probs = 0.90, na.rm = TRUE)) %>%
+    ungroup()
   
   low10 = df %>%
     group_by(month) %>%
-    summarize(low10 = quantile(TMinF, probs = 0.10, na.rm = TRUE))
+    summarize(low10 = quantile(TMinF, probs = 0.10, na.rm = TRUE)) %>%
+    ungroup()
   
-  high10low10 = full_join(high10, low10)
+  high10low10 = left_join(high10, low10)
   
   quantiles[[i]] = high10low10 
   
@@ -88,9 +93,9 @@ for(i in 1:length(noaa_monthSum)){
     rename(TMaxF = Avg_TMaxF) %>%
     rename(TMinF = Avg_TMinF) 
   
-  # Combine with AbsMinMax data
+  # Combine with quantile data
   
-  noaaClim[[i]] = full_join(noaaClimDF, quantiles[[i]])
+  noaaClim[[i]] = left_join(noaaClimDF, quantiles[[i]])
 
   }
 

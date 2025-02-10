@@ -89,6 +89,7 @@ for(i in 1:length(AllDays_hist)){
      names(noaa_monthSum)[i] = names(AllDays_hist[i])
 }
 
+rm(df)
 
 ## Add summary rows (YrAverage and YrTotals) and save for table construction
 
