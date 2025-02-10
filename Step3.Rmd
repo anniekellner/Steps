@@ -436,70 +436,30 @@ if (!dir.exists(noaaClim_dir)){
 
 source("./Code/NOAA/NOAA_AllDays_v2.R") # creates standard outputs (csv files and AllDays_hist dataframe)
 source("./Code/NOAA/NOAA_AllDays_Dashboard.R") # creates AllDays_Dash dataframe for Climate Viewer outputs
-source("./Code/NOAA/NOAA_monthSum_v2.R")
-source("./COde/NOAA/NOAA_Climographs_createDF.R")
+source("./Code/NOAA/NOAA_monthSum_v2.R") # creates noaa_monthSum df and csv outputs
+source("./Code/NOAA/NOAA_monthSum_Dashboard.R") # creates noaaDashboard dataframe (to be combined later with futures)
+source("./COde/NOAA/NOAA_Climographs_createDF.R") # creates noaaClim list of dataframes for NOAA climograph plots
 source("./Code/NOAA/NOAA_ClimographPlots.R")
 
 
 ```
+
+*This concludes the data concatenation and table/plot creation for the Observed Historical Period*
 
 
 ## Remove extraneous objects from global environment
 
 ```{r}
 
-rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
-                        "official_name",
-                        "model", 
-                        "plots_dir",
-                        "results_folder",
-                        "noaaMonthly", # will add futures to this dataframe later
-                        lsf.str()))) # all functions
+source("./Code/prepare_env_for_data_extraction.R")
 
 ```
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-The rest of the script should be able to be run automatically. From this point forward, all you need to do is press the green 'run' arrow for each chunk. DO NOT ALTER THE CODE BELOW. 
-
 ################################################################################################################
-####            AUTOMATED ANALYSIS PART I - DATA EXTRACTION                                                 ####
+####            FUTURE SCENARIOS: PART I - DATA EXTRACTION                                                 ####
 ################################################################################################################
-
-
-## CREATE VECTORS FOR YEAR-SCENARIO COMBOS
-
-```{r character-vectors}
-
-scenarios <- c(baseline, scenario1, scenario2)
-
-scenario1_plotName <- ifelse(str_detect(scenario1, "ssp245"), "SSP2-4.5", "RCP 4.5")
-scenario2_plotName <- ifelse(str_detect(scenario2, "ssp585"), "SSP5-8.5", "RCP 8.5")
-  
-scenario_plotNames <- c("Historical", scenario1_plotName, scenario2_plotName)
-
-years <- c(baseline_start_year, # vector for easy reference
-           baseline_end_year, 
-           future1_start_year, 
-           future1_end_year, 
-           future2_start_year, 
-           future2_end_year)
-
-```
 
 
 ## SUBSET FILES OF INTEREST
@@ -507,12 +467,6 @@ years <- c(baseline_start_year, # vector for easy reference
 In this step, we are creating lists of filenames that will eventually combine into raster stacks. When this chunk is finished running, you can check the objects to make sure the correct number of years have been included. 
 
 ```{r list-filenames}
-
-scenarios <- c(baseline, scenario1, scenario2)
-
-baseline_yrs <- paste(seq(baseline_start_year, baseline_end_year, 1), collapse = '|')
-future1_yrs <- paste(seq(future1_start_year, future1_end_year, 1), collapse = '|')
-future2_yrs <- paste(seq(future2_start_year, future2_end_year, 1), collapse = '|')
 
 files_baseline <- list() # historical
 files_s1f1 <- list() # scenario1, future 1

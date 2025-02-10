@@ -100,7 +100,7 @@ for(i in 1:length(noaa_monthSum)){
   }
 
 
-
+rm(df)
   
 
 
