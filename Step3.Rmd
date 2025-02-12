@@ -196,8 +196,6 @@ The output following the code chunk will confirm your selections. You can easily
 
 shp <- shp_names[14] 
 
-base_abbrev <- base_abbreviations[1] 
-
 official_name <- official_base_names[19] # These names serve as titles for the climatograph and Walter-Lieth plots
 
 
