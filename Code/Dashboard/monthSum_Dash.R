@@ -12,8 +12,8 @@
 
 vars <- list()
 
-for(i in 1:length(NOAA_AllDays_Dash)){
-  df = NOAA_AllDays_Dash[[i]]
+for(i in 1:length(AllDaysDash)){
+  df = AllDaysDash[[i]]
   
   df = df %>%
     mutate(date = ymd(date)) %>%
@@ -170,3 +170,13 @@ vars[[5]]$ScenID <- "8"
 # --------  ADD TO NOAA MONTHLY DATAFRAME  ---------- #
 
 MonthlySeries <- bind_rows(list(noaaDashboard, vars[[1]], vars[[2]], vars[[3]], vars[[4]], vars[[5]]))
+
+
+# --  SAVE SPREADSHEET  --  #
+
+dash_dir <- paste(results_folder,"Dashboard", sep = "/")
+
+if (!dir.exists(dash_dir)){
+  dir.create(dash_dir)}
+
+write.csv(MonthlySeries, file = paste(dash_dir,"MonthlySeries.csv", sep = "/"))
