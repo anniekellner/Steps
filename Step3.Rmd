@@ -429,7 +429,7 @@ if (!dir.exists(noaaClim_dir)){
 ## Analyses and plots (Climographs) for observed historical data
 
 
-```{r Observed-historical}
+```{r Observed-historical, message=FALSE, warning=FALSE}
 
 
 source("./Code/NOAA/NOAA_AllDays_v2.R") # creates standard outputs (csv files and AllDays_hist dataframe)
@@ -449,7 +449,7 @@ source("./Code/NOAA/NOAA_ClimographPlots.R")
 
 ```{r}
 
-source("./Code/prepare_env_for_data_extraction.R")
+source("./Code/prep_env_for_data_extraction.R")
 
 ```
 
@@ -787,7 +787,7 @@ The next chunk creates AllDays.csv files as well as the AllDays dataframe for do
 # Add derived (recalculated) variables to dataframes
 # All functions are from the original LOCA_summarize.R script
 
-source("./Code/Create_AllDaysDF.R") # creates AllDays df (traditiona outputs)
+source("./Code/Create_AllDaysDF.R") # creates AllDays df (traditional outputs)
 source("./Code/Dashboard/AllDaysDash.R") # creates AllDaysDash df (climate viewer outputs)
 
 ```
@@ -833,6 +833,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "results_folder",
                         "plots_dir",
                         "AllDays",
+                        "AllDaysDash",
                         "noaaDashboard",
                         "RasterUnitConvert")))
 
@@ -852,7 +853,7 @@ The next chunk creates MonthSum.csv files
     # Monthly Series spreadsheet for Dashboard
 
 source("./Code/monthSum.R")
-
+source("./Code/Dashboard/monthSum_Dash.R")
 
 
 
@@ -871,7 +872,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "plots_dir",
                         "AllDays",
                         "monthSumDF",
-                        #insert Dashboard df
+                        "AllDaysDash",
                         "plots_dir",
                         "RasterUnitConvert")))
 
