@@ -169,4 +169,4 @@ vars[[5]]$ScenID <- "8"
 
 # --------  ADD TO NOAA MONTHLY DATAFRAME  ---------- #
 
-MonthlySeries <- bind_rows(list(noaaDashboard, vars[[1]], vars[[2]], vars[[3]]))
+MonthlySeries <- bind_rows(list(noaaDashboard, vars[[1]], vars[[2]], vars[[3]], vars[[4]], vars[[5]]))
