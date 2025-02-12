@@ -10,10 +10,6 @@
 
 ## BEGIN SCRIPT
 
-DashScenarios <- c(,
-                   ,
-                   )
-
 vars <- list()
 
 for(i in 1:length(AllDaysDash)){
