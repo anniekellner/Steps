@@ -18,9 +18,9 @@
 
 noaa_monthSum <- list()
 
-for(i in 1:length(AllDays_hist)){
+for(i in 1:length(AllDays_NOAA)){
   
-  df = AllDays_hist[[i]]
+  df = AllDays_NOAA[[i]]
  
    df = df %>%
     mutate(month = month(date)) %>%
