@@ -10,6 +10,9 @@
 
 ## BEGIN SCRIPT
 
+DashScenarios <- c(,
+                   ,
+                   )
 
 vars <- list()
 
@@ -146,7 +149,13 @@ for(i in 1:length(AllDaysDash)){
   monthAvg$Period <- Period
   monthAvg$SITENAME <- official_name
   
-  monthAvg$Scenario <- ifelse(first(all$year) == 1985, "Modeled Historical Climate", "Moderate Emissions (SSP2-4.5)")
+  monthAvg <- monthAvg %>%
+    mutate(Scenario = case_when(
+      first(all$year) == 1985 ~ "Modeled Historical Climate",
+      first(all$year) == 2021 & i == 2 ~ "Moderate Emissions (SSP2-4.5)",
+      first(all$year) == 2051 & i == 3 ~ "Moderate Emissions (SSP2-4.5)",
+      first(all$year) == 2021 & i == 4 ~ "High Emissions (SSP5-8.5)",
+      first(all$year) == 2051 & i == 5 ~ "High Emissions (SSP5-8.5)"))
   
   vars[[i]] = monthAvg 
   
@@ -159,6 +168,8 @@ rm(df)
 vars[[1]]$ScenID <- "4"
 vars[[2]]$ScenID <- "5"
 vars[[3]]$ScenID <- "6"
+vars[[4]]$ScenID <- "7"
+vars[[5]]$ScenID <- "8"
 
 # --------  ADD TO NOAA MONTHLY DATAFRAME  ---------- #
 
