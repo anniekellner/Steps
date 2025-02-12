@@ -11,8 +11,8 @@
 
 vars <- list()
 
-for(i in 1:length(AllDays_Dash)){
-  df = AllDays_Dash[[i]]
+for(i in 1:length(NOAA_AllDays_Dash)){
+  df = NOAA_AllDays_Dash[[i]]
   
   df = df %>%
     mutate(MonthNum = month(date)) %>%

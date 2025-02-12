@@ -113,11 +113,11 @@ write.csv(grp3, file = filePath_grp3)
 
 ##  --  PREPARE FOR MONTHLY SUMMARY --  ##
 
-AllDays_hist <- list()
+AllDays_NOAA <- list()
 
-AllDays_hist[[1]] <- grp1
-AllDays_hist[[2]] <- grp2
-AllDays_hist[[3]] <- grp3
+AllDays_NOAA[[1]] <- grp1
+AllDays_NOAA[[2]] <- grp2
+AllDays_NOAA[[3]] <- grp3
 
 rm(df)
 rm(list = ls(pattern = "^grp"))
