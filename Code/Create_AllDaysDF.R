@@ -48,7 +48,7 @@ for(i in 1:length(avdf)){
     mutate(colddays = Rastercolddays(TMinC, coldtemp = 0)) %>%
     mutate(wetdays = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
     mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
-    mutate(ftdays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) %>%
+    mutate(ftdays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) 
     
   
   AllDays[[i]] = csv # new df for use with MonthSum
