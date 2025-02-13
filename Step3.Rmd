@@ -160,7 +160,7 @@ load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBLE_L/JBLE
 
 # Load raster stack
 
-#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBLE_L/rasterStack_JBLE_L_EC-Earth3-Veg-LR_20250204.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBLE_L/rasterStack_JBLE_L_EC-Earth3-Veg-LR_20250204.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
@@ -914,7 +914,7 @@ source('./Code/Tables_and_Plots/Walter-Lieth.R')
 
 ```{r remove-objects}
 
-rm(list=setdiff(ls(), c("monthSum", 
+rm(list=setdiff(ls(), c("monthSumDF", 
                         "shp", 
                         "model", 
                         "scenarios",
@@ -923,7 +923,9 @@ rm(list=setdiff(ls(), c("monthSum",
                         "plots_dir",
                         "years",
                         "csv",
-                        "RasterUnitConvert")))
+                        "RasterUnitConvert",
+                        "MonthlySeries",
+                        )))
 
 ```
 

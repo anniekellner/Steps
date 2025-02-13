@@ -20,11 +20,11 @@ WLplots <- list()
 
 # Calculate Celsius values before running function for plot creation
 
-for(i in 1:length(monthSum)){
+for(i in 1:length(monthSumDF)){
   
   # Format data
   
-  wlC = monthSum[[i]] %>%
+  wlC = monthSumDF[[i]] %>%
     mutate(Avg_TMaxC = RasterUnitConvert(Avg_TMaxF, "FtoC")) %>%
     mutate(Avg_TMinC = RasterUnitConvert(Avg_TMinF, "FtoC")) %>%
     mutate(Abs_TminC = RasterUnitConvert(Abs_TminF, "FtoC")) %>%
@@ -37,17 +37,17 @@ for(i in 1:length(monthSum)){
   
   # per is 'period' and is an argument in the ggclimat_walter_lieth() function
   
-  per_scenario = if (str_detect(names(monthSum[i]), "baseline")){
+  per_scenario = if (str_detect(names(monthSumDF[i]), "baseline")){
     scenario_plotNames[1]
-  } else if(str_detect(names(monthSum[i]),"s1")) {
+  } else if(str_detect(names(monthSumDF[i]),"s1")) {
     scenario_plotNames[2]
   } else {
     scenario_plotNames[3]
   }
   
-  per_years = if(str_detect(names(monthSum[i]), "baseline")){ 
+  per_years = if(str_detect(names(monthSumDF[i]), "baseline")){ 
     as.character(paste(years[1], years[2], sep = " - "))
-  } else if(str_detect(names(monthSum[i]),"f1")){
+  } else if(str_detect(names(monthSumDF[i]),"f1")){
     as.character(paste(years[3],years[4], sep = " - "))
   } else {
     as.character(paste(years[5], years[6], sep = " - "))
@@ -60,30 +60,30 @@ for(i in 1:length(monthSum)){
   
   
   wlCplot = ggclimat_walter_lieth(wlC, 
-                                  est = official_name, 
+                                  est = paste0(official_name,"/n"), 
                                   per = per,
                                   mlab = "en", # English language 
-                                  pcol = "blue", # precip color
-                                  tcol = "red", # temp color
-                                  pfcol = "lightblue", # probable freeze
-                                  sfcol = "steelblue") # certain freeze
+                                  pcol = "#0083BE", # precip color
+                                  tcol = "#BB5145", # temp color
+                                  pfcol = "#74CFE4", # probable freeze
+                                  sfcol = "#65B2A7") # certain freeze
   
   
   # Save plot in results_folder/Plots/Walter-Lieth 
   
-  wl_scenario = if (str_detect(names(monthSum[i]), "baseline")){
+  wl_scenario = if (str_detect(names(monthSumDF[i]), "baseline")){
     "historical"
-  } else if(str_detect(names(monthSum[i]),"s1")) {
+  } else if(str_detect(names(monthSumDF[i]),"s1")) {
     scenarios[2]
   } else {
     scenarios[3]
   }
   
-  midyear = if (str_detect(names(monthSum[i]), "baseline")){
+  midyear = if (str_detect(names(monthSumDF[i]), "baseline")){
     floor((years[1] + years[2])/2)
-  } else if (str_detect(names(monthSum[i]),"f1")) {
+  } else if (str_detect(names(monthSumDF[i]),"f1")) {
     floor((years[3] + years[4])/2)
-  } else if (str_detect(names(monthSum[i]),"f2")) {
+  } else if (str_detect(names(monthSumDF[i]),"f2")) {
     floor((years[5] + years[6])/2)
   }
   
@@ -227,7 +227,7 @@ for(i in 1:length(monthSum)){
         size = 14,
         face = "plain"
       ),
-      plot.tag = element_text(size = 10),
+      plot.tag = element_text(family = "Calibri", size = 10),
       plot.tag.position = "left",
       axis.ticks.length.x.bottom = unit(0, "pt"),
       axis.line.x.bottom = element_blank(),
@@ -249,7 +249,7 @@ for(i in 1:length(monthSum)){
       ),
       axis.text.y.right = element_text(colour = pcol, size = 10)
     ) +
-    ggplot2::theme(text=element_text(family="Calibri")) # Times New Roman
+    ggplot2::theme(text=element_text(family="Calibri")) 
   
   # Save Fahrenheit plot
   
