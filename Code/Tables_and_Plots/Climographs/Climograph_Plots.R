@@ -29,11 +29,11 @@ plot_titles <- c(paste0("Modeled Monthly Means - Historical, ",years[1],"-",year
 
 # Plot names include "Monthly Means", scenario, and center year (e.g., 2030)
 
-plot_names <- c("Modeled_Monthly_Means_Historical",
-                paste0("Monthly_Means_",scenarios[2],"_",floor((years[3]+years[4])/2)), # floor() rounds down to the nearest integer
-                paste0("Monthly_Means_",scenarios[2],"_",floor((years[5]+years[6])/2)),
-                paste0("Monthly_Means_",scenarios[3],"_",floor((years[3]+years[4])/2)),
-                paste0("Monthly_Means_",scenarios[3],"_",floor((years[5]+years[6])/2)))
+plot_names <- c(paste(shp,"Modeled_Monthly_Means_Historical", sep = "_"),
+                paste(shp, "Monthly_Means", scenarios[2], floor((years[3]+years[4])/2), sep = "_"), # floor() rounds down to the nearest integer
+                paste(shp, "Monthly_Means", scenarios[2], floor((years[5]+years[6])/2), sep = "_"),
+                paste(shp, "Monthly_Means", scenarios[3], floor((years[3]+years[4])/2), sep = "_"),
+                paste(shp, "Monthly_Means",scenarios[3], floor((years[5]+years[6])/2), sep = "_"))
 
 
 ##  -----   PLOT SPECS   -----------           ##
