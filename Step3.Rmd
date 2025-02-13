@@ -942,19 +942,19 @@ diffHist <- list() # create diffHist dataframe for later use
 
 # Create historical object
 
-hist <- monthSum[[1]] # separate historical values for use in calculations
+hist <- monthSumDF[[1]] # separate historical values for use in calculations
 
 # Create dataframe
 
-for(i in 2:length(monthSum)){ # 2 because [[1]] is historical 
+for(i in 2:length(monthSumDF)){ # 2 because [[1]] is historical 
   diff = hist %>%
-  bind_rows(monthSum[[i]]) %>%
+  bind_rows(monthSumDF[[i]]) %>%
   group_by(month) %>%
   summarise_each(funs(diff(.))) %>% # this gives warnings because the function is deprecated, but it still works as of 5/9/23. If this breaks, look here first.
   slice(1,5:12, 2:4,13:14) # arranges rows in the desired order
   
   diffHist[[i-1]] = diff # add to DiffHist dataframe for future use
-  names(diffHist)[[i-1]] = names(monthSum[i])
+  names(diffHist)[[i-1]] = names(monthSumDF[i])
 }
   
 # Save csv files 
