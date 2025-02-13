@@ -42,7 +42,7 @@ for(i in 1:length(AllDays_hist)){
 }
 
 
-## Add month label to noaa_monthSum dataframe   ### WHY IS THIS HERE???
+## Add month label to noaa_monthSum dataframe   
 
 for(i in 1:length(noaa_monthSum)){
   noaa_monthSum[[i]]$Avg_month <- month.abb[noaa_monthSum[[i]]$Avg_month]
