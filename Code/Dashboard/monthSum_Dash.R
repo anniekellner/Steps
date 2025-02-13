@@ -30,7 +30,8 @@ for(i in 1:length(AllDaysDash)){
                      TMaxC,
                      TMinC,
                      TmeanC,
-                     PPT_mm))
+                     PPT_mm
+                     ))
   
   yearAvg = df %>%
     dplyr::select(!c('date','PPT_in', 'GDDF')) %>% # exclude variables for which the result is not simply a MonthNumly average
@@ -39,12 +40,6 @@ for(i in 1:length(AllDaysDash)){
     select(!contains("NIGHTS")) %>% 
     group_by(year, MonthNum) %>%
     summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) %>%
-    ungroup()
-  
-  Abs_TminF = df %>%
-    select(date, year, MonthNum, TMinF) %>%
-    group_by(year, MonthNum) %>%
-    summarise(Abs_TminF = min(TMinF)) %>%
     ungroup()
 
   sum_ppt = df %>%
@@ -80,7 +75,6 @@ for(i in 1:length(AllDaysDash)){
   all = yearAvg %>% # Averages by year (e.g., for Jan 1981, Feb 1981...)
     left_join(sum_days) %>%
     left_join(sum_ppt) %>%
-    left_join(Abs_TminF) %>%
     left_join(sum_GDDF) %>%
     left_join(sum_DAYS) %>%
     left_join(sum_nights)
@@ -91,7 +85,6 @@ for(i in 1:length(AllDaysDash)){
     dplyr::select(!year) %>%
     group_by(MonthNum) %>%
     summarise(across(TMaxF:WARMNIGHTS, ~ mean(.x, na.rm = TRUE))) %>%
-    round(digits = 1) %>%
     ungroup()
   
   monthAvg = monthAvg %>%
@@ -112,7 +105,8 @@ for(i in 1:length(AllDaysDash)){
     rename(GDDF = Avg_GDDF) %>%
     rename(DRYDAYS = Avg_drydays) %>%
     rename(WETDAYS = Avg_wetdays) %>%
-    rename(VWETDAYS = Avg_VWETDAYS)
+    rename(VWETDAYS = Avg_VWETDAYS) 
+
   
   Pctl90_TmaxF = df %>%
     select(MonthNum, TMaxF) %>%
@@ -140,10 +134,12 @@ for(i in 1:length(AllDaysDash)){
     left_join(Pctl90_TmaxF) %>%
     left_join(Pctl10_TminF) %>%
     left_join(Pctl90_Prcp_in) %>%
-    left_join(Pctl10_Prcp_in)
+    left_join(Pctl10_Prcp_in) %>%
+    round(digits = 1)
   
-  monthAvg$Period <- Period
-  monthAvg$SITENAME <- official_name
+ # monthAvg$Period <- Period
+  
+  #monthAvg$SITENAME <- official_name
   
   monthAvg <- monthAvg %>%
     mutate(Scenario = case_when(
@@ -151,7 +147,11 @@ for(i in 1:length(AllDaysDash)){
       first(all$year) == 2021 & i == 2 ~ "Moderate Emissions (SSP2-4.5)",
       first(all$year) == 2051 & i == 3 ~ "Moderate Emissions (SSP2-4.5)",
       first(all$year) == 2021 & i == 4 ~ "High Emissions (SSP5-8.5)",
-      first(all$year) == 2051 & i == 5 ~ "High Emissions (SSP5-8.5)"))
+      first(all$year) == 2051 & i == 5 ~ "High Emissions (SSP5-8.5)")) %>%
+    mutate(Period = Period) %>%
+    mutate(SITENAME = official_name)
+  
+  monthAvg$Month <- month.abb[monthAvg$MonthNum]
   
   vars[[i]] = monthAvg 
   
@@ -167,9 +167,47 @@ vars[[3]]$ScenID <- "6"
 vars[[4]]$ScenID <- "7"
 vars[[5]]$ScenID <- "8"
 
+# Order columns for spreadsheet
+
+for(i in 1:length(vars)){
+  
+  df = vars[[i]]
+  df2 = df %>% 
+    select(SITENAME,
+           Scenario,
+           Period,
+           ScenID,
+           Month,
+           MonthNum,
+           Pctl90_Prcp_in,
+           Avg_Prcp_in,
+           Pctl10_Prcp_in,
+           Pctl90_TmaxF,
+           Avg_TmaxF,
+           Avg_TmeanF,
+           Avg_TminF,
+           Pctl10_TminF,
+           HOTDAYS,
+           VHOTDAYS,
+           EXHOTDAYS,
+           HELLDAYS,
+           WARMNIGHTS,
+           COLDDAYS,
+           FRFRDAYS,
+           FTDAYS,
+           GDDF,
+           DRYDAYS,
+           WETDAYS,
+           VWETDAYS)
+  
+  vars[[i]] = df2
+    
+}
+
 # --------  ADD TO NOAA MONTHLY DATAFRAME  ---------- #
 
 MonthlySeries <- bind_rows(list(noaaDashboard, vars[[1]], vars[[2]], vars[[3]], vars[[4]], vars[[5]]))
+
 
 
 # --  SAVE SPREADSHEET  --  #

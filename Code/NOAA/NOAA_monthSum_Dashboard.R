@@ -27,12 +27,6 @@ for(i in 1:length(NOAA_AllDays_Dash)){
     summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) %>%
      ungroup()
   
-  Abs_TminF = df %>%
-    select(date, year, MonthNum, TMinF) %>%
-    group_by(year, MonthNum) %>%
-    summarise(Abs_TminF = min(TMinF)) %>%
-    ungroup()
-  
   sum_ppt = df %>%
     select(date, year, MonthNum, 'PPT_in') %>%
     group_by(year, MonthNum) %>%
@@ -68,7 +62,6 @@ for(i in 1:length(NOAA_AllDays_Dash)){
   all = yearAvg %>% # Averages by year (e.g., for Jan 1981, Feb 1981...)
     left_join(sum_days) %>%
     left_join(sum_ppt) %>%
-    left_join(Abs_TminF) %>%
     left_join(sum_GDDF) %>%
     left_join(sum_DAYS) %>%
     left_join(sum_nights)
