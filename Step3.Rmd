@@ -851,6 +851,7 @@ The next chunk creates MonthSum.csv files
     # MonthSumDF dataframe (for use downstream) 
     # monthSum csv's (to Results folder)
     # Monthly Series spreadsheet for Dashboard
+    # 30 yr averages for Future Scenarios
 
 source("./Code/monthSum.R")
 source("./Code/Dashboard/monthSum_Dash.R")
