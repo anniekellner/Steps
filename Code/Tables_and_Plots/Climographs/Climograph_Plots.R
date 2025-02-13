@@ -203,7 +203,7 @@ for(i in 1:length(climMelt)){
  climPlots[[i]] <- p
  #names(climPlots)[i] = names(plot_names[i]) 
   
-  ggsave(filename = paste0(plot_names[i],"_",shp,".png"),
+  ggsave(filename = paste0(plot_names[i],".png"),
          path = path_to_climographs,
          dpi = 330)
 }
