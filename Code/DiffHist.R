@@ -17,12 +17,15 @@ for(i in 2:length(monthSumDF)){ # 2 because [[1]] is historical
   diff = hist %>%
     bind_rows(monthSumDF[[i]]) %>%
     group_by(Avg_month) %>%
-    summarise_each(funs(diff(.))) %>% # this gives warnings because the function is deprecated, but it still works as of 5/9/23. If this breaks, look here first.
-    slice(1,5:12, 2:4,13:14) # arranges rows in the desired order
+    summarise(across(everything(), diff)) %>% # this gives warnings because the function is deprecated, but it still works as of 5/9/23. If this breaks, look here first.
+    #slice(1,5:12, 2:4,13:14) # arranges rows in the desired order
   
   diffHist[[i-1]] = diff # add to DiffHist dataframe for future use
   names(diffHist)[[i-1]] = names(monthSumDF[i])
 }
+
+
+
 
 # Save csv files 
 
