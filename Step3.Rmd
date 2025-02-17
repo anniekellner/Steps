@@ -918,6 +918,7 @@ source('./Code/Tables_and_Plots/Walter-Lieth.R')
 rm(list=setdiff(ls(), c("monthSumDF", 
                         "shp", 
                         "model", 
+                        "official_name",
                         "scenarios",
                         "scenario_plotNames",
                         "results_folder",
@@ -925,7 +926,7 @@ rm(list=setdiff(ls(), c("monthSumDF",
                         "years",
                         "csv",
                         "RasterUnitConvert",
-                        "MonthlySeries",
+                        "MonthlySeries"
                         )))
 
 ```
