@@ -20,14 +20,21 @@ base <- MonthlySeries %>%
 
 Diff <- MonthlySeries %>%
   filter(ScenID == 1)
+
+ScenID <- paste0(base$ScenID,"v",Diff$ScenID)
+
+prd <- paste(base$Period, "vs.", Diff$Period, sep = " ")
   
 
 monthlySeriesDiffHist[[1]] <- Diff %>%
   bind_rows(base) %>% 
   group_by(MonthNum) %>%
   summarise(across(Pctl90_Prcp_in:VWETDAYS, ~diff(.))) %>%
-  mutate(across(Pctl90_Prcp_in:VWETDAYS, ~round(., digits = 2))) %>%  
+
+  
   arrange(MonthNum) %>%
+  
+  
   ungroup()
            
 
@@ -72,26 +79,11 @@ for(i in 5:8){
   monthlySeriesDiffHist[[i-2]] = df
 
   }
+
+# After creating spreadsheet, add these:
   
-  
-    
-  
-  diffHist[[i-1]] = diff # add to DiffHist dataframe for future use
-  names(diffHist)[[i-1]] = names(monthSumDF[i])
-}
+mutate(across(Pctl90_Prcp_in:VWETDAYS, ~round(., digits = 2))) %>% 
+  mutate(across(Pctl90_Prcp_in:VWETDAYS, ~setNames(paste0(names(.),"_diff")))) %>%
 
 
 
-base <- MonthlySeries %>%
-  filter(ScenID == 5)
-
-Diff <- MonthlySeries %>%
-  filter(ScenID == 4)
-
-monthlySeriesDiffHist[[3]] <- Diff %>%
-  bind_rows(base) %>% 
-  group_by(MonthNum) %>%
-  summarise(across(Pctl90_Prcp_in:VWETDAYS, ~diff(.))) %>%
-  mutate(across(Pctl90_Prcp_in:VWETDAYS, ~round(., digits = 2))) %>%  
-  arrange(MonthNum) %>%
-  ungroup()
