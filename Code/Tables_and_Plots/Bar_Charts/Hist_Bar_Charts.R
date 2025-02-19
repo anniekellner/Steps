@@ -15,7 +15,7 @@ histTitles <- c("Modeled Historical Average Temperature",
 
 # ------------- Prep data ----------------------------- #
 
-hist_df <- monthSum[[1]] # Historical data
+hist_df <- monthSumDF[[1]] # Historical data
 
 hist_df <- add_month(hist_df)  ## Make sure this works
 hist_df <- select(hist_df, Month, Avg_TMeanF, Avg_TMaxF, Avg_TMinF, Avg_PPT_in)
@@ -70,7 +70,7 @@ upper_limit <- upper_value + 1
 breaks <- upper_limit + 1 # add 1 so that y-axis scale starts at zero
 
 prcp_hist <- ggplot(hist_df) + 
-  geom_col(aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in), color="#74CFE4", fill="#74CFE4", width = 0.7) + 
+  geom_col(aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_in), color="#65B287", fill="#65B287", width = 0.7) + # Mountain Lake Turquoise
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Average Precipitation (inches)", "\n")) +
   labs(title = "Modeled Historical Average Precipitation") +

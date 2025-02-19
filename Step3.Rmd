@@ -941,6 +941,7 @@ The next chunk creates all things DiffHist (comparisons between future time peri
 ```{r DiffHist, warning=FALSE}
 
 source("./Code/DiffHist.R")
+source("./Code/Dashboard/MontlySeries_DiffHist.R")
 
 ```
 
@@ -955,7 +956,7 @@ if (!dir.exists(bar_charts_dir)){
 
 add_month <- function(df){
   df = df[1:12,]
-  df = select(df, -month)
+  #df = select(df, -month)
   df = mutate(df, Month = month.abb)
 }
 

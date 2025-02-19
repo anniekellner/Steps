@@ -30,7 +30,7 @@ subtitles <- c(
 custom_fill_temp <- c("F1" = "#D4B83A", "F2" = "#BB5145") 
 custom_labels <- c("Near Term", "Far Term") 
 
-custom_fill_prcp <- c("F1" = "#BDD7EE", "F2" = "#0083BE") 
+custom_fill_prcp <- c("F1" = "#74CFE4", "F2" = "#0083BE") 
 
 
 
@@ -40,12 +40,12 @@ custom_fill_prcp <- c("F1" = "#BDD7EE", "F2" = "#0083BE")
 
 diffs <- list()
 
-for(i in 1:length(diffHist)){ 
-  df = diffHist[[i]]
+for(i in 1:length(DiffHist)){ 
+  df = DiffHist[[i]]
   df = add_month(df)
   df = select(df, Month, Avg_TMeanF, Avg_TMaxF, Avg_TMinF, Avg_PPT_in)
   diffs[[i]] = df
-  names(diffs)[[i]] = names(diffHist[i])
+  names(diffs)[[i]] = names(DiffHist[i])
 }
 
 rm(df)
@@ -62,7 +62,7 @@ s1f2 <- s1f2 %>%
 
 S1 <- full_join(s1f1, s1f2) 
 
-S1 <- S1 %>% mutate(across(where(is.numeric), round, digits = 1)) # rounding because makes plotting easier
+S1 <- S1 %>% mutate(across(where(is.numeric),  \(x) round(x, digits = 1)))  # rounding because makes plotting easier
 
 # Scenario 2 (e.g., SSP2-8.5)
 
@@ -76,7 +76,7 @@ s2f2 <- s2f2 %>%
 
 S2 <- full_join(s2f1, s2f2) 
 
-S2 <- S2 %>% mutate(across(where(is.numeric), round, digits = 1))
+S2 <- S2 %>% mutate(across(where(is.numeric), \(x) round(x, digits = 1)))
 
 
 # ---- Plotting Prep ------------  #
