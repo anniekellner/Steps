@@ -180,7 +180,7 @@ ggplot(data = noaaMelt[[i]], aes(x = factor(month, level =c(month.abb)),
                                      legend.title.position = "right"),
                                order = 1))
   
-  ggsave(filename = paste0("Monthly_Means_Observed_Historical_",NOAA_years[i],"_",shp,".png"),
+  ggsave(filename = paste0(shp,"_","Monthly_Means_Observed_Historical_",NOAA_years[i],"_",shp,".png"),
          path = noaaClim_dir,
          dpi = 330)
 }
