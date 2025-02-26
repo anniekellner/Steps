@@ -26,6 +26,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "results_folder",
                         "dir_installation_boundaries",
                         "noaaDashboard", # will add futures to this dataframe later
+                        "noaa30dash",
                         lsf.str()))) # all functions
 
 
