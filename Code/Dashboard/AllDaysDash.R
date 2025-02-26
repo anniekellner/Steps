@@ -64,18 +64,91 @@ for(i in 1:length(avdf)){
 
 # ----    CALCULATE 30-YEAR AVERAGES  ------  #
 
-#### EXAMPLE FROM MONTHSUM  #######
-
-avg30 <- MonthlySeries %>%
-  select(!MonthNum) %>%
-  group_by(SITENAME, Scenario, Period, ScenID) %>%
-  summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) %>%
-  arrange(ScenID) %>%
-  ungroup()
-
-avg30 <- avg30 %>%
-  mutate(across(where(is.numeric), round, 2))
-
+alldays30 <- for(i in 1:length(AllDaysDash)){
+  
+  df = AllDaysDash[[i]] 
+  
+  Period = paste(first(df$Year),"to",last(df$Year), sep = " ")
+  
+  Pctl90_TmaxF = df %>%
+    select(TMaxF) %>%
+    summarize(Pctl90_TmaxF = quantile(TMaxF, probs = 0.90, na.rm = TRUE)) %>%
+    ungroup()
+  
+  Pctl10_TminF = df %>%
+    select(TMinF) %>%
+    summarize(Pctl10_TminF = quantile(TMinF, probs = 0.10, na.rm = TRUE)) %>%
+    ungroup()
+  
+  YearAvg = df %>%
+    dplyr::select(!c('date', 'Year', 'PPT_in', 'GDDF')) %>% # exclude variables for which the result should be summed before averaging
+    dplyr::select(!(contains("days"))) %>%
+    select(!contains("DAYS")) %>%
+    select(!contains("NIGHTS")) %>% 
+    summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) %>%
+    ungroup()
+  
+  sum_ppt = df %>%
+    select(Year, 'PPT_in') %>%
+    group_by(Year) %>%
+    summarise(across(contains('PPT'), ~ sum(.x, na.rm = TRUE))) %>%
+    ungroup()
+  
+  Pctl90_Prcp_in = sum_ppt %>%
+    summarize(Pctl90_Prcp_in = quantile(PPT_in, probs = 0.90, na.rm = TRUE)) %>%
+    ungroup()
+  
+  Pctl10_Prcp_in = sum_ppt %>%
+    summarize(Pctl10_Prcp_in = quantile(PPT_in, probs = 0.10, na.rm = TRUE)) %>%
+    ungroup()
+  
+  
+  sum_days = df %>%
+    select(Year, contains('days')) %>%
+    group_by(Year) %>%
+    summarise(across(contains('days'), ~ sum(.x, na.rm = TRUE))) %>%
+    ungroup()
+  
+  sum_DAYS = df %>%
+    select(Year, contains('DAYS')) %>%
+    group_by(Year) %>%
+    summarise(across(contains('DAYS'), ~ sum(.x, na.rm = TRUE))) %>%
+    ungroup()
+  
+  sum_nights = df %>%
+    select(Year, contains('NIGHTS')) %>%
+    group_by(Year) %>%
+    summarise(across(contains('nights'), ~ sum(.x, na.rm = TRUE))) %>%
+    ungroup()
+  
+  sum_GDDF = df %>%
+    select(Year, GDDF) %>%
+    group_by(Year) %>%
+    summarise(GDDF = sum(GDDF, na.rm = TRUE)) %>%
+    ungroup()
+  
+  sums = sum_days %>% # Averages by Year (e.g., 1981, 1982...2010)
+    left_join(sum_ppt) %>%
+    left_join(sum_GDDF) %>%
+    left_join(sum_DAYS) %>%
+    left_join(sum_nights)
+  
+  sumAvg = sums %>%
+    dplyr::select(!Year) %>%
+    summarise(across(everything(), ~ mean(.x, na.rm = TRUE))) %>%
+    ungroup()
+  
+  
+  ScenID = i + 3
+  
+  all = bind_cols("ScenID" = ScenID, "PERIOD" = Period, Pctl90_Prcp_in, sumAvg, Pctl10_Prcp_in, Pctl90_TmaxF, Pctl10_TminF, YearAvg)
+  
+  all = all %>%
+    mutate(across(Pctl90_Prcp_in:TMeanF,  ~ round(., digits = 1)))
+  
+  alldays30[[i]] = all
+  
+}
 
 # --  SAVE SPREADSHEETS  --  #
 
