@@ -209,25 +209,14 @@ for(i in 1:length(vars)){
 MonthlySeries <- bind_rows(list(noaaDashboard, vars[[1]], vars[[2]], vars[[3]], vars[[4]], vars[[5]]))
 
 
-# ----    CALCULATE 30-YEAR AVERAGES  ------  #
+# ------  SAVE SPREADSHEET   ----------- #
 
-avg30 <- MonthlySeries %>%
-  select(!MonthNum) %>%
-  group_by(SITENAME, Scenario, Period, ScenID) %>%
-  summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) %>%
-  arrange(ScenID) %>%
-  ungroup()
-
-avg30 <- avg30 %>%
-  mutate(across(where(is.numeric), round, 2))
-
-
-# --  SAVE SPREADSHEETS  --  #
-
-dash_dir <- paste(results_folder,"Dashboard", sep = "/")
+dash_dir <- paste(results_folder,"Dashboard",sep = "/")
 
 if (!dir.exists(dash_dir)){
   dir.create(dash_dir)}
 
-write.csv(MonthlySeries, file = paste(dash_dir,"MonthlySeries.csv", sep = "/"))
-write.csv(avg30, file = paste(dash_dir, "30yr_Averages.csv", sep = "/"))
+write.csv(MonthlySeries, file = paste(dash_dir,"MonthlySeries.csv",sep = "/"))
+}
+
+

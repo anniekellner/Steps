@@ -60,3 +60,29 @@ for(i in 1:length(avdf)){
   names(AllDaysDash)[i] = names(avdf[i])
   
 } # end creation of AllDaysDash dataframe
+
+
+# ----    CALCULATE 30-YEAR AVERAGES  ------  #
+
+#### EXAMPLE FROM MONTHSUM  #######
+
+avg30 <- MonthlySeries %>%
+  select(!MonthNum) %>%
+  group_by(SITENAME, Scenario, Period, ScenID) %>%
+  summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) %>%
+  arrange(ScenID) %>%
+  ungroup()
+
+avg30 <- avg30 %>%
+  mutate(across(where(is.numeric), round, 2))
+
+
+# --  SAVE SPREADSHEETS  --  #
+
+dash_dir <- paste(results_folder,"Dashboard", sep = "/")
+
+if (!dir.exists(dash_dir)){
+  dir.create(dash_dir)}
+
+write.csv(MonthlySeries, file = paste(dash_dir,"MonthlySeries.csv", sep = "/"))
+write.csv(avg30, file = paste(dash_dir, "30yr_Averages.csv", sep = "/"))

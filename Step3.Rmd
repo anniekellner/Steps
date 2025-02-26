@@ -362,7 +362,7 @@ weather_station <- "JBLE_L.csv"
 
 noaa_dataFilepath <- paste0(NOAA_dir, weather_station)
 
-noaa <- read.csv(file = noaa_dataFilepath) # creates dataframe of observed historical data 
+
 
 ```
 
