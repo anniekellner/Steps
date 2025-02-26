@@ -176,15 +176,14 @@ FYI, the raster is loaded separately because as of the date this script was writ
 
 First, let's *select which base (AFB, etc.) you wish to run.* You will need to select or input the following:
 
-1) *The general acronym* associated with the installation of interest (e.g., "JBLE" for "JBLE_E" or "JBLE_L"). This is required to locate the historical data associated with local weather stations, as the filenames associated with historical data are often different from those associated with the model data.  
 
-2) *The name of the shapefile* that corresponds with the installation. For various reasons, identifying the appropriate area/grid cell for a given model can require trial-and-error, so occasionally there is more than one shapefile per base. This information will be provided by Trevor Even (trevor.even@colostate.edu)
+1) *The name of the shapefile* that corresponds with the installation. For various reasons, identifying the appropriate area/grid cell for a given model can require trial-and-error, so occasionally there is more than one shapefile per base. This information will be provided by Trevor Even (trevor.even@colostate.edu)
 
-3) *The official name of the installation*. This name is used for plot titles, and will also be provided by Trevor Even (see above) 
+2) *The official name of the installation*. This name is used for plot titles, and will also be provided by Trevor Even (see above) 
 
 In some cases, you can select these names from an existing list, located in './Code/Misc/character_vectors.R'. To see the list, you can either type the following phrases into the console, or simply select the phrases below and run them (ctrl + enter). 
 
-`base_abbreviations` (used for finding NOAA Excel files - could be an abbreviation or name [e.g., 'Eglin'])
+
 `shp_names`           (used for locating the shapefile associated with the installation. Also identical to the name of the Results folder)
 `official_base_names` (used for plot titles)
 
@@ -361,8 +360,6 @@ weather_station <- "JBLE_L.csv"
 # Read in data
 
 noaa_dataFilepath <- paste0(NOAA_dir, weather_station)
-
-
 
 ```
 
