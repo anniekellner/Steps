@@ -13,14 +13,26 @@
 
 ## BEGIN SCRIPT
 
+noaa <- read.csv(file = noaa_dataFilepath) # creates dataframe of observed historical data 
+
+noaa$DATE <- mdy(noaa$DATE) # format date using lubridate pkg
+
+noaa <- noaa %>%
+  select(STATION, NAME, DATE, PRCP, TMAX, TMIN) %>%
+  rename(Station_ID = STATION) %>%
+  rename(Station_Name = NAME) %>%
+  rename(date = DATE) %>%
+  rename(PPT_in = PRCP) %>%
+  rename(TMaxF = TMAX) %>%
+  rename(TMinF = TMIN) 
+
 df <- noaa # noaa dataframe was altered in NOAA_AllDays script
 
 
 # -----   ADD DERIVED VARIABLES   -------  #
 
 df <- df %>%
-  mutate(month = month(date)) %>%
-  mutate(year = year(date)) %>%
+  mutate(Year = year(date)) %>%
   mutate(PPT_mm = RasterUnitConvert(PPT_in, "INtoMM")) %>%
   mutate(TMeanF = (TMaxF + TMinF)/2) %>%
   mutate(GDDF = RasterGDD(TMinF, TMaxF, 50, 86)) %>%
@@ -42,13 +54,12 @@ df <- df %>%
   mutate(WARMNIGHTS = fnWARMNIGHTS(TMinC, coldtemp = 23.9)) %>%
   mutate(FRFRDAYS = fnFRFRDAYS(TMinC, coldtemp = 0)) %>%
   mutate(VWETDAYS = fnVWETDAYS(PPT_mm, wetprecip = 101.6))
-           
-  
-df <- select(df,  # remove metric units
-             year,
+
+df <- select(df,  # remove Celsius values; add new variables for Viewer (2-26-2025)
              Station_ID, 
              Station_Name,
              date,
+             Year,
              PPT_in, 
              TMaxF, 
              TMinF, 
@@ -62,25 +73,25 @@ df <- select(df,  # remove metric units
              VHOTDAYS,
              EXHOTDAYS,
              HELLDAYS,
-             WARMNIGHTS, 
+             WARMNIGHTS,
              FRFRDAYS,
              VWETDAYS)
+           
+  
 
-# ---  ASSORT DATA GROUPS BY YEAR AND SAVE   -----   #
+# ---  ASSORT DATA GROUPS BY Year  -----   #
 
-# Sort into groups by year
+# Sort into groups by Year
 
 grp1 <- df %>%
-  filter(year > 1980 & year < 2011) %>%
-  select(-year) 
+  filter(Year > 1980 & Year < 2011) 
 
 grp2 <- df %>%
-  filter(year > 1984 & year < 2015) %>%
-  select(-year)
+  filter(Year > 1984 & Year < 2015)
 
 grp3 <- df %>%
-  filter(year > 1990 & year < 2021) %>%
-  select(-year)
+  filter(Year > 1990 & Year < 2021) 
+
 
 ##  --  CREATE LIST OF DATAFRAMES BY PERIOD --  ##
 
@@ -91,10 +102,16 @@ NOAA_AllDays_Dash[[2]] <- grp2
 NOAA_AllDays_Dash[[3]] <- grp3
 
 
-# ----    CALCULATE 30-YEAR AVERAGES  ------  #
+# ----    CALCULATE 30-Year AVERAGES  ------  #
 
-df = grp1 %>%
-  mutate(Year = year(date))
+noaa30 <- list()
+
+for(i in 1:length(NOAA_AllDays_Dash)){
+
+df = NOAA_AllDays_Dash[[i]] 
+
+
+Period = paste(first(df$Year),"to",last(df$Year), sep = " ")
 
 Pctl90_TmaxF = df %>%
   select(TMaxF) %>%
@@ -106,12 +123,11 @@ Pctl10_TminF = df %>%
   summarize(Pctl10_TminF = quantile(TMinF, probs = 0.10, na.rm = TRUE)) %>%
   ungroup()
 
-yearAvg = df %>%
+YearAvg = df %>%
   dplyr::select(!c('date', 'Year', 'PPT_in', 'GDDF')) %>% # exclude variables for which the result should be summed before averaging
   dplyr::select(!(contains("days"))) %>%
   select(!contains("DAYS")) %>%
   select(!contains("NIGHTS")) %>% 
-  group_by(year, MonthNum) %>%
   summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) %>%
   ungroup()
 
@@ -129,12 +145,6 @@ Pctl10_Prcp_in = sum_ppt %>%
   summarize(Pctl10_Prcp_in = quantile(PPT_in, probs = 0.10, na.rm = TRUE)) %>%
   ungroup()
 
-monthAvg = monthAvg %>%
-  left_join(Pctl90_TmaxF) %>%
-  left_join(Pctl10_TminF) %>%
-  left_join(Pctl90_Prcp_in) %>%
-  left_join(Pctl10_Prcp_in) %>%
-  round(digits = 1)
 
 sum_days = df %>%
   select(Year, contains('days')) %>%
@@ -160,17 +170,11 @@ sum_GDDF = df %>%
   summarise(GDDF = sum(GDDF, na.rm = TRUE)) %>%
   ungroup()
 
-
-
-
-
-sums = sum_days %>% # Averages by year (e.g., 1981, 1982...2010)
+sums = sum_days %>% # Averages by Year (e.g., 1981, 1982...2010)
   left_join(sum_ppt) %>%
   left_join(sum_GDDF) %>%
   left_join(sum_DAYS) %>%
   left_join(sum_nights)
-
-Period = paste(first(yearAvg$Year),"to",last(yearAvg$Year), sep = " ")
 
 sumAvg = sums %>%
   dplyr::select(!Year) %>%
@@ -178,9 +182,69 @@ sumAvg = sums %>%
   ungroup()
 
 
+ScenID = i
 
-avg30_grp1 <- grp1 %>%
-  select(!c(Station_ID, Station_Name)) %>%
+all = bind_cols("ScenID" = ScenID, "PERIOD" = Period, Pctl90_Prcp_in, sumAvg, Pctl10_Prcp_in, Pctl90_TmaxF, Pctl10_TminF, YearAvg)
+
+all = all %>%
+  mutate(across(where(is.double),  ~ round(., digits = 2)))
+
+noaa30[[i]] = all
+
+}
+
+noaa30dash <- bind_rows(list(noaa30[[1]], noaa30[[2]], noaa30[[3]]))
+
+noaa30dash <- noaa30dash %>%
+  mutate(SITENAME = official_name) %>%
+  mutate(SCENARIO = "ObsvHist") %>%
+  rename(Avg_Prcp_in = PPT_in) %>%
+  rename(Avg_TmaxF = TMaxF) %>%
+  rename(Avg_TmeanF = TMeanF) %>%
+  rename(Avg_TminF = TMinF) 
+  
+
+noaa30dash <- select(noaa30dash,
+                     SITENAME,
+                     SCENARIO,
+                     ScenID,
+                     PERIOD,
+                     Pctl90_Prcp_in,
+                     Avg_Prcp_in,
+                     Pctl10_Prcp_in,
+                     Pctl90_TmaxF,
+                     Avg_TmaxF,
+                     Avg_TmeanF,
+                     Avg_TminF,
+                     Pctl10_TminF,
+                     HOTDAYS,)
+
+
+df <- select(df,  # remove metric units
+             Year,
+             Station_ID, 
+             Station_Name,
+             date,
+             PPT_in, 
+             TMaxF, 
+             TMinF, 
+             TMeanF, 
+             GDDF, 
+             hotdays, 
+             colddays, 
+             wetdays, 
+             drydays, 
+             ftdays,
+             VHOTDAYS,
+             EXHOTDAYS,
+             HELLDAYS,
+             WARMNIGHTS, 
+             FRFRDAYS,
+             VWETDAYS)
+
+
+
+
   
 
 
