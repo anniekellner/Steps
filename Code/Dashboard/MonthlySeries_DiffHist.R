@@ -134,34 +134,9 @@ monthlySeriesDiffHist_dash <- monthlySeriesDiffHist_dash %>%
          Pctl90_Prcp_in_diff: VWETDAYS_diff)
 
 
-# ----    CALCULATE 30-YEAR AVERAGES  ------  #
-
-avg30 <- monthlySeriesDiffHist_dash %>%
-  select(-c(MonthNum, Scenario, Period)) %>%
-  group_by(SITENAME, ScenID) %>%
-  summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) %>%
-  arrange(ScenID) %>%
-  ungroup()
-
-avg30 <- avg30 %>%
-  mutate(across(where(is.numeric),  ~ round(., digits = 2))) %>%
-  mutate(Period = c("1991 to 2020 vs. 1981-2010",
-                    "Modeled 1985 to 2014 vs. Observed 1985 - 2014",
-                    "2021 to 2050 vs. Modeled Historical",
-                    "2051 to 2080 vs. Modeled Historical",
-                    "2021 to 2050 vs. Modeled Historical",
-                    "2051 to 2080 vs. Modeled Historical")
-                    )
-
-avg30 <- select(avg30,
-                SITENAME,
-                ScenID,
-                Period,
-                Pctl90_Prcp_in_diff: VWETDAYS_diff)
-
 # Save .csv files
 
-write.csv(monthlySeriesDiffHist_dash, file = paste(dash_dir, "30yr_Avgs_Diffs.csv", sep = "/"))
-write.csv(avg30, file = paste(dash_dir, "30yr_Diffs.csv", sep = "/"))
+
+write.csv(avg30, file = paste(dash_dir, "30yr_Monthly_Diffs.csv", sep = "/"))
 
 
