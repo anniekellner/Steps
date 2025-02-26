@@ -130,5 +130,10 @@ diff30_Dash <- diffs30_Dash %>%
 
 # Write to csv
 
-write.csv(diffs30_dash, file = paste(dash_dir, "30yr_Annual_Diffs.csv", sep = "/"))
+dash_dir <- paste(results_folder,"Dashboard",sep = "/")
+
+if (!dir.exists(dash_dir)){
+  dir.create(dash_dir)}
+
+write.csv(diffs30_Dash, file = paste(dash_dir, "30yr_Annual_Diffs.csv", sep = "/"))
 

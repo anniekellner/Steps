@@ -96,7 +96,7 @@ This script can be found in './Code/Misc/character_vectors.R'. Once you open the
 
 source('./Code/Misc/character_vectors.R')
 source('./Code/CEMML/Functions/Function_General.R')
-source('./Code/Step3Functions.R')
+source('./Code/Functions/Step3Functions.R')
 source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude systems from (-180, 180 ) to (0, 360)
 source('./Code/Functions/ClimateViewerFns.R')
 
@@ -803,7 +803,8 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "plots_dir",
                         "AllDays",
                         "AllDaysDash",
-                        "noaaDashboard",
+                        "noaaDashboard", 
+                        "avg30",
                         "RasterUnitConvert")))
 
 ```
@@ -832,6 +833,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "AllDays",
                         "AllDaysDash",
                         "noaaDashboard",
+                        "avg30",
                         "RasterUnitConvert")))
 
 ```
@@ -872,6 +874,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "monthSumDF",
                         "MonthlySeries",
                         "AllDaysDash",
+                        "avg30",
                         "plots_dir",
                         "RasterUnitConvert")))
 
@@ -923,7 +926,8 @@ rm(list=setdiff(ls(), c("monthSumDF",
                         "years",
                         "csv",
                         "RasterUnitConvert",
-                        "MonthlySeries"
+                        "MonthlySeries",
+                        "avg30"
                         )))
 
 ```
@@ -936,6 +940,11 @@ The next chunk creates all things DiffHist (comparisons between future time peri
   - Dashboard tables
 
 ```{r DiffHist, warning=FALSE}
+
+dash_dir <- paste(results_folder,"Dashboard",sep = "/")
+
+if (!dir.exists(dash_dir)){
+  dir.create(dash_dir)}
 
 source("./Code/DiffHist.R")
 source("./Code/Dashboard/MonthlySeries_DiffHist.R")
