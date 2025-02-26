@@ -211,10 +211,7 @@ MonthlySeries <- bind_rows(list(noaaDashboard, vars[[1]], vars[[2]], vars[[3]], 
 
 # ------  SAVE SPREADSHEET   ----------- #
 
-dash_dir <- paste(results_folder,"Dashboard",sep = "/")
 
-if (!dir.exists(dash_dir)){
-  dir.create(dash_dir)}
 
 write.csv(MonthlySeries, file = paste(dash_dir,"MonthlySeries.csv",sep = "/"))
 
