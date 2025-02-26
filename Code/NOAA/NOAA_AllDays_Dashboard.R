@@ -40,11 +40,11 @@ df <- df %>%
   mutate(TMinC = RasterUnitConvert(TMinF, "FtoC"))
 
 df <- df %>%
-  mutate(hotdays = Rasterhotdays(TMaxC, hottemp = 32.2)) %>%
-  mutate(colddays = Rastercolddays(TMinC, coldtemp = 0)) %>%
-  mutate(wetdays = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
-  mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
-  mutate(ftdays = RasterFTdays(TMaxC, 
+  mutate(HOTDAYS = Rasterhotdays(TMaxC, hottemp = 32.2)) %>%
+  mutate(COLDDAYS = Rastercolddays(TMinC, coldtemp = 0)) %>%
+  mutate(WETDAYS = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
+  mutate(DRYDAYS = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
+  mutate(FTDAYS = RasterFTdays(TMaxC, 
                                TMinC, 
                                freezethresh = -2.2, 
                                thawthresh = 1.2)) %>%
@@ -65,11 +65,11 @@ df <- select(df,  # remove Celsius values; add new variables for Viewer (2-26-20
              TMinF, 
              TMeanF, 
              GDDF, 
-             hotdays, 
-             colddays, 
-             wetdays, 
-             drydays, 
-             ftdays,
+             HOTDAYS, 
+             COLDDAYS, 
+             WETDAYS, 
+             DRYDAYS, 
+             FTDAYS,
              VHOTDAYS,
              EXHOTDAYS,
              HELLDAYS,
@@ -101,6 +101,7 @@ NOAA_AllDays_Dash[[1]] <- grp1
 NOAA_AllDays_Dash[[2]] <- grp2
 NOAA_AllDays_Dash[[3]] <- grp3
 
+rm(df)
 
 # ----    CALCULATE 30-Year AVERAGES  ------  #
 
@@ -187,7 +188,7 @@ ScenID = i
 all = bind_cols("ScenID" = ScenID, "PERIOD" = Period, Pctl90_Prcp_in, sumAvg, Pctl10_Prcp_in, Pctl90_TmaxF, Pctl10_TminF, YearAvg)
 
 all = all %>%
-  mutate(across(where(is.double),  ~ round(., digits = 2)))
+  mutate(across(Pctl90_Prcp_in:TMeanF,  ~ round(., digits = 1)))
 
 noaa30[[i]] = all
 
@@ -217,39 +218,18 @@ noaa30dash <- select(noaa30dash,
                      Avg_TmeanF,
                      Avg_TminF,
                      Pctl10_TminF,
-                     HOTDAYS,)
-
-
-df <- select(df,  # remove metric units
-             Year,
-             Station_ID, 
-             Station_Name,
-             date,
-             PPT_in, 
-             TMaxF, 
-             TMinF, 
-             TMeanF, 
-             GDDF, 
-             hotdays, 
-             colddays, 
-             wetdays, 
-             drydays, 
-             ftdays,
-             VHOTDAYS,
-             EXHOTDAYS,
-             HELLDAYS,
-             WARMNIGHTS, 
-             FRFRDAYS,
-             VWETDAYS)
-
-
-
-
-  
-
-
-
-
+                     HOTDAYS,
+                     VHOTDAYS,
+                     EXHOTDAYS,
+                     HELLDAYS,
+                     WARMNIGHTS,
+                     COLDDAYS,
+                     FRFRDAYS,
+                     FTDAYS,
+                     GDDF,
+                     DRYDAYS,
+                     WETDAYS,
+                     VWETDAYS)
 
 
 rm(list = c("df", "noaa")) 
@@ -264,27 +244,6 @@ rm(list = ls(pattern = "^filePath"))
 
 
 
-
-avg30 <- MonthlySeries %>%
-  select(!MonthNum) %>%
-  group_by(SITENAME, Scenario, Period, ScenID) %>%
-  summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) %>%
-  arrange(ScenID) %>%
-  ungroup()
-
-avg30 <- avg30 %>%
-  mutate(across(where(is.numeric), round, 2))
-
-
-# --  SAVE SPREADSHEETS  --  #
-
-dash_dir <- paste(results_folder,"Dashboard", sep = "/")
-
-if (!dir.exists(dash_dir)){
-  dir.create(dash_dir)}
-
-write.csv(MonthlySeries, file = paste(dash_dir,"MonthlySeries.csv", sep = "/"))
-write.csv(avg30, file = paste(dash_dir, "30yr_Averages.csv", sep = "/"))
 
 
            
