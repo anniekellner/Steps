@@ -147,11 +147,11 @@ Pctl10_Prcp_in = sum_ppt %>%
   ungroup()
 
 
-sum_days = df %>%
-  select(Year, contains('days')) %>%
-  group_by(Year) %>%
-  summarise(across(contains('days'), ~ sum(.x, na.rm = TRUE))) %>%
-  ungroup()
+#sum_days = df %>% ## probably can delete this
+  #select(Year, contains('days')) %>%
+  #group_by(Year) %>%
+  #summarise(across(contains('days'), ~ sum(.x, na.rm = TRUE))) %>%
+  #ungroup()
 
 sum_DAYS = df %>%
   select(Year, contains('DAYS')) %>%
