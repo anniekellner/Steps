@@ -16,7 +16,7 @@ hist <- monthSumDF[[1]] # separate historical values for use in calculations
 for(i in 2:length(monthSumDF)){ # 2 because [[1]] is historical 
   diff = hist %>%
     bind_rows(monthSumDF[[i]]) %>%
-    group_by(Avg_month) %>%
+    group_by(month) %>%
     summarise(across(everything(), \(x) diff(x))) 
   
   diffHist[[i-1]] = diff # add to DiffHist dataframe for future use
