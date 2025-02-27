@@ -48,13 +48,35 @@ for(i in 1:length(avdf)){
     mutate(colddays = Rastercolddays(TMinC, coldtemp = 0)) %>%
     mutate(wetdays = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
     mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
-    mutate(ftdays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) 
+    mutate(ftdays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) %>%
+    rename(spH = huss) %>%
+    rename(humidity = hurs)
+  
+  AllDays[[i]] = csv
     
+} 
+
+# VPD calculation
+
+for(i in 1:length(AllDays)){
+  vpdDF = AllDays[[i]] %>%
+    select(date, humidity, TmeanC)
   
-  AllDays[[i]] = csv # new df for use with MonthSum
-  names(AllDays)[i] = names(avdf[i])
+  vpdDF = VaporPressureDeficit(vpdDF, humidity = "humidity", temperature = "TmeanC") # output is a dataframe
   
-} # end creation of AllDays dataframe
+  vpdDF = vpdDF %>%
+    select(date, vapor.pressure.deficit) %>%
+    rename(VPD = vapor.pressure.deficit)
+  
+  AllDays[[i]] <- AllDays[[i]] %>%
+    left_join(vpdDF, by = "date")
+
+  AllDays[[i]] <- AllDays[[i]] %>%
+    select(!humidity)
+  
+  names(AllDays)[i] = names(avdf)[i]
+}
+
 
 # Write output to .csv
 
