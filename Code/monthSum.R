@@ -64,13 +64,30 @@ for(i in 1:length(AllDays)){
     left_join(sum_ppt) %>%
     left_join(Abs_TminF) %>%
     left_join(sum_GDDF) %>%
+    select(month, # put in order on MonthSum csv
+           PPT_in, 
+           PPT_mm, 
+           TMaxF, 
+           TMinF, 
+           TMeanF, 
+           Abs_TminF, 
+           GDDF,
+           hotdays,
+           colddays,
+           wetdays,
+           drydays,
+           ftdays,
+           specHum,
+           VPD) %>%
+    mutate(across(PPT_in:ftdays, ~round(., digits = 1))) %>% 
+    mutate(across(specHum:VPD, ~round(., digits = 5))) %>%
     ungroup()
   
   monthAvg = all %>%
-    dplyr::select(!year) %>%
     group_by(month) %>%
     summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE))) %>%
-    round(digits = 1) %>%
+    mutate(across(PPT_in:ftdays, ~round(., digits = 1))) %>%  
+    mutate(across(specHum:VPD, ~round(., digits = 5))) %>%
     setNames(paste0('Avg_', names(.))) %>%
     rename(Abs_TminF = Avg_Abs_TminF) %>%
     select(Avg_month, # put in order on MonthSum csv
@@ -118,7 +135,7 @@ for(i in 1:length(monthSumDF)){
     mutate(across(.cols = contains("Avg_T"), ~na_if(.,.))) %>%
     mutate(across(.cols = contains("Abs"), ~na_if(.,.))) %>%
     mutate(across(.cols = any_of("Avg_sfcWind"), ~na_if(.,.))) %>%
-    mutate(across(.cols = contains("hu"), ~na_if(.,.)))
+    mutate(across(.cols = Avg_specHum:Avg_VPD, ~na_if(.,.)))
   
   csv = csv %>%
     slice(1:(n()-2)) %>% # remove summary rows
@@ -132,7 +149,7 @@ for(i in 1:length(monthSumDF)){
   Avs_and_Totals[[i]] = csv %>% slice_tail(n = 2) 
   names(Avs_and_Totals)[i] = names(AllDays[i])
   
-  monthSum[[i]] = csv # will write over original monthSum df that did not have final two columns
+  monthSum[[i]] = csv 
   names(monthSum)[i] = names(AllDays[i])
 }
 
