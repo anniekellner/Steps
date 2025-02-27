@@ -86,7 +86,7 @@ for(i in 1:length(AllDays)){
            Avg_wetdays,
            Avg_drydays,
            Avg_ftdays,
-           Avg_spH,
+           Avg_specHum,
            Avg_VPD
     )
   
