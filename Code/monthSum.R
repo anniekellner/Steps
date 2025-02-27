@@ -90,7 +90,8 @@ for(i in 1:length(AllDays)){
     mutate(across(specHum:VPD, ~round(., digits = 5))) %>%
     setNames(paste0('Avg_', names(.))) %>%
     rename(Abs_TminF = Avg_Abs_TminF) %>%
-    select(Avg_month, # put in order on MonthSum csv
+    rename(month = Avg_month) %>%
+    select(month, # put in order on MonthSum csv
            Avg_PPT_in, 
            Avg_PPT_mm, 
            Avg_TMaxF, 
