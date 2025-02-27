@@ -421,6 +421,13 @@ noaaClim_dir <- paste0(plots_dir,"/","NOAA_Climographs")
 if (!dir.exists(noaaClim_dir)){
   dir.create(noaaClim_dir)}
 
+# Dashboard tables
+
+dash_dir <- paste(results_folder,"Dashboard",sep = "/")
+
+if (!dir.exists(dash_dir)){
+  dir.create(dash_dir)}
+
 ```
 
 
@@ -803,9 +810,9 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "results_folder",
                         "plots_dir",
                         "AllDays",
-                        "AllDaysDash",
-                        "noaaDashboard", 
-                        "avg30",
+                        #"AllDaysDash",
+                        #"noaaDashboard", 
+                        #"avg30",
                         "RasterUnitConvert")))
 
 ```
@@ -942,10 +949,7 @@ The next chunk creates all things DiffHist (comparisons between future time peri
 
 ```{r DiffHist, warning=FALSE}
 
-dash_dir <- paste(results_folder,"Dashboard",sep = "/")
 
-if (!dir.exists(dash_dir)){
-  dir.create(dash_dir)}
 
 source("./Code/DiffHist.R")
 source("./Code/Dashboard/MonthlySeries_DiffHist.R")
