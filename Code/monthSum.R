@@ -86,7 +86,8 @@ for(i in 1:length(AllDays)){
            Avg_wetdays,
            Avg_drydays,
            Avg_ftdays,
-           contains("hu") # for the time being, huss = 0 because the values are so small. Waiting on Andy for VPD info
+           Avg_spH,
+           Avg_VPD
     )
   
   monthSumDF[[i]] = monthAvg # new df for export and use with DiffHist
