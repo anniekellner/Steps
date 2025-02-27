@@ -49,8 +49,8 @@ for(i in 1:length(avdf)){
     mutate(wetdays = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
     mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
     mutate(ftdays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) %>%
-    rename(spH = huss) %>%
-    rename(humidity = hurs)
+    rename(specHum = huss) %>%
+    rename(RH = hurs)
   
   AllDays[[i]] = csv
     
@@ -60,9 +60,9 @@ for(i in 1:length(avdf)){
 
 for(i in 1:length(AllDays)){
   vpdDF = AllDays[[i]] %>%
-    select(date, humidity, TmeanC)
+    select(date, RH, TmeanC)
   
-  vpdDF = VaporPressureDeficit(vpdDF, humidity = "humidity", temperature = "TmeanC") # output is a dataframe
+  vpdDF = VaporPressureDeficit(vpdDF, humidity = "RH", temperature = "TmeanC") # output is a dataframe
   
   vpdDF = vpdDF %>%
     select(date, vapor.pressure.deficit) %>%
@@ -72,7 +72,7 @@ for(i in 1:length(AllDays)){
     left_join(vpdDF, by = "date")
 
   AllDays[[i]] <- AllDays[[i]] %>%
-    select(!humidity)
+    select(!RH)
   
   names(AllDays)[i] = names(avdf)[i]
 }
