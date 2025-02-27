@@ -55,6 +55,7 @@ library(climatol) # for Walter-Lieth Diagrams
 library(extrafont) # for using Calibri font in plots
 library(patchwork)
 library(grid) # for legend grobs (Climographs)
+library(pvldcurve) # for calculating Vapor Pressure Deficit (VPD)
 library(conflicted)
 
 conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
