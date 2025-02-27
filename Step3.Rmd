@@ -949,10 +949,9 @@ The next chunk creates all things DiffHist (comparisons between future time peri
 
 ```{r DiffHist, warning=FALSE}
 
-
-
 source("./Code/DiffHist.R")
 source("./Code/Dashboard/MonthlySeries_DiffHist.R")
+source("./Code/Avg30_DiffHist.R")
 
 ```
 
