@@ -74,7 +74,42 @@ for(i in 1:length(AllDays)){
   AllDays[[i]] <- AllDays[[i]] %>%
     select(!RH)
   
+}
+  
+  # Round values, order columns and name lists
+  
+  for(i in 1:length(AllDays)){ # put in order on MonthSum csv
+    df = AllDays[[i]] %>%
+      select(lat,
+           lon,
+           tmax,
+           tmin,
+           prcp,
+           sfcWind, 
+           date,
+           PPT_mm, 
+           PPT_in,
+           TMaxF,
+           TMaxC,
+           TMinF,
+           TMinC,
+           TMeanF, 
+           TmeanC,
+           GDDF,
+           hotdays,
+           colddays,
+           wetdays,
+           drydays,
+           ftdays,
+           specHum,
+           VPD) %>%
+      mutate(across(tmax:ftdays, ~round(., digits = 1))) %>% 
+      mutate(across(specHum:VPD, ~round(., digits = 5))) 
+    
+    AllDays[[i]] = df
+  
   names(AllDays)[i] = names(avdf)[i]
+  
 }
 
 
