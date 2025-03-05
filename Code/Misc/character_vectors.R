@@ -30,6 +30,7 @@ shp_names <- c("Homestead_ARB",
               "South_Range_Boundary",
               "Carter_Creek_Recreation_Center_Boundary",
               "JBLE_L",
+              "JBLE_E",
               "Edwards_AFB",                 
               "Malmstrom_AFB_Proxy",
               "Kitsap_Proxy",
@@ -73,7 +74,8 @@ official_base_names <- c("NAVBASE Kitsap",
                                    "Joint Base Elmendorf-Richardson", 
                                    "Edwards Air Force Base",
                                    "Joint Base McGuire-Dix-Lakehurst",
-                                   "JBLE - Langley") 
+                                   "JBLE - Langley",
+                         "JBLE - Eustis") 
 
 
 
