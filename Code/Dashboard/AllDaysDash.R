@@ -26,7 +26,7 @@ for(i in 1:length(avdf)){
   csv = avdf[[i]]
   
   csv$date = ymd(csv$date) # change date to lubridate type
-  csv$Year = Year(csv$date) # add Year for summed variables
+  csv$Year = year(csv$date) # add Year for summed variables
   
   csv = csv %>%
     mutate(PPT_mm = case_when( # if raster units are "kg-m-2 -1", convert to mm (otherwise keep as is)

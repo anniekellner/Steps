@@ -34,8 +34,7 @@ for(i in 1:length(AllDaysDash)){
                      ))
   
   yearAvg = df %>%
-    dplyr::select(!c('date','PPT_in', 'GDDF')) %>% # exclude variables for which the result is not simply a MonthNumly average
-    dplyr::select(!(contains("days"))) %>%
+    dplyr::select(!c('date','PPT_in', 'GDDF')) %>% # exclude variables for which the result is not simply a Monthly average
     select(!contains("DAYS")) %>%
     select(!contains("NIGHTS")) %>% 
     group_by(year, MonthNum) %>%
@@ -46,12 +45,6 @@ for(i in 1:length(AllDaysDash)){
     select(date, year, MonthNum, 'PPT_in') %>%
     group_by(year, MonthNum) %>%
     summarise(across(contains('PPT'), ~ sum(.x, na.rm = TRUE))) %>%
-    ungroup()
-  
-  sum_days = df %>%
-    select(date, year, MonthNum, contains('days')) %>%
-    group_by(year, MonthNum) %>%
-    summarise(across(contains('days'), ~ sum(.x, na.rm = TRUE))) %>%
     ungroup()
   
   sum_DAYS = df %>%
