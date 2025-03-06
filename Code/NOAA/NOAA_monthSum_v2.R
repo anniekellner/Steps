@@ -7,7 +7,7 @@
 # Written/updated by Annie Kellner (annie.kellner@colostate.edu)
 # 2-9-2025
 
-# Inputs: AllDays_hist dataframe (concatenated NOAA daily data)
+# Inputs: AllDays_NOAA dataframe (concatenated NOAA daily data)
 
 # Outputs: 
     # .csv files (3): monthly summaries for 3 historical time periods
@@ -86,7 +86,7 @@ for(i in 1:length(AllDays_NOAA)){
      )
      
      noaa_monthSum[[i]] <- monthAvg
-     names(noaa_monthSum)[i] = names(AllDays_hist[i])
+     names(noaa_monthSum)[i] = names(AllDays_NOAA[i])
 }
 
 rm(df)

@@ -82,17 +82,17 @@ for(i in 1:length(NOAA_AllDays_Dash)){
     rename(Avg_TmaxF = Avg_TMaxF) %>%
     rename(Avg_TmeanF = Avg_TMeanF) %>%
     rename(Avg_TminF = Avg_TMinF) %>%
-    rename(HOTDAYS = Avg_hotdays) %>%
+    rename(HOTDAYS = Avg_HOTDAYS) %>%
     rename(VHOTDAYS = Avg_VHOTDAYS) %>%
     rename(EXHOTDAYS = Avg_EXHOTDAYS) %>%
     rename(HELLDAYS = Avg_HELLDAYS) %>%
     rename(WARMNIGHTS = Avg_WARMNIGHTS) %>%
-    rename(COLDDAYS = Avg_colddays) %>%
+    rename(COLDDAYS = Avg_COLDDAYS) %>%
     rename(FRFRDAYS = Avg_FRFRDAYS) %>%
-    rename(FTDAYS = Avg_ftdays) %>%
+    rename(FTDAYS = Avg_FTDAYS) %>%
     rename(GDDF = Avg_GDDF) %>%
-    rename(DRYDAYS = Avg_drydays) %>%
-    rename(WETDAYS = Avg_wetdays) %>%
+    rename(DRYDAYS = Avg_DRYDAYS) %>%
+    rename(WETDAYS = Avg_WETDAYS) %>%
     rename(VWETDAYS = Avg_VWETDAYS)
   
   Pctl90_TmaxF = df %>%

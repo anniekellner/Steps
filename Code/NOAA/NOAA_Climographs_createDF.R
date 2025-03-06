@@ -9,7 +9,7 @@
 # written by Annie Kellner for CEMML 12-23-2024
 
 # inputs: 
-    # AllDays_hist dataframe
+    # AllDays_NOAA dataframe
     # noaa_monthSum dataframe
 
 # outputs:
@@ -23,7 +23,7 @@
 
 ## Unify labeling of months
 
-# Create function for adding month label (e.g., "Jan") to AllDays_hist dataframe
+# Create function for adding month label (e.g., "Jan") to AllDays_NOAA dataframe
 
 add_month <- function(df){
   df = df %>%
@@ -34,11 +34,11 @@ add_month <- function(df){
 }
 
 
-## Add month label to AllDays_hist dataframe
+## Add month label to AllDays_NOAA dataframe
 
-for(i in 1:length(AllDays_hist)){
-  AllDays_hist[[i]] = add_month(AllDays_hist[[i]])
-  AllDays_hist[[i]]$month = as.character(AllDays_hist[[i]]$month)
+for(i in 1:length(AllDays_NOAA)){
+  AllDays_NOAA[[i]] = add_month(AllDays_NOAA[[i]])
+  AllDays_NOAA[[i]]$month = as.character(AllDays_NOAA[[i]]$month)
 }
 
 
@@ -49,16 +49,16 @@ for(i in 1:length(noaa_monthSum)){
   }
 
 
-### PREP ALLDAYS_HIST  ###
+### PREP AllDays_NOAA  ###
 
 
 ## Calculate quantiles:  90% TMaxF, 10% TMinF
 
 quantiles <- list()
 
-for(i in 1:length(AllDays_hist)){
+for(i in 1:length(AllDays_NOAA)){
   
-  df = AllDays_hist[[i]]
+  df = AllDays_NOAA[[i]]
   
   high10 = df %>%
     group_by(month) %>%

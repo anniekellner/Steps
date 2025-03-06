@@ -146,13 +146,6 @@ Pctl10_Prcp_in = sum_ppt %>%
   summarize(Pctl10_Prcp_in = quantile(PPT_in, probs = 0.10, na.rm = TRUE)) %>%
   ungroup()
 
-
-#sum_days = df %>% ## probably can delete this
-  #select(Year, contains('days')) %>%
-  #group_by(Year) %>%
-  #summarise(across(contains('days'), ~ sum(.x, na.rm = TRUE))) %>%
-  #ungroup()
-
 sum_DAYS = df %>%
   select(Year, contains('DAYS')) %>%
   group_by(Year) %>%
@@ -171,8 +164,7 @@ sum_GDDF = df %>%
   summarise(GDDF = sum(GDDF, na.rm = TRUE)) %>%
   ungroup()
 
-sums = sum_days %>% # Averages by Year (e.g., 1981, 1982...2010)
-  left_join(sum_ppt) %>%
+sums = sum_ppt %>% # Averages by Year (e.g., 1981, 1982...2010)
   left_join(sum_GDDF) %>%
   left_join(sum_DAYS) %>%
   left_join(sum_nights)
@@ -181,7 +173,6 @@ sumAvg = sums %>%
   dplyr::select(!Year) %>%
   summarise(across(everything(), ~ mean(.x, na.rm = TRUE))) %>%
   ungroup()
-
 
 ScenID = i
 
