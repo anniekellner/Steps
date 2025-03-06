@@ -14,6 +14,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "scenario_plotNames",
                         "baseline", "scenario1", "scenario2",
                         "variables",
+                        "baseline_dir",
                         "baseline_start_year",
                         "baseline_end_year",
                         "future1_start_year",
@@ -35,4 +36,11 @@ scenarios <- c(baseline, scenario1, scenario2)
 baseline_yrs <- paste(seq(baseline_start_year, baseline_end_year, 1), collapse = '|')
 future1_yrs <- paste(seq(future1_start_year, future1_end_year, 1), collapse = '|')
 future2_yrs <- paste(seq(future2_start_year, future2_end_year, 1), collapse = '|')
+
+years <- c(baseline_start_year, # vector for easy reference
+           baseline_end_year, 
+           future1_start_year, 
+           future1_end_year, 
+           future2_start_year, 
+           future2_end_year)
 
