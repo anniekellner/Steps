@@ -78,6 +78,7 @@ for(i in 1:length(AllDays)){
            drydays,
            ftdays,
            specHum,
+           meanRH,
            VPD) %>%
     mutate(across(PPT_in:ftdays, ~round(., digits = 1))) %>% 
     mutate(across(specHum:VPD, ~round(., digits = 5))) %>%
@@ -105,6 +106,7 @@ for(i in 1:length(AllDays)){
            Avg_drydays,
            Avg_ftdays,
            Avg_specHum,
+           Avg_meanRH,
            Avg_VPD
     )
   
@@ -141,7 +143,6 @@ for(i in 1:length(monthSumDF)){
   csv = csv %>%
     slice(1:(n()-2)) %>% # remove summary rows
     bind_rows(NAs, NAs_Totals) %>% # replace with NA's included
-    rename(month = Avg_month) %>%
     mutate(month = as.character(month))
   
   csv[13,1] = "YrAverage"
