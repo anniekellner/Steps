@@ -88,7 +88,7 @@ for(i in 1:length(AllDays)){
     group_by(month) %>%
     summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE))) %>%
     mutate(across(PPT_in:ftdays, ~round(., digits = 1))) %>%  
-    mutate(across(specHum:VPD, ~round(., digits = 5))) %>%
+    mutate(across(specHum:VPD, ~round(., digits = 4))) %>%
     setNames(paste0('Avg_', names(.))) %>%
     rename(Abs_TminF = Avg_Abs_TminF) %>%
     rename(month = Avg_month) %>%
@@ -105,8 +105,8 @@ for(i in 1:length(AllDays)){
            Avg_wetdays,
            Avg_drydays,
            Avg_ftdays,
-           Avg_specHum,
            Avg_meanRH,
+           Avg_specHum,
            Avg_VPD
     )
   
@@ -138,12 +138,15 @@ for(i in 1:length(monthSumDF)){
     mutate(across(.cols = contains("Avg_T"), ~na_if(.,.))) %>%
     mutate(across(.cols = contains("Abs"), ~na_if(.,.))) %>%
     mutate(across(.cols = any_of("Avg_sfcWind"), ~na_if(.,.))) %>%
-    mutate(across(.cols = Avg_specHum:Avg_VPD, ~na_if(.,.)))
+    mutate(across(.cols = Avg_meanRH:Avg_VPD, ~na_if(.,.)))
   
   csv = csv %>%
     slice(1:(n()-2)) %>% # remove summary rows
     bind_rows(NAs, NAs_Totals) %>% # replace with NA's included
-    mutate(month = as.character(month))
+    mutate(month = as.character(month)) %>%
+    mutate(across(Avg_PPT_in:Avg_meanRH, ~round(., digits = 1))) %>% 
+    mutate(across(Avg_specHum:Avg_VPD, ~round(., digits = 4))) 
+    
   
   csv[13,1] = "YrAverage"
   csv[14,1] = "YrTotals"
