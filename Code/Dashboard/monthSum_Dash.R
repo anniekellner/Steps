@@ -17,65 +17,50 @@ for(i in 1:length(AllDaysDash)){
   
   df = df %>%
     mutate(date = ymd(date)) %>%
-    mutate(MonthNum = month(date)) %>%
-    mutate(year = year(date)) %>%
-    dplyr::select(-c(lat, 
-                     lon, 
-                     tmax, 
-                     tmin, 
-                     prcp, 
-                     hurs, 
-                     huss, 
-                     sfcWind,
-                     TMaxC,
-                     TMinC,
-                     TmeanC,
-                     PPT_mm
-                     ))
+    mutate(MonthNum = month(date)) 
   
   yearAvg = df %>%
     dplyr::select(!c('date','PPT_in', 'GDDF')) %>% # exclude variables for which the result is not simply a Monthly average
     select(!contains("DAYS")) %>%
     select(!contains("NIGHTS")) %>% 
-    group_by(year, MonthNum) %>%
+    group_by(Year, MonthNum) %>%
     summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) %>%
     ungroup()
 
   sum_ppt = df %>%
-    select(date, year, MonthNum, 'PPT_in') %>%
-    group_by(year, MonthNum) %>%
+    select(date, Year, MonthNum, 'PPT_in') %>%
+    group_by(Year, MonthNum) %>%
     summarise(across(contains('PPT'), ~ sum(.x, na.rm = TRUE))) %>%
     ungroup()
   
   sum_DAYS = df %>%
-    select(date, year, MonthNum, contains('DAYS')) %>%
-    group_by(year, MonthNum) %>%
+    select(date, Year, MonthNum, contains('DAYS')) %>%
+    group_by(Year, MonthNum) %>%
     summarise(across(contains('DAYS'), ~ sum(.x, na.rm = TRUE))) %>%
     ungroup()
   
   sum_nights = df %>%
-    select(date, year, MonthNum, contains('NIGHTS')) %>%
-    group_by(year, MonthNum) %>%
+    select(date, Year, MonthNum, contains('NIGHTS')) %>%
+    group_by(Year, MonthNum) %>%
     summarise(across(contains('nights'), ~ sum(.x, na.rm = TRUE))) %>%
     ungroup()
   
   sum_GDDF = df %>%
-    select(date, year, MonthNum, GDDF) %>%
-    group_by(year, MonthNum) %>%
+    select(date, Year, MonthNum, GDDF) %>%
+    group_by(Year, MonthNum) %>%
     summarise(GDDF = sum(GDDF, na.rm = TRUE)) %>%
     ungroup()
   
   all = yearAvg %>% # Averages by year (e.g., for Jan 1981, Feb 1981...)
-    left_join(sum_days) %>%
     left_join(sum_ppt) %>%
     left_join(sum_GDDF) %>%
     left_join(sum_DAYS) %>%
     left_join(sum_nights)
   
-  Period = paste(first(all$year),"to",last(all$year), sep = " ")
+  Period = paste(first(all$Year),"to",last(all$Year), sep = " ")
   
   monthAvg = all %>%
-    dplyr::select(!year) %>%
+    dplyr::select(!Year) %>%
     group_by(MonthNum) %>%
     summarise(across(TMaxF:WARMNIGHTS, ~ mean(.x, na.rm = TRUE))) %>%
     ungroup()
@@ -87,17 +72,17 @@ for(i in 1:length(AllDaysDash)){
     rename(Avg_TmaxF = Avg_TMaxF) %>%
     rename(Avg_TmeanF = Avg_TMeanF) %>%
     rename(Avg_TminF = Avg_TMinF) %>%
-    rename(HOTDAYS = Avg_hotdays) %>%
+    rename(HOTDAYS = Avg_HOTDAYS) %>%
     rename(VHOTDAYS = Avg_VHOTDAYS) %>%
     rename(EXHOTDAYS = Avg_EXHOTDAYS) %>%
     rename(HELLDAYS = Avg_HELLDAYS) %>%
     rename(WARMNIGHTS = Avg_WARMNIGHTS) %>%
-    rename(COLDDAYS = Avg_colddays) %>%
+    rename(COLDDAYS = Avg_COLDDAYS) %>%
     rename(FRFRDAYS = Avg_FRFRDAYS) %>%
-    rename(FTDAYS = Avg_ftdays) %>%
+    rename(FTDAYS = Avg_FTDAYS) %>%
     rename(GDDF = Avg_GDDF) %>%
-    rename(DRYDAYS = Avg_drydays) %>%
-    rename(WETDAYS = Avg_wetdays) %>%
+    rename(DRYDAYS = Avg_DRYDAYS) %>%
+    rename(WETDAYS = Avg_WETDAYS) %>%
     rename(VWETDAYS = Avg_VWETDAYS) 
 
   
@@ -130,17 +115,13 @@ for(i in 1:length(AllDaysDash)){
     left_join(Pctl10_Prcp_in) %>%
     round(digits = 1)
   
- # monthAvg$Period <- Period
-  
-  #monthAvg$SITENAME <- official_name
-  
   monthAvg <- monthAvg %>%
     mutate(Scenario = case_when(
-      first(all$year) == 1985 ~ "Modeled Historical Climate",
-      first(all$year) == 2021 & i == 2 ~ "Moderate Emissions (SSP2-4.5)",
-      first(all$year) == 2051 & i == 3 ~ "Moderate Emissions (SSP2-4.5)",
-      first(all$year) == 2021 & i == 4 ~ "High Emissions (SSP5-8.5)",
-      first(all$year) == 2051 & i == 5 ~ "High Emissions (SSP5-8.5)")) %>%
+      first(all$Year) == 1985 ~ "Modeled Historical Climate",
+      first(all$Year) == 2021 & i == 2 ~ "Moderate Emissions (SSP2-4.5)",
+      first(all$Year) == 2051 & i == 3 ~ "Moderate Emissions (SSP2-4.5)",
+      first(all$Year) == 2021 & i == 4 ~ "High Emissions (SSP5-8.5)",
+      first(all$Year) == 2051 & i == 5 ~ "High Emissions (SSP5-8.5)")) %>%
     mutate(Period = Period) %>%
     mutate(SITENAME = official_name)
   
@@ -204,9 +185,9 @@ MonthlySeries <- bind_rows(list(noaaDashboard, vars[[1]], vars[[2]], vars[[3]], 
 
 # ------  SAVE SPREADSHEET   ----------- #
 
+filename <- paste(shp, "MonthlySeries.csv", sep = "_")
 
-
-write.csv(MonthlySeries, file = paste(dash_dir,"MonthlySeries.csv",sep = "/"))
+write.csv(MonthlySeries, file = paste(dash_dir,filename,sep = "/"), row.names = FALSE)
 
 
 
