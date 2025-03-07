@@ -33,6 +33,11 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
 
 scenarios <- c(baseline, scenario1, scenario2)
 
+scenario1_plotName <- ifelse(str_detect(scenario1, "ssp245"), "SSP2-4.5", "RCP 4.5")
+scenario2_plotName <- ifelse(str_detect(scenario2, "ssp585"), "SSP5-8.5", "RCP 8.5")
+
+scenario_plotNames <- c("Historical", scenario1_plotName, scenario2_plotName)
+
 baseline_yrs <- paste(seq(baseline_start_year, baseline_end_year, 1), collapse = '|')
 future1_yrs <- paste(seq(future1_start_year, future1_end_year, 1), collapse = '|')
 future2_yrs <- paste(seq(future2_start_year, future2_end_year, 1), collapse = '|')
