@@ -43,16 +43,11 @@ for(i in 1:length(AllDays)){
 # monthSum
 
 for(i in 1:length(monthSumDF)){
-  monthSumDF[[i]]$Avg_month = month.abb[monthSumDF[[i]]$Avg_month]
+  monthSumDF[[i]]$month = month.abb[monthSumDF[[i]]$month]
 }
 
-for(i in 1:length(monthSumDF)){
-  df = monthSumDF[[i]]
-  
-  df = df %>%
-    rename(month = Avg_month)
-    monthSumDF[[i]] = df
-}
+
+
 ## -----  Calculate quantiles:  90% TMaxF, 10% TMinF  ------------  ##
 
 
