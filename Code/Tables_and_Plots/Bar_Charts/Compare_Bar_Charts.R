@@ -40,12 +40,12 @@ custom_fill_prcp <- c("F1" = "#74CFE4", "F2" = "#0083BE")
 
 diffs <- list()
 
-for(i in 1:length(DiffHist)){ 
-  df = DiffHist[[i]]
+for(i in 1:length(diffHist)){ 
+  df = diffHist[[i]]
   df = add_month(df)
   df = select(df, Month, Avg_TMeanF, Avg_TMaxF, Avg_TMinF, Avg_PPT_in)
   diffs[[i]] = df
-  names(diffs)[[i]] = names(DiffHist[i])
+  names(diffs)[[i]] = names(diffHist[i])
 }
 
 rm(df)

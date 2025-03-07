@@ -942,6 +942,7 @@ rm(list=setdiff(ls(), c("monthSumDF",
                         "scenario_plotNames",
                         "results_folder",
                         "plots_dir",
+                        "dash_dir",
                         "years",
                         "csv",
                         "RasterUnitConvert",
@@ -962,7 +963,7 @@ The next chunk creates all things DiffHist (comparisons between future time peri
 
 source("./Code/DiffHist.R")
 source("./Code/Dashboard/MonthlySeries_DiffHist.R")
-source("./Code/Avg30_DiffHist.R")
+source("./Code/Dashboard/Avg30_DiffHist.R")
 
 ```
 
