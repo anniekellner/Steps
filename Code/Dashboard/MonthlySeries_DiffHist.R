@@ -61,7 +61,7 @@ monthlySeriesDiffHist[[2]] <- Diff %>%
 
 monthlySeriesDiffHist[[2]]$ScenID = sid
 monthlySeriesDiffHist[[2]]$Period = prd
-monthlySeriesDiffHist[[2]]$Scenario = prd
+monthlySeriesDiffHist[[2]]$Scenario = "Historical Modeled (1985 to 2014) vs. Historical Observed (1985 to 2014)"
 
 
 ##  --  Compare all other Future/Scenario combos to Modeled Historical  -- ##
@@ -108,14 +108,14 @@ monthlySeriesDiffHist_dash <- bind_rows(list(monthlySeriesDiffHist[[1]],
                                 monthlySeriesDiffHist[[5]],
                                 monthlySeriesDiffHist[[6]]))
 
-monthlySeriesDiffHist_dash$Scenario <- factor(
-  monthlySeriesDiffHist_dash$Scenario, 
-  levels = c(
-    "Observed Historical Climate Trend",
-    "1985 to 2014 Modeled vs. 1985-2014 Observed",
-    "Moderate Emissions (SSP2-4.5) Change vs. Historical",
-    "High Emissions (SSP5-8.5) Change vs. Historical")
-)
+#monthlySeriesDiffHist_dash$Scenario <- factor(
+  #monthlySeriesDiffHist_dash$Scenario, 
+  #levels = c(
+    #"Observed Historical Climate Trend",
+    #"Historical Modeled (1985 to 2014 ) vs. Historical Observed (1985 to 2014)",
+    #"Moderate Emissions (SSP2-4.5) Change vs. Historical",
+    #"High Emissions (SSP5-8.5) Change vs. Historical")
+#)
 
 monthlySeriesDiffHist_dash <- monthlySeriesDiffHist_dash %>%
   mutate(across(Pctl90_Prcp_in:VWETDAYS, ~ round(., digits = 2))) %>% 
@@ -136,7 +136,7 @@ monthlySeriesDiffHist_dash <- monthlySeriesDiffHist_dash %>%
 
 # Save .csv files
 
+filename <- paste(shp, "30yr_Monthly_Diffs.csv", sep = "_")
 
-write.csv(avg30, file = paste(dash_dir, "30yr_Monthly_Diffs.csv", sep = "/"))
-
+write.csv(monthlySeriesDiffHist_dash, file = paste(dash_dir, filename, sep = "/"), row.names = FALSE)
 
