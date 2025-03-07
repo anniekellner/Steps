@@ -38,7 +38,7 @@ calcRH <- function(h, T, Q){
   
   P <- calcP(h, T)
   
-  RH <- 26.3*P*Q*(exp((17.67*(T - T_0))/(T - 29.65)))^-1
+  RH <- 0.263*P*Q*(exp((17.67*(T - T_0))/(T - 29.65)))^-1
 
   return(RH)
 }
