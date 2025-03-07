@@ -118,20 +118,20 @@ for(i in 1:length(climMelt)){
              width = 0.7,
              show.legend = FALSE)  +
     
-    geom_text(data = subset(climMelt[[i]], Variable == "PPT_in5"), 
-              aes(label = round(Value/5, digits = 1)),
-              family = "Calibri", 
-              fontface = "plain",
-              size = 3, # arbitrary based on visualization
-              vjust = 2.5,  # + values are below the bar; - values are above the bar
-              hjust = 0.5,
-              show.legend = FALSE) +
-    
     geom_line(data = subset(climMelt[[i]], Variable %in% c("high90", "TMaxF", "TMinF", "low10")),
               aes(group = Variable, linetype = Variable, color = Variable), linewidth = 1.25) + 
     
     geom_point(data = subset(climMelt[[i]], Variable %in% c("high90", "low10", "TMaxF", "TMinF")),
-               aes(group = Variable, color = Variable, shape = Variable, fill = Variable), size = 3) + 
+               aes(group = Variable, color = Variable, shape = Variable, fill = Variable), size = 3) +
+   
+   geom_text(data = subset(climMelt[[i]], Variable == "PPT_in5"), 
+             aes(label = round(Value/5, digits = 1)),
+             family = "Calibri", 
+             fontface = "plain",
+             size = 3, # arbitrary based on visualization
+             vjust = 2.5,  # + values are below the bar; - values are above the bar
+             hjust = 0.5,
+             show.legend = FALSE) +
     
     scale_y_continuous(limits = c(lower_value, upper_value), 
                        n.breaks = numBreaks,
