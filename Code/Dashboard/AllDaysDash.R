@@ -61,6 +61,7 @@ for(i in 1:length(avdf)){
     mutate(VWETDAYS = fnVWETDAYS(PPT_mm, wetprecip = 101.6))
   
   csv <- select(csv,  # remove Celsius values; add new variables for Viewer (2-26-2025)
+                date,
                Year,
                PPT_in, 
                TMaxF, 
