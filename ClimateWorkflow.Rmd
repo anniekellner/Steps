@@ -146,9 +146,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[15] # CHANGE THIS TO INSTALLATION OF INTEREST
+#shp <- shp_names[15] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
 ```
 
@@ -194,9 +194,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[15] 
+shp <- shp_names[5] 
 
-official_name <- official_base_names[20] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[16] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -356,7 +356,7 @@ list.files(path = NOAA_dir, pattern = shp)
 
 ```{r pull-NOAA-data}
 
-weather_station <- "JBLE_L.csv"
+weather_station <- "JBER.csv"
 
 # Read in data
 
@@ -565,6 +565,8 @@ afb_dir <- (paste(dir_installation_boundaries, shp, sep = '/'))
 afb_filename <- paste(afb_dir, '.shp', sep = "")
 
 afbSF <- st_read(afb_filename) # Because plotting package (tmap) doesn't take terra vectors
+elev <- afbSF$Elev_Mean
+
 afb <- vect(afbSF)
 
 afbSF <- if (xmax(rx) == 360 & xmax(afb) < 0) {st_shift_longitude(afbSF)} else afbSF # adjustment in case ncdf lon scale is 0-360
@@ -791,6 +793,34 @@ for(i in 1:length(nested_tibbles)){
  
 ```
 
+################################################################################
+###                     RUN HISTORICAL ANALYSIS (OBSERVED)                   ###
+################################################################################
+
+# Prep Environment
+
+
+Now that we've extracted and formatted the model data, we can remove extraneous variables from the environment and run the observed historical analysis. 
+
+```{r prep-env-for-NOAA}
+
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
+                        "official_name",
+                        "model", 
+                        "scenarios",
+                        "scenario_plotNames",
+                        "years",
+                        "results_folder",
+                        "plots_dir",
+                        "avdf",
+                        "years",
+                        "rx",
+                        "elev",
+                        lsf.str()))) # keep all functions
+
+```
+
+
 ## ADD DERIVED VARIABLES
 
 NOTE: see comments within code. Functions assume the raw ncdf data does NOT use imperial units. 
@@ -866,8 +896,11 @@ The next chunk creates MonthSum.csv files
 
 # input: AllDays dataframes
 # outputs: 
+  # monthSum.R
     # MonthSumDF dataframe (for use downstream) 
     # monthSum csv's (to Results folder)
+  
+  # monthSum_Dash.R
     # Monthly Series spreadsheet for Dashboard
     # 30 yr averages for Future Scenarios
 
