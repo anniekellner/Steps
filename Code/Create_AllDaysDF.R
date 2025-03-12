@@ -74,11 +74,9 @@ for(i in 1:length(AllDays)){
     select(date, vapor.pressure.deficit) %>%
     rename(VPD = vapor.pressure.deficit)
   
-  AllDays[[i]] <- AllDays[[i]] %>%
-    left_join(vpdDF, by = "date")
+  AllDays[[i]] <- vpdDF %>%
+    right_join(AllDays[[i]], by = "date")
 
-  AllDays[[i]] <- AllDays[[i]] 
-  
 }
   
   # Round values, order columns and name lists
@@ -106,12 +104,12 @@ for(i in 1:length(AllDays)){
            wetdays,
            drydays,
            ftdays,
-           specHum,
            maxRH,
            meanRH,
            minRH,
+           specHum,
            VPD) %>%
-      mutate(across(tmax:ftdays, ~round(., digits = 1))) %>% 
+      mutate(across(tmax:minRH, ~round(., digits = 1))) %>% 
       mutate(across(specHum:VPD, ~round(., digits = 5))) 
     
     AllDays[[i]] = df
