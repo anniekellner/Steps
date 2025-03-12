@@ -49,15 +49,18 @@ for(i in 1:length(avdf)){
     mutate(wetdays = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
     mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
     mutate(ftdays = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) %>%
-    mutate(maxRH = calcRH(h = 2, T = tmin, Q = huss)) %>%
-    mutate(minRH = calcRH(h = 2, T = tmax, Q = huss)) %>%
+    mutate(maxRH = calcRH(h = elev, T = tmin, Q = huss)) %>%
+    mutate(minRH = calcRH(h = elev, T = tmax, Q = huss)) %>%
     rename(specHum = huss) %>%
-    rename(meanRH = hurs) 
+    rename(meanRH = hurs) %>%
+    mutate(maxRH = ifelse(maxRH > 100, 100, maxRH)) %>% # cap maxRH at 100
+    mutate(minRH = ifelse(minRH < 0, 0, minRH)) # cap minRH at 0 
 
   
   AllDays[[i]] = csv
     
 } 
+
 
 # VPD calculation
 
