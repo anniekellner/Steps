@@ -77,10 +77,12 @@ for(i in 1:length(AllDays)){
            wetdays,
            drydays,
            ftdays,
-           specHum,
+           maxRH,
            meanRH,
+           minRH,
+           specHum,
            VPD) %>%
-    mutate(across(PPT_in:ftdays, ~round(., digits = 1))) %>% 
+    mutate(across(PPT_in:minRH, ~round(., digits = 1))) %>% 
     mutate(across(specHum:VPD, ~round(., digits = 5))) %>%
     ungroup()
   
@@ -105,7 +107,9 @@ for(i in 1:length(AllDays)){
            Avg_wetdays,
            Avg_drydays,
            Avg_ftdays,
+           Avg_maxRH,
            Avg_meanRH,
+           Avg_minRH,
            Avg_specHum,
            Avg_VPD
     )
@@ -138,13 +142,13 @@ for(i in 1:length(monthSumDF)){
     mutate(across(.cols = contains("Avg_T"), ~na_if(.,.))) %>%
     mutate(across(.cols = contains("Abs"), ~na_if(.,.))) %>%
     mutate(across(.cols = any_of("Avg_sfcWind"), ~na_if(.,.))) %>%
-    mutate(across(.cols = Avg_meanRH:Avg_VPD, ~na_if(.,.)))
+    mutate(across(.cols = Avg_maxRH:Avg_VPD, ~na_if(.,.)))
   
   csv = csv %>%
     slice(1:(n()-2)) %>% # remove summary rows
     bind_rows(NAs, NAs_Totals) %>% # replace with NA's included
     mutate(month = as.character(month)) %>%
-    mutate(across(Avg_PPT_in:Avg_meanRH, ~round(., digits = 1))) %>% 
+    mutate(across(Avg_PPT_in:Avg_minRH, ~round(., digits = 1))) %>% 
     mutate(across(Avg_specHum:Avg_VPD, ~round(., digits = 4))) 
     
   
