@@ -53,9 +53,15 @@ for(i in 1:length(avdf)){
     mutate(minRH = calcRH(h = elev, T = tmax, Q = huss)) %>%
     rename(specHum = huss) %>%
     rename(meanRH = hurs) %>%
-    mutate(maxRH = ifelse(maxRH > 100, 100, maxRH)) %>% # cap maxRH at 100
-    mutate(minRH = ifelse(minRH < 0, 0, minRH)) # cap minRH at 0 
-
+    mutate(maxRH = case_when(
+      maxRH > 100 ~ 100,
+      maxRH < 0 ~ 0,
+      .default = maxRH)) %>% # cap maxRH 
+    mutate(minRH = case_when(
+      minRH > 100 ~ 100,
+      minRH < 0 ~ 0,
+      .default = minRH) # cap minRH
+    )
   
   AllDays[[i]] = csv
     
