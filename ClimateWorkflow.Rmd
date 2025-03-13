@@ -47,9 +47,9 @@ library(sf)
 library(tidyverse)
 library(data.table)
 library(scales)
-library(mapview) # for maps
+#library(mapview) # for maps
 library(tmap)
-library(tmaptools)
+#library(tmaptools)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
 library(extrafont) # for using Calibri font in plots
@@ -194,9 +194,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[5] 
+shp <- shp_names[28] 
 
-official_name <- official_base_names[16] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[11] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -854,7 +854,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         #"AllDaysDash",
                         #"noaaDashboard", 
                         #"avg30",
-                        "RasterUnitConvert")))
+                        lsf.str())))
 
 ```
 
