@@ -349,18 +349,15 @@ list.files(path = NOAA_dir, pattern = shp)
 ```
 
 
-*If only one file is listed or you know which .csv you need, please copy the filename above (including '.csv')and paste into the 'weather_station' object (include the quotation marks)*
-
-*If more than one filename shows up, refer to Trevor as described above. Then copy-paste the appropriate filename (also described above)*
+*Copy the filename above and paste the AFB NAME ONLY (e.g., "Creech_AFB") into the 'weather_station' object (include the quotation marks)*
 
 
-```{r pull-NOAA-data}
+```{r prep-pulling-NOAA-data}
 
-weather_station <- "Creech_AFB.csv"
+weather_station <- "Creech_AFB"
+weather_station_filename <- paste0(weather_station,".csv")
 
-# Read in data
-
-noaa_dataFilepath <- paste0(NOAA_dir, weather_station)
+noaa_dataFilepath <- paste0(NOAA_dir, weather_station_filename)
 
 ```
 
@@ -382,7 +379,7 @@ noaa_dataFilepath <- paste0(NOAA_dir, weather_station)
 
 
 ################################################################################
-####            FUTURE SCENARIOS: PART I - DATA EXTRACTION                  ####                          ################################################################################
+####            FUTURE SCENARIOS: PART I - DATA EXTRACTION                  ####              ################################################################################
 
 
 ## SUBSET FILES OF INTEREST
@@ -663,7 +660,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "avdf",
                         "elev",
                         "years",
-                        "weather_station",
+                        ls(pattern = "^weather"),
                         ls(pattern = "^model"), 
                         ls(pattern = "^scenario"),
                         ls(pattern = "^baseline"),
@@ -739,28 +736,15 @@ source("./Code/NOAA/NOAA_AllDays_v2.R") # creates standard outputs (csv files an
 source("./Code/NOAA/NOAA_AllDays_Dashboard.R") # creates AllDays_Dash dataframe for Climate Viewer outputs
 source("./Code/NOAA/NOAA_monthSum_v2.R") # creates noaa_monthSum df and csv outputs
 source("./Code/NOAA/NOAA_monthSum_Dashboard.R") # creates noaaDashboard dataframe (to be combined later with futures)
-source("./COde/NOAA/NOAA_Climographs_createDF.R") # creates noaaClim list of dataframes for NOAA climograph plots
+source("./Code/NOAA/NOAA_Climographs_createDF.R") # creates noaaClim list of dataframes for NOAA climograph plots
 source("./Code/NOAA/NOAA_ClimographPlots.R")
-
 
 ```
 
 *This concludes the data concatenation and table/plot creation for the Observed Historical Period*
 
 
-## Remove extraneous objects from global environment
-
-```{r}
-
-source("./Code/prep_env_for_data_extraction.R")
-
-```
-
-
-
-
-
-# Prep Environment
+## CLEAN UP GLOBAL ENVIRONMENT
 
 
 Now that we've extracted and formatted the model data, we can remove extraneous variables from the environment and run the observed historical analysis. 
@@ -769,17 +753,22 @@ Now that we've extracted and formatted the model data, we can remove extraneous 
 
 rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
-                        "model", 
-                        "scenarios",
-                        "scenario_plotNames",
-                        "years",
+                        "variables",
                         "results_folder",
-                        "plots_dir",
-                        "avdf",
-                        "years",
                         "rx",
+                        "avdf",
                         "elev",
-                        lsf.str()))) # keep all functions
+                        "years",
+                        #ls(pattern = "^weather"),
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^baseline"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
 
 ```
 
