@@ -194,9 +194,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[28] 
+shp <- shp_names[25] 
 
-official_name <- official_base_names[11] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[8] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -356,7 +356,7 @@ list.files(path = NOAA_dir, pattern = shp)
 
 ```{r pull-NOAA-data}
 
-weather_station <- "JBER.csv"
+weather_station <- "Creech_AFB.csv"
 
 # Read in data
 
@@ -380,89 +380,9 @@ noaa_dataFilepath <- paste0(NOAA_dir, weather_station)
 
 
 
+
 ################################################################################
-###                ANALYSES OF OBSERVED HISTORICAL DATA                     ####
-################################################################################
-
-Because the historical analyses of observed data (NOAA data) use a different dataset from the rest of the script, we are running it here, prior to further user inputs. The following two chunks DO NOT require user input. Simply press the green arrow to run sections {r Output-directories} and {r Observed-historical}
-
-## Output Directories
-
-
-```{r Output-directories}
-
-# Observed Historical - csv's
-
-noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_NOAA_Hist/", weather_station)
-
-if (!dir.exists(noaa_resultsDir)){
-  dir.create(noaa_resultsDir)}
-
-
-# Modeled Futures
-
-results_folder <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_",model,"/", shp) 
-
-if (!dir.exists(results_folder)){
-  dir.create(results_folder)}
-
-
-# Plots and Tables - Modeled
-
-plots_dir <- paste0(results_folder,"/","Plots_and_Tables")
-
-if (!dir.exists(plots_dir)){
-  dir.create(plots_dir)}
-
-#  Plots and Tables - Observed Historical (NOAA climographs)
-
-noaaClim_dir <- paste0(plots_dir,"/","NOAA_Climographs")
-
-if (!dir.exists(noaaClim_dir)){
-  dir.create(noaaClim_dir)}
-
-# Dashboard tables
-
-dash_dir <- paste(results_folder,"Dashboard",sep = "/")
-
-if (!dir.exists(dash_dir)){
-  dir.create(dash_dir)}
-
-```
-
-
-## Analyses and plots (Climographs) for observed historical data
-
-
-```{r Observed-historical, message=FALSE, warning=FALSE}
-
-
-source("./Code/NOAA/NOAA_AllDays_v2.R") # creates standard outputs (csv files and AllDays_hist dataframe)
-source("./Code/NOAA/NOAA_AllDays_Dashboard.R") # creates AllDays_Dash dataframe for Climate Viewer outputs
-source("./Code/NOAA/NOAA_monthSum_v2.R") # creates noaa_monthSum df and csv outputs
-source("./Code/NOAA/NOAA_monthSum_Dashboard.R") # creates noaaDashboard dataframe (to be combined later with futures)
-source("./COde/NOAA/NOAA_Climographs_createDF.R") # creates noaaClim list of dataframes for NOAA climograph plots
-source("./Code/NOAA/NOAA_ClimographPlots.R")
-
-
-```
-
-*This concludes the data concatenation and table/plot creation for the Observed Historical Period*
-
-
-## Remove extraneous objects from global environment
-
-```{r}
-
-source("./Code/prep_env_for_data_extraction.R")
-
-```
-
-
-
-################################################################################################################
-####            FUTURE SCENARIOS: PART I - DATA EXTRACTION                                                 ####
-################################################################################################################
+####            FUTURE SCENARIOS: PART I - DATA EXTRACTION                  ####                          ################################################################################
 
 
 ## SUBSET FILES OF INTEREST
@@ -471,78 +391,8 @@ In this step, we are creating lists of filenames that will eventually combine in
 
 ```{r list-filenames}
 
-# REMOVE WHEN PREP_ENV SCRIPT IS CORRECT # !!!!!!!
+source("./Code/prep_env_for_data_extraction.R")
 
-#scenarios <- c(baseline, scenario1, scenario2)
-
-#baseline_yrs <- paste(seq(baseline_start_year, baseline_end_year, 1), collapse = '|')
-#future1_yrs <- paste(seq(future1_start_year, future1_end_year, 1), collapse = '|')
-#future2_yrs <- paste(seq(future2_start_year, future2_end_year, 1), collapse = '|')
-
-files_baseline <- list() # historical
-files_s1f1 <- list() # scenario1, future 1
-files_s1f2 <- list() # scenario 1, future 2
-files_s2f1 <- list() # scenario 2, future 1
-files_s2f2 <- list() # scenario 2, future 2
-
-# List files for Baseline Scenario
-
-for(i in 1:length(variables)){ 
-  fileNames = list.files(baseline_dir, pattern = variables[i], full.names = TRUE)
-  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
-  fileNames = fileNames[!duplicated(fileNames)]
-  dt = data.table(fileNames, result = grepl(baseline_yrs, fileNames))
-  dt2 = dplyr::filter(dt, result == TRUE)
-  files_baseline[[i]] = dt2$fileNames
-}
-
-# List files for S1F1 
-
-for(i in 1:length(variables)){ 
-  dir = paste(model_dir, scenario1, sep = '/')
-  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
-  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
-  fileNames = fileNames[!duplicated(fileNames)]
-  dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
-  dt2 = dplyr::filter(dt, result == TRUE)
-  files_s1f1[[i]] = dt2$fileNames
-  }
-
-# List files for S1F2
-
-for(i in 1:length(variables)){ 
-  dir = paste(model_dir, scenario1, sep = '/')
-  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
-  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
-  fileNames = fileNames[!duplicated(fileNames)]
-  dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
-  dt2 = dplyr::filter(dt, result == TRUE)
-  files_s1f2[[i]] = dt2$fileNames
-  }
-
-# List files for S2F1 
-
-for(i in 1:length(variables)){ 
-  dir = paste(model_dir, scenario2, sep = '/')
-  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
-  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
-  fileNames = fileNames[!duplicated(fileNames)]
-  dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
-  dt2 = dplyr::filter(dt, result == TRUE)
-  files_s2f1[[i]] = dt2$fileNames
-}
-
-# List files for S2F2
-
-for(i in 1:length(variables)){ 
-  dir = paste(model_dir, scenario2, sep = '/')
-  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
-  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
-  fileNames = fileNames[!duplicated(fileNames)]
-  dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
-  dt2 = dplyr::filter(dt, result == TRUE)
-  files_s2f2[[i]] = dt2$fileNames
-}
 
 ```
 
@@ -793,9 +643,89 @@ for(i in 1:length(nested_tibbles)){
  
 ```
 
+
+
 ################################################################################
-###                     RUN HISTORICAL ANALYSIS (OBSERVED)                   ###
+###                ANALYSES OF OBSERVED HISTORICAL DATA                     ####
 ################################################################################
+
+Because the historical analyses of observed data (NOAA data) use a different dataset from the rest of the script, we are running it here, prior to further user inputs. The following two chunks DO NOT require user input. Simply press the green arrow to run sections {r Output-directories} and {r Observed-historical}
+
+## Output Directories
+
+
+```{r Output-directories}
+
+# Observed Historical - csv's
+
+noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_NOAA_Hist/", weather_station)
+
+if (!dir.exists(noaa_resultsDir)){
+  dir.create(noaa_resultsDir)}
+
+
+# Modeled Futures
+
+results_folder <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_",model,"/", shp) 
+
+if (!dir.exists(results_folder)){
+  dir.create(results_folder)}
+
+
+# Plots and Tables - Modeled
+
+plots_dir <- paste0(results_folder,"/","Plots_and_Tables")
+
+if (!dir.exists(plots_dir)){
+  dir.create(plots_dir)}
+
+#  Plots and Tables - Observed Historical (NOAA climographs)
+
+noaaClim_dir <- paste0(plots_dir,"/","NOAA_Climographs")
+
+if (!dir.exists(noaaClim_dir)){
+  dir.create(noaaClim_dir)}
+
+# Dashboard tables
+
+dash_dir <- paste(results_folder,"Dashboard",sep = "/")
+
+if (!dir.exists(dash_dir)){
+  dir.create(dash_dir)}
+
+```
+
+
+## Analyses and plots (Climographs) for observed historical data
+
+
+```{r Observed-historical, message=FALSE, warning=FALSE}
+
+
+source("./Code/NOAA/NOAA_AllDays_v2.R") # creates standard outputs (csv files and AllDays_hist dataframe)
+source("./Code/NOAA/NOAA_AllDays_Dashboard.R") # creates AllDays_Dash dataframe for Climate Viewer outputs
+source("./Code/NOAA/NOAA_monthSum_v2.R") # creates noaa_monthSum df and csv outputs
+source("./Code/NOAA/NOAA_monthSum_Dashboard.R") # creates noaaDashboard dataframe (to be combined later with futures)
+source("./COde/NOAA/NOAA_Climographs_createDF.R") # creates noaaClim list of dataframes for NOAA climograph plots
+source("./Code/NOAA/NOAA_ClimographPlots.R")
+
+
+```
+
+*This concludes the data concatenation and table/plot creation for the Observed Historical Period*
+
+
+## Remove extraneous objects from global environment
+
+```{r}
+
+source("./Code/prep_env_for_data_extraction.R")
+
+```
+
+
+
+
 
 # Prep Environment
 

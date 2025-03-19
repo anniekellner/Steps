@@ -2,33 +2,8 @@
 ###       PREPARE GLOBAL ENVIRONMENT FOR DATA EXTRACTION                  ###
 #############################################################################
 
+
 # written by Annie Kellner 2-9-2025
-
-# This script clears the global environment from the Observed Historical Analyses
-  # but retains objects that will be used for data extraction and beyond
-
-rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
-                        "official_name",
-                        "model", 
-                        "scenarios",
-                        "scenario_plotNames",
-                        "baseline", "scenario1", "scenario2",
-                        "variables",
-                        "baseline_dir",
-                        "baseline_start_year",
-                        "baseline_end_year",
-                        "future1_start_year",
-                        "future1_end_year",
-                        "future2_start_year",
-                        "future2_end_year",
-                        "model_dir",
-                        "variables",
-                        "plots_dir",
-                        "results_folder",
-                        "dir_installation_boundaries",
-                        "noaaDashboard", # will add futures to this dataframe later
-                        "noaa30dash",
-                        lsf.str()))) # all functions
 
 
 scenarios <- c(baseline, scenario1, scenario2)
@@ -48,4 +23,71 @@ years <- c(baseline_start_year, # vector for easy reference
            future1_end_year, 
            future2_start_year, 
            future2_end_year)
+
+
+
+files_baseline <- list() # historical
+files_s1f1 <- list() # scenario1, future 1
+files_s1f2 <- list() # scenario 1, future 2
+files_s2f1 <- list() # scenario 2, future 1
+files_s2f2 <- list() # scenario 2, future 2
+
+# List files for Baseline Scenario
+
+for(i in 1:length(variables)){ 
+  fileNames = list.files(baseline_dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
+  dt = data.table(fileNames, result = grepl(baseline_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_baseline[[i]] = dt2$fileNames
+}
+
+# List files for S1F1 
+
+for(i in 1:length(variables)){ 
+  dir = paste(model_dir, scenario1, sep = '/')
+  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
+  dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_s1f1[[i]] = dt2$fileNames
+}
+
+# List files for S1F2
+
+for(i in 1:length(variables)){ 
+  dir = paste(model_dir, scenario1, sep = '/')
+  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
+  dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_s1f2[[i]] = dt2$fileNames
+}
+
+# List files for S2F1 
+
+for(i in 1:length(variables)){ 
+  dir = paste(model_dir, scenario2, sep = '/')
+  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
+  dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_s2f1[[i]] = dt2$fileNames
+}
+
+# List files for S2F2
+
+for(i in 1:length(variables)){ 
+  dir = paste(model_dir, scenario2, sep = '/')
+  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
+  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
+  fileNames = fileNames[!duplicated(fileNames)]
+  dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
+  dt2 = dplyr::filter(dt, result == TRUE)
+  files_s2f2[[i]] = dt2$fileNames
+}
 
