@@ -19,6 +19,20 @@
 
 ## BEGIN SCRIPT
 
+## Alter noaa30dash so column names match AllDaysDash
+
+noaa30dash <- noaa30dash %>%
+  rename(PPT_in = Avg_Prcp_in) %>%
+  rename(TMaxF = Avg_TmaxF) %>%
+  rename(TMeanF = Avg_TmeanF) %>%
+  rename(TMinF = Avg_TminF)
+
+noaa30dash$SCENARIO <- "Observed Historical"
+  
+
+## Create AllDaysDash DF and csv
+
+
 AllDaysDash <- list() # required for monthSumDash
 
 
