@@ -146,9 +146,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-#shp <- shp_names[15] # CHANGE THIS TO INSTALLATION OF INTEREST
+shp <- shp_names[25] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
 ```
 
@@ -157,11 +157,11 @@ However, if you are re- specific segments of the script using previously extract
 
 # Load workspace image
 
-#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBLE_E/JBLE_E_EC-Earth3-Veg-LR_20250305.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Creech_AFB/Creech_AFB_EC-Earth3-Veg-LR_20250318.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBLE_E/rasterStack_JBLE_E_EC-Earth3-Veg-LR_20250305.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Creech_AFB/rasterStack_Creech_AFB_EC-Earth3-Veg-LR_20250318.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
@@ -641,6 +641,39 @@ for(i in 1:length(nested_tibbles)){
   names(avdf)[i] = names(nested_tibbles[i]) 
 }    
  
+```
+
+
+################################################################################
+###                   REMOVE EXTRANEOUS OBJECTS FROM ENVIRONMENT             ###
+################################################################################
+
+Now that we've extracted the model data for the relevant grid cell, we can remove many objects that are cluttering the global environment.
+
+```{r}
+
+# This script clears the global environment from the Observed Historical Analyses
+  # but retains objects that will be used for data extraction and beyond
+
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
+                        "official_name",
+                        "variables",
+                        "results_folder",
+                        "rx",
+                        "avdf",
+                        "elev",
+                        "years",
+                        "weather_station",
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^baseline"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
+
 ```
 
 
