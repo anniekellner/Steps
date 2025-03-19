@@ -13,7 +13,7 @@
 
 ## BEGIN SCRIPT
 
-noaa <- read.csv(file = noaa_dataFilepath) # creates dataframe of observed historical data 
+noaa <- read_csv(file = noaa_dataFilepath) # creates dataframe of observed historical data 
 
 noaa$DATE <- mdy(noaa$DATE) # format date using lubridate pkg
 
