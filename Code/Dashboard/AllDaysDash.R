@@ -167,16 +167,12 @@ for(i in 1:length(AllDaysDash)){
   
   all = all %>% 
     mutate(SCENARIO = case_when(
-      first(df$Year) == 1985 ~ "ModelHist",
-      first(df$Year) == 2021 & i == 2 ~ "SSP2-4.5",
-      first(df$Year) == 2051 & i == 3 ~ "SSP2-4.5",
-      first(df$Year) == 2021 & i == 4 ~ "SSP5-8.5",
-      first(df$Year) == 2051 & i == 5 ~ "SSP5-8.5") ) %>%
-    mutate(SITENAME = official_name) %>%
-    rename(Avg_Prcp_in = PPT_in) %>%
-    rename(Avg_TmaxF = TMaxF) %>%
-    rename(Avg_TmeanF = TMeanF) %>%
-    rename(Avg_TminF = TMinF) 
+      first(df$Year) == 1985 ~ "Modeled Historical",
+      first(df$Year) == 2021 & i == 2 ~ "Near Term",
+      first(df$Year) == 2051 & i == 3 ~ "Near Term",
+      first(df$Year) == 2021 & i == 4 ~ "Far Term",
+      first(df$Year) == 2051 & i == 5 ~ "Far Term")) %>%
+    mutate(SITENAME = official_name) 
 
   all = select(all,
                SITENAME,
@@ -184,12 +180,12 @@ for(i in 1:length(AllDaysDash)){
                ScenID,
                PERIOD,
                Pctl90_Prcp_in,
-               Avg_Prcp_in,
+               PPT_in,
                Pctl10_Prcp_in,
                Pctl90_TmaxF,
-               Avg_TmaxF,
-               Avg_TmeanF,
-               Avg_TminF,
+               TMaxF,
+               TMeanF,
+               TMinF,
                Pctl10_TminF,
                HOTDAYS,
                VHOTDAYS,
@@ -212,7 +208,7 @@ rm(df)
 
 # Combine noaa with AllDays
 
-avg30 <- bind_rows(list(noaa30, alldays30[[1]], alldays30[[2]], alldays30[[3]], alldays30[[4]], alldays30[[5]]))
+avg30 <- bind_rows(list(noaa30dash, alldays30[[1]], alldays30[[2]], alldays30[[3]], alldays30[[4]], alldays30[[5]]))
 
 
 # --  SAVE SPREADSHEETS  --  #
