@@ -801,6 +801,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "avdf",
                         "elev",
                         "years",
+                        #"avg30",
                         ls(pattern = "^AllDays"),
                         ls(pattern = "^model"), 
                         ls(pattern = "^scenario"),
@@ -834,6 +835,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "avdf",
                         "elev",
                         "years",
+                        #"avg30",
                         ls(pattern = "^AllDays"),
                         ls(pattern = "^model"), 
                         ls(pattern = "^scenario"),
@@ -873,19 +875,24 @@ source("./Code/Dashboard/monthSum_Dash.R")
 
 rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
-                        "model", 
-                        "scenarios",
-                        "scenario_plotNames",
-                        "years",
+                        "variables",
                         "results_folder",
-                        "plots_dir",
-                        "AllDays",
+                        "rx",
+                        "avdf",
+                        "elev",
+                        "years",
+                        "avg30",
                         "monthSumDF",
                         "MonthlySeries",
-                        "AllDaysDash",
-                        "avg30",
-                        "plots_dir",
-                        "RasterUnitConvert")))
+                        ls(pattern = "^AllDays"),
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
 
 ```
 
