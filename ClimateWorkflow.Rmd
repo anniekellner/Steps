@@ -74,7 +74,7 @@ NOTE: If you clear the workspace but save the environment for later use (i.e., a
 
 ```{r clear-workspace}
 
-#rm(list = ls()) # clear workspace - this can be commented out as needed
+rm(list = ls()) # clear workspace - this can be commented out as needed
 
 ```
 
