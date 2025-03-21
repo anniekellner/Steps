@@ -183,7 +183,9 @@ ggplot(data = noaaMelt[[i]], aes(x = factor(month, level =c(month.abb)),
   
   ggsave(filename = paste0(shp,"_","Monthly_Means_Observed_Historical_",NOAA_years[i],"_",shp,".png"),
          path = noaaClim_dir,
+         width = 11,
+         height = 8.5,
+         units = c("in"),
          dpi = 330)
 }
 
-# Note: saved .png's are 7 in x 7 in
