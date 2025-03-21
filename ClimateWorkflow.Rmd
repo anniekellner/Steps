@@ -47,9 +47,7 @@ library(sf)
 library(tidyverse)
 library(data.table)
 library(scales)
-#library(mapview) # for maps
 library(tmap)
-#library(tmaptools)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
 library(extrafont) # for using Calibri font in plots
@@ -146,9 +144,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-#shp <- shp_names[39] # CHANGE THIS TO INSTALLATION OF INTEREST
+shp <- shp_names[39] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
 ```
 
@@ -161,7 +159,7 @@ However, if you are re- specific segments of the script using previously extract
 
 # Load raster stack
 
-#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Creech_AFB/rasterStack_Creech_AFB_EC-Earth3-Veg-LR_20250318.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBMDL/rasterStack_JBMDL_EC-Earth3-Veg-LR_20250320.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
@@ -758,7 +756,6 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "avdf",
                         "elev",
                         "years",
-                        #ls(pattern = "^weather"),
                         ls(pattern = "^model"), 
                         ls(pattern = "^scenario"),
                         ls(pattern = "^baseline"),
@@ -796,7 +793,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
                         "variables",
                         "results_folder",
-                        "rx",
+                        "avg30",
                         "avdf",
                         "elev",
                         "years",
@@ -806,7 +803,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         ls(pattern = "^future"),
                         ls(pattern = "dir"),
                         ls(pattern = "^noaa"),
-                        ls(pattern = "^NOAA"),
+                        ls(pattern = "NOAA"),
                         ls(pattern = "^results"),
                         lsf.str()))) # all functions
 
@@ -833,6 +830,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "avdf",
                         "elev",
                         "years",
+                        "avg30",
                         ls(pattern = "^AllDays"),
                         ls(pattern = "^model"), 
                         ls(pattern = "^scenario"),
@@ -872,19 +870,22 @@ source("./Code/Dashboard/monthSum_Dash.R")
 
 rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
-                        "model", 
-                        "scenarios",
-                        "scenario_plotNames",
-                        "years",
+                        "variables",
                         "results_folder",
-                        "plots_dir",
-                        "AllDays",
+                        "elev",
+                        "years",
                         "monthSumDF",
                         "MonthlySeries",
-                        "AllDaysDash",
                         "avg30",
-                        "plots_dir",
-                        "RasterUnitConvert")))
+                        ls(pattern = "^AllDays"),
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
 
 ```
 

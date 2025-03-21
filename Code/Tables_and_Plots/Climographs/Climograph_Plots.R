@@ -127,9 +127,9 @@ for(i in 1:length(climMelt)){
    geom_text(data = subset(climMelt[[i]], Variable == "PPT_in5"), 
              aes(label = round(Value/5, digits = 1)),
              family = "Calibri", 
-             fontface = "plain",
+             fontface = "bold",
              size = 3, # arbitrary based on visualization
-             vjust = 2.5,  # + values are below the bar; - values are above the bar
+             vjust = -0.5,  # + values are below the bar; - values are above the bar
              hjust = 0.5,
              show.legend = FALSE) +
     
