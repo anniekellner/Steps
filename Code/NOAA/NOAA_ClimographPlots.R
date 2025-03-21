@@ -99,19 +99,20 @@ ggplot(data = noaaMelt[[i]], aes(x = factor(month, level =c(month.abb)),
            width = 0.7,
            show.legend = FALSE)  +
 
-  geom_text(data = subset(noaaMelt[[i]], Variable == "PPT_in5"), 
-            aes(label = round(Value/5, digits = 1)),
-            family = "Calibri", 
-            fontface = "plain",
-            size = 4, # arbitrary based on visualization
-            vjust = 2.5,  # + values are below the bar; - values are above the bar
-            show.legend = FALSE) +
-  
+
   geom_line(data = subset(noaaMelt[[i]], Variable %in% c("high10", "TMaxF", "TMinF", "low10")),
             aes(group = Variable, linetype = Variable, color = Variable), linewidth = 1.25) + 
   
   geom_point(data = subset(noaaMelt[[i]], Variable %in% c("high10", "low10", "TMaxF", "TMinF")),
              aes(group = Variable, color = Variable, shape = Variable, fill = Variable), size = 3) + 
+    
+  geom_text(data = subset(noaaMelt[[i]], Variable == "PPT_in5"), 
+              aes(label = round(Value/5, digits = 1)),
+              family = "Calibri", 
+              fontface = "bold",
+              size = 4, # arbitrary based on visualization
+              vjust = -0.5,  # + values are below the bar; - values are above the bar
+              show.legend = FALSE) +
   
   scale_y_continuous(limits = c(lower_value, upper_value), 
                      n.breaks = numBreaks,
@@ -182,7 +183,9 @@ ggplot(data = noaaMelt[[i]], aes(x = factor(month, level =c(month.abb)),
   
   ggsave(filename = paste0(shp,"_","Monthly_Means_Observed_Historical_",NOAA_years[i],"_",shp,".png"),
          path = noaaClim_dir,
+         width = 11,
+         height = 8.5,
+         units = c("in"),
          dpi = 330)
 }
 
-# Note: saved .png's are 7 in x 7 in

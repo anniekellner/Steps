@@ -53,7 +53,8 @@ shp_names <- c("Homestead_ARB",
               "JBMDL", 
               "Edwards_AFB_v2",
               "Edwards_AFB_v3_EastofBarstow",
-              "Edwards_AFB_v3_Renoville")             
+              "Edwards_AFB_v3_Renoville",
+              "JBMDL")             
 
 
 official_base_names <- c("NAVBASE Kitsap",     

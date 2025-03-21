@@ -47,9 +47,7 @@ library(sf)
 library(tidyverse)
 library(data.table)
 library(scales)
-#library(mapview) # for maps
 library(tmap)
-#library(tmaptools)
 library(leaflet)
 library(climatol) # for Walter-Lieth Diagrams
 library(extrafont) # for using Calibri font in plots
@@ -146,9 +144,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-#shp <- shp_names[15] # CHANGE THIS TO INSTALLATION OF INTEREST
+shp <- shp_names[25] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
 ```
 
@@ -157,11 +155,11 @@ However, if you are re- specific segments of the script using previously extract
 
 # Load workspace image
 
-#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBLE_E/JBLE_E_EC-Earth3-Veg-LR_20250305.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Creech_AFB/Creech_AFB_EC-Earth3-Veg-LR_20250318.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBLE_E/rasterStack_JBLE_E_EC-Earth3-Veg-LR_20250305.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Creech_AFB/rasterStack_Creech_AFB_EC-Earth3-Veg-LR_20250318.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
@@ -194,9 +192,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[28] 
+shp <- shp_names[39] 
 
-official_name <- official_base_names[11] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[18] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -349,18 +347,15 @@ list.files(path = NOAA_dir, pattern = shp)
 ```
 
 
-*If only one file is listed or you know which .csv you need, please copy the filename above (including '.csv')and paste into the 'weather_station' object (include the quotation marks)*
-
-*If more than one filename shows up, refer to Trevor as described above. Then copy-paste the appropriate filename (also described above)*
+*Copy the filename above and paste the AFB NAME ONLY (e.g., "Creech_AFB") into the 'weather_station' object (include the quotation marks)*
 
 
-```{r pull-NOAA-data}
+```{r prep-pulling-NOAA-data}
 
-weather_station <- "JBER.csv"
+weather_station <- "Creech_AFB" # this is usually the shp name
+weather_station_filename <- paste0(weather_station,".csv")
 
-# Read in data
-
-noaa_dataFilepath <- paste0(NOAA_dir, weather_station)
+noaa_dataFilepath <- paste0(NOAA_dir, weather_station_filename)
 
 ```
 
@@ -380,89 +375,9 @@ noaa_dataFilepath <- paste0(NOAA_dir, weather_station)
 
 
 
+
 ################################################################################
-###                ANALYSES OF OBSERVED HISTORICAL DATA                     ####
-################################################################################
-
-Because the historical analyses of observed data (NOAA data) use a different dataset from the rest of the script, we are running it here, prior to further user inputs. The following two chunks DO NOT require user input. Simply press the green arrow to run sections {r Output-directories} and {r Observed-historical}
-
-## Output Directories
-
-
-```{r Output-directories}
-
-# Observed Historical - csv's
-
-noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_NOAA_Hist/", weather_station)
-
-if (!dir.exists(noaa_resultsDir)){
-  dir.create(noaa_resultsDir)}
-
-
-# Modeled Futures
-
-results_folder <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_",model,"/", shp) 
-
-if (!dir.exists(results_folder)){
-  dir.create(results_folder)}
-
-
-# Plots and Tables - Modeled
-
-plots_dir <- paste0(results_folder,"/","Plots_and_Tables")
-
-if (!dir.exists(plots_dir)){
-  dir.create(plots_dir)}
-
-#  Plots and Tables - Observed Historical (NOAA climographs)
-
-noaaClim_dir <- paste0(plots_dir,"/","NOAA_Climographs")
-
-if (!dir.exists(noaaClim_dir)){
-  dir.create(noaaClim_dir)}
-
-# Dashboard tables
-
-dash_dir <- paste(results_folder,"Dashboard",sep = "/")
-
-if (!dir.exists(dash_dir)){
-  dir.create(dash_dir)}
-
-```
-
-
-## Analyses and plots (Climographs) for observed historical data
-
-
-```{r Observed-historical, message=FALSE, warning=FALSE}
-
-
-source("./Code/NOAA/NOAA_AllDays_v2.R") # creates standard outputs (csv files and AllDays_hist dataframe)
-source("./Code/NOAA/NOAA_AllDays_Dashboard.R") # creates AllDays_Dash dataframe for Climate Viewer outputs
-source("./Code/NOAA/NOAA_monthSum_v2.R") # creates noaa_monthSum df and csv outputs
-source("./Code/NOAA/NOAA_monthSum_Dashboard.R") # creates noaaDashboard dataframe (to be combined later with futures)
-source("./COde/NOAA/NOAA_Climographs_createDF.R") # creates noaaClim list of dataframes for NOAA climograph plots
-source("./Code/NOAA/NOAA_ClimographPlots.R")
-
-
-```
-
-*This concludes the data concatenation and table/plot creation for the Observed Historical Period*
-
-
-## Remove extraneous objects from global environment
-
-```{r}
-
-source("./Code/prep_env_for_data_extraction.R")
-
-```
-
-
-
-################################################################################################################
-####            FUTURE SCENARIOS: PART I - DATA EXTRACTION                                                 ####
-################################################################################################################
+####            FUTURE SCENARIOS: PART I - DATA EXTRACTION                  ####              ################################################################################
 
 
 ## SUBSET FILES OF INTEREST
@@ -471,78 +386,7 @@ In this step, we are creating lists of filenames that will eventually combine in
 
 ```{r list-filenames}
 
-# REMOVE WHEN PREP_ENV SCRIPT IS CORRECT # !!!!!!!
-
-#scenarios <- c(baseline, scenario1, scenario2)
-
-#baseline_yrs <- paste(seq(baseline_start_year, baseline_end_year, 1), collapse = '|')
-#future1_yrs <- paste(seq(future1_start_year, future1_end_year, 1), collapse = '|')
-#future2_yrs <- paste(seq(future2_start_year, future2_end_year, 1), collapse = '|')
-
-files_baseline <- list() # historical
-files_s1f1 <- list() # scenario1, future 1
-files_s1f2 <- list() # scenario 1, future 2
-files_s2f1 <- list() # scenario 2, future 1
-files_s2f2 <- list() # scenario 2, future 2
-
-# List files for Baseline Scenario
-
-for(i in 1:length(variables)){ 
-  fileNames = list.files(baseline_dir, pattern = variables[i], full.names = TRUE)
-  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
-  fileNames = fileNames[!duplicated(fileNames)]
-  dt = data.table(fileNames, result = grepl(baseline_yrs, fileNames))
-  dt2 = dplyr::filter(dt, result == TRUE)
-  files_baseline[[i]] = dt2$fileNames
-}
-
-# List files for S1F1 
-
-for(i in 1:length(variables)){ 
-  dir = paste(model_dir, scenario1, sep = '/')
-  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
-  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
-  fileNames = fileNames[!duplicated(fileNames)]
-  dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
-  dt2 = dplyr::filter(dt, result == TRUE)
-  files_s1f1[[i]] = dt2$fileNames
-  }
-
-# List files for S1F2
-
-for(i in 1:length(variables)){ 
-  dir = paste(model_dir, scenario1, sep = '/')
-  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
-  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
-  fileNames = fileNames[!duplicated(fileNames)]
-  dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
-  dt2 = dplyr::filter(dt, result == TRUE)
-  files_s1f2[[i]] = dt2$fileNames
-  }
-
-# List files for S2F1 
-
-for(i in 1:length(variables)){ 
-  dir = paste(model_dir, scenario2, sep = '/')
-  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
-  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
-  fileNames = fileNames[!duplicated(fileNames)]
-  dt = data.table(fileNames, result = grepl(future1_yrs, fileNames))
-  dt2 = dplyr::filter(dt, result == TRUE)
-  files_s2f1[[i]] = dt2$fileNames
-}
-
-# List files for S2F2
-
-for(i in 1:length(variables)){ 
-  dir = paste(model_dir, scenario2, sep = '/')
-  fileNames = list.files(dir, pattern = variables[i], full.names = TRUE)
-  fileNames = str_remove_all(fileNames, pattern = ".aux.xml")
-  fileNames = fileNames[!duplicated(fileNames)]
-  dt = data.table(fileNames, result = grepl(future2_yrs, fileNames))
-  dt2 = dplyr::filter(dt, result == TRUE)
-  files_s2f2[[i]] = dt2$fileNames
-}
+source("./Code/prep_env_for_data_extraction.R")
 
 ```
 
@@ -793,11 +637,111 @@ for(i in 1:length(nested_tibbles)){
  
 ```
 
+
 ################################################################################
-###                     RUN HISTORICAL ANALYSIS (OBSERVED)                   ###
+###                   REMOVE EXTRANEOUS OBJECTS FROM ENVIRONMENT             ###
 ################################################################################
 
-# Prep Environment
+Now that we've extracted the model data for the relevant grid cell, we can remove many objects that are cluttering the global environment.
+
+```{r}
+
+# This script clears the global environment from the Observed Historical Analyses
+  # but retains objects that will be used for data extraction and beyond
+
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
+                        "official_name",
+                        "variables",
+                        "results_folder",
+                        "rx",
+                        "avdf",
+                        "elev",
+                        "years",
+                        ls(pattern = "^weather"),
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^baseline"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
+
+```
+
+
+
+################################################################################
+###                ANALYSES OF OBSERVED HISTORICAL DATA                     ####
+################################################################################
+
+Because the historical analyses of observed data (NOAA data) use a different dataset from the rest of the script, we are running it here, prior to further user inputs. The following two chunks DO NOT require user input. Simply press the green arrow to run sections {r Output-directories} and {r Observed-historical}
+
+## Output Directories
+
+
+```{r Output-directories}
+
+# Observed Historical - csv's
+
+noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_NOAA_Hist/", weather_station)
+
+if (!dir.exists(noaa_resultsDir)){
+  dir.create(noaa_resultsDir)}
+
+
+# Modeled Futures
+
+results_folder <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_",model,"/", shp) 
+
+if (!dir.exists(results_folder)){
+  dir.create(results_folder)}
+
+
+# Plots and Tables - Modeled
+
+plots_dir <- paste0(results_folder,"/","Plots_and_Tables")
+
+if (!dir.exists(plots_dir)){
+  dir.create(plots_dir)}
+
+#  Plots and Tables - Observed Historical (NOAA climographs)
+
+noaaClim_dir <- paste0(plots_dir,"/","NOAA_Climographs")
+
+if (!dir.exists(noaaClim_dir)){
+  dir.create(noaaClim_dir)}
+
+# Dashboard tables
+
+dash_dir <- paste(results_folder,"Dashboard",sep = "/")
+
+if (!dir.exists(dash_dir)){
+  dir.create(dash_dir)}
+
+```
+
+
+## Analyses and plots (Climographs) for observed historical data
+
+
+```{r Observed-historical, message=FALSE, warning=FALSE}
+
+
+source("./Code/NOAA/NOAA_AllDays_v2.R") # creates standard outputs (csv files and AllDays_hist dataframe)
+source("./Code/NOAA/NOAA_AllDays_Dashboard.R") # creates AllDays_Dash dataframe for Climate Viewer outputs
+source("./Code/NOAA/NOAA_monthSum_v2.R") # creates noaa_monthSum df and csv outputs
+source("./Code/NOAA/NOAA_monthSum_Dashboard.R") # creates noaaDashboard dataframe (to be combined later with futures)
+source("./Code/NOAA/NOAA_Climographs_createDF.R") # creates noaaClim list of dataframes for NOAA climograph plots
+source("./Code/NOAA/NOAA_ClimographPlots.R")
+
+```
+
+*This concludes the data concatenation and table/plot creation for the Observed Historical Period*
+
+
+## CLEAN UP GLOBAL ENVIRONMENT
 
 
 Now that we've extracted and formatted the model data, we can remove extraneous variables from the environment and run the observed historical analysis. 
@@ -806,17 +750,21 @@ Now that we've extracted and formatted the model data, we can remove extraneous 
 
 rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
-                        "model", 
-                        "scenarios",
-                        "scenario_plotNames",
-                        "years",
+                        "variables",
                         "results_folder",
-                        "plots_dir",
-                        "avdf",
-                        "years",
                         "rx",
+                        "avdf",
                         "elev",
-                        lsf.str()))) # keep all functions
+                        "years",
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^baseline"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
 
 ```
 
@@ -843,18 +791,22 @@ Now that the AllDays.csv files have been created, it is no longer necessary to r
 
 rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
-                        "model", 
-                        "scenarios",
-                        "scenario_plotNames",
-                        "years",
+                        "variables",
                         "results_folder",
-                        "plots_dir",
-                        "AllDays",
+                        "avg30",
+                        "avdf",
+                        "elev",
                         "years",
-                        #"AllDaysDash",
-                        #"noaaDashboard", 
                         #"avg30",
-                        lsf.str())))
+                        ls(pattern = "^AllDays"),
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
 
 ```
 
@@ -873,17 +825,22 @@ source('Code/Ecosystems_Climate_Data.R')
 
 rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
-                        "model", 
-                        "scenarios",
-                        "scenario_plotNames",
-                        "years",
+                        "variables",
                         "results_folder",
-                        "plots_dir",
-                        "AllDays",
-                        "AllDaysDash",
-                        "noaaDashboard",
+                        "rx",
+                        "avdf",
+                        "elev",
+                        "years",
                         "avg30",
-                        "RasterUnitConvert")))
+                        ls(pattern = "^AllDays"),
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
 
 ```
 
@@ -907,8 +864,6 @@ The next chunk creates MonthSum.csv files
 source("./Code/monthSum.R")
 source("./Code/Dashboard/monthSum_Dash.R")
 
-
-
 ```
 
 
@@ -916,19 +871,22 @@ source("./Code/Dashboard/monthSum_Dash.R")
 
 rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
-                        "model", 
-                        "scenarios",
-                        "scenario_plotNames",
-                        "years",
+                        "variables",
                         "results_folder",
-                        "plots_dir",
-                        "AllDays",
+                        "elev",
+                        "years",
                         "monthSumDF",
                         "MonthlySeries",
-                        "AllDaysDash",
                         "avg30",
-                        "plots_dir",
-                        "RasterUnitConvert")))
+                        ls(pattern = "^AllDays"),
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
 
 ```
 
@@ -967,21 +925,25 @@ source('./Code/Tables_and_Plots/Walter-Lieth.R')
 
 ```{r remove-objects}
 
-rm(list=setdiff(ls(), c("monthSumDF", 
-                        "shp", 
-                        "model", 
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
-                        "scenarios",
-                        "scenario_plotNames",
+                        "variables",
                         "results_folder",
-                        "plots_dir",
-                        "dash_dir",
+                        "elev",
                         "years",
-                        "csv",
-                        "RasterUnitConvert",
+                        "avg30",
+                        "monthSumDF",
                         "MonthlySeries",
-                        "avg30"
-                        )))
+                        ls(pattern = "^AllDays"),
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
+
 
 ```
 

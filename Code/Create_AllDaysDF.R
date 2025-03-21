@@ -12,6 +12,7 @@
 
 # Inputs: 
     # avdf list ("all values data frame")
+    # Functions: Raster_*, calc_RH
 
 # Outputs: 
     # AllDays dataframe for downstream use
