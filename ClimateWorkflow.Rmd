@@ -155,11 +155,11 @@ list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspac
 
 # Load workspace image
 
-load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Creech_AFB/Creech_AFB_EC-Earth3-Veg-LR_20250318.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Creech_AFB/Creech_AFB_EC-Earth3-Veg-LR_20250318.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Creech_AFB/rasterStack_Creech_AFB_EC-Earth3-Veg-LR_20250318.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Creech_AFB/rasterStack_Creech_AFB_EC-Earth3-Veg-LR_20250318.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
@@ -646,9 +646,6 @@ Now that we've extracted the model data for the relevant grid cell, we can remov
 
 ```{r}
 
-# This script clears the global environment from the Observed Historical Analyses
-  # but retains objects that will be used for data extraction and beyond
-
 rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
                         "variables",
@@ -797,7 +794,6 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "avdf",
                         "elev",
                         "years",
-                        #"avg30",
                         ls(pattern = "^AllDays"),
                         ls(pattern = "^model"), 
                         ls(pattern = "^scenario"),
@@ -827,7 +823,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
                         "variables",
                         "results_folder",
-                        "rx",
+                        #"rx",
                         "avdf",
                         "elev",
                         "years",

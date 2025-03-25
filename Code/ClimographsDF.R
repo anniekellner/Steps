@@ -89,7 +89,7 @@ for(i in 1:length(monthSumDF)){
     rename(TMinF = Avg_TMinF) 
 
   
-  # Combine with AbsMinMax data
+  # Combine with Quantiles data
   
   clim[[i]] = left_join(climDF, quantiles[[i]])
   
