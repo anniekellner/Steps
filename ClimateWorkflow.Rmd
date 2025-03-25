@@ -144,7 +144,7 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[25] # CHANGE THIS TO INSTALLATION OF INTEREST
+shp <- shp_names[33] # CHANGE THIS TO INSTALLATION OF INTEREST
 
 list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
@@ -155,11 +155,11 @@ list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspac
 
 # Load workspace image
 
-#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Creech_AFB/Creech_AFB_EC-Earth3-Veg-LR_20250318.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBER/JBER_EC-Earth3-Veg-LR_20250312.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Creech_AFB/rasterStack_Creech_AFB_EC-Earth3-Veg-LR_20250318.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBER/rasterStack_JBER_EC-Earth3-Veg-LR_20250312.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
@@ -352,7 +352,7 @@ list.files(path = NOAA_dir, pattern = shp)
 
 ```{r prep-pulling-NOAA-data}
 
-weather_station <- "Creech_AFB" # this is usually the shp name
+weather_station <- "JBER" # this is usually the shp name
 weather_station_filename <- paste0(weather_station,".csv")
 
 noaa_dataFilepath <- paste0(NOAA_dir, weather_station_filename)
@@ -950,7 +950,7 @@ The next chunk creates all things DiffHist (comparisons between future time peri
   - diffHist dataframe for bar plots
   - Dashboard tables
 
-```{r DiffHist, warning=FALSE}
+```{r DiffHist, message=FALSE, warning=FALSE}
 
 source("./Code/DiffHist.R")
 source("./Code/Dashboard/MonthlySeries_DiffHist.R")
