@@ -8,8 +8,8 @@
 
 scenarios <- c(baseline, scenario1, scenario2)
 
-scenario1_plotName <- ifelse(str_detect(scenario1, "ssp245"), "SSP2-4.5", "RCP 4.5")
-scenario2_plotName <- ifelse(str_detect(scenario2, "ssp585"), "SSP5-8.5", "RCP 8.5")
+scenario1_plotName <- "Moderate Emissions"
+scenario2_plotName <- "High Emissions"
 
 scenario_plotNames <- c("Historical", scenario1_plotName, scenario2_plotName)
 
