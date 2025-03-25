@@ -20,8 +20,8 @@ tempTitles <- c(
 ## Subtitles
 
 subtitles <- c(
-  paste0("\n", scenario_plotNames[2], " ", "(Moderate Emissions)"),
-  paste0("\n", scenario_plotNames[3], " ", "(High Emissions)")
+  paste0("\n", scenario_plotNames[2]),
+  paste0("\n", scenario_plotNames[3])
 )
 
 
@@ -117,7 +117,60 @@ prcp_lower_limit <- case_when(
 
 ## PLOTS FOR SCENARIO 1 ##
 
-# Temperatures
+# Temperature Deltas
+
+# Determine highest and lowest values for plot axes
+
+# Max
+
+maxDelta_TMaxS1 <- max(S1$Avg_TMaxF)
+maxDelta_TMaxS2 <- max(S2$Avg_TMaxF)
+
+maxDelta_TMeanS1 <- max(S1$Avg_TMeanF)
+maxDelta_TMeanS2 <- max(S2$Avg_TMeanF)
+
+maxDelta_TMinS1 <- max(S1$Avg_TMinF)
+maxDelta_TMinS2 <- max(S2$Avg_TMinF)
+
+# Min
+
+minDelta_TMaxS1 <- min(S1$Avg_TMinF)
+minDelta_TMaxS2 <- min(S2$Avg_TMinF)
+
+minDelta_TMeanS1 <- min(S1$Avg_TMeanF)
+minDelta_TMeanS2 <- min(S2$Avg_TMeanF)
+
+minDelta_TMinS1 <- min(S1$Avg_TMinF)
+minDelta_TMinS2 <- min(S2$Avg_TMinF)
+
+
+
+# Assign max/min values
+
+max_tDelta_value <- max(maxDelta_TMaxS1, maxDelta_TMaxS2, maxDelta_TMeanS1, maxDelta_TMeanS2, maxDelta_TMinS1, maxDelta_TMinS2)
+min_tDelta_value <- min(minDelta_TMaxS1, minDelta_TMaxS2, minDelta_TMeanS1, minDelta_TMeanS2, minDelta_TMinS1, minDelta_TMinS2)
+
+max_tDelta_value <- round(max_tDelta_value, digits = 0)
+min_tDelta_value <- round(min_tDelta_value, digits = 0)
+
+# Assign plot limits
+
+temp_upper_limit <- case_when(
+  max_tDelta_value <= 10 ~ 10,
+  max_tDelta_value > 10 & max_tDelta_value <= 12 ~ 12,
+  max_tDelta_value > 12 & max_tDelta_value <= 14 ~ 14,
+  max_tDelta_value > 14 & max_tDelta_value <= 16 ~ 16
+)
+
+temp_lower_limit <- case_when(
+  min_tDelta_value >= 0 ~ 0,
+  min_tDelta_value < 0 & min_tDelta_value >= -2 ~ -2,
+  min_tDelta_value < -2 & min_tDelta_value >= -4 ~ -4
+)
+
+
+## Plot
+
 
 temp_plotList_S1 <- list()
 
@@ -142,8 +195,14 @@ temp_plots_S1 <- list()
 for(i in 1:length(temp_plotList_S1)){  
   p = temp_plotList_S1[[i]] +
     labs(title = tempTitles[i], subtitle = subtitles[1])+
-    scale_y_continuous(limits = c(0, 10), n.breaks = 6) +
+    
+    scale_y_continuous(limits = c(temp_lower_limit, temp_upper_limit),
+                       breaks = seq(from = temp_lower_limit, to = temp_upper_limit, by = 2),
+                       labels = scales::number_format(accuracy = 0.5)) +
+    
+    
     scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
+    
     theme(element_text(family = "Calibri", hjust = 0.5),
           plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
           plot.subtitle = element_text(family = "Calibri", hjust = 0, size = 11),
@@ -204,8 +263,13 @@ temp_plots_S2 <- list()
 for(i in 1:length(temp_plotList_S2)){  
   p = temp_plotList_S2[[i]] +
     labs(subtitle = subtitles[2]) +
-    scale_y_continuous(limits = c(0,10), n.breaks = 6) +
+    
+    scale_y_continuous(limits = c(temp_lower_limit, temp_upper_limit),
+                       breaks = seq(from = temp_lower_limit, to = temp_upper_limit, by = 2),
+                       labels = scales::number_format(accuracy = 0.5)) +
+    
     scale_fill_manual(values = custom_fill_temp, labels = custom_labels) +
+    
     theme(element_text(family = "Calibri", hjust = 0.5),
           plot.subtitle = element_text(family = "Calibri", hjust = 0, size = 11),
           axis.title = element_text(family = "Calibri", hjust = 0.5, size = 10),

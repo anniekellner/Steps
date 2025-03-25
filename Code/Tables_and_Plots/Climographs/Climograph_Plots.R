@@ -22,10 +22,10 @@ if (!dir.exists(path_to_climographs)){
 # ---- PLOT NAMES AND SUBTITLES ------------    #
 
 plot_titles <- c(paste0("Modeled Monthly Means - Historical, ",years[1],"-",years[2]),
-                    paste0("Predicted Monthly Means:"," ", years[3],"-",years[4]," ","(Moderate Emissions)"),
-                    paste0("Predicted Monthly Means:"," ", years[5],"-",years[6]," ","Moderate Emissions)"),
-                    paste0("Predicted Monthly Means:"," ",years[3],"-",years[4]," ","(High Emissions)"),
-                    paste0("Predicted Monthly Means:"," ",years[5],"-",years[6]," ","(High Emissions)"))
+                    paste0("Projected Monthly Means: Near Term (Moderate Emissions)"),
+                    paste0("Projected Monthly Means: Far Term (Moderate Emissions)"),
+                    paste0("Projected Monthly Means: Near Term (High Emissions)"),
+                    paste0("Projected Monthly Means: Far Term (High Emissions)"))
 
 # Plot names include "Monthly Means", scenario, and center year (e.g., 2030)
 
@@ -189,7 +189,7 @@ for(i in 1:length(climMelt)){
            scale_color_manual = guide_legend(),
            scale_shape_manual = guide_legend(),
            scale_fill_manual = guide_legend(),
-           custom = guide_custom(title = "Average Total Precipitation",
+           custom = guide_custom(title = "Average Total Precipitation (in)",
                                  grob = prcpRect,
                                  width = unit(0.25, "in"),
                                  height = unit(0.12, "in"),

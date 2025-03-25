@@ -46,15 +46,17 @@ for(i in 1:length(monthSumDF)){
   }
   
   per_years = if(str_detect(names(monthSumDF[i]), "baseline")){ 
-    as.character(paste(years[1], years[2], sep = " - "))
+    ""
   } else if(str_detect(names(monthSumDF[i]),"f1")){
-    as.character(paste(years[3],years[4], sep = " - "))
+    "Near Term"
   } else {
-    as.character(paste(years[5], years[6], sep = " - "))
+    "Far Term"
   }
   
   
-  per = paste(per_scenario,per_years,sep = ", ")
+  per = ifelse(str_detect(per_scenario, "Historical"), 
+               "Historical", 
+               paste(per_scenario, per_years, sep = ", "))
   
   per_length = nchar(per) # to calculate where to put the "subtitle" on the plot
   
@@ -90,7 +92,7 @@ for(i in 1:length(monthSumDF)){
   
   filenameC = paste0(shp,"_",model,"_WLDiagram_",wl_scenario,"_",midyear,"_Celsius.png")
   
-  ggsave(filenameC, plot = wlCplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 300)
+  ggsave(filenameC, plot = wlCplot, device = png, path = wl_dir, width = 6.5, height = 4.5, units = "in", dpi = 330)
   
   
   # ----------   Fahrenheit Plot  --------------  #
@@ -185,8 +187,7 @@ for(i in 1:length(monthSumDF)){
   )
   
   sub_length = nchar(sub)
-  sub_placement = 78 - per_length - sub_length # 1 in = ~10 character-spaces in Times New Roman font, so an image of 6.5" in width contains 78 character-spaces per line. This right-aligns the "subtitle" (i.e., the righthand temp/precip values)
-  
+  sub_placement = 78 - per_length - sub_length 
   
   sub2 = paste0(
     per, 

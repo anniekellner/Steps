@@ -52,7 +52,7 @@ upper_value <- case_when(
 
 lower_value <- case_when(
   minTemp >= 0 ~ 0,
-  minTemp < 0 & minTemp > -10 ~ -10,
+  minTemp < 0 & minTemp >= -10 ~ -10,
   minTemp < -10 ~ -20
 )
 

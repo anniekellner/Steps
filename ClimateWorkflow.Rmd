@@ -144,7 +144,7 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[25] # CHANGE THIS TO INSTALLATION OF INTEREST
+shp <- shp_names[33] # CHANGE THIS TO INSTALLATION OF INTEREST
 
 list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
@@ -646,9 +646,6 @@ Now that we've extracted the model data for the relevant grid cell, we can remov
 
 ```{r}
 
-# This script clears the global environment from the Observed Historical Analyses
-  # but retains objects that will be used for data extraction and beyond
-
 rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
                         "variables",
@@ -797,7 +794,6 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "avdf",
                         "elev",
                         "years",
-                        #"avg30",
                         ls(pattern = "^AllDays"),
                         ls(pattern = "^model"), 
                         ls(pattern = "^scenario"),
@@ -827,7 +823,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
                         "variables",
                         "results_folder",
-                        "rx",
+                        #"rx",
                         "avdf",
                         "elev",
                         "years",
@@ -954,7 +950,7 @@ The next chunk creates all things DiffHist (comparisons between future time peri
   - diffHist dataframe for bar plots
   - Dashboard tables
 
-```{r DiffHist, warning=FALSE}
+```{r DiffHist, message=FALSE, warning=FALSE}
 
 source("./Code/DiffHist.R")
 source("./Code/Dashboard/MonthlySeries_DiffHist.R")
