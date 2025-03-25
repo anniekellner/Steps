@@ -732,7 +732,7 @@ assign("title", title, envir = .GlobalEnv)
               sep = ""
   )
   
-  sub_length = nchar(sub) # 1 in = ~10 character-spaces in Times New Roman font, so an image of 6.5" in width contains 78 character-spaces per line. This right-aligns the "subtitle" (i.e., the righthand temp/precip values)
+  sub_length = nchar(sub) 
   
   sub_placement = 78 - per_length - sub_length
   
