@@ -9,15 +9,34 @@ diffHist <- list() # create diffHist dataframe for later use
 
 # Create historical object
 
-hist <- monthSumDF[[1]] # separate historical values for use in calculations
+
 
 # Create dataframe
+
+for(i in 1:length(monthSumDF)){ # so that month can be arranged chronologically
+  df = monthSumDF[[i]]
+
+  df = df %>%
+    mutate(month = paste(month,"2000", sep = " "))
+  
+  df = df %>%
+    mutate(month = my(month))
+  
+  df = df %>%
+    mutate(month = month(month, label = TRUE, abbr = TRUE))
+  
+  monthSumDF[[i]] = df
+}
+
+
+hist <- monthSumDF[[1]] # separate historical values for use in calculations
 
 for(i in 2:length(monthSumDF)){ # 2 because [[1]] is historical 
   diff = hist %>%
     bind_rows(monthSumDF[[i]]) %>%
     group_by(month) %>%
-    summarise(across(everything(), \(x) diff(x))) 
+    summarise(across(everything(), \(x) diff(x))) %>%
+    arrange(month)
   
   diffHist[[i-1]] = diff # add to DiffHist dataframe for future use
   names(diffHist)[[i-1]] = names(monthSumDF[i])
