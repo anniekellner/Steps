@@ -222,7 +222,8 @@ rm(df)
 
 # Combine noaa with AllDays
 
-avg30 <- bind_rows(list(noaa30dash, alldays30[[1]], alldays30[[2]], alldays30[[3]], alldays30[[4]], alldays30[[5]]))
+avg30 <- bind_rows(list(noaa30dash, 
+                        alldays30[[1]], alldays30[[2]], alldays30[[3]], alldays30[[4]], alldays30[[5]]))
 
 
 # --  SAVE SPREADSHEETS  --  #

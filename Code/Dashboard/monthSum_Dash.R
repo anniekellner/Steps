@@ -180,7 +180,8 @@ for(i in 1:length(vars)){
 
 # --------  ADD TO NOAA MONTHLY DATAFRAME  ---------- #
 
-MonthlySeries <- bind_rows(list(noaaDashboard, vars[[1]], vars[[2]], vars[[3]], vars[[4]], vars[[5]]))
+MonthlySeries <- bind_rows(list(noaaDashboard, 
+                                vars[[1]], vars[[2]], vars[[3]], vars[[4]], vars[[5]]))
 
 
 # ------  SAVE SPREADSHEET   ----------- #
