@@ -144,9 +144,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[42] # CHANGE THIS TO INSTALLATION OF INTEREST
+#shp <- shp_names[33] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
 ```
 
@@ -155,11 +155,11 @@ list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspac
 
 # Load workspace image
 
-load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/BMGR_West/BMGR_West_EC-Earth3-Veg-LR_20250820.RData")
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Creech_AFB/Creech_AFB_EC-Earth3-Veg-LR_20250318.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/BMGR_West/rasterStack_BMGR_West_EC-Earth3-Veg-LR_20250820.Rds")
+#rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Creech_AFB/rasterStack_Creech_AFB_EC-Earth3-Veg-LR_20250318.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
@@ -192,9 +192,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[42] 
+shp <- shp_names[43] 
 
-official_name <- official_base_names[23] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[22] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -224,7 +224,7 @@ cat(paste("The model you have selected is", model,"for the installation", offici
 ###               USER SETTINGS PART III - SCENARIOS                        ###
 ################################################################################
 
-The next chunk checks what scenarios (subfolders) are contained in the 'Data' folder associated with the model of interest.
+The next chunk checks what scenarios (subfolders) are contained in the 'Data' folder associated with the model of interest. *If you run the whole chunk at once and do not receive the subfolder names in the output, run the first two lines, wait for the process to complete, then run the last two*
 
 ```{r scenarios, results='asis'}
 
