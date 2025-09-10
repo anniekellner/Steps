@@ -58,7 +58,8 @@ shp_names <- c("Homestead_ARB",
               "Luke Aux Air Field",
               "BMGR_East",
               "BMGR_West",
-              "BGR_West_Marines",
+              "BGR_West_Marines", # actual name of shp in folder 9-10-2025
+              "BGR-W", # Desired name for outputs 9-10-2025
               "Dover AFB",
               "New Boston SFS",
               "45th SW - Cape Canaveral",
