@@ -6,10 +6,10 @@
 # written by Annie Kellner 2-7-2025
 # for Climate Viewer inputs
 
-fnVHOTDAYS <- function(tmaxrast, hottemp = 35){
+fnVHOTDAYS <- function(tmaxrast, lo = 35, hi = 37.78){
     
     #Find all Tmax values greater than or equal to hottemp
-    tmaxrast[tmaxrast > hottemp] = 1
+    tmaxrast[tmaxrast >= lo & tmaxrast < hi] = 1
     
     #Set all remaining values to 0
     tmaxrast[tmaxrast != 1] = 0
@@ -22,10 +22,10 @@ fnVHOTDAYS <- function(tmaxrast, hottemp = 35){
   }
 
 
-fnEXHOTDAYS <- function(tmaxrast, hottemp = 37.8){
+fnEXHOTDAYS <- function(tmaxrast, lo = 37.8, hi = 40.6){
     
     #Find all Tmax values greater than or equal to hottemp
-    tmaxrast[tmaxrast > hottemp] = 1
+    tmaxrast[tmaxrast >= lo & tmaxrast < hi] = 1
     
     #Set all remaining values to 0
     tmaxrast[tmaxrast != 1] = 0
@@ -38,10 +38,10 @@ fnEXHOTDAYS <- function(tmaxrast, hottemp = 37.8){
 }
 
 
-fnHELLDAYS <- function(tmaxrast, hottemp = 40.6){
+fnHELLDAYS <- function(tmaxrast, lo = 40.6){
   
   #Find all Tmax values greater than or equal to hottemp
-  tmaxrast[tmaxrast > hottemp] = 1
+  tmaxrast[tmaxrast >= lo] = 1
   
   #Set all remaining values to 0
   tmaxrast[tmaxrast != 1] = 0
