@@ -99,14 +99,6 @@ fnVWETDAYS <- function(preciprast, wetprecip = 101.6)
   
 }
 
-
-
-
-
-
-
-
-
 ######################################################################
 #Function: Rasterhotdays
 # Description: Create a raster of  of values indicating total count of hot days which by 
@@ -120,11 +112,11 @@ fnVWETDAYS <- function(preciprast, wetprecip = 101.6)
 #   hottemp = The temperature value in Deg Celsius that defines hot days (cells above
 #              this will be flagged as hot)
 #
-Rasterhotdays <- function(tmaxrast, hottemp = 32.2) 
+Rasterhotdays <- function(tmaxrast, lo = 32.2, hi = 35) 
 {
   
   #Find all Tmax values greater than or equal to hottemp
-  tmaxrast[tmaxrast >= hottemp] = 1
+  tmaxrast[tmaxrast >= lo & tmaxrast < hi] = 1
   
   #Set all remaining values to 0
   tmaxrast[tmaxrast != 1] = 0

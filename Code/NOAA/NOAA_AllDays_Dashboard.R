@@ -40,7 +40,7 @@ df <- df %>%
   mutate(TMinC = RasterUnitConvert(TMinF, "FtoC"))
 
 df <- df %>%
-  mutate(HOTDAYS = Rasterhotdays(TMaxC, hottemp = 32.2)) %>%
+  mutate(HOTDAYS = Rasterhotdays(TMaxC, lo = 32.2, hi = 35)) %>%
   mutate(COLDDAYS = Rastercolddays(TMinC, coldtemp = 0)) %>%
   mutate(WETDAYS = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
   mutate(DRYDAYS = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
@@ -48,9 +48,9 @@ df <- df %>%
                                TMinC, 
                                freezethresh = -2.2, 
                                thawthresh = 1.2)) %>%
-  mutate(VHOTDAYS = fnVHOTDAYS(TMaxC, hottemp = 37.8)) %>%
-  mutate(EXHOTDAYS = fnEXHOTDAYS(TMaxC, hottemp = 37.8)) %>%
-  mutate(HELLDAYS = fnHELLDAYS(TMaxC, hottemp = 40.6)) %>%
+  mutate(VHOTDAYS = fnVHOTDAYS(TMaxC, lo = 35, hi = 37.8)) %>%
+  mutate(EXHOTDAYS = fnEXHOTDAYS(TMaxC, lo = 37.8, hi = 40.6)) %>%
+  mutate(HELLDAYS = fnHELLDAYS(TMaxC, lo = 40.6)) %>%
   mutate(WARMNIGHTS = fnWARMNIGHTS(TMinC, coldtemp = 23.9)) %>%
   mutate(FRFRDAYS = fnFRFRDAYS(TMinC, coldtemp = 0)) %>%
   mutate(VWETDAYS = fnVWETDAYS(PPT_mm, wetprecip = 101.6))

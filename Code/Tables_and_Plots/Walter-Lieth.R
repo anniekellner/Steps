@@ -165,7 +165,7 @@ for(i in 1:length(monthSumDF)){
       expand = c(0, 0)
     ) +
     scale_y_continuous(
-      "°F",
+      "\u00B0F",
       labels = function(x) x* (9/5) + 32,
       breaks = range_tm, # Celsius breaks are kept so that precip axis is aligned
       sec.axis = dup_axis(name = "in",
@@ -175,7 +175,7 @@ for(i in 1:length(monthSumDF)){
   # Subtitle (aka, time period and precip/temp values)
   
   sub = paste(round(mean(dat_long_endF[dat_long_endF$interpolate == FALSE, ]$tmF), 1),
-              "°F        ",
+              "\u00B0F        ",
               prettyNum(
                 round(sum(
                   dat_long_endF[dat_long_endF$interpolate == FALSE, ]$p_mesIN
