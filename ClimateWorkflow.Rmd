@@ -144,7 +144,7 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[44] # CHANGE THIS TO INSTALLATION OF INTEREST
+#shp <- shp_names[48] # CHANGE THIS TO INSTALLATION OF INTEREST
 
 #list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
@@ -192,9 +192,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[44] 
+shp <- shp_names[49] 
 
-official_name <- official_base_names[22] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[30] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -342,7 +342,7 @@ The following chunk makes use of the 'shorthand' term (or acronym) for a given b
 
 NOAA_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/" # directory for raw data
 
-list.files(path = NOAA_dir, pattern = shp)
+list.files(path = NOAA_dir, pattern = "Luke_Aux")
 
 ```
 
@@ -352,7 +352,7 @@ list.files(path = NOAA_dir, pattern = shp)
 
 ```{r prep-pulling-NOAA-data}
 
-weather_station <- shp # this is usually the shp name
+weather_station <- "Luke_Aux_Air_Field" # this is usually the shp name
 weather_station_filename <- paste0(weather_station,".csv")
 
 noaa_dataFilepath <- paste0(NOAA_dir, weather_station_filename)
@@ -740,8 +740,6 @@ source("./Code/NOAA/NOAA_ClimographPlots.R")
 
 ## CLEAN UP GLOBAL ENVIRONMENT
 
-
-Now that we've extracted and formatted the model data, we can remove extraneous variables from the environment and run the observed historical analysis. 
 
 ```{r prep-env-for-NOAA}
 
