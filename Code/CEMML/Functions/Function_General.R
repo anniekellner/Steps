@@ -45,22 +45,25 @@ RasterGDD <- function(tminrast, tmaxrast, basetemp=10, captemp=30)
 #              layer corresponding to a day. 
 #   hottemp = The temperature value in Deg Celsius that defines hot days (cells above
 #              this will be flagged as hot)
-#
-Rasterhotdays <- function(tmaxrast, lo = 32.2, hi = 35) 
-{
-  
-  #Find all Tmax values greater than or equal to hottemp
-  tmaxrast[tmaxrast >= lo & tmaxrast < hi] = 1
-  
-  #Set all remaining values to 0
-  tmaxrast[tmaxrast != 1] = 0
 
+# 
+Rasterhotdays <- function(tmaxrast, hottemp = 32.2)  
+{ 
+  
+  #Find all Tmax values greater than or equal to hottemp 
+  tmaxrast[tmaxrast >= hottemp] = 1 
+  
+  #Set all remaining values to 0 
+  tmaxrast[tmaxrast != 1] = 0 
+  
   return(tmaxrast)
+  
+}
 
   # Assign hotdays as sum of raster stack
   #hotdays = sum(tmaxrast)  
   
-}
+
 #########################################################################
 
 
