@@ -48,7 +48,7 @@ df <- df %>%
   mutate(TMinC = RasterUnitConvert(TMinF, "FtoC"))
 
 df <- df %>%
-  mutate(hotdays = Rasterhotdays(TMaxC, lo = 32.2, hi = 100)) %>% # hi = 100 to incorporate all hot days
+  mutate(hotdays = Rasterhotdays(TMaxC, lo = 32.2, hi = 35)) %>% 
   mutate(colddays = Rastercolddays(TMinC, coldtemp = 0)) %>%
   mutate(wetdays = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
   mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
