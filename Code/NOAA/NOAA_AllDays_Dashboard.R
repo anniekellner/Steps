@@ -40,7 +40,7 @@ df <- df %>%
   mutate(TMinC = RasterUnitConvert(TMinF, "FtoC"))
 
 df <- df %>%
-  mutate(HOTDAYS = Rasterhotdays(TMaxC, lo = 32.2, hi = 35)) %>%
+  mutate(HOTDAYS_90to95 = fnHOTDAYS(TMaxC, lo = 32.2, hi = 35)) %>%
   mutate(COLDDAYS = Rastercolddays(TMinC, coldtemp = 0)) %>%
   mutate(WETDAYS = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
   mutate(DRYDAYS = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
@@ -48,9 +48,9 @@ df <- df %>%
                                TMinC, 
                                freezethresh = -2.2, 
                                thawthresh = 1.2)) %>%
-  mutate(VHOTDAYS = fnVHOTDAYS(TMaxC, lo = 35, hi = 37.8)) %>%
-  mutate(EXHOTDAYS = fnEXHOTDAYS(TMaxC, lo = 37.8, hi = 40.6)) %>%
-  mutate(HELLDAYS = fnHELLDAYS(TMaxC, lo = 40.6)) %>%
+  mutate(HOTDAYS_95to100 = fnVHOTDAYS(TMaxC, lo = 35, hi = 37.8)) %>%
+  mutate(HOTDAYS_100to105 = fnEXHOTDAYS(TMaxC, lo = 37.8, hi = 40.6)) %>%
+  mutate(HOTDAYS_105plus = fnHELLDAYS(TMaxC, lo = 40.6)) %>%
   mutate(WARMNIGHTS = fnWARMNIGHTS(TMinC, coldtemp = 23.9)) %>%
   mutate(FRFRDAYS = fnFRFRDAYS(TMinC, coldtemp = 0)) %>%
   mutate(VWETDAYS = fnVWETDAYS(PPT_mm, wetprecip = 101.6))
@@ -65,14 +65,14 @@ df <- select(df,  # remove Celsius values; add new variables for Viewer (2-26-20
              TMinF, 
              TMeanF, 
              GDDF, 
-             HOTDAYS, 
+             HOTDAYS_90to95, 
              COLDDAYS, 
              WETDAYS, 
              DRYDAYS, 
              FTDAYS,
-             VHOTDAYS,
-             EXHOTDAYS,
-             HELLDAYS,
+             HOTDAYS_95to100,
+             HOTDAYS_100to105,
+             HOTDAYS_105plus,
              WARMNIGHTS,
              FRFRDAYS,
              VWETDAYS)
@@ -209,10 +209,10 @@ noaa30dash <- select(noaa30dash,
                      Avg_TmeanF,
                      Avg_TminF,
                      Pctl10_TminF,
-                     HOTDAYS,
-                     VHOTDAYS,
-                     EXHOTDAYS,
-                     HELLDAYS,
+                     HOTDAYS_90to95,
+                     HOTDAYS_95to100,
+                     HOTDAYS_100to105,
+                     HOTDAYS_105plus,
                      WARMNIGHTS,
                      COLDDAYS,
                      FRFRDAYS,
