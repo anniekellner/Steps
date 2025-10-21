@@ -82,14 +82,14 @@ for(i in 1:length(AllDays)){
            minRH,
            specHum,
            VPD) %>%
-    mutate(across(PPT_in:minRH, ~round(., digits = 1))) %>% 
+    mutate(across(PPT_in:minRH, ~round(., digits = 3))) %>% 
     mutate(across(specHum:VPD, ~round(., digits = 5))) %>%
     ungroup()
   
   monthAvg = all %>%
     group_by(month) %>%
     summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE))) %>%
-    mutate(across(PPT_in:ftdays, ~round(., digits = 1))) %>%  
+    mutate(across(PPT_in:ftdays, ~round(., digits = 3))) %>%  
     mutate(across(specHum:VPD, ~round(., digits = 4))) %>%
     setNames(paste0('Avg_', names(.))) %>%
     rename(Abs_TminF = Avg_Abs_TminF) %>%
@@ -148,7 +148,7 @@ for(i in 1:length(monthSumDF)){
     slice(1:(n()-2)) %>% # remove summary rows
     bind_rows(NAs, NAs_Totals) %>% # replace with NA's included
     mutate(month = as.character(month)) %>%
-    mutate(across(Avg_PPT_in:Avg_minRH, ~round(., digits = 1))) %>% 
+    mutate(across(Avg_PPT_in:Avg_minRH, ~round(., digits = 3))) %>% 
     mutate(across(Avg_specHum:Avg_VPD, ~round(., digits = 4))) 
     
   
