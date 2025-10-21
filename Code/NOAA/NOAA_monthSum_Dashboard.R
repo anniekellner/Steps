@@ -72,7 +72,7 @@ for(i in 1:length(NOAA_AllDays_Dash)){
     dplyr::select(!year) %>%
     group_by(MonthNum) %>%
     summarise(across(TMaxF:WARMNIGHTS, ~ mean(.x, na.rm = TRUE))) %>%
-    round(digits = 1) %>%
+    round(digits = 3) %>%
     ungroup()
   
   monthAvg = monthAvg %>%
@@ -82,10 +82,10 @@ for(i in 1:length(NOAA_AllDays_Dash)){
     rename(Avg_TmaxF = Avg_TMaxF) %>%
     rename(Avg_TmeanF = Avg_TMeanF) %>%
     rename(Avg_TminF = Avg_TMinF) %>%
-    rename(HOTDAYS = Avg_HOTDAYS) %>%
-    rename(VHOTDAYS = Avg_VHOTDAYS) %>%
-    rename(EXHOTDAYS = Avg_EXHOTDAYS) %>%
-    rename(HELLDAYS = Avg_HELLDAYS) %>%
+    rename(HOTDAYS_90to95 = Avg_HOTDAYS_90to95) %>%
+    rename(HOTDAYS_95to100 = Avg_HOTDAYS_95to100) %>%
+    rename(HOTDAYS_100to105 = Avg_HOTDAYS_100to105) %>%
+    rename(HOTDAYS_105plus = Avg_HOTDAYS_105plus) %>%
     rename(WARMNIGHTS = Avg_WARMNIGHTS) %>%
     rename(COLDDAYS = Avg_COLDDAYS) %>%
     rename(FRFRDAYS = Avg_FRFRDAYS) %>%
@@ -168,10 +168,10 @@ noaaDashboard <- noaaDashboard %>%
           Avg_TmeanF,
           Avg_TminF,
           Pctl10_TminF,
-          HOTDAYS,
-          VHOTDAYS,
-          EXHOTDAYS,
-          HELLDAYS,
+          HOTDAYS_90to95,
+          HOTDAYS_95to100,
+          HOTDAYS_100to105,
+          HOTDAYS_105plus,
           WARMNIGHTS,
           COLDDAYS,
           FRFRDAYS,

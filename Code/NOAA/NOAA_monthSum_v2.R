@@ -67,7 +67,7 @@ for(i in 1:length(AllDays_NOAA)){
      dplyr::select(!year) %>%
      group_by(month) %>%
      summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE))) %>%
-     round(digits = 1) %>%
+     round(digits = 3) %>%
      setNames(paste0('Avg_', names(.))) %>%
      rename(Abs_TminF = Avg_Abs_TminF) %>%
      select(Avg_month, # put in order on MonthSum csv
