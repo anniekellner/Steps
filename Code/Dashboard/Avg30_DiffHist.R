@@ -106,7 +106,7 @@ diffs30_Dash <- bind_rows(list(diffs30[[1]],
 diffs30_Dash$SITENAME <- official_name
 
 diffs30_Dash <- diffs30_Dash %>%
-  mutate(across(Pctl90_Prcp_in:VWETDAYS, ~ round(., digits = 2))) %>% 
+  mutate(across(Pctl90_Prcp_in:VWETDAYS, ~ round(., digits = 3))) %>% 
   rename_with(~paste0(., "_diff"), .cols = Pctl90_Prcp_in:VWETDAYS)
 
 diffs30_Dash <- diffs30_Dash %>%

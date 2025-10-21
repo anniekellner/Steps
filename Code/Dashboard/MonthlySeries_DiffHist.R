@@ -55,7 +55,7 @@ monthlySeriesDiffHist[[2]] <- Diff %>%
   bind_rows(base) %>% 
   group_by(SITENAME, Month, MonthNum) %>%
   summarise(across(Pctl90_Prcp_in:VWETDAYS, ~diff(.))) %>%
-  mutate(across(Pctl90_Prcp_in:VWETDAYS, ~round(., digits = 2))) %>%  
+  mutate(across(Pctl90_Prcp_in:VWETDAYS, ~round(., digits = 3))) %>%  
   arrange(MonthNum) %>%
   ungroup()
 
@@ -118,7 +118,7 @@ monthlySeriesDiffHist_dash <- bind_rows(list(monthlySeriesDiffHist[[1]],
 #)
 
 monthlySeriesDiffHist_dash <- monthlySeriesDiffHist_dash %>%
-  mutate(across(Pctl90_Prcp_in:VWETDAYS, ~ round(., digits = 2))) %>% 
+  mutate(across(Pctl90_Prcp_in:VWETDAYS, ~ round(., digits = 3))) %>% 
   rename_with(~paste0(., "_diff"), .cols = Pctl90_Prcp_in:VWETDAYS)
   
   
