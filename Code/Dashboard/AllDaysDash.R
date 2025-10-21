@@ -62,14 +62,14 @@ for(i in 1:length(avdf)){
     mutate(TMeanF = (TMaxF + TMinF)/2) %>%
     mutate(TmeanC = (TMaxC + TMinC)/2) %>%
     mutate(GDDF = RasterGDD(TMinF, TMaxF, 50, 86)) %>% # All hard-coded values are from the original CEMML script
-    mutate(HOTDAYS = Rasterhotdays(TMaxC, lo = 32.2, hi = 35)) %>% # Hard-coded values may be changed at user discretion
+    mutate(HOTDAYS_90to95 = fnHOTDAYS(TMaxC, lo = 32.2, hi = 35)) %>% # Hard-coded values may be changed at user discretion
     mutate(COLDDAYS = Rastercolddays(TMinC, coldtemp = 0)) %>%
     mutate(WETDAYS = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
     mutate(DRYDAYS = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
     mutate(FTDAYS = RasterFTdays(TMaxC, TMinC, freezethresh = -2.2, thawthresh = 1.2)) %>%
-    mutate(VHOTDAYS = fnVHOTDAYS(TMaxC, lo = 35, hi = 37.8)) %>%
-    mutate(EXHOTDAYS = fnEXHOTDAYS(TMaxC, lo = 37.8, hi = 40.6)) %>%
-    mutate(HELLDAYS = fnHELLDAYS(TMaxC, lo = 40.6)) %>%
+    mutate(HOTDAYS_95to100 = fnVHOTDAYS(TMaxC, lo = 35, hi = 37.8)) %>%
+    mutate(HOTDAYS_100to105 = fnEXHOTDAYS(TMaxC, lo = 37.8, hi = 40.6)) %>%
+    mutate(HOTDAYS_105plus = fnHELLDAYS(TMaxC, lo = 40.6)) %>%
     mutate(WARMNIGHTS = fnWARMNIGHTS(TMinC, coldtemp = 23.9)) %>%
     mutate(FRFRDAYS = fnFRFRDAYS(TMinC, coldtemp = 0)) %>%
     mutate(VWETDAYS = fnVWETDAYS(PPT_mm, wetprecip = 101.6))
@@ -82,14 +82,14 @@ for(i in 1:length(avdf)){
                TMinF, 
                TMeanF, 
                GDDF, 
-               HOTDAYS, 
+               HOTDAYS_90to95, 
                COLDDAYS, 
                WETDAYS, 
                DRYDAYS, 
                FTDAYS,
-               VHOTDAYS,
-               EXHOTDAYS,
-               HELLDAYS,
+               HOTDAYS_95to100,
+               HOTDAYS_100to105,
+               HOTDAYS_105plus,
                WARMNIGHTS,
                FRFRDAYS,
                VWETDAYS)
@@ -201,10 +201,10 @@ for(i in 1:length(AllDaysDash)){
                TMeanF,
                TMinF,
                Pctl10_TminF,
-               HOTDAYS,
-               VHOTDAYS,
-               EXHOTDAYS,
-               HELLDAYS,
+               HOTDAYS_90to95,
+               HOTDAYS_95to100,
+               HOTDAYS_100to105,
+               HOTDAYS_105plus,
                WARMNIGHTS,
                COLDDAYS,
                FRFRDAYS,

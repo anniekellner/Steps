@@ -45,7 +45,7 @@ for(i in 1:length(avdf)){
     mutate(TMeanF = (TMaxF + TMinF)/2) %>%
     mutate(TmeanC = (TMaxC + TMinC)/2) %>%
     mutate(GDDF = RasterGDD(TMinF, TMaxF, 50, 86)) %>% # All hard-coded values are from the original CEMML script
-    mutate(hotdays = Rasterhotdays(TMaxC, lo = 32.2, hi = 100)) %>% # hi = 100 to account for all HOTDAYS (VHOTDAYS, etc)
+    mutate(hotdays = Rasterhotdays(TMaxC, hottemp = 32.2)) %>% 
     mutate(colddays = Rastercolddays(TMinC, coldtemp = 0)) %>%
     mutate(wetdays = Rasterwetdays(PPT_mm, wetprecip = 50.8)) %>%
     mutate(drydays = Rasterdrydays(PPT_mm, dryprecip = 2.54)) %>%
@@ -116,7 +116,7 @@ for(i in 1:length(AllDays)){
            minRH,
            specHum,
            VPD) %>%
-      mutate(across(tmax:minRH, ~round(., digits = 1))) %>% 
+      mutate(across(tmax:minRH, ~round(., digits = 3))) %>% 
       mutate(across(specHum:VPD, ~round(., digits = 5))) 
     
     AllDays[[i]] = df
