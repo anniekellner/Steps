@@ -65,7 +65,8 @@ shp_names <- c("Homestead_ARB",
               "45th SW - Cape Canaveral",
               "Luke_AFB",
               "Luke_AFB_FTRA",
-              "Dover_AFB")           
+              "Dover_AFB",
+              "NewBoston_SFS")           
 
 
 official_base_names <- c("NAVBASE Kitsap",     
@@ -98,5 +99,6 @@ official_base_names <- c("NAVBASE Kitsap",
                          "45 Space Wing - JDMTA",
                          "Luke Air Force Base",
                          "Luke Air Force Base - Fort Tuthill Recreation Area",
-                         "Dover Air Force Base") 
+                         "Dover Air Force Base",
+                         "New Boston Space Force Station") 
                         
