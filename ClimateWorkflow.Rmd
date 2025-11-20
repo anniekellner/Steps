@@ -144,7 +144,7 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[51] # CHANGE THIS TO INSTALLATION OF INTEREST
+shp <- shp_names[45] # CHANGE THIS TO INSTALLATION OF INTEREST
 
 list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
@@ -155,11 +155,11 @@ list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspac
 
 # Load workspace image
 
-load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/NewBoston_SFS/NewBoston_SFS_ACCESS-ESM1-5_20251104.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Dover_AFB/Dover_AFB_ACCESS-ESM1-5_20251014.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/NewBoston_SFS/rasterStack_NewBoston_SFS_ACCESS-ESM1-5_20251104.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Dover_AFB/rasterStack_Dover_AFB_ACCESS-ESM1-5_20251014.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
