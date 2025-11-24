@@ -132,7 +132,7 @@ However, if you are re- specific segments of the script using previously extract
 
 *3. Run the first chunk ({r get-saved-files})* This will give you the pathnames to enter for the second chunk, which will load the files. 
 
-*3. In the second chunk ({r load-saved-files}), copy-paste the full paths to the .RData and .Rds files where indicated (including parentheses)* 
+*3. In the second chunk ({r load-saved-files}), copy-paste the full paths to the .RData and .tif files where indicated (including parentheses)* 
 
 *4. Run the second chunk* You will receive an error about the rx file, but you can ignore it. The second line of code takes care of it. 
 
@@ -159,7 +159,7 @@ load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eielson_AFB
 
 # Load raster stack
 
-rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eielson_AFB/rasterStack_Eielson_AFB_EC-Earth3-Veg-LR_20250327.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eielson_AFB/rasterStack_Eielson_AFB_EC-Earth3-Veg-LR_20251124.tif") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
@@ -413,6 +413,8 @@ elev <- afbSF$Elev_Mean
 
 afb <- vect(afbSF)
 
+#afb <- vect(afbSF)
+
 afbSF <- if (xmax(rx) == 360 & xmax(afb) < 0) {st_shift_longitude(afbSF)} else afbSF # adjustment in case ncdf lon scale is 0-360
 
 afb <- vect(afbSF)
@@ -568,13 +570,17 @@ for(i in 1:length(files_s2f2)){
 
 # Create directory and save raw extracted data along with associated raster stack in the event the installation needs to be re-run. 
 
+# Remove unnecessary objects (these cause problems)
+
+rm(afbExt, afbSF)
+
 # Filenames
 
 timestamp <- format(today(), "%Y%m%d")
 
 image_filename <-  paste(shp,model,timestamp, sep = "_")
 rawData_filename <- paste0(image_filename,".RData")
-rasterStack_filename <- paste0("rasterStack_",image_filename,".tif")
+rx_filename <- paste0("rx_",image_filename,".tif")
 
 # Directory for Workspace Images
 
@@ -585,7 +591,7 @@ if (!dir.exists(rawDataDir)){
 
 save.image(file = paste0(rawDataDir,"/",rawData_filename)) # save workspace image to N: drive
 
-writeRaster(rx, filename = paste0(rawDataDir,"/",rasterStack_filename), overwrite = TRUE) # save raster stack to N: drive
+writeRaster(rxCrop, filename = paste0(rawDataDir,"/",rasterStack_filename), overwrite = TRUE) # save raster stack to N: drive
 
 ```
 
