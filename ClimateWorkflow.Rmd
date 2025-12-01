@@ -144,9 +144,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[42] # CHANGE THIS TO INSTALLATION OF INTEREST
+#shp <- shp_names[44] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
 ```
 
@@ -155,11 +155,11 @@ list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspac
 
 # Load workspace image
 
-load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/BMGR_West/BMGR_West_EC-Earth3-Veg-LR_20250820.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/BGR_West_Marines/BGR_West_Marines_EC-Earth3-Veg-LR_20250904.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/BMGR_West/rasterStack_BMGR_West_EC-Earth3-Veg-LR_20250820.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+#rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/BGR_West_Marines/rasterStack_BGR_West_Marines_EC-Earth3-Veg-LR_20250904.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
@@ -192,9 +192,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[28] 
+shp <- shp_names[43] 
 
-official_name <- official_base_names[11] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[22] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -591,7 +591,7 @@ if (!dir.exists(rawDataDir)){
 
 save.image(file = paste0(rawDataDir,"/",rawData_filename)) # save workspace image to N: drive
 
-writeRaster(rxCrop, filename = paste0(rawDataDir,"/",rasterStack_filename), overwrite = TRUE) # save raster stack to N: drive
+writeRaster(rxCrop, filename = paste0(rawDataDir,"/",rx_filename), overwrite = TRUE) # save raster stack to N: drive
 
 ```
 
