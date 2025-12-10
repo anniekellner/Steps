@@ -132,7 +132,7 @@ However, if you are re- specific segments of the script using previously extract
 
 *3. Run the first chunk ({r get-saved-files})* This will give you the pathnames to enter for the second chunk, which will load the files. 
 
-*3. In the second chunk ({r load-saved-files}), copy-paste the full paths to the .RData and .Rds files where indicated (including parentheses)* 
+*3. In the second chunk ({r load-saved-files}), copy-paste the full paths to the .RData and .tif files where indicated (including parentheses)* 
 
 *4. Run the second chunk* You will receive an error about the rx file, but you can ignore it. The second line of code takes care of it. 
 
@@ -144,7 +144,7 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[51] # CHANGE THIS TO INSTALLATION OF INTEREST
+shp <- shp_names[43] # CHANGE THIS TO INSTALLATION OF INTEREST
 
 list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
@@ -155,11 +155,11 @@ list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspac
 
 # Load workspace image
 
-load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/NewBoston_SFS/NewBoston_SFS_ACCESS-ESM1-5_20251104.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/BGR_West_Marines/BGR_West_Marines_EC-Earth3-Veg-LR_20250904.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-rx <- readRDS(file = "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/NewBoston_SFS/rasterStack_NewBoston_SFS_ACCESS-ESM1-5_20251104.Rds") #INSERT COPY-PASTED PATH TO .RDS FILE
+rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/BGR_West_Marines/rx_BGR_West_Marines_EC-Earth3-Veg-LR_20251201.tif") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
@@ -192,9 +192,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[51] 
+shp <- shp_names[43] 
 
-official_name <- official_base_names[32] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[22] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -214,7 +214,7 @@ Similar to what you did above, now *enter the number between the brackets ([]) t
 
 ```{r select-model}
 
-model <- models[8] 
+model <- models[7] 
 
 cat(paste("The model you have selected is", model,"for the installation", official_name))
 
@@ -413,6 +413,8 @@ elev <- afbSF$Elev_Mean
 
 afb <- vect(afbSF)
 
+#afb <- vect(afbSF)
+
 afbSF <- if (xmax(rx) == 360 & xmax(afb) < 0) {st_shift_longitude(afbSF)} else afbSF # adjustment in case ncdf lon scale is 0-360
 
 afb <- vect(afbSF)
@@ -568,13 +570,17 @@ for(i in 1:length(files_s2f2)){
 
 # Create directory and save raw extracted data along with associated raster stack in the event the installation needs to be re-run. 
 
+# Remove unnecessary objects (these cause problems)
+
+rm(afbExt, afbSF)
+
 # Filenames
 
 timestamp <- format(today(), "%Y%m%d")
 
 image_filename <-  paste(shp,model,timestamp, sep = "_")
 rawData_filename <- paste0(image_filename,".RData")
-rasterStack_filename <- paste0("rasterStack_",image_filename,".Rds")
+rx_filename <- paste0("rx_",image_filename,".tif")
 
 # Directory for Workspace Images
 
@@ -585,7 +591,7 @@ if (!dir.exists(rawDataDir)){
 
 save.image(file = paste0(rawDataDir,"/",rawData_filename)) # save workspace image to N: drive
 
-saveRDS(rx, file = paste0(rawDataDir,"/",rasterStack_filename)) # save raster stack to N: drive
+writeRaster(rxCrop, filename = paste0(rawDataDir,"/",rx_filename), overwrite = TRUE) # save raster stack to N: drive
 
 ```
 

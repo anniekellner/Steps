@@ -70,16 +70,21 @@ for(i in 1:length(avdf)){
 
 
 # VPD calculation
+  # Saturation Vapor Pressure calculated using {pvldcurve}
 
 for(i in 1:length(AllDays)){
-  vpdDF = AllDays[[i]] %>%
-    select(date, meanRH, TmeanC)
+  vpDF = AllDays[[i]] %>%
+    select(date, meanRH, TmeanC) 
   
-  vpdDF = VaporPressureDeficit(vpdDF, humidity = "meanRH", temperature = "TmeanC") # output is a dataframe
-  
-  vpdDF = vpdDF %>%
-    select(date, vapor.pressure.deficit) %>%
-    rename(VPD = vapor.pressure.deficit)
+  vpDF = SaturationVaporPressure(vpDF, temperature = "TmeanC") # uses Arden-Buck equation for Saturation Vapor Pressure
+    
+  vpDF = vpDF %>%
+    rename(SVP = saturation.vapor.pressure) %>%
+    mutate(AVP = (meanRH/100)*SVP) %>% # Actual Vapor Pressure
+    mutate(VPD = SVP - AVP)
+
+  vpdDF = vpDF %>%
+    select(date, VPD)
   
   AllDays[[i]] <- vpdDF %>%
     right_join(AllDays[[i]], by = "date")
@@ -116,8 +121,7 @@ for(i in 1:length(AllDays)){
            minRH,
            specHum,
            VPD) %>%
-      mutate(across(tmax:minRH, ~round(., digits = 3))) %>% 
-      mutate(across(specHum:VPD, ~round(., digits = 5))) 
+      mutate(across(where(is.numeric), ~round(., digits = 3)))  
     
     AllDays[[i]] = df
   
