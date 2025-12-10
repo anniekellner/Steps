@@ -136,6 +136,8 @@ However, if you are re- specific segments of the script using previously extract
 
 *4. Run the second chunk* You will receive an error about the rx file, but you can ignore it. The second line of code takes care of it. 
 
+**NOTE: If you are not seeing a workspace image that you expect (i.e., it says `character(0)`), you may need to go into File Explorer and make sure the wcnr N:/ drive mapped to your computer is green. Even if you've connected via GlobalConnect, sometimes RStudio requires that you actually open the N:/ drive through File Explorer before it acknowledges access. Stupid, I know.**
+
 *5. Comment out (#) the code for both chunks after running (as a future safeguard)*
 
 *6. If you need to re-run the historical (NOAA) analysis, proceed to the section "OBSERVED HISTORICAL ANALYSIS"*
@@ -144,7 +146,7 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[43] # CHANGE THIS TO INSTALLATION OF INTEREST
+shp <- shp_names[52] # CHANGE THIS TO INSTALLATION OF INTEREST
 
 list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
@@ -155,11 +157,11 @@ list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspac
 
 # Load workspace image
 
-load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/BGR_West_Marines/BGR_West_Marines_EC-Earth3-Veg-LR_20250904.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Travis_AFB/Travis_AFB_ACCESS-ESM1-5_20251210.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/BGR_West_Marines/rx_BGR_West_Marines_EC-Earth3-Veg-LR_20251201.tif") #INSERT COPY-PASTED PATH TO .RDS FILE
+rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Travis_AFB/rx_Travis_AFB_ACCESS-ESM1-5_20251210.tif") #INSERT COPY-PASTED PATH TO .RDS FILE
 
 ##
 
@@ -572,7 +574,7 @@ for(i in 1:length(files_s2f2)){
 
 # Remove unnecessary objects (these cause problems)
 
-rm(afbExt, afbSF)
+rm(list = ls(pattern = "^sf", pattern = "^afb", lf))
 
 # Filenames
 

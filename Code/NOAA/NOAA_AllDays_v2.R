@@ -25,8 +25,8 @@ noaa <- read_csv(file = noaa_dataFilepath) # creates dataframe of observed histo
 noaa$DATE <- mdy(noaa$DATE) # format date using lubridate pkg
 
 noaa <- noaa %>%
-  select(STATION, NAME, DATE, PRCP, TMAX, TMIN) %>%
-  rename(Station_ID = STATION) %>%
+  select(starts_with("STATION"), NAME, DATE, PRCP, TMAX, TMIN) %>%
+  rename(Station_ID = starts_with("STATION")) %>%
   rename(Station_Name = NAME) %>%
   rename(date = DATE) %>%
   rename(PPT_in = PRCP) %>%
