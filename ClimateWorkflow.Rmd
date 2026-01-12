@@ -146,9 +146,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[53] # CHANGE THIS TO INSTALLATION OF INTEREST
+#shp <- shp_names[54] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
 ```
 
@@ -194,9 +194,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[53] 
+shp <- shp_names[54] 
 
-official_name <- official_base_names[22] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[35] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
