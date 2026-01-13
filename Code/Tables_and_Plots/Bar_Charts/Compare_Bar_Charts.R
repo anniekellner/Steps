@@ -92,12 +92,12 @@ min_prcpS1 <- min(S1$Avg_PPT_in)
 max_prcpS2 <- max(S2$Avg_PPT_in)
 min_prcpS2 <- min(S2$Avg_PPT_in)
 
-# Assign max/min values
+# Assign max/min values for precip
 
 max_pr_value <- if_else(max_prcpS1 > max_prcpS2, max_prcpS1, max_prcpS2)
 min_pr_value <- if_else(min_prcpS1 < min_prcpS2, min_prcpS1, min_prcpS2)
 
-# Assign plot limits
+# Assign plot limitsfor precip
 
 prcp_upper_limit <- case_when(
   max_pr_value > 2 ~ ceiling(max_pr_value / 0.4) * 0.4,
@@ -228,9 +228,9 @@ prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
   labs(title = "Projected Change in Average Precipitation", subtitle = subtitles[1]) +
   
   scale_y_continuous(limits = c(prcp_lower_limit, prcp_upper_limit), 
-                     breaks = case_when(
-                       max_pr_value > 2 ~ seq(from = prcp_lower_limit, to = prcp_upper_limit, by=0.8),
-                       max_pr_value <= 2 ~ seq(from = prcp_lower_limit, to = prcp_upper_limit, by=0.4)),
+                     breaks = seq(from = prcp_lower_limit, 
+                                           to = prcp_upper_limit, 
+                                           by = ifelse(max_pr_value > 2, 0.8, 0.4)),
                      labels = scales::number_format(accuracy = 0.1)) +
   
                        scale_fill_manual(values = custom_fill_prcp, labels = custom_labels) +
@@ -301,7 +301,9 @@ prcpS2 <- ggplot(S2, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
   ylab(paste0("Change in precipitation (inches)", "\n")) + 
   labs(subtitle = subtitles[2]) +
   scale_y_continuous(limits = c(prcp_lower_limit, prcp_upper_limit), 
-                     breaks = seq(from = prcp_lower_limit, to = prcp_upper_limit, by=0.4), 
+                     breaks = seq(from = prcp_lower_limit, 
+                                             to = prcp_upper_limit, 
+                                             by = ifelse(max_pr_value > 2, 0.8, 0.4)), 
                      labels = scales::number_format(accuracy = 0.1)) +
   scale_fill_manual(values = custom_fill_prcp, labels = custom_labels) +
   theme(element_text(family = "Calibri", hjust = 0.5),
