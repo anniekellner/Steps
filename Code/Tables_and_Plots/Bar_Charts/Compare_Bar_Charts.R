@@ -226,10 +226,14 @@ prcpS1 <- ggplot(S1, aes(x = factor(Month, levels = c(month.abb)), y = Avg_PPT_i
   xlab(paste0("\n", "Month")) +
   ylab(paste0("Change in precipitation (inches)", "\n")) + 
   labs(title = "Projected Change in Average Precipitation", subtitle = subtitles[1]) +
+  
   scale_y_continuous(limits = c(prcp_lower_limit, prcp_upper_limit), 
-                     breaks = seq(from = prcp_lower_limit, to = prcp_upper_limit, by=0.4), 
+                     breaks = case_when(
+                       max_pr_value > 2 ~ seq(from = prcp_lower_limit, to = prcp_upper_limit, by=0.8),
+                       max_pr_value <= 2 ~ seq(from = prcp_lower_limit, to = prcp_upper_limit, by=0.4)),
                      labels = scales::number_format(accuracy = 0.1)) +
-  scale_fill_manual(values = custom_fill_prcp, labels = custom_labels) +
+  
+                       scale_fill_manual(values = custom_fill_prcp, labels = custom_labels) +
   theme(element_text(family = "Calibri", hjust = 0.5),
         plot.title = element_text(family = "Calibri", face = "bold", hjust = 0.5, size = 12),
         plot.subtitle = element_text(family = "Calibri", hjust = 0, size = 11),
