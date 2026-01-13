@@ -574,7 +574,7 @@ for(i in 1:length(files_s2f2)){
 
 # Remove unnecessary objects (these cause problems)
 
-rm(list = ls(pattern = "^afb", lf, map))
+rm(list = c(ls(pattern = "^afb"), "lf", "map"))
 
 # Filenames
 
