@@ -97,7 +97,7 @@ min_prcpS2 <- min(S2$Avg_PPT_in)
 max_pr_value <- if_else(max_prcpS1 > max_prcpS2, max_prcpS1, max_prcpS2)
 min_pr_value <- if_else(min_prcpS1 < min_prcpS2, min_prcpS1, min_prcpS2)
 
-# Assign plot limitsfor precip
+# Assign plot limits for precip
 
 prcp_upper_limit <- case_when(
   max_pr_value > 2 ~ ceiling(max_pr_value / 0.4) * 0.4,
