@@ -21,6 +21,8 @@
 
 ###  BEGIN SCRIPT
 
+
+
 AllDays <- list() # for MonthSum section
 
 for(i in 1:length(avdf)){
