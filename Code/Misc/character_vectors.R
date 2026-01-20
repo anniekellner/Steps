@@ -68,7 +68,8 @@ shp_names <- c("Homestead_ARB",
               "Dover_AFB",
               "NewBoston_SFS",
               "Travis_AFB",
-              "Travis_AFB_Ozol")           
+              "Travis_AFB_Ozol",
+              "Beale_AFB")           
 
 
 official_base_names <- c("NAVBASE Kitsap",     
@@ -104,5 +105,6 @@ official_base_names <- c("NAVBASE Kitsap",
                          "Dover Air Force Base",
                          "New Boston Space Force Station",
                          "Travis Air Force Base",
-                         "Travis Air Force Base - Ozol") 
+                         "Travis Air Force Base - Ozol",
+                         "Beale Air Force Base") 
                         
