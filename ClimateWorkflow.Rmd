@@ -146,9 +146,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-#shp <- shp_names[54] # CHANGE THIS TO INSTALLATION OF INTEREST
+shp <- shp_names[5] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
 ```
 
@@ -157,11 +157,11 @@ However, if you are re- specific segments of the script using previously extract
 
 # Load workspace image
 
-#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Beale_AFB/Beale_AFB_EC-Earth3-Veg-LR_20260112.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBER/JBER_EC-Earth3-Veg-LR_20250312.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Beale_AFB/rx_Beale_AFB_EC-Earth3-Veg-LR_20260112.tif") #INSERT COPY-PASTED PATH TO .RDS FILE
+rx <- readRDS("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBER/rasterStack_JBER_EC-Earth3-Veg-LR_20250312.Rds") #INSERT COPY-PASTED PATH TO .TIF FILE
 
 ##
 
@@ -668,8 +668,8 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         ls(pattern = "^baseline"),
                         ls(pattern = "^future"),
                         ls(pattern = "dir"),
-                        ls(pattern = "^noaa"),
-                        ls(pattern = "^NOAA"),
+                        #ls(pattern = "^noaa"),
+                        #ls(pattern = "^NOAA"),
                         ls(pattern = "^results"),
                         lsf.str()))) # all functions
 
@@ -764,8 +764,8 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         ls(pattern = "^baseline"),
                         ls(pattern = "^future"),
                         ls(pattern = "dir"),
-                        ls(pattern = "^noaa"),
-                        ls(pattern = "NOAA"),
+                        #ls(pattern = "^noaa"),
+                        #ls(pattern = "NOAA"),
                         ls(pattern = "^results"),
                         lsf.str()))) # all functions
 
@@ -796,7 +796,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
                         "variables",
                         "results_folder",
-                        "avg30",
+                        #"avg30",
                         "avdf",
                         "elev",
                         "years",
@@ -805,8 +805,8 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         ls(pattern = "^scenario"),
                         ls(pattern = "^future"),
                         ls(pattern = "dir"),
-                        ls(pattern = "^noaa"),
-                        ls(pattern = "NOAA"),
+                        #ls(pattern = "^noaa"),
+                        #ls(pattern = "NOAA"),
                         ls(pattern = "^results"),
                         lsf.str()))) # all functions
 
@@ -878,15 +878,15 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "elev",
                         "years",
                         "monthSumDF",
-                        "MonthlySeries",
-                        "avg30",
+                        #"MonthlySeries",
+                        #"avg30",
                         ls(pattern = "^AllDays"),
                         ls(pattern = "^model"), 
                         ls(pattern = "^scenario"),
                         ls(pattern = "^future"),
                         ls(pattern = "dir"),
-                        ls(pattern = "^noaa"),
-                        ls(pattern = "^NOAA"),
+                        #ls(pattern = "^noaa"),
+                        #ls(pattern = "^NOAA"),
                         ls(pattern = "^results"),
                         lsf.str()))) # all functions
 
