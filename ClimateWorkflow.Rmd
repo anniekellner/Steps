@@ -146,7 +146,7 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[5] # CHANGE THIS TO INSTALLATION OF INTEREST
+shp <- shp_names[55] # CHANGE THIS TO INSTALLATION OF INTEREST
 
 list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
@@ -157,11 +157,11 @@ list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspac
 
 # Load workspace image
 
-load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBER/JBER_EC-Earth3-Veg-LR_20250312.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Naval_Station_Norfolk/Naval_Station_Norfolk_ACCESS-ESM1-5_20260129.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-rx <- readRDS("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/JBER/rasterStack_JBER_EC-Earth3-Veg-LR_20250312.Rds") #INSERT COPY-PASTED PATH TO .TIF FILE
+rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Naval_Station_Norfolk/rx_Naval_Station_Norfolk_ACCESS-ESM1-5_20260129.tif") #INSERT COPY-PASTED PATH TO .TIF FILE
 
 ##
 
@@ -194,9 +194,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[54] 
+shp <- shp_names[55] 
 
-official_name <- official_base_names[35] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[36] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -319,7 +319,7 @@ The first step is to determine whether the installation is managed by the Navy (
 
 # Is the AFB managed by the Navy?
 
-Navy = FALSE
+Navy = TRUE
 
 dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
                                   "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
@@ -344,7 +344,7 @@ The following chunk makes use of the 'shorthand' term (or acronym) for a given b
 
 NOAA_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/" # directory for raw data
 
-list.files(path = NOAA_dir, pattern = shp)
+list.files(path = NOAA_dir, pattern = "NS_Norfolk")
 
 ```
 
@@ -354,7 +354,7 @@ list.files(path = NOAA_dir, pattern = shp)
 
 ```{r prep-pulling-NOAA-data}
 
-weather_station <- shp # this is usually the shp name
+weather_station <- "NS_Norfolk" # this is usually the shp name
 weather_station_filename <- paste0(weather_station,".csv")
 
 noaa_dataFilepath <- paste0(NOAA_dir, weather_station_filename)
@@ -668,8 +668,8 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         ls(pattern = "^baseline"),
                         ls(pattern = "^future"),
                         ls(pattern = "dir"),
-                        #ls(pattern = "^noaa"),
-                        #ls(pattern = "^NOAA"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
                         ls(pattern = "^results"),
                         lsf.str()))) # all functions
 
@@ -764,8 +764,8 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         ls(pattern = "^baseline"),
                         ls(pattern = "^future"),
                         ls(pattern = "dir"),
-                        #ls(pattern = "^noaa"),
-                        #ls(pattern = "NOAA"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "NOAA"),
                         ls(pattern = "^results"),
                         lsf.str()))) # all functions
 
@@ -796,7 +796,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
                         "variables",
                         "results_folder",
-                        #"avg30",
+                        "avg30",
                         "avdf",
                         "elev",
                         "years",
@@ -805,8 +805,8 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         ls(pattern = "^scenario"),
                         ls(pattern = "^future"),
                         ls(pattern = "dir"),
-                        #ls(pattern = "^noaa"),
-                        #ls(pattern = "NOAA"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "NOAA"),
                         ls(pattern = "^results"),
                         lsf.str()))) # all functions
 
@@ -878,15 +878,15 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "elev",
                         "years",
                         "monthSumDF",
-                        #"MonthlySeries",
-                        #"avg30",
+                        "MonthlySeries",
+                        "avg30",
                         ls(pattern = "^AllDays"),
                         ls(pattern = "^model"), 
                         ls(pattern = "^scenario"),
                         ls(pattern = "^future"),
                         ls(pattern = "dir"),
-                        #ls(pattern = "^noaa"),
-                        #ls(pattern = "^NOAA"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
                         ls(pattern = "^results"),
                         lsf.str()))) # all functions
 
