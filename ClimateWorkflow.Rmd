@@ -146,7 +146,7 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[55] # CHANGE THIS TO INSTALLATION OF INTEREST
+shp <- shp_names[28] # CHANGE THIS TO INSTALLATION OF INTEREST
 
 list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
@@ -157,11 +157,11 @@ list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspac
 
 # Load workspace image
 
-load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Naval_Station_Norfolk/Naval_Station_Norfolk_ACCESS-ESM1-5_20260129.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eielson_AFB/Eielson_AFB_EC-Earth3-Veg-LR_20250327.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Naval_Station_Norfolk/rx_Naval_Station_Norfolk_ACCESS-ESM1-5_20260129.tif") #INSERT COPY-PASTED PATH TO .TIF FILE
+rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Eielson_AFB/rasterStack_Eielson_AFB_EC-Earth3-Veg-LR_20251124.tif") #INSERT COPY-PASTED PATH TO .TIF FILE
 
 ##
 
@@ -829,7 +829,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
                         "variables",
                         "results_folder",
-                        #"rx",
+                        "rx",
                         "avdf",
                         "elev",
                         "years",
