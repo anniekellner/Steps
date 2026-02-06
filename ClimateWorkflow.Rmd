@@ -454,39 +454,41 @@ lf
 
 ```
 
-Next, we will check the size of the AFB to see whether we should use its centroid or spatial extent to extract the data we need. If the AFB fits within a single NetCDF cell, it will be much faster to extract data using a single point (the centroid). The script will assume that if the AFB is smaller than the NetCDF cell, you will want to use the centroid, and if it is larger, you will want to use the spatial extent. 
+Next, we will check the size of the installation to see whether we should use its centroid or spatial extent to extract the data we need. If the installation fits within a single NetCDF cell, it will be much faster to extract data using a single point (the centroid). The chunk below calculates the area of the ncdf cell as well as the area of the installation itself. The output tells you which to use.
 
-You can override the automatic by changing the 'extract_obj' object to 'afb' (spatial extent) or 'cell' (centroid). See the text below the code chunk for additional comments about interpreting and manually altering the output.      
+**note: as of 2026-02-06, we only use the centroid for data extraction**. Most of this code is left here in case we want to use the base in its entirety in the future. Most of the time, the installation is smaller than the ncdf cell, so you will not have to change anything. In the offchance the installation is larger than the ncdf cell, you will find instructions below for how to switch the object back to the centroid.    
 
 
 ```{r decision-to-use-shp-or-centroid-for-extraction, warning=FALSE, results='asis'}
 
 # What is the cell size of the ncdf?
 
-rxCellSize <- cellSize(rxCrop, unit = "km") # size of the cropped raster
-ncdf_cellSize <- mean(values(rxCellSize)) # get mean cell size of ncdf (all cells are not necessarily equally sized)
+rx_cellSize <- expanse(rxCrop, unit = "km") # size of the cropped raster, returned as a spatRaster
+#rx_cellSize <- rx_cellSize$area # returns numeric value
 
-# How big is the AFB?
+# How big is the installation?
 
-afb_area <- expanse(afb, unit = "km")
+base_area <- expanse(base_spatVect, unit = "km") # for vector data, a single value (area) is returned
 
-centroid <- geom(centroids(afb, inside = TRUE)) # inside = TRUE guarantees that the centroid is contained within the boundaries of the AFB (in some cases, depending on the shape of the AFB, the true centroid may be outside)
+
+centroid <- geom(centroids(base_spatVect, inside = TRUE)) # inside = TRUE guarantees that the centroid is contained within the boundaries of the installation (in some cases, depending on the shape of the AFB, the true centroid may be outside)
 centroid_matrix <- cbind(centroid[3], centroid[4]) # used to find cell index. [3] and [4] refer to the values in the 'centroid' object. If a downstream error occurs, make sure these values are actually x and y.
 
-extract_obj <- afb
 cell <- terra::cellFromXY(rx, centroid_matrix) # finds the cell (index) in which the centroid is located
+baseExt <- ext(base_spatVect) # get geographic extent. This is not currently used.
+
 
 # add an if_else statement to tell R whether to extract raster values from matrix or shapefile
 
-extract_obj <- if(afb_area < ncdf_cellSize) cell else (afb)
+extract_obj <- ifelse(base_area < rx_cellSize, cell, baseExt) 
 
-afbExt <- ext(afb)
+ 
 
-cat("The object used for data extraction is ", class(extract_obj)) 
+cat("The object used for data extraction is", 
+    ifelse(class(extract_obj) == "numeric", "the centroid", "the installation's spatial extent")) 
 
 ```
 
-*INTERPRETING THE OUTPUT ABOVE*: If the output of the following code chunk says 'numeric', the script will use the centroid. If it says 'spatVector', it will use the spatial object (afb). 
 
 *If you want to override the automatic choice, manually highlight and run either of the options below:* (if you enter it into the code chunk it will remain there and you risk overriding future choices you may not want to, so just do it here in the main text.) 
 
@@ -522,7 +524,7 @@ for(i in 1:length(files_baseline)){
   r = rast(files_baseline[[i]])
   times = time(r)
   varName = varnames(r)[1]
-  vals = values(crop(r, ext(afb)))
+  vals = values(crop(r, baseExt)
   vals = r[extract_obj]
   tVals = data.table::transpose(vals) # do not use purrr:transpose
   colnames(tVals) = varName
