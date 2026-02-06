@@ -403,38 +403,42 @@ The next chunk checks that the spatial files are aligned and appear in the corre
 
 ```{r spatial-check}
 
+# GCM raster
+
 stackX <- rast(files_s1f1[[1]]) # creates raster stack for first variable in s1f1 list (using s1f1 because has fewer files than baseline)
 
 random_raster <- as.numeric(sample(1:nlyr(stackX), 1)) # get a random raster layer from StackX to use as an example
 
 rx <- stackX[[random_raster]]
 
+# Installation spatial data
+
 # AFB 
 
-afb_dir <- (paste(dir_installation_boundaries, shp, sep = '/'))
-afb_filename <- paste(afb_dir, '.shp', sep = "")
+baseGeo_dir <- (paste(dir_installation_boundaries, shp, sep = '/'))
+baseGeo_filename <- paste(afb_dir, '.shp', sep = "")
 
-afbSF <- st_read(afb_filename) # Because plotting package (tmap) doesn't take terra vectors
+baseSF <- st_read(baseGeo_filename) # Because plotting package (tmap) doesn't take terra vectors
+elev <- baseSF$Elev_Mean # add elevation data to sf object
 
-
-# Convert to lat/lon if shp uses projected CRS and lat/lon columns exist
-
-afbSF <- if(!st_is_longlat(afbSF) && "lat" %in% names(afbSF) && "lon" %in% names(afbSF)) {
-  # Transform geometry from projected CRS to lat/lon
-  afbSF <- st_transform(afbSF, crs = 4326)  # 4326 is WGS84 (lat/lon)
+# Check if CRS is projected AND lat/lon columns exist
+if(!st_is_longlat(baseSF) && "lat" %in% names(baseSF) && "lon" %in% names(baseSF)) {
+  # Transform geometry from projected CRS to WGS84 (lat/lon)
+  baseSF <- st_transform(baseSF, crs = 4326)  # 4326 is WGS84 (lat/lon)
 }
 
-afbSF <- if (xmax(rx) == 360 & xmax(afb) < 0) {st_shift_longitude(afbSF)} else afbSF # adjustment in case ncdf lon scale is 0-360
+base_spatVect <- vect(baseSF) # convert to spatVector object for use with {terra} package
 
-elev <- afbSF$Elev_Mean
 
-afb <- vect(afbSF)
+baseSF <- if (xmax(rx) == 360 & xmax(base_spatVect) < 0) {st_shift_longitude(baseSF)} else baseSF # adjustment in case ncdf lon scale is 0-360
 
-afb <- terra::aggregate(afb)
+base_spatVect <- vect(baseSF)
+base_spatVect <- terra::aggregate(base_spatVect) # dissolves extraneous boundaries within shp
 
 # Crop single raster to AFB shape
 
-rxCrop <- terra::crop(rx, afb, snap = "out") # snap = "out" shows all cells that overlap AFB polygon
+rxCrop <- terra::crop(rx, base_spatVect, snap = "out") # snap = "out" shows all cells that overlap AFB polygon
+
 
 # Quick interactive plot
 
@@ -442,7 +446,7 @@ rxCrop <- terra::crop(rx, afb, snap = "out") # snap = "out" shows all cells that
 
 map <- tm_shape(as(rxCrop, "Raster")) + 
   tm_raster() + 
-  tm_shape(afbSF) + 
+  tm_shape(baseSF) + 
   tm_borders()
 
 lf <- tmap_leaflet(map)
