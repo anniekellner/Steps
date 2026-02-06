@@ -146,9 +146,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[55] # CHANGE THIS TO INSTALLATION OF INTEREST
+#shp <- shp_names[55] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
 ```
 
@@ -157,11 +157,11 @@ list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspac
 
 # Load workspace image
 
-load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Naval_Station_Norfolk/Naval_Station_Norfolk_ACCESS-ESM1-5_20260129.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Naval_Station_Norfolk/Naval_Station_Norfolk_ACCESS-ESM1-5_20260129.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Naval_Station_Norfolk/rx_Naval_Station_Norfolk_ACCESS-ESM1-5_20260129.tif") #INSERT COPY-PASTED PATH TO .TIF FILE
+#rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Naval_Station_Norfolk/rx_Naval_Station_Norfolk_ACCESS-ESM1-5_20260129.tif") #INSERT COPY-PASTED PATH TO .TIF FILE
 
 ##
 
@@ -194,9 +194,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[55] 
+shp <- shp_names[56] 
 
-official_name <- official_base_names[36] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[37] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -320,10 +320,14 @@ The first step is to determine whether the installation is managed by the Navy (
 # Is the AFB managed by the Navy?
 
 Navy = TRUE
+year2026 = TRUE
 
-dir_installation_boundaries <- ifelse(Navy == FALSE, # site boundary (shapefile used for clipping)
-                                  "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
-                            "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY")
+dir_installation_boundaries <- case_when(
+  Navy == FALSE ~ "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
+  Navy == TRUE & year2026 == FALSE ~
+    "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY",
+  Navy == TRUE & year2026 == TRUE ~
+    "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/2026 Targets")
 
 ```
 
@@ -344,7 +348,7 @@ The following chunk makes use of the 'shorthand' term (or acronym) for a given b
 
 NOAA_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/" # directory for raw data
 
-list.files(path = NOAA_dir, pattern = "NS_Norfolk")
+list.files(path = NOAA_dir, pattern = shp)
 
 ```
 
@@ -354,7 +358,7 @@ list.files(path = NOAA_dir, pattern = "NS_Norfolk")
 
 ```{r prep-pulling-NOAA-data}
 
-weather_station <- "NS_Norfolk" # this is usually the shp name
+weather_station <- shp # this is usually the shp name
 weather_station_filename <- paste0(weather_station,".csv")
 
 noaa_dataFilepath <- paste0(NOAA_dir, weather_station_filename)
@@ -411,15 +415,21 @@ afb_dir <- (paste(dir_installation_boundaries, shp, sep = '/'))
 afb_filename <- paste(afb_dir, '.shp', sep = "")
 
 afbSF <- st_read(afb_filename) # Because plotting package (tmap) doesn't take terra vectors
+
+
+# Convert to lat/lon if shp uses projected CRS and lat/lon columns exist
+
+afbSF <- if(!st_is_longlat(afbSF) && "lat" %in% names(afbSF) && "lon" %in% names(afbSF)) {
+  # Transform geometry from projected CRS to lat/lon
+  afbSF <- st_transform(afbSF, crs = 4326)  # 4326 is WGS84 (lat/lon)
+}
+
+afbSF <- if (xmax(rx) == 360 & xmax(afb) < 0) {st_shift_longitude(afbSF)} else afbSF # adjustment in case ncdf lon scale is 0-360
+
 elev <- afbSF$Elev_Mean
 
 afb <- vect(afbSF)
 
-#afb <- vect(afbSF)
-
-afbSF <- if (xmax(rx) == 360 & xmax(afb) < 0) {st_shift_longitude(afbSF)} else afbSF # adjustment in case ncdf lon scale is 0-360
-
-afb <- vect(afbSF)
 afb <- terra::aggregate(afb)
 
 # Crop single raster to AFB shape
