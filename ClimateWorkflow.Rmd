@@ -317,17 +317,21 @@ The first step is to determine whether the installation is managed by the Navy (
 
 ```{r installation-boundaries}
 
-# Is the AFB managed by the Navy?
+# Is this installation being run for the first time in 2026?
 
-Navy = TRUE
 year2026 = TRUE
 
+# Is this installation managed by the Navy?
+
+Navy = TRUE
+
+
 dir_installation_boundaries <- case_when(
-  Navy == FALSE ~ "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
-  Navy == TRUE & year2026 == FALSE ~
-    "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY",
-  Navy == TRUE & year2026 == TRUE ~
-    "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/2026 Targets")
+  year2026 == TRUE ~ "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/2026 Targets",
+  year2026 == FALSE & Navy == FALSE ~ "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
+  year2026 == FALSE & Navy == TRUE &  ~
+    "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY"
+    )
 
 ```
 
