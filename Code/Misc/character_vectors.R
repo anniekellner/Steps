@@ -110,5 +110,5 @@ official_base_names <- c("NAVBASE Kitsap",
                          "Travis Air Force Base - Ozol",
                          "Beale Air Force Base",
                          "Naval Station Norfolk",
-                         "Naval Computer and Telecommunications Area, Master Station Detachment Cutler") 
+                         "NSA Cutler") 
                         
