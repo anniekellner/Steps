@@ -329,7 +329,7 @@ Navy = TRUE
 dir_installation_boundaries <- case_when(
   year2026 == TRUE ~ "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/2026 Targets",
   year2026 == FALSE & Navy == FALSE ~ "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
-  year2026 == FALSE & Navy == TRUE &  ~
+  year2026 == FALSE & Navy == TRUE  ~
     "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY"
     )
 
@@ -415,14 +415,13 @@ random_raster <- as.numeric(sample(1:nlyr(stackX), 1)) # get a random raster lay
 
 rx <- stackX[[random_raster]]
 
+
 # Installation spatial data
 
-# AFB 
+baseBoundaries_dir <- (paste(dir_installation_boundaries, shp, sep = '/'))
+baseBoundaries_filename <- paste(baseBoundaries_dir, '.shp', sep = "")
 
-baseGeo_dir <- (paste(dir_installation_boundaries, shp, sep = '/'))
-baseGeo_filename <- paste(afb_dir, '.shp', sep = "")
-
-baseSF <- st_read(baseGeo_filename) # Because plotting package (tmap) doesn't take terra vectors
+baseSF <- st_read(baseBoundaries_filename) # Because plotting package (tmap) doesn't take terra vectors
 elev <- baseSF$Elev_Mean # add elevation data to sf object
 
 # Check if CRS is projected AND lat/lon columns exist
@@ -458,46 +457,21 @@ lf
 
 ```
 
-Next, we will check the size of the installation to see whether we should use its centroid or spatial extent to extract the data we need. If the installation fits within a single NetCDF cell, it will be much faster to extract data using a single point (the centroid). The chunk below calculates the area of the ncdf cell as well as the area of the installation itself. The output tells you which to use.
 
-**note: as of 2026-02-06, we only use the centroid for data extraction**. Most of this code is left here in case we want to use the base in its entirety in the future. Most of the time, the installation is smaller than the ncdf cell, so you will not have to change anything. In the offchance the installation is larger than the ncdf cell, you will find instructions below for how to switch the object back to the centroid.    
+Now that we have confirmed the shp matches the real-world geographic location of the base, we can use the installation's centroid to determine the cell from which we will extract data from the NetCDF files.    
 
 
 ```{r decision-to-use-shp-or-centroid-for-extraction, warning=FALSE, results='asis'}
 
-# What is the cell size of the ncdf?
+centroid <- geom(centroids(base_spatVect, inside = TRUE)) # inside = TRUE guarantees that the centroid is contained within the boundaries of the installation (in some cases, depending on the shape of the installation, the true centroid may be outside). Note this is returned as a vector of 5 numbers, which is not useful.
 
-rx_cellSize <- expanse(rxCrop, unit = "km") # size of the cropped raster, returned as a spatRaster
-#rx_cellSize <- rx_cellSize$area # returns numeric value
-
-# How big is the installation?
-
-base_area <- expanse(base_spatVect, unit = "km") # for vector data, a single value (area) is returned
-
-
-centroid <- geom(centroids(base_spatVect, inside = TRUE)) # inside = TRUE guarantees that the centroid is contained within the boundaries of the installation (in some cases, depending on the shape of the AFB, the true centroid may be outside)
-centroid_matrix <- cbind(centroid[3], centroid[4]) # used to find cell index. [3] and [4] refer to the values in the 'centroid' object. If a downstream error occurs, make sure these values are actually x and y.
+centroid_matrix <- cbind(centroid[3], centroid[4]) # we use vector values [3] and [4] to find the cell index. [3] and [4] refer to the longitude (x) and latitude (y) respectively. 
 
 cell <- terra::cellFromXY(rx, centroid_matrix) # finds the cell (index) in which the centroid is located
-baseExt <- ext(base_spatVect) # get geographic extent. This is not currently used.
 
-
-# add an if_else statement to tell R whether to extract raster values from matrix or shapefile
-
-extract_obj <- ifelse(base_area < rx_cellSize, cell, baseExt) 
-
- 
-
-cat("The object used for data extraction is", 
-    ifelse(class(extract_obj) == "numeric", "the centroid", "the installation's spatial extent")) 
+#baseExt <- ext(base_spatVect) # get geographic extent. This is not currently used.
 
 ```
-
-
-*If you want to override the automatic choice, manually highlight and run either of the options below:* (if you enter it into the code chunk it will remain there and you risk overriding future choices you may not want to, so just do it here in the main text.) 
-
-`extract_obj <- cell` to use the centroid  -OR-
-`extract_obj <- afb` to use the entire shapefile
 
 
 ## DATA EXTRACTION
@@ -523,16 +497,13 @@ results_s2f2 <- list()
 # Extract data
 
 
-
 for(i in 1:length(files_baseline)){
   r = rast(files_baseline[[i]])
   times = time(r)
   varName = varnames(r)[1]
-  vals = values(crop(r, baseExt)
-  vals = r[extract_obj]
-  tVals = data.table::transpose(vals) # do not use purrr:transpose
-  colnames(tVals) = varName
-  results_baseline[[i]] = tVals
+  vals = data.frame(values(r)[cell, ])
+  colnames(vals) = varName
+  results_baseline[[i]] = vals
   names(results_baseline)[i] = varName
   results_baseline[[i]]$date = times
   rm(r)
@@ -542,23 +513,21 @@ for(i in 1:length(files_s1f1)){
   r = rast(files_s1f1[[i]])
   times = time(r)
   varName = varnames(r)[1]
-  vals = r[extract_obj]
-  tVals = data.table::transpose(vals) 
-  colnames(tVals) = varName
-  results_s1f1[[i]] = tVals
-  names(results_s1f1)[i] = varName
+  vals = data.frame(values(r)[cell, ])
+  colnames(vals) = varName
+  results_s1f1[[i]] = vals
+  names(results_s1f1)[i] <- varName
   results_s1f1[[i]]$date = times
   rm(r)
 }
-
+ 
 for(i in 1:length(files_s1f2)){
   r = rast(files_s1f2[[i]])
   times = time(r)
   varName = varnames(r)[1]
-  vals = r[extract_obj]
-  tVals = data.table::transpose(vals) 
-  colnames(tVals) = varName
-  results_s1f2[[i]] = tVals
+  vals = data.frame(values(r)[cell, ])
+  colnames(vals) = varName
+  results_s1f2[[i]] = vals
   names(results_s1f2)[i] <- varName
   results_s1f2[[i]]$date = times
   rm(r)
@@ -568,10 +537,9 @@ for(i in 1:length(files_s2f1)){
   r = rast(files_s2f1[[i]])
   times = time(r)
   varName = varnames(r)[1]
-  vals = r[extract_obj]
-  tVals = data.table::transpose(vals) 
-  colnames(tVals) = varName
-  results_s2f1[[i]] = tVals
+  vals = data.frame(values(r)[cell, ])
+  colnames(vals) = varName
+  results_s2f1[[i]] = vals
   names(results_s2f1)[i] <- varName
   results_s2f1[[i]]$date = times
   rm(r)
@@ -581,10 +549,9 @@ for(i in 1:length(files_s2f2)){
   r = rast(files_s2f2[[i]])
   times = time(r)
   varName = varnames(r)[1]
-  vals = r[extract_obj]
-  tVals = data.table::transpose(vals) 
-  colnames(tVals) = varName
-  results_s2f2[[i]] = tVals
+  vals = data.frame(values(r)[cell, ])
+  colnames(vals) = varName
+  results_s2f2[[i]] = vals
   names(results_s2f2)[i] <- varName
   results_s2f2[[i]]$date = times
   rm(r)
@@ -594,7 +561,7 @@ for(i in 1:length(files_s2f2)){
 
 # Remove unnecessary objects (these cause problems)
 
-rm(list = c(ls(pattern = "^afb"), "lf", "map"))
+rm(list = c(ls(pattern = "^base"), "lf", "map"))
 
 # Filenames
 
