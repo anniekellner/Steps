@@ -71,7 +71,9 @@ shp_names <- c("Homestead_ARB",
               "Travis_AFB_Ozol",
               "Beale_AFB",
               "Naval_Station_Norfolk",
-              "NCTAMS_Cutler")           
+              "NCTAMS_Cutler",
+              "RAF_Alconbury_and_RAF_Molesworth",
+              "LRRAF_Alconbury_and_RAF_Molesworth")           
 
 
 official_base_names <- c("NAVBASE Kitsap",     
@@ -110,5 +112,6 @@ official_base_names <- c("NAVBASE Kitsap",
                          "Travis Air Force Base - Ozol",
                          "Beale Air Force Base",
                          "Naval Station Norfolk",
-                         "NSA Cutler") 
+                         "NSA Cutler",
+                         "RAF Alconbury and RAF Molesworth") 
                         
