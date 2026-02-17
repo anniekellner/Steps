@@ -194,9 +194,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[56] 
+shp <- shp_names[57] 
 
-official_name <- official_base_names[37] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[38] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -319,11 +319,11 @@ The first step is to determine whether the installation is managed by the Navy (
 
 # Is this installation being run for the first time in 2026?
 
-year2026 = FALSE
+year2026 = TRUE
 
 # Is this installation managed by the Navy?
 
-Navy = TRUE
+Navy = FALSE
 
 
 dir_installation_boundaries <- case_when(
@@ -974,7 +974,7 @@ source('./Code/Tables_and_Plots/Bar_Charts/Format_Bar_Charts.R') # Formatting pl
 ```
 
 
-
+### END DOCUMENT  ###
 
 
 
