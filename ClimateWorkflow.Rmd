@@ -54,6 +54,7 @@ library(extrafont) # for using Calibri font in plots
 library(patchwork)
 library(grid) # for legend grobs (Climographs)
 library(pvldcurve) # for calculating Vapor Pressure Deficit (VPD)
+library(elevatr) # elevation data
 library(conflicted)
 
 conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
@@ -194,9 +195,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[58] 
+shp <- shp_names[59] 
 
-official_name <- official_base_names[39] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[40] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -216,7 +217,7 @@ Similar to what you did above, now *enter the number between the brackets ([]) t
 
 ```{r select-model}
 
-model <- models[5] 
+model <- models[6] 
 
 cat(paste("The model you have selected is", model,"for the installation", official_name))
 
@@ -275,7 +276,7 @@ Of the variables listed, which do you want to include in your analysis? *Enter t
 
 ```{r}
 
-variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin")#, "huss_d") # an example of how you would choose among the variables if desired
+variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin", "huss_d") # an example of how you would choose among the variables if desired
 
 ```
 
@@ -422,7 +423,7 @@ baseBoundaries_dir <- (paste(dir_installation_boundaries, shp, sep = '/'))
 baseBoundaries_filename <- paste(baseBoundaries_dir, '.shp', sep = "")
 
 baseSF <- st_read(baseBoundaries_filename) # Because plotting package (tmap) doesn't take terra vectors
-elev <- baseSF$Elev_Mean # add elevation data to sf object
+
 
 # Check if CRS is projected AND lat/lon columns exist
 if(!st_is_longlat(baseSF) && "lat" %in% names(baseSF) && "lon" %in% names(baseSF)) {
@@ -432,6 +433,15 @@ if(!st_is_longlat(baseSF) && "lat" %in% names(baseSF) && "lon" %in% names(baseSF
 
 base_spatVect <- vect(baseSF) # convert to spatVector object for use with {terra} package
 
+# Get elevation data (SRTM)
+
+elevRaster <- get_elev_raster(locations = baseSF, z = 10) # z-value is the "zoom" value. 10 is standard for SRTM data
+
+
+# Single row matrix: columns are x (lon) and y (lat)
+point_matrix <- matrix(c(x, y), nrow = 1, ncol = 2)
+# Extract value at point
+elevation_value <- terra::extract(elev_raster, point_matrix)[1, 2]
 
 baseSF <- if (xmax(rx) == 360 & xmax(base_spatVect) < 0) {st_shift_longitude(baseSF)} else baseSF # adjustment in case ncdf lon scale is 0-360
 
@@ -441,6 +451,8 @@ base_spatVect <- terra::aggregate(base_spatVect) # dissolves extraneous boundari
 # Crop single raster to AFB shape
 
 rxCrop <- terra::crop(rx, base_spatVect, snap = "out") # snap = "out" shows all cells that overlap AFB polygon
+
+
 
 
 # Quick interactive plot
@@ -472,6 +484,7 @@ cell <- terra::cellFromXY(rx, centroid_matrix) # finds the cell (index) in which
 #baseExt <- ext(base_spatVect) # get geographic extent. This is not currently used.
 
 ```
+
 
 
 ## DATA EXTRACTION

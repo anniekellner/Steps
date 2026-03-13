@@ -73,7 +73,8 @@ shp_names <- c("Homestead_ARB",
               "Naval_Station_Norfolk",
               "NCTAMS_Cutler",
               "RAF_Alconbury_and_RAF_Molesworth",
-              "Holloman_Air_Force_Base")           
+              "Holloman_Air_Force_Base",
+              "611_-_King_Salmon_Airport")           
 
 
 official_base_names <- c("NAVBASE Kitsap",     
@@ -114,5 +115,6 @@ official_base_names <- c("NAVBASE Kitsap",
                          "Naval Station Norfolk",
                          "NSA Cutler",
                          "RAF Alconbury and RAF Molesworth",
-                         "Holloman Air Force Base") 
+                         "Holloman Air Force Base",
+                         "King Salmon Airport") 
                         
