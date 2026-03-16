@@ -147,9 +147,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-shp <- shp_names[49] # CHANGE THIS TO INSTALLATION OF INTEREST
+#shp <- shp_names[58] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
 ```
 
@@ -158,11 +158,11 @@ list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspac
 
 # Load workspace image
 
-load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Luke_AFB_FTRA/Luke_AFB_FTRA_EC-Earth3-Veg-LR_20250926.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Luke_AFB_FTRA/Luke_AFB_FTRA_EC-Earth3-Veg-LR_20250926.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-rx <- readRDS("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Luke_AFB_FTRA/rasterStack_Luke_AFB_FTRA_EC-Earth3-Veg-LR_20250926.Rds") #INSERT COPY-PASTED PATH TO .TIF FILE
+#rx <- readRDS("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Luke_AFB_FTRA/rasterStack_Luke_AFB_FTRA_EC-Earth3-Veg-LR_20250926.Rds") #INSERT COPY-PASTED PATH TO .TIF FILE
 
 ##
 
@@ -431,17 +431,20 @@ if(!st_is_longlat(baseSF) && "lat" %in% names(baseSF) && "lon" %in% names(baseSF
   baseSF <- st_transform(baseSF, crs = 4326)  # 4326 is WGS84 (lat/lon)
 }
 
+
 base_spatVect <- vect(baseSF) # convert to spatVector object for use with {terra} package
 
 # Get elevation data (SRTM)
 
 elevRaster <- get_elev_raster(locations = baseSF, z = 10) # z-value is the "zoom" value. 10 is standard for SRTM data
+elevRaster <- rast(elevRaster)
+elevRaster <- project(elevRaster, "EPSG:4326")
 
 
 # Single row matrix: columns are x (lon) and y (lat)
-point_matrix <- matrix(c(x, y), nrow = 1, ncol = 2)
+point_matrix <- matrix(c(baseSF$lon, baseSF$lat), nrow = 1, ncol = 2)
 # Extract value at point
-elevation_value <- terra::extract(elev_raster, point_matrix)[1, 2]
+elevation_value <- terra::extract(elevRaster, point_matrix)[1, 2]
 
 baseSF <- if (xmax(rx) == 360 & xmax(base_spatVect) < 0) {st_shift_longitude(baseSF)} else baseSF # adjustment in case ncdf lon scale is 0-360
 
