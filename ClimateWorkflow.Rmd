@@ -195,9 +195,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[59] 
+shp <- shp_names[60] 
 
-official_name <- official_base_names[40] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[41] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -324,7 +324,7 @@ year2026 = TRUE
 
 # Is this installation managed by the Navy?
 
-Navy = FALSE
+Navy = TRUE
 
 
 dir_installation_boundaries <- case_when(
@@ -353,7 +353,7 @@ The following chunk makes use of the 'shorthand' term (or acronym) for a given b
 
 NOAA_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/" # directory for raw data
 
-list.files(path = NOAA_dir, pattern = "611_-_King_Salmon_Airport")
+list.files(path = NOAA_dir, pattern = shp)
 
 ```
 
@@ -363,7 +363,7 @@ list.files(path = NOAA_dir, pattern = "611_-_King_Salmon_Airport")
 
 ```{r prep-pulling-NOAA-data}
 
-weather_station <- "611_-_King_Salmon_Airport" #shp # this is usually the shp name
+weather_station <- "NWS_Yorktown" #shp # this is usually the shp name
 weather_station_filename <- paste0(weather_station,".csv")
 
 noaa_dataFilepath <- paste0(NOAA_dir, weather_station_filename)
