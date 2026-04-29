@@ -195,9 +195,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[60] 
+shp <- shp_names[61] 
 
-official_name <- official_base_names[41] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[42] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -217,7 +217,7 @@ Similar to what you did above, now *enter the number between the brackets ([]) t
 
 ```{r select-model}
 
-model <- models[8] 
+model <- models[7] 
 
 cat(paste("The model you have selected is", model,"for the installation", official_name))
 
@@ -363,7 +363,7 @@ list.files(path = NOAA_dir, pattern = shp)
 
 ```{r prep-pulling-NOAA-data}
 
-weather_station <- "NWS_Yorktown" #shp # this is usually the shp name
+weather_station <- shp #shp # this is usually the shp name
 weather_station_filename <- paste0(weather_station,".csv")
 
 noaa_dataFilepath <- paste0(NOAA_dir, weather_station_filename)
