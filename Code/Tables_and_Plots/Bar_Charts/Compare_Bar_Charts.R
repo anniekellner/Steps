@@ -160,7 +160,10 @@ temp_upper_limit <- case_when(
   max_tDelta_value <= 10 ~ 10,
   max_tDelta_value > 10 & max_tDelta_value <= 12 ~ 12,
   max_tDelta_value > 12 & max_tDelta_value <= 14 ~ 14,
-  max_tDelta_value > 14 & max_tDelta_value <= 16 ~ 16
+  max_tDelta_value > 14 & max_tDelta_value <= 16 ~ 16,
+  max_tDelta_value > 16 & max_tDelta_value <= 18 ~ 18,
+  max_tDelta_value > 18 & max_tDelta_value <= 20 ~ 20,
+  max_tDelta_value > 20 & max_tDelta_value <= 22 ~ 22
 )
 
 temp_lower_limit <- case_when(

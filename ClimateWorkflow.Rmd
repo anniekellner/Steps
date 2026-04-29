@@ -147,7 +147,7 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-#shp <- shp_names[56] # CHANGE THIS TO INSTALLATION OF INTEREST
+#shp <- shp_names[58] # CHANGE THIS TO INSTALLATION OF INTEREST
 
 #list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
@@ -158,11 +158,11 @@ However, if you are re- specific segments of the script using previously extract
 
 # Load workspace image
 
-#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/NCTAMS_Cutler/NCTAMS_Cutler_ACCESS-ESM1-5_20260209.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Luke_AFB_FTRA/Luke_AFB_FTRA_EC-Earth3-Veg-LR_20250926.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/NCTAMS_Cutler/rx_NCTAMS_Cutler_ACCESS-ESM1-5_20260209.tif") #INSERT COPY-PASTED PATH TO .TIF FILE
+#rx <- readRDS("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Luke_AFB_FTRA/rasterStack_Luke_AFB_FTRA_EC-Earth3-Veg-LR_20250926.Rds") #INSERT COPY-PASTED PATH TO .TIF FILE
 
 ##
 
@@ -195,9 +195,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[59] 
+shp <- shp_names[61] 
 
-official_name <- official_base_names[40] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[42] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -217,7 +217,7 @@ Similar to what you did above, now *enter the number between the brackets ([]) t
 
 ```{r select-model}
 
-model <- models[6] 
+model <- models[7] 
 
 cat(paste("The model you have selected is", model,"for the installation", official_name))
 
@@ -324,7 +324,7 @@ year2026 = TRUE
 
 # Is this installation managed by the Navy?
 
-Navy = FALSE
+Navy = TRUE
 
 
 dir_installation_boundaries <- case_when(
@@ -363,7 +363,7 @@ list.files(path = NOAA_dir, pattern = shp)
 
 ```{r prep-pulling-NOAA-data}
 
-weather_station <- shp # this is usually the shp name
+weather_station <- shp #shp # this is usually the shp name
 weather_station_filename <- paste0(weather_station,".csv")
 
 noaa_dataFilepath <- paste0(NOAA_dir, weather_station_filename)
@@ -426,33 +426,21 @@ baseSF <- st_read(baseBoundaries_filename) # Because plotting package (tmap) doe
 
 
 # Check if CRS is projected AND lat/lon columns exist
-if(!st_is_longlat(baseSF) && "lat" %in% names(baseSF) && "lon" %in% names(baseSF)) {
+if(!st_is_longlat(baseSF)){ #&& "lat" %in% names(baseSF) && "lon" %in% names(baseSF)) {
   # Transform geometry from projected CRS to WGS84 (lat/lon)
   baseSF <- st_transform(baseSF, crs = 4326)  # 4326 is WGS84 (lat/lon)
 }
 
 base_spatVect <- vect(baseSF) # convert to spatVector object for use with {terra} package
 
-# Get elevation data (SRTM)
+baseSF360 <- if (xmax(rx) == 360 & xmax(base_spatVect) < 0) {st_shift_longitude(baseSF)} else baseSF # adjustment in case ncdf lon scale is 0-360
 
-elevRaster <- get_elev_raster(locations = baseSF, z = 10) # z-value is the "zoom" value. 10 is standard for SRTM data
-
-
-# Single row matrix: columns are x (lon) and y (lat)
-point_matrix <- matrix(c(x, y), nrow = 1, ncol = 2)
-# Extract value at point
-elevation_value <- terra::extract(elev_raster, point_matrix)[1, 2]
-
-baseSF <- if (xmax(rx) == 360 & xmax(base_spatVect) < 0) {st_shift_longitude(baseSF)} else baseSF # adjustment in case ncdf lon scale is 0-360
-
-base_spatVect <- vect(baseSF)
-base_spatVect <- terra::aggregate(base_spatVect) # dissolves extraneous boundaries within shp
+base_spatVect360 <- vect(baseSF360)
+base_spatVect360 <- terra::aggregate(base_spatVect360) # dissolves extraneous boundaries within shp
 
 # Crop single raster to AFB shape
 
-rxCrop <- terra::crop(rx, base_spatVect, snap = "out") # snap = "out" shows all cells that overlap AFB polygon
-
-
+rxCrop <- terra::crop(rx, base_spatVect360, snap = "out") # snap = "out" shows all cells that overlap AFB polygon
 
 
 # Quick interactive plot
@@ -461,7 +449,7 @@ rxCrop <- terra::crop(rx, base_spatVect, snap = "out") # snap = "out" shows all 
 
 map <- tm_shape(as(rxCrop, "Raster")) + 
   tm_raster() + 
-  tm_shape(baseSF) + 
+  tm_shape(baseSF360) + 
   tm_borders()
 
 lf <- tmap_leaflet(map)
@@ -473,15 +461,26 @@ lf
 Now that we have confirmed the shp matches the real-world geographic location of the base, we can use the installation's centroid to determine the cell from which we will extract data from the NetCDF files.    
 
 
-```{r decision-to-use-shp-or-centroid-for-extraction, warning=FALSE, results='asis'}
+```{r get-centroid-elevation-cellNum, warning=FALSE, results='asis'}
 
-centroid <- geom(centroids(base_spatVect, inside = TRUE)) # inside = TRUE guarantees that the centroid is contained within the boundaries of the installation (in some cases, depending on the shape of the installation, the true centroid may be outside). Note this is returned as a vector of 5 numbers, which is not useful.
+centroid <- geom(centroids(base_spatVect360, inside = TRUE)) # inside = TRUE guarantees that the centroid is contained within the boundaries of the installation (in some cases, depending on the shape of the installation, the true centroid may be outside). Note this is returned as a vector of 5 numbers, which is not useful.
 
 centroid_matrix <- cbind(centroid[3], centroid[4]) # we use vector values [3] and [4] to find the cell index. [3] and [4] refer to the longitude (x) and latitude (y) respectively. 
 
-cell <- terra::cellFromXY(rx, centroid_matrix) # finds the cell (index) in which the centroid is located
+centroidElev <- geom(centroids(base_spatVect, inside = TRUE)) # Different longitude scale for elevation function (-180,180)
+centroidElev_matrix <- cbind(centroidElev[3], centroidElev[4]) 
 
-#baseExt <- ext(base_spatVect) # get geographic extent. This is not currently used.
+# Get elevation data (SRTM)
+
+elevRaster <- get_elev_raster(locations = baseSF, z = 10) # z-value is the "zoom" value. 10 is standard for SRTM data
+elevRast <- rast(elevRaster)
+elevRast <- project(elevRast, "EPSG:4326")
+elev <- as.numeric(terra::extract(elevRast, centroidElev_matrix)[1,]) # in meters
+
+
+# Get cell reference for data extraction
+
+cell <- terra::cellFromXY(rx, centroid_matrix) # finds the cell (index) in which the centroid is located
 
 ```
 
@@ -690,7 +689,7 @@ Because the historical analyses of observed data (NOAA data) use a different dat
 
 # Observed Historical - csv's
 
-noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_NOAA_Hist/", weather_station)
+noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_NOAA_Hist/", "611_-_King_Salmon_Airport")
 
 if (!dir.exists(noaa_resultsDir)){
   dir.create(noaa_resultsDir)}
