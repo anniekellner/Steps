@@ -147,7 +147,7 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-#shp <- shp_names[58] # CHANGE THIS TO INSTALLATION OF INTEREST
+#shp <- shp_names[62] # CHANGE THIS TO INSTALLATION OF INTEREST
 
 #list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
@@ -158,11 +158,11 @@ However, if you are re- specific segments of the script using previously extract
 
 # Load workspace image
 
-#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Luke_AFB_FTRA/Luke_AFB_FTRA_EC-Earth3-Veg-LR_20250926.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/611_-_Cold_Bay_Long_Range_Radar_Site/611_-_Cold_Bay_Long_Range_Radar_Site_ACCESS-ESM1-5_20260507.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- readRDS("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Luke_AFB_FTRA/rasterStack_Luke_AFB_FTRA_EC-Earth3-Veg-LR_20250926.Rds") #INSERT COPY-PASTED PATH TO .TIF FILE
+#rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/611_-_Cold_Bay_Long_Range_Radar_Site/rx_611_-_Cold_Bay_Long_Range_Radar_Site_ACCESS-ESM1-5_20260507.tif") #INSERT COPY-PASTED PATH TO .TIF FILE
 
 ##
 
