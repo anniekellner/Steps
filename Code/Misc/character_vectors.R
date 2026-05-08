@@ -76,7 +76,8 @@ shp_names <- c("Homestead_ARB",
               "Holloman_Air_Force_Base",
               "611_-_King_Salmon_Airport",
               "NWS_Yorktown",
-              "NSA_Panama_City")           
+              "NSA_Panama_City",
+              "611_-_Cold_Bay_Long_Range_Radar_Site")           
 
 
 official_base_names <- c("NAVBASE Kitsap",     
@@ -120,5 +121,6 @@ official_base_names <- c("NAVBASE Kitsap",
                          "Holloman Air Force Base",
                          "King Salmon Airport",
                          "Naval Weapons Station Yorktown",
-                         "NSA Panama City") 
+                         "NSA Panama City",
+                         "Cold Bay Long Range Radar Site") 
                         
