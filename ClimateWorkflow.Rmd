@@ -513,7 +513,7 @@ for(i in 1:length(files_baseline)){
   r = rast(files_baseline[[i]])
   times = time(r)
   varName = varnames(r)[1]
-  vals = data.frame(values(r)[cell, ])
+  vals = data.frame(unlist(r[cell], use.names = FALSE))
   colnames(vals) = varName
   results_baseline[[i]] = vals
   names(results_baseline)[i] = varName
@@ -525,7 +525,7 @@ for(i in 1:length(files_s1f1)){
   r = rast(files_s1f1[[i]])
   times = time(r)
   varName = varnames(r)[1]
-  vals = data.frame(values(r)[cell, ])
+  vals = data.frame(unlist(r[cell], use.names = FALSE))
   colnames(vals) = varName
   results_s1f1[[i]] = vals
   names(results_s1f1)[i] <- varName
@@ -537,7 +537,7 @@ for(i in 1:length(files_s1f2)){
   r = rast(files_s1f2[[i]])
   times = time(r)
   varName = varnames(r)[1]
-  vals = data.frame(values(r)[cell, ])
+  vals = data.frame(unlist(r[cell], use.names = FALSE))
   colnames(vals) = varName
   results_s1f2[[i]] = vals
   names(results_s1f2)[i] <- varName
@@ -549,7 +549,7 @@ for(i in 1:length(files_s2f1)){
   r = rast(files_s2f1[[i]])
   times = time(r)
   varName = varnames(r)[1]
-  vals = data.frame(values(r)[cell, ])
+  vals = data.frame(unlist(r[cell], use.names = FALSE))
   colnames(vals) = varName
   results_s2f1[[i]] = vals
   names(results_s2f1)[i] <- varName
@@ -561,7 +561,7 @@ for(i in 1:length(files_s2f2)){
   r = rast(files_s2f2[[i]])
   times = time(r)
   varName = varnames(r)[1]
-  vals = data.frame(values(r)[cell, ])
+  vals = data.frame(unlist(r[cell], use.names = FALSE))
   colnames(vals) = varName
   results_s2f2[[i]] = vals
   names(results_s2f2)[i] <- varName
