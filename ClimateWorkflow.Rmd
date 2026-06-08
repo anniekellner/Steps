@@ -195,9 +195,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[62] 
+shp <- shp_names[63] 
 
-official_name <- official_base_names[43] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[44] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
