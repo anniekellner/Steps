@@ -28,9 +28,7 @@ AllDays <- list() # for MonthSum section
 for(i in 1:length(avdf)){
   csv = avdf[[i]]
   csv = csv %>%
-    mutate(PPT_mm = case_when( # if raster units are "kg-m-2 -1", convert to mm (otherwise keep as is)
-      str_detect(units(rx), "kg") ~ prcp*86400,
-      TRUE ~ as.numeric(prcp))) %>%
+    mutate(PPT_mm = if (unitsRX == "kg m-2 s-1") prcp * 86400 else as.numeric(prcp)) %>% # if raster units are "kg-m-2 -1", convert to mm (otherwise keep as is) 
     mutate(PPT_in = RasterUnitConvert(PPT_mm, "MMtoIN")) %>%
     mutate(TMaxF = case_when(
       tmax > 200 ~ RasterUnitConvert(tmax, "KtoF"), # Because only values in Kelvin would be > 200
@@ -67,7 +65,7 @@ for(i in 1:length(avdf)){
     )
   
   AllDays[[i]] = csv
-    
+  
 } 
 
 
