@@ -24,16 +24,14 @@
 
 for(i in 1:length(AllDays)){ # Convert date column to ymd (year-month-day in {lubridate})
   df = AllDays[[i]]
-  df$date = ymd(df$date)
-  AllDays[[i]] = df
+  
+  df = df %>%
+    mutate(date = date(date)) %>%
+    mutate(date = ymd(date)) %>%
+    mutate(month = month(date))
+    AllDays[[i]] = df
 }
 
-for(i in 1:length(AllDays)){
-  df = AllDays[[i]]
-  df = df %>%
-    mutate(month = month(df$date))
-  AllDays[[i]] = df
-}
 
 for(i in 1:length(AllDays)){
   AllDays[[i]]$month = month.abb[AllDays[[i]]$month]
