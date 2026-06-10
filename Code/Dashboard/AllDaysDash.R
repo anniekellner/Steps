@@ -38,11 +38,10 @@ AllDaysDash <- list() # required for monthSumDash
 
 for(i in 1:length(avdf)){
   csv = avdf[[i]]
-  
-  csv$date = ymd(csv$date) # change date to lubridate type
-  csv$Year = year(csv$date) # add Year for summed variables
-  
   csv = csv %>%
+    mutate(Date = date(date)) %>%
+    mutate(Date = ymd(date)) %>% # change date to lubridate type
+    mutate(Year = year(date)) %>% # add Year for summed variables
     mutate(PPT_mm = case_when( # if raster units are "kg-m-2 -1", convert to mm (otherwise keep as is)
       str_detect(units(rx), "kg") ~ prcp*86400,
       TRUE ~ as.numeric(prcp))) %>%
