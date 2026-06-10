@@ -147,9 +147,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-saved-files}
 
-#shp <- shp_names[62] # CHANGE THIS TO INSTALLATION OF INTEREST
+shp <- shp_names[63] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
 ```
 
@@ -158,11 +158,11 @@ However, if you are re- specific segments of the script using previously extract
 
 # Load workspace image
 
-#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/611_-_Cold_Bay_Long_Range_Radar_Site/611_-_Cold_Bay_Long_Range_Radar_Site_ACCESS-ESM1-5_20260507.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/611_-_Indian_Mountain/611_-_Indian_Mountain_ACCESS-ESM1-5_20260609.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-#rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/611_-_Cold_Bay_Long_Range_Radar_Site/rx_611_-_Cold_Bay_Long_Range_Radar_Site_ACCESS-ESM1-5_20260507.tif") #INSERT COPY-PASTED PATH TO .TIF FILE
+rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/611_-_Indian_Mountain/rx_611_-_Indian_Mountain_ACCESS-ESM1-5_20260609.tif") #INSERT COPY-PASTED PATH TO .TIF FILE
 
 ##
 
@@ -571,9 +571,6 @@ for(i in 1:length(files_s2f2)){
 
 # Create directory and save raw extracted data along with associated raster stack in the event the installation needs to be re-run. 
 
-# Remove unnecessary objects (these cause problems)
-
-rm(list = c(ls(lf, map)))
 
 # Filenames
 
@@ -607,6 +604,9 @@ writeRaster(rxCrop, filename = paste0(rawDataDir,"/",rx_filename), overwrite = T
 This chunk reorganizes the extracted data into a more workable dataframe ("tibble", from the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
 
 ```{r allvaluesdf-dataframes, message=FALSE}
+
+rm(map)
+rm(lf)
 
 rm(list = ls(pattern = "^files")) # remove lists from the environment that aren't extracted data
 
