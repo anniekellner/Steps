@@ -30,31 +30,31 @@ for(i in 1:length(AllDays_NOAA)){
      dplyr::select(!c('date','PPT_in', 'PPT_mm', 'GDDF')) %>% # exclude variables for which the result is not simply a monthly average
      dplyr::select(!(contains("days"))) %>%
      group_by(year, month) %>%
-     summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) %>%
+     summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE)), .groups = "drop_last") %>%
      ungroup()
    
    Abs_TminF = df %>%
      select(date, year, month, TMinF) %>%
      group_by(year, month) %>%
-     summarise(Abs_TminF = min(TMinF)) %>%
+     summarise(Abs_TminF = min(TMinF), .groups = "drop_last") %>%
      ungroup()
    
    sum_ppt = df %>%
      select(date, year, month, 'PPT_in', 'PPT_mm') %>%
      group_by(year, month) %>%
-     summarise(across(contains('PPT'), ~ sum(.x, na.rm = TRUE))) %>%
+     summarise(across(contains('PPT'), ~ sum(.x, na.rm = TRUE), .groups = "drop_last")) %>%
      ungroup()
    
    sum_days = df %>%
      select(date, year, month, contains('days')) %>%
      group_by(year, month) %>%
-     summarise(across(contains('days'), ~ sum(.x, na.rm = TRUE))) %>%
+     summarise(across(contains('days'), ~ sum(.x, na.rm = TRUE), .groups = "drop_last")) %>%
      ungroup()
    
    sum_GDDF = df %>%
      select(date, year, month, GDDF) %>%
      group_by(year, month) %>%
-     summarise(GDDF = sum(GDDF, na.rm = TRUE)) %>%
+     summarise(GDDF = sum(GDDF, na.rm = TRUE), .groups = "drop_last") %>%
      ungroup()
    
    all = yearAvg %>% # Averages by year (e.g., for Jan 1981, Feb 1981...)
@@ -66,7 +66,7 @@ for(i in 1:length(AllDays_NOAA)){
    monthAvg = all %>%
      dplyr::select(!year) %>%
      group_by(month) %>%
-     summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE))) %>%
+     summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE)), .groups = "drop_last") %>%
      round(digits = 3) %>%
      setNames(paste0('Avg_', names(.))) %>%
      rename(Abs_TminF = Avg_Abs_TminF) %>%
