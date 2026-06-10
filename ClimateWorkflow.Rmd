@@ -905,7 +905,7 @@ source("./Code/Tables_and_Plots/Climographs/Climograph_Plots.R")
 
 ```
 
-
+STUPID PRECIP IS ZERO
 
 ## Walter and Leith Diagrams
 
