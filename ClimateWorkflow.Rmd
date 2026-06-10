@@ -131,11 +131,11 @@ However, if you are re- specific segments of the script using previously extract
     To do this, type `shp_names` into the console or highlight the inline code in blue and press ctrl+enter. 
     Then, find the number associated with the installation and enter it between the brackets where indicated.
 
-*3. Run the first chunk ({r get-saved-files})* This will give you the pathnames to enter for the second chunk, which will load the files. 
+*3. Run the first chunk ({r get-workspace-image})* This will give you the path to enter for the second chunk, which will load the saved environment. 
 
-*3. In the second chunk ({r load-saved-files}), copy-paste the full paths to the .RData and .tif files where indicated (including parentheses)* 
+*3. In the second chunk ({r load-saved-files}), copy-paste the full path to the .RData file indicated (including parentheses)* 
 
-*4. Run the second chunk* You will receive an error about the rx file, but you can ignore it. The second line of code takes care of it. 
+*4. Run the second chunk* 
 
 **NOTE: If you are not seeing a workspace image that you expect (i.e., it says `character(0)`), you may need to go into File Explorer and make sure the wcnr N:/ drive mapped to your computer is green. Even if you've connected via GlobalConnect, sometimes RStudio requires that you actually open the N:/ drive through File Explorer before it acknowledges access. Stupid, I know.**
 
@@ -160,16 +160,10 @@ list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspac
 
 load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/611_-_Indian_Mountain/611_-_Indian_Mountain_ACCESS-ESM1-5_20260609.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
-# Load raster stack
-
-rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/611_-_Indian_Mountain/rx_611_-_Indian_Mountain_ACCESS-ESM1-5_20260609.tif") #INSERT COPY-PASTED PATH TO .TIF FILE
-
 ##
 
 ```
 
-
-FYI, the raster is loaded separately because as of the date this script was written (9-29-24), raster objects do not save correctly during the `save.image()` process. If the raster does not load, you will get an error about a missing 'pointer'. As stated above, the second line of code should take care of this problem. If for some reason it does not, you can also re-run the portion of the {r spatial-check} chunk through to the creation of the object 'rx' (this is a raster stack). The raster stack is required to create the avdf dataframe.
 
 
 ####################################################################################################
@@ -455,6 +449,8 @@ map <- tm_shape(as(rxCrop, "Raster")) +
 lf <- tmap_leaflet(map)
 lf
 
+unitsRX <- units(rx)
+
 ```
 
 
@@ -583,7 +579,6 @@ timestamp <- format(today(), "%Y%m%d")
 
 image_filename <-  paste(shp,model,timestamp, sep = "_")
 rawData_filename <- paste0(image_filename,".RData")
-rx_filename <- paste0("rx_",image_filename,".tif")
 
 # Directory for Workspace Images
 
@@ -594,7 +589,6 @@ if (!dir.exists(rawDataDir)){
 
 save.image(file = paste0(rawDataDir,"/",rawData_filename)) # save workspace image to N: drive
 
-writeRaster(rxCrop, filename = paste0(rawDataDir,"/",rx_filename), overwrite = TRUE) # save raster stack to N: drive
 
 ```
 
