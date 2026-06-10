@@ -30,7 +30,7 @@ for(i in 1:length(AllDays_NOAA)){
      dplyr::select(!c('date','PPT_in', 'PPT_mm', 'GDDF')) %>% # exclude variables for which the result is not simply a monthly average
      dplyr::select(!(contains("days"))) %>%
      group_by(year, month) %>%
-     summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE)), .groups = "drop_last") %>%
+     summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE), .groups = "drop_last")) %>%
      ungroup()
    
    Abs_TminF = df %>%
@@ -66,7 +66,7 @@ for(i in 1:length(AllDays_NOAA)){
    monthAvg = all %>%
      dplyr::select(!year) %>%
      group_by(month) %>%
-     summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE)), .groups = "drop_last") %>%
+     summarise(across(where(is.numeric), ~mean(.x, na.rm = TRUE), .groups = "drop_last")) %>%
      round(digits = 3) %>%
      setNames(paste0('Avg_', names(.))) %>%
      rename(Abs_TminF = Avg_Abs_TminF) %>%
