@@ -16,8 +16,8 @@ for(i in 1:length(AllDaysDash)){
   df = AllDaysDash[[i]]
   
   df = df %>%
-    mutate(date = date(date)) %>%
-    mutate(date = ymd(date)) %>%
+    #mutate(Date = Date(Date)) %>%
+    mutate(date = ymd(Date)) %>%
     mutate(MonthNum = month(date)) 
   
   yearAvg = df %>%
@@ -116,7 +116,7 @@ for(i in 1:length(AllDaysDash)){
     left_join(Pctl10_Prcp_in) %>%
     round(digits = 1)
   
-  monthAvg <- monthAvg %>%
+  monthAvg = monthAvg %>%
     mutate(Scenario = case_when(
       first(all$Year) == 1985 ~ "Modeled Historical Climate",
       first(all$Year) == 2021 & i == 2 ~ "Moderate Emissions (SSP2-4.5)",

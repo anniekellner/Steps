@@ -40,8 +40,8 @@ for(i in 1:length(avdf)){
   csv = avdf[[i]]
   csv = csv %>%
     mutate(Date = date(date)) %>%
-    mutate(Date = ymd(date)) %>% # change date to lubridate type
-    mutate(Year = year(date)) %>% # add Year for summed variables
+    mutate(Date = ymd(Date)) %>% # change date to lubridate type
+    mutate(Year = year(Date)) %>% # add Year for summed variables
     mutate(PPT_mm = case_when( # if raster units are "kg-m-2 -1", convert to mm (otherwise keep as is)
       str_detect(units(rx), "kg") ~ prcp*86400,
       TRUE ~ as.numeric(prcp))) %>%
@@ -74,7 +74,7 @@ for(i in 1:length(avdf)){
     mutate(VWETDAYS = fnVWETDAYS(PPT_mm, wetprecip = 101.6))
   
   csv <- select(csv,  # remove Celsius values; add new variables for Viewer (2-26-2025)
-                date,
+                Date,
                Year,
                PPT_in, 
                TMaxF, 
