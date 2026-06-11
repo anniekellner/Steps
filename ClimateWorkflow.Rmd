@@ -573,6 +573,11 @@ for(i in 1:length(files_s2f2)){
 
 rm(map)
 rm(lf)
+rm(rx)
+rm(rxCrop)
+rm(stackX)
+rm(elevRast)
+rm(elevRaster)
 
 # Create directory and save raw extracted data along with associated raster stack in the event the installation needs to be re-run. 
 
@@ -689,7 +694,7 @@ Because the historical analyses of observed data (NOAA data) use a different dat
 
 # Observed Historical - csv's
 
-noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_NOAA_Hist/", "611_-_King_Salmon_Airport")
+noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_NOAA_Hist/", shp)
 
 if (!dir.exists(noaa_resultsDir)){
   dir.create(noaa_resultsDir)}
