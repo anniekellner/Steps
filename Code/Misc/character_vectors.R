@@ -78,7 +78,8 @@ shp_names <- c("Homestead_ARB",
               "NWS_Yorktown",
               "NSA_Panama_City",
               "611_-_Cold_Bay_Long_Range_Radar_Site",
-              "611_-_Indian_Mountain")           
+              "611_-_Indian_Mountain",
+              "NAS_Jacksonville")           
 
 
 official_base_names <- c("NAVBASE Kitsap",     
@@ -124,5 +125,6 @@ official_base_names <- c("NAVBASE Kitsap",
                          "Naval Weapons Station Yorktown",
                          "NSA Panama City",
                          "Cold Bay Long Range Radar Site",
-                         "Indian Mountain Air Force Station") 
+                         "Indian Mountain Air Force Station",
+                         "Naval Air Station Jacksonville") 
                         
