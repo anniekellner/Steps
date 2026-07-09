@@ -1,22 +1,21 @@
----
 title: "Steps"
 author: "Annie Kellner"
 date: "2023-05-10"
 output: html_document
 ---
-
-## GitHub Integration
-
-This script uses git version control via Github. As of 10-17-2023, the remote repository is housed at https://github.com/anniekellner/Steps. The SSH associated with the repo is git@github.com:anniekellner/Steps.git.
+  
+  ## GitHub Integration
+  
+  This script uses git version control via Github. As of 10-17-2023, the remote repository is housed at https://github.com/anniekellner/Steps. The SSH associated with the repo is git@github.com:anniekellner/Steps.git.
 
 Best practices for using this script require the following:
-
-1. Integrate RStudio with git by following the protocol at https://happygitwithr.com/
-
-2. PULL the script prior to running it so that you are sure to have the most current version
+  
+  1. Integrate RStudio with git by following the protocol at https://happygitwithr.com/
+  
+  2. PULL the script prior to running it so that you are sure to have the most current version
 
 3. Make sure you are running the script on the 'Main' branch, unless you have express reason to use a different branch. You can check what branch you are using by either
-  a) selecting the 'Git' tab in the top-right quadrant of RStudio (assuming RStudio's default layout) and ensuring you see the word "Main" on the right side of the menu bar OR
+a) selecting the 'Git' tab in the top-right quadrant of RStudio (assuming RStudio's default layout) and ensuring you see the word "Main" on the right side of the menu bar OR
   b) opening a Terminal (tab in bottom left quadrant) that is set to Git Bash (this can be changed in the Tools menu). If you type `git branch` (without ``) and press enter, the *Main branch should appear highlighted with an asterisk
   
 
@@ -126,16 +125,16 @@ However, if you are re- specific segments of the script using previously extract
 
 
 *1. Remove the #'s that precede the code for the following two chunks.*
-
-*2. Enter the installation of interest where prompted in the first code chunk.*
-    To do this, type `shp_names` into the console or highlight the inline code in blue and press ctrl+enter. 
-    Then, find the number associated with the installation and enter it between the brackets where indicated.
+  
+  *2. Enter the installation of interest where prompted in the first code chunk.*
+  To do this, type `shp_names` into the console or highlight the inline code in blue and press ctrl+enter. 
+Then, find the number associated with the installation and enter it between the brackets where indicated.
 
 *3. Run the first chunk ({r get-saved-files})* This will give you the pathnames to enter for the second chunk, which will load the files. 
 
 *3. In the second chunk ({r load-saved-files}), copy-paste the full paths to the .RData and .tif files where indicated (including parentheses)* 
-
-*4. Run the second chunk* You will receive an error about the rx file, but you can ignore it. The second line of code takes care of it. 
+  
+  *4. Run the second chunk* You will receive an error about the rx file, but you can ignore it. The second line of code takes care of it. 
 
 **NOTE: If you are not seeing a workspace image that you expect (i.e., it says `character(0)`), you may need to go into File Explorer and make sure the wcnr N:/ drive mapped to your computer is green. Even if you've connected via GlobalConnect, sometimes RStudio requires that you actually open the N:/ drive through File Explorer before it acknowledges access. Stupid, I know.**
 
@@ -177,9 +176,9 @@ FYI, the raster is loaded separately because as of the date this script was writ
 ####################################################################################################
 
 First, let's *select which base (AFB, etc.) you wish to run.* You will need to select or input the following:
-
-
-1) *The name of the shapefile* that corresponds with the installation. For various reasons, identifying the appropriate area/grid cell for a given model can require trial-and-error, so occasionally there is more than one shapefile per base. This information will be provided by Trevor Even (trevor.even@colostate.edu)
+  
+  
+  1) *The name of the shapefile* that corresponds with the installation. For various reasons, identifying the appropriate area/grid cell for a given model can require trial-and-error, so occasionally there is more than one shapefile per base. This information will be provided by Trevor Even (trevor.even@colostate.edu)
 
 2) *The official name of the installation*. This name is used for plot titles, and will also be provided by Trevor Even (see above) 
 
@@ -204,11 +203,11 @@ cat(paste("The official name for the installation you are running is",official_n
 
 ```
 
- *If your base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the installation_names and official_base_names vectors. If you do not know what those entries should be, please contact Trevor Even (trevor.even@colostate.edu).*
- 
-*IMPORTANT: If you added new names to the vector lists, you will then need to re-run the line the imports the character vector names into the global environment. If you still do not see your new entries, return to the file and make sure to save it. Then run the line of code again. It is included below for easy reference. You can just highlight the code below and run it. You DO NOT NEED TO RE-RUN THE LINE if the appropriate names were already included in the character_vectors.R script, and you did not add new entries.*
-
-####################################################################################################
+*If your base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the installation_names and official_base_names vectors. If you do not know what those entries should be, please contact Trevor Even (trevor.even@colostate.edu).*
+  
+  *IMPORTANT: If you added new names to the vector lists, you will then need to re-run the line the imports the character vector names into the global environment. If you still do not see your new entries, return to the file and make sure to save it. Then run the line of code again. It is included below for easy reference. You can just highlight the code below and run it. You DO NOT NEED TO RE-RUN THE LINE if the appropriate names were already included in the character_vectors.R script, and you did not add new entries.*
+  
+  ####################################################################################################
 ###                USER SETTINGS PART II - SELECT OR ADD MODEL NAME                            #####
 ####################################################################################################
 
@@ -228,8 +227,8 @@ cat(paste("The model you have selected is", model,"for the installation", offici
 ################################################################################
 
 The next chunk checks what scenarios (subfolders) are contained in the 'Data' folder associated with the model of interest. *If you run the whole chunk at once and do not receive the subfolder names in the output, run the first two lines, wait for the process to complete, then run the last two*
-
-```{r scenarios, results='asis'}
+  
+  ```{r scenarios, results='asis'}
 
 # Directories
 
@@ -314,7 +313,7 @@ The following chunk enables us to access the shapefile (spatially explicit outli
 The first step is to determine whether the installation is managed by the Navy (because the Navy spatial data resides in a separate directory). If you don't know the answer, ask Trevor Even (trevor.even@colostate.edu).
 
 *If the AFB is managed by the Navy, set Navy = TRUE*
-*If the AFB is NOT managed by the Navy, set Navy = FALSE* (This would mean it is managed by the Army, Air Force, Space Force, etc.)
+  *If the AFB is NOT managed by the Navy, set Navy = FALSE* (This would mean it is managed by the Army, Air Force, Space Force, etc.)
 
 ```{r installation-boundaries}
 
@@ -332,7 +331,7 @@ dir_installation_boundaries <- case_when(
   year2026 == FALSE & Navy == FALSE ~ "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
   year2026 == FALSE & Navy == TRUE  ~
     "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY"
-    )
+)
 
 ```
 
@@ -347,9 +346,9 @@ Observed historical data comes from weather stations in close proximity to a giv
 The following chunk makes use of the 'shorthand' term (or acronym) for a given base (e.g., "JBLE" for JBLE-Langley or "Eglin" for "Eglin Air Force Base") to pull the filenames for all weather station data associated with a given base.
 
 *We need to be sure we are using data from the appropriate weather station, so if more than one file shows up, please ask Trevor Even (trevor.even@colostate.edu) which to use.*
-
-
-```{r list-NOAA-folders}
+  
+  
+  ```{r list-NOAA-folders}
 
 NOAA_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/" # directory for raw data
 
@@ -359,9 +358,9 @@ list.files(path = NOAA_dir, pattern = shp)
 
 
 *Copy the filename above and paste the AFB NAME ONLY (e.g., "Creech_AFB") into the 'weather_station' object (include the quotation marks)*
-
-
-```{r prep-pulling-NOAA-data}
+  
+  
+  ```{r prep-pulling-NOAA-data}
 
 weather_station <- shp #shp # this is usually the shp name
 weather_station_filename <- paste0(weather_station,".csv")
@@ -376,11 +375,11 @@ noaa_dataFilepath <- paste0(NOAA_dir, weather_station_filename)
 ################################################################################
 
 *The remainder of the script runs automatically, but requires manual activation of each chunk to ensure the spatial boundaries are appropriate and the script runs without errors*
-
-*To run each chunk, press the green arrow in the top right*
-
-
-################################################################################
+  
+  *To run each chunk, press the green arrow in the top right*
+  
+  
+  ################################################################################
 ################################################################################
 
 
@@ -641,7 +640,7 @@ for(i in 1:length(nested_tibbles)){
   avdf[[i]] = sf_tbl
   names(avdf)[i] = names(nested_tibbles[i]) 
 }    
- 
+
 ```
 
 
@@ -743,12 +742,12 @@ source("./Code/NOAA/NOAA_ClimographPlots.R")
 ```
 
 *This concludes the data concatenation and table/plot creation for the Observed Historical Period*
-
-
-## CLEAN UP GLOBAL ENVIRONMENT
-
-
-```{r prep-env-for-NOAA}
+  
+  
+  ## CLEAN UP GLOBAL ENVIRONMENT
+  
+  
+  ```{r prep-env-for-NOAA}
 
 rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         "official_name",
@@ -854,13 +853,13 @@ The next chunk creates MonthSum.csv files
 
 # input: AllDays dataframes
 # outputs: 
-  # monthSum.R
-    # MonthSumDF dataframe (for use downstream) 
-    # monthSum csv's (to Results folder)
-  
-  # monthSum_Dash.R
-    # Monthly Series spreadsheet for Dashboard
-    # 30 yr averages for Future Scenarios
+# monthSum.R
+# MonthSumDF dataframe (for use downstream) 
+# monthSum csv's (to Results folder)
+
+# monthSum_Dash.R
+# Monthly Series spreadsheet for Dashboard
+# 30 yr averages for Future Scenarios
 
 source("./Code/monthSum.R")
 source("./Code/Dashboard/monthSum_Dash.R")
@@ -912,9 +911,9 @@ This section creates WL Diagrams for both F and C and places the results in the 
 ```{r walter-lieth-diagrams}
 
 source('./Code/Functions/WL_Adapted.R') # Walter-Lieth plots. Adapted from https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R by Annie Kellner 10-15-23  
-  
+
 # Directory for WL plots
-  
+
 wl_dir <- paste(plots_dir,"Walter-Lieth", sep = "/")
 
 if (!dir.exists(wl_dir)){
@@ -952,8 +951,8 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
 
 The next chunk creates all things DiffHist (comparisons between future time periods and historical periods). Outputs include:
   - original DiffHist .csv for reports
-  - diffHist dataframe for bar plots
-  - Dashboard tables
+- diffHist dataframe for bar plots
+- Dashboard tables
 
 ```{r DiffHist, message=FALSE, warning=FALSE}
 
@@ -987,8 +986,6 @@ source('./Code/Tables_and_Plots/Bar_Charts/Format_Bar_Charts.R') # Formatting pl
 
 
 ### END DOCUMENT  ###
-
-
 
 
 
