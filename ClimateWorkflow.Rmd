@@ -455,6 +455,8 @@ map <- tm_shape(as(rxCrop, "Raster")) +
 lf <- tmap_leaflet(map)
 lf
 
+unitsRX <- units(rx)
+
 ```
 
 
