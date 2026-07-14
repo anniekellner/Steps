@@ -195,9 +195,9 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[64] 
+shp <- shp_names[65] 
 
-official_name <- official_base_names[45] # These names serve as titles for the climograph and Walter-Lieth plots
+official_name <- official_base_names[46] # These names serve as titles for the climograph and Walter-Lieth plots
 
 
 cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
@@ -324,7 +324,7 @@ year2026 = TRUE
 
 # Is this installation managed by the Navy?
 
-Navy = TRUE
+Navy = FALSE
 
 
 dir_installation_boundaries <- case_when(
@@ -575,7 +575,7 @@ for(i in 1:length(files_s2f2)){
 
 # Remove unnecessary objects (these cause problems)
 
-rm(list = c(ls(lf, map)))
+rm(
 
 # Filenames
 
