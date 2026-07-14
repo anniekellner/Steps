@@ -26,7 +26,6 @@ noaa$DATE <- case_when(
   is.numeric(noaa$DATE) ~ as.Date(noaa$DATE, origin = "1899-12-30"), # this is the date Excel uses for julian dates
   TRUE ~ mdy(noaa$DATE) # format if date is a character in month-day-year format
 )
-  
 
 noaa <- noaa %>%
   select(starts_with("STATION"), NAME, DATE, PRCP, TMAX, TMIN) %>%

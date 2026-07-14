@@ -16,7 +16,8 @@ for(i in 1:length(AllDaysDash)){
   df = AllDaysDash[[i]]
   
   df = df %>%
-    mutate(date = ymd(date)) %>%
+    #mutate(Date = Date(Date)) %>%
+    mutate(date = ymd(Date)) %>%
     mutate(MonthNum = month(date)) 
   
   yearAvg = df %>%
@@ -24,31 +25,31 @@ for(i in 1:length(AllDaysDash)){
     select(!contains("DAYS")) %>%
     select(!contains("NIGHTS")) %>% 
     group_by(Year, MonthNum) %>%
-    summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE))) %>%
+    summarise(across(where(is.numeric), ~ mean(.x, na.rm = TRUE)), .groups = "drop_last") %>%
     ungroup()
 
   sum_ppt = df %>%
     select(date, Year, MonthNum, 'PPT_in') %>%
     group_by(Year, MonthNum) %>%
-    summarise(across(contains('PPT'), ~ sum(.x, na.rm = TRUE))) %>%
+    summarise(across(contains('PPT'), ~ sum(.x, na.rm = TRUE)), .groups = "drop_last") %>%
     ungroup()
   
   sum_DAYS = df %>%
     select(date, Year, MonthNum, contains('DAYS')) %>%
     group_by(Year, MonthNum) %>%
-    summarise(across(contains('DAYS'), ~ sum(.x, na.rm = TRUE))) %>%
+    summarise(across(contains('DAYS'), ~ sum(.x, na.rm = TRUE)), .groups = "drop_last") %>%
     ungroup()
   
   sum_nights = df %>%
     select(date, Year, MonthNum, contains('NIGHTS')) %>%
     group_by(Year, MonthNum) %>%
-    summarise(across(contains('nights'), ~ sum(.x, na.rm = TRUE))) %>%
+    summarise(across(contains('nights'), ~ sum(.x, na.rm = TRUE)), .groups = "drop_last") %>%
     ungroup()
   
   sum_GDDF = df %>%
     select(date, Year, MonthNum, GDDF) %>%
     group_by(Year, MonthNum) %>%
-    summarise(GDDF = sum(GDDF, na.rm = TRUE)) %>%
+    summarise(GDDF = sum(GDDF, na.rm = TRUE), .groups = "drop_last") %>%
     ungroup()
   
   all = yearAvg %>% # Averages by year (e.g., for Jan 1981, Feb 1981...)
@@ -62,7 +63,7 @@ for(i in 1:length(AllDaysDash)){
   monthAvg = all %>%
     dplyr::select(!Year) %>%
     group_by(MonthNum) %>%
-    summarise(across(TMaxF:WARMNIGHTS, ~ mean(.x, na.rm = TRUE))) %>%
+    summarise(across(TMaxF:WARMNIGHTS, ~ mean(.x, na.rm = TRUE)), .groups = "drop_last") %>%
     ungroup()
   
   monthAvg = monthAvg %>%
@@ -115,7 +116,7 @@ for(i in 1:length(AllDaysDash)){
     left_join(Pctl10_Prcp_in) %>%
     round(digits = 1)
   
-  monthAvg <- monthAvg %>%
+  monthAvg = monthAvg %>%
     mutate(Scenario = case_when(
       first(all$Year) == 1985 ~ "Modeled Historical Climate",
       first(all$Year) == 2021 & i == 2 ~ "Moderate Emissions (SSP2-4.5)",

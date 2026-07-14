@@ -38,14 +38,11 @@ AllDaysDash <- list() # required for monthSumDash
 
 for(i in 1:length(avdf)){
   csv = avdf[[i]]
-  
-  csv$date = ymd(csv$date) # change date to lubridate type
-  csv$Year = year(csv$date) # add Year for summed variables
-  
   csv = csv %>%
-    mutate(PPT_mm = case_when( # if raster units are "kg-m-2 -1", convert to mm (otherwise keep as is)
-      str_detect(units(rx), "kg") ~ prcp*86400,
-      TRUE ~ as.numeric(prcp))) %>%
+    mutate(Date = date(date)) %>%
+    mutate(Date = ymd(Date)) %>% # change date to lubridate type
+    mutate(Year = year(Date)) %>% # add Year for summed variables
+    mutate(PPT_mm = if (unitsRX == "kg m-2 s-1") prcp * 86400 else as.numeric(prcp)) %>% # if raster units are "kg-m-2 -1", convert to mm (otherwise keep as i
     mutate(PPT_in = RasterUnitConvert(PPT_mm, "MMtoIN")) %>%
     mutate(TMaxF = case_when(
       tmax > 200 ~ RasterUnitConvert(tmax, "KtoF"), # Because only values in Kelvin would be > 200
@@ -75,7 +72,7 @@ for(i in 1:length(avdf)){
     mutate(VWETDAYS = fnVWETDAYS(PPT_mm, wetprecip = 101.6))
   
   csv <- select(csv,  # remove Celsius values; add new variables for Viewer (2-26-2025)
-                date,
+                Date,
                Year,
                PPT_in, 
                TMaxF, 
