@@ -1,0 +1,1006 @@
+---
+title: "ClimateWorkflow_R6"
+output: html_document
+date: "2026-07-14"
+---
+
+title: "Steps"
+author: "Annie Kellner"
+date: "2023-05-10"
+output: html_document
+---
+
+## GitHub Integration
+
+This script uses git version control via Github. As of 10-17-2023, the remote repository is housed at https://github.com/anniekellner/Steps. The SSH associated with the repo is git@github.com:anniekellner/Steps.git.
+
+Best practices for using this script require the following:
+
+1. Integrate RStudio with git by following the protocol at https://happygitwithr.com/
+
+2. PULL the script prior to running it so that you are sure to have the most current version
+
+3. Make sure you are running the script on the 'Main' branch, unless you have express reason to use a different branch. You can check what branch you are using by either
+  a) selecting the 'Git' tab in the top-right quadrant of RStudio (assuming RStudio's default layout) and ensuring you see the word "Main" on the right side of the menu bar OR
+  b) opening a Terminal (tab in bottom left quadrant) that is set to Git Bash (this can be changed in the Tools menu). If you type `git branch` (without ``) and press enter, the *Main branch should appear highlighted with an asterisk
+  
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+For this script, it is best to run one chunk (box of R code) at a time to make sure each is working properly. Also, some chunks produce output you will want to inspect. Output will appear below the chunk on this screen rather than in the bottom right window (results appear in the bottom right window for regular .R scripts)
+
+*Throughout the script, instructions you need to follow will appear like this*. You can ignore code in the same color within code chunks, unless it is part of the code that explicitly requires user input. 
+
+*The first chunks (before 'PART ONE') should not require any user input. You just need to run them to set up the script.*   
+
+The first chunk ('setup') allows you to set options that apply to every chunk in the script)
+
+```{r setup, include=FALSE}
+
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+ # echo = FALSE means R will not print the code along with the results. 
+```
+
+The next chunk loads the libraries required for use with this script. 
+
+```{r load-libraries}
+
+library(terra) # for spatial data
+library(sf)
+library(tidyverse)
+library(data.table)
+library(scales)
+library(tmap)
+library(leaflet)
+library(climatol) # for Walter-Lieth Diagrams
+library(extrafont) # for using Calibri font in plots
+library(patchwork)
+library(grid) # for legend grobs (Climographs)
+library(pvldcurve) # for calculating Vapor Pressure Deficit (VPD)
+library(elevatr) # elevation data
+library(conflicted)
+
+conflicts_prefer( # this ensures that the correct package is used when multiple packages contain the same function
+  lubridate::month(),
+  dplyr::first(),
+  dplyr::last(),
+  dplyr::filter(),
+  dplyr::select(),
+  lubridate::year(),
+)
+```
+
+**NOTE: Only run the next chunk (clear-workspace) if necessary. Code is commented out to avoid accidentally clearing the workspace. If you un-comment to clear the workspace, please remember to reinsert the #**
+
+NOTE: If you clear the workspace but save the environment for later use (i.e., an .RData file), spatial objects created by the {terra} package are not retained. You will need to re-run the code in the chunk {r spatial-check} even if you save all objects in the global environment.
+
+```{r clear-workspace}
+
+#rm(list = ls()) # clear workspace - this can be commented out as needed
+
+```
+
+These scripts contain objects and functions required to run the script.
+
+*If you are running a new base (one that has not been run using this script previously), you will need to enter the following information into the character_vectors.R script.*:
+
+  1) Shapefile name (this is usually an abbreviation for the base name, such as JBER for Joint Base Elmendorf Richardson)
+  
+  2) Official base name (per the example above, this would be "Joint Base Elmendorf Richardson")
+
+
+This script can be found in './Code/Misc/character_vectors.R'. Once you open the script, it should be self-explanatory where to enter the information. If you do not have this information, contact Trevor Even at trevor.even@colostate.edu (or on Microsoft Teams). 
+
+
+
+```{r functions}
+
+# The 'source' function reads the following scripts and places associated functions into the global environment
+
+source('./Code/Misc/character_vectors.R')
+source('./Code/CEMML/Functions/Function_General.R')
+source('./Code/Functions/Step3Functions.R')
+source('./Code/Stars_HowTo/shift_longitude.R') # ability to switch longitude systems from (-180, 180 ) to (0, 360)
+source('./Code/Functions/ClimateViewerFns.R')
+
+```
+
+
+################################################################################
+####        RUNNING FROM A WORKSPACE IMAGE                                  ####
+################################################################################
+
+
+Typically, this script will be used to run new bases or new proxies for bases (i.e, running an installation or proxy location for the first time). 
+
+However, sometimes you may need to re-run a base from the workspace image stored on the N:/ drive. It takes several hours to extract data for a given installation, so we save the extracted data as a workspace image (.RData file) and an associated rasterstack (.Rds file) to avoid repeating this time-consuming step. 
+
+## ONLY RUN THE FOLLOWING TWO CHUNKS IF YOU ARE USING STORED DATA FROM A WORKSPACE IMAGE!!! ##
+## In other words, if this installation has been run previously and there are NO CHANGES to the location from which the climate data is extracted, FOLLOW DIRECTIONS FOR RUNNING THE SUBSEQUENT TWO CODE CHUNKS ##
+
+          ###       OTHERWISE          ###
+
+## IF YOU ARE RUNNING THIS INSTALLATION (or grid cell/shapefile) FOR THE FIRST TIME, SKIP TO THE SECTION "USER SETTINGS - PART I ## 
+
+However, if you are re- specific segments of the script using previously extracted data, you will need to manually enter the required information and re-run Part One of the script. Then you will need to load the data from a workspace image and raster stack saved to the N:/ drive. Instructions to follow.
+
+
+#### INSTRUCTIONS FOR RUNNING FROM WORKSPACE IMAGE  #####
+
+
+*1. Remove the #'s that precede the code for the following two chunks.*
+
+*2. Enter the installation of interest where prompted in the first code chunk.*
+    To do this, type `shp_names` into the console or highlight the inline code in blue and press ctrl+enter. 
+    Then, find the number associated with the installation and enter it between the brackets where indicated.
+
+*3. Run the first chunk ({r get-workspace-image})* This will give you the path to enter for the second chunk, which will load the saved environment. 
+
+*3. In the second chunk ({r load-workspace-image}), copy-paste the full path to the .RData file indicated (including parentheses)* 
+
+*4. Run the second chunk* 
+
+**NOTE: If you are not seeing a workspace image that you expect (i.e., it says `character(0)`), you may need to go into File Explorer and make sure the wcnr N:/ drive mapped to your computer is green. Even if you've connected via GlobalConnect, sometimes RStudio requires that you actually open the N:/ drive through File Explorer before it acknowledges access. Stupid, I know.**
+
+**ANOTHER NOTE: If you are running a base that was run prior to June 2026, you may see a .Rds or .tif file listed beneath the .RData file. You can ignore that. Also ignore the error; it was related to the .Rds or .tif file**
+
+**AND ANOTHER: If there are two .RData files listed, use the more recent one unless you have reason to use an earlier version**
+
+*5. Comment out (#) the code for both chunks after running (as a future safeguard)*
+
+*6. If you need to re-run the historical (NOAA) analysis, proceed to the section "OBSERVED HISTORICAL ANALYSIS"*
+    *If you do NOT need to re-run the historical (NOAA) analysis, proceed to section "AUTOMATED ANALYSIS PART II -  Add Derived Variables"*
+    
+
+```{r get-workspace-image}
+
+#shp <- shp_names[65] # CHANGE THIS TO INSTALLATION OF INTEREST
+
+#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+
+```
+
+
+```{r load-workspace-image}
+
+# Load workspace image
+
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/611_-_Indian_Mountain/611_-_Indian_Mountain_ACCESS-ESM1-5_20260610.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+
+
+```
+
+
+
+####################################################################################################
+###               USER SETTINGS PART I - SELECT OR ADD INSTALLATION NAME                       #####
+####################################################################################################
+
+First, let's *select which base (AFB, etc.) you wish to run.* You will need to select or input the following:
+
+
+1) *The name of the shapefile* that corresponds with the installation. For various reasons, identifying the appropriate area/grid cell for a given model can require trial-and-error, so occasionally there is more than one shapefile per base. This information will be provided by Trevor Even (trevor.even@colostate.edu)
+
+2) *The official name of the installation*. This name is used for plot titles, and will also be provided by Trevor Even (see above) 
+
+In some cases, you can select these names from an existing list, located in './Code/Misc/character_vectors.R'. To see the list, you can either type the following phrases into the console, or simply select the phrases below and run them (ctrl + enter). 
+
+
+`shp_names`           (used for locating the shapefile associated with the installation. Also identical to the name of the Results folder)
+`official_base_names` (used for plot titles)
+
+You would then identify the number associated with the installation of interest, and enter that number between the brackets in the code chunk below. (For example, Homestead_ARB would be shp_names[1], and NAVBASE San Diego would be official_base_names[2]).
+
+The output following the code chunk will confirm your selections. You can easily revise as necessary if you entered anything incorrectly. If your installation of interest does not appear in the list, see the orange text below the code chunk.
+
+```{r enter-base-name}
+
+shp <- shp_names[65] 
+
+official_name <- official_base_names[46] # These names serve as titles for the climograph and Walter-Lieth plots
+
+
+cat(paste("The official name for the installation you are running is",official_name,".","The abbreviated name for the installation shapefile is", shp,"."))
+
+```
+
+ *If your base of interest is not listed, go into 'character_vectors.R' script ('./Code/Misc/character_vectors.R') and add the new base names to both the installation_names and official_base_names vectors. If you do not know what those entries should be, please contact Trevor Even (trevor.even@colostate.edu).*
+ 
+*IMPORTANT: If you added new names to the vector lists, you will then need to re-run the line the imports the character vector names into the global environment. If you still do not see your new entries, return to the file and make sure to save it. Then run the line of code again. It is included below for easy reference. You can just highlight the code below and run it. You DO NOT NEED TO RE-RUN THE LINE if the appropriate names were already included in the character_vectors.R script, and you did not add new entries.*
+
+####################################################################################################
+###                USER SETTINGS PART II - SELECT OR ADD MODEL NAME                            #####
+####################################################################################################
+
+Similar to what you did above, now *enter the number between the brackets ([]) that corresponds with the model of interest.* You can type `models` into the console or highlight the blue text and press {cntrl + enter} to see the models already listed 
+
+
+```{r select-model}
+
+model <- models[8] 
+
+cat(paste("The model you have selected is", model,"for the installation", official_name))
+
+```
+
+################################################################################
+###               USER SETTINGS PART III - SCENARIOS                        ###
+################################################################################
+
+The next chunk checks what scenarios (subfolders) are contained in the 'Data' folder associated with the model of interest. *If you run the whole chunk at once and do not receive the subfolder names in the output, run the first two lines, wait for the process to complete, then run the last two*
+
+```{r scenarios, results='asis'}
+
+# Directories
+
+model_dir <- paste("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Models/", model, sep = "") 
+
+scenario_dirs <- list.dirs(path = model_dir, full.names = FALSE) 
+
+cat("The scenarios (subfolders) associated with this model are:  ") # cat() basically means 'print' in this context 
+
+cat(paste(scenario_dirs), sep = " - ") # ignore the first comma that shows up
+
+```
+
+*Enter the scenarios of interest below*. Input values between the quotation marks ("") for 'baseline', 'scenario1', and 'scenario2'.
+
+```{r enter-scenarios}
+
+baseline <- "historical"
+scenario1 <- "ssp245"
+scenario2 <- "ssp585"
+
+```
+
+################################################################################
+###           USER SETTINGS PART IV - VARIABLES OF INTEREST                  ###
+################################################################################
+
+
+Next, let's see which variables are represented in this dataset. The variables will appear in a list below the code chunk.
+
+```{r}
+
+baseline_dir = paste(model_dir, baseline, sep = "/")
+baseline_filenames <- list.files(baseline_dir, pattern = '.nc', full.names = FALSE) # this line might need to be adjusted if some files are .ncdf or other
+
+variables <- unique(substr(baseline_filenames, 1,6)) # Numbers 1 and 6 refer to character indices within the file names (i.e., the first six letters of the file name)
+
+cat("The variables in this dataset are:", sep = '\n')
+cat(paste("-", variables), sep = "\n")
+
+```
+
+Of the variables listed, which do you want to include in your analysis? *Enter the variables names you want to include between the quotation marks.* 
+
+```{r}
+
+variables <- c("pr_day", "tasmax", "tasmin", "hurs_d", "sfcWin", "huss_d") # an example of how you would choose among the variables if desired
+
+```
+
+################################################################################
+###           USER SETTINGS PART V - YEARS OF INTEREST                       ###
+################################################################################
+
+
+*Now, enter the years of interest for each time period*
+1985-2014 (or 1976-2005 if it is LOCAv2 or MACA), 2021-2050, and 2051-2080
+
+```{r enter-years-of-interest}
+
+baseline_start_year <- 1985 # Start year of interest for the historical time period  
+baseline_end_year <- 2014 # End year of interest for the historical time period
+
+future1_start_year <- 2021 # Start year of interest for the first future time period 
+future1_end_year <- 2050 # End year of interest for the first future time period 
+
+future2_start_year <- 2051 # Start year of interest for the second future time period 
+future2_end_year <- 2080 # End year of interest for the second future time period 
+
+```
+
+
+################################################################################
+###           USER SETTINGS PART VI - INSTALLATION BOUNDARIES                ###
+################################################################################
+
+# Installation Boundaries
+
+The following chunk enables us to access the shapefile (spatially explicit outline) of the base, or occasionally an area nearby that serves as an ecological proxy for the base. This is how we select the grid cell associated with the modeled climate data. 
+
+
+The first step is to determine whether the installation is managed by the Navy (because the Navy spatial data resides in a separate directory). If you don't know the answer, ask Trevor Even (trevor.even@colostate.edu).
+
+*If the AFB is managed by the Navy, set Navy = TRUE*
+*If the AFB is NOT managed by the Navy, set Navy = FALSE* (This would mean it is managed by the Army, Air Force, Space Force, etc.)
+
+```{r installation-boundaries}
+
+# Is this installation being run for the first time in 2026?
+
+year2026 = TRUE
+
+# Is this installation managed by the Navy?
+
+Navy = TRUE
+
+
+dir_installation_boundaries <- case_when(
+  year2026 == TRUE ~ "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/2026 Targets",
+  year2026 == FALSE & Navy == FALSE ~ "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries",
+  year2026 == FALSE & Navy == TRUE  ~
+    "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Spatial/Installation_Boundaries/NAVY"
+    )
+
+```
+
+
+
+####################################################################################################
+###                USER SETTINGS PART VII - GET OBSERVED HISTORICAL DATA                       #####
+####################################################################################################
+
+Observed historical data comes from weather stations in close proximity to a given installation. It is frequently the case that for a single installation, data may be pulled from multiple weather stations.
+
+The following chunk makes use of the 'shorthand' term (or acronym) for a given base (e.g., "JBLE" for JBLE-Langley or "Eglin" for "Eglin Air Force Base") to pull the filenames for all weather station data associated with a given base.
+
+*We need to be sure we are using data from the appropriate weather station, so if more than one file shows up, please ask Trevor Even (trevor.even@colostate.edu) which to use.*
+
+
+```{r list-NOAA-folders}
+
+NOAA_dir <- "N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Historical Climate Data/NOAA/" # directory for raw data
+
+list.files(path = NOAA_dir, pattern = shp)
+
+```
+
+
+*Copy the filename above and paste the AFB NAME ONLY (e.g., "Creech_AFB") into the 'weather_station' object (include the quotation marks)*
+
+
+```{r prep-pulling-NOAA-data}
+
+weather_station <- shp #shp # this is usually the shp name
+weather_station_filename <- paste0(weather_station,".csv")
+
+noaa_dataFilepath <- paste0(NOAA_dir, weather_station_filename)
+
+```
+
+
+################################################################################
+###               THIS CONCLUDES THE USER SETTINGS PORTION OF THE SCRIPT     ###
+################################################################################
+
+*The remainder of the script runs automatically, but requires manual activation of each chunk to ensure the spatial boundaries are appropriate and the script runs without errors*
+
+*To run each chunk, press the green arrow in the top right*
+
+
+################################################################################
+################################################################################
+
+
+
+
+
+################################################################################
+####            FUTURE SCENARIOS: PART I - DATA EXTRACTION                  ####              ################################################################################
+
+
+## SUBSET FILES OF INTEREST
+
+In this step, we are creating lists of filenames that will eventually combine into raster stacks. When this chunk is finished running, you can check the objects to make sure the correct number of years have been included. 
+
+```{r list-filenames}
+
+source("./Code/prep_env_for_data_extraction.R")
+
+```
+
+## SPATIAL CHECK
+
+The next chunk checks that the spatial files are aligned and appear in the correct location on the globe. An interactive map will appear below the code chunk, and you can zoom in or out as needed to view the AFB's (the easiest way is to scroll with your mouse). You can press the 'show in new window' button (the white square with an arrow) to open the map in another page if you prefer a larger view. You may have to wait a few moments for the map to produce. *Make sure the installation boundary aligns with one or more raster cells*. If it doesn't, you might have a difference in spatial projections between the installation boundary and the raster/ncdf files.  
+
+
+```{r spatial-check}
+
+# GCM raster
+
+stackX <- rast(files_s1f1[[1]]) # creates raster stack for first variable in s1f1 list (using s1f1 because has fewer files than baseline)
+
+random_raster <- as.numeric(sample(1:nlyr(stackX), 1)) # get a random raster layer from StackX to use as an example
+
+rx <- stackX[[random_raster]]
+
+
+# Installation spatial data
+
+baseBoundaries_dir <- (paste(dir_installation_boundaries, shp, sep = '/'))
+baseBoundaries_filename <- paste(baseBoundaries_dir, '.shp', sep = "")
+
+baseSF <- st_read(baseBoundaries_filename) # Because plotting package (tmap) doesn't take terra vectors
+
+
+# Check if CRS is projected AND lat/lon columns exist
+if(!st_is_longlat(baseSF)){ #&& "lat" %in% names(baseSF) && "lon" %in% names(baseSF)) {
+  # Transform geometry from projected CRS to WGS84 (lat/lon)
+  baseSF <- st_transform(baseSF, crs = 4326)  # 4326 is WGS84 (lat/lon)
+}
+
+base_spatVect <- vect(baseSF) # convert to spatVector object for use with {terra} package
+
+baseSF360 <- if (xmax(rx) == 360 & xmax(base_spatVect) < 0) {st_shift_longitude(baseSF)} else baseSF # adjustment in case ncdf lon scale is 0-360
+
+base_spatVect360 <- vect(baseSF360)
+base_spatVect360 <- terra::aggregate(base_spatVect360) # dissolves extraneous boundaries within shp
+
+# Crop single raster to AFB shape
+
+rxCrop <- terra::crop(rx, base_spatVect360, snap = "out") # snap = "out" shows all cells that overlap AFB polygon
+
+
+# Quick interactive plot
+
+#tmap_mode('view')
+
+map <- tm_shape(as(rxCrop, "Raster")) + 
+  tm_raster() + 
+  tm_shape(baseSF360) + 
+  tm_borders()
+
+lf <- tmap_leaflet(map)
+lf
+
+unitsRX <- units(rx)
+
+```
+
+
+Now that we have confirmed the shp matches the real-world geographic location of the base, we can use the installation's centroid to determine the cell from which we will extract data from the NetCDF files.    
+
+
+```{r get-centroid-elevation-cellNum, warning=FALSE, results='asis'}
+
+centroid <- geom(centroids(base_spatVect360, inside = TRUE)) # inside = TRUE guarantees that the centroid is contained within the boundaries of the installation (in some cases, depending on the shape of the installation, the true centroid may be outside). Note this is returned as a vector of 5 numbers, which is not useful.
+
+centroid_matrix <- cbind(centroid[3], centroid[4]) # we use vector values [3] and [4] to find the cell index. [3] and [4] refer to the longitude (x) and latitude (y) respectively. 
+
+centroidElev <- geom(centroids(base_spatVect, inside = TRUE)) # Different longitude scale for elevation function (-180,180)
+centroidElev_matrix <- cbind(centroidElev[3], centroidElev[4]) 
+
+# Get elevation data (SRTM)
+
+elevRaster <- get_elev_raster(locations = baseSF, z = 10) # z-value is the "zoom" value. 10 is standard for SRTM data
+elevRast <- rast(elevRaster)
+elevRast <- project(elevRast, "EPSG:4326")
+elev <- as.numeric(terra::extract(elevRast, centroidElev_matrix)[1,]) # in meters
+
+
+# Get cell reference for data extraction
+
+cell <- terra::cellFromXY(rx, centroid_matrix) # finds the cell (index) in which the centroid is located
+
+```
+
+
+
+## DATA EXTRACTION
+
+The following chunk extracts raw data from the ncdf files of interest. It then saves the global environment to the Workspace Images folder ("N:/RStor/mindyc/afccm/Climate Modeling/Workspace Images/"). 
+
+As written, this code assumes the centroid is being used for data extraction. It has not been tested for use with a spatial object. It may still work, but might be quite slow. If you are running several large bases sequentially, it will be worth exploring an alternative coding strategy.
+
+This is the most time-consuming chunk of the entire script. To avoid repeating this step, the global environment is saved upon extraction. As of the time this script was written (9-26-2024), the {raster} package is unable to save objects into .RData images, so {raster} objects must be saved separately. Because The raster stack (object 'rx') is required to run the chunk 'add-derived-variables', the raster stack is saved alongside the .RData file.    
+
+```{r extract-values}
+
+# Create lists to store extracted values from ncdf data
+# s1 = scenario1; s2 = scenario2
+# f1 = future1; f2 = future2
+
+results_baseline <- list()
+results_s1f1 <- list()
+results_s1f2 <- list()
+results_s2f1 <- list()
+results_s2f2 <- list()
+
+# Extract data
+
+
+for(i in 1:length(files_baseline)){
+  r = rast(files_baseline[[i]])
+  times = time(r)
+  varName = varnames(r)[1]
+  vals = data.frame(unlist(r[cell], use.names = FALSE))
+  colnames(vals) = varName
+  results_baseline[[i]] = vals
+  names(results_baseline)[i] = varName
+  results_baseline[[i]]$date = times
+  rm(r)
+}
+
+for(i in 1:length(files_s1f1)){
+  r = rast(files_s1f1[[i]])
+  times = time(r)
+  varName = varnames(r)[1]
+  vals = data.frame(unlist(r[cell], use.names = FALSE))
+  colnames(vals) = varName
+  results_s1f1[[i]] = vals
+  names(results_s1f1)[i] <- varName
+  results_s1f1[[i]]$date = times
+  rm(r)
+}
+ 
+for(i in 1:length(files_s1f2)){
+  r = rast(files_s1f2[[i]])
+  times = time(r)
+  varName = varnames(r)[1]
+  vals = data.frame(unlist(r[cell], use.names = FALSE))
+  colnames(vals) = varName
+  results_s1f2[[i]] = vals
+  names(results_s1f2)[i] <- varName
+  results_s1f2[[i]]$date = times
+  rm(r)
+}
+
+for(i in 1:length(files_s2f1)){
+  r = rast(files_s2f1[[i]])
+  times = time(r)
+  varName = varnames(r)[1]
+  vals = data.frame(unlist(r[cell], use.names = FALSE))
+  colnames(vals) = varName
+  results_s2f1[[i]] = vals
+  names(results_s2f1)[i] <- varName
+  results_s2f1[[i]]$date = times
+  rm(r)
+}
+
+for(i in 1:length(files_s2f2)){
+  r = rast(files_s2f2[[i]])
+  times = time(r)
+  varName = varnames(r)[1]
+  vals = data.frame(unlist(r[cell], use.names = FALSE))
+  colnames(vals) = varName
+  results_s2f2[[i]] = vals
+  names(results_s2f2)[i] <- varName
+  results_s2f2[[i]]$date = times
+  rm(r)
+}
+
+# Remove extraneous items (these cause problems in avdf chunk)
+
+rm(map)
+rm(lf)
+rm(rx)
+rm(rxCrop)
+rm(stackX)
+rm(elevRast)
+rm(elevRaster)
+
+# Create directory and save raw extracted data along with associated raster stack in the event the installation needs to be re-run. 
+
+
+# Filenames
+
+timestamp <- format(today(), "%Y%m%d")
+
+image_filename <-  paste(shp,model,timestamp, sep = "_")
+rawData_filename <- paste0(image_filename,".RData")
+
+# Directory for Workspace Images
+
+rawDataDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp)
+
+if (!dir.exists(rawDataDir)){
+  dir.create(rawDataDir)}
+
+save.image(file = paste0(rawDataDir,"/",rawData_filename)) # save workspace image to N: drive
+
+
+```
+
+
+##############################################################################
+###     AUTOMATED ANALYSIS PART II -  Add Derived Variables               ####                        
+##############################################################################
+
+
+# AVDF data frame
+
+This chunk reorganizes the extracted data into a more workable dataframe ("tibble", from the tidyverse). The output is equivalent to the 'AllValuesDataframe' from the original Step3 script. 
+
+```{r allvaluesdf-dataframes, message=FALSE}
+
+rm(list = ls(pattern = "^files")) # remove lists from the environment that aren't extracted data
+
+lists <- Filter(function(x) is(x, "list"), mget(ls())) # reads in all remaining lists
+nested_tibbles <- as_tibble(lists) # tibbles are tidy objects
+
+avdf <- list() # results mimic allvaluesdf objects created by original script, with the exception of the 'time' column
+
+for(i in 1:length(nested_tibbles)){
+  sf_combo_nested = flatten(nested_tibbles[i]) # scenario-future combo
+  sf = flatten(sf_combo_nested)
+  tbl = tibble(lat = centroid_matrix[2], # will need to be changed when spatial objects are used for extraction
+               lon = centroid_matrix[1],
+               date = pluck(sf_combo_nested, 1, "date")) # pulls date column from first sublist
+  sf_tbl = sf %>%
+    as_tibble(sf, validate = NULL, .name_repair = "unique") %>% # validate argument necessary for running on cluster
+    unnest(cols = where(is.numeric)) %>%
+    dplyr::select(!(contains("date"))) %>%
+    bind_cols(tbl) %>%
+    dplyr::select(lat, 
+                  lon, 
+                  contains("max"), 
+                  contains("min"), 
+                  contains("pr"),
+                  contains("hu"), # the 'any_of' helper function should ignore variables if they are not of interest
+                  any_of("sfcWind"), # if it does not and you get an error, let me (Annie) know
+                  date) %>%
+    rename(c(tmax = tasmax, # these names match variable names in the functions that follow
+             tmin = tasmin,
+             prcp = pr))
+  
+  avdf[[i]] = sf_tbl
+  names(avdf)[i] = names(nested_tibbles[i]) 
+}    
+ 
+```
+
+
+################################################################################
+###                   REMOVE EXTRANEOUS OBJECTS FROM ENVIRONMENT             ###
+################################################################################
+
+Now that we've extracted the model data for the relevant grid cell, we can remove many objects that are cluttering the global environment.
+
+```{r}
+
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
+                        "official_name",
+                        "variables",
+                        "results_folder",
+                        "unitsRX",
+                        "avdf",
+                        "elev",
+                        "years",
+                        ls(pattern = "^weather"),
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^baseline"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
+
+```
+
+
+
+################################################################################
+###                ANALYSES OF OBSERVED HISTORICAL DATA                     ####
+################################################################################
+
+Because the historical analyses of observed data (NOAA data) use a different dataset from the rest of the script, we are running it here, prior to further user inputs. The following two chunks DO NOT require user input. Simply press the green arrow to run sections {r Output-directories} and {r Observed-historical}
+
+## Output Directories
+
+
+```{r Output-directories}
+
+# Observed Historical - csv's
+
+noaa_resultsDir <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_NOAA_Hist/", shp)
+
+if (!dir.exists(noaa_resultsDir)){
+  dir.create(noaa_resultsDir)}
+
+
+# Modeled Futures
+
+results_folder <- paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Results/Results_",model,"/", shp) 
+
+if (!dir.exists(results_folder)){
+  dir.create(results_folder)}
+
+
+# Plots and Tables - Modeled
+
+plots_dir <- paste0(results_folder,"/","Plots_and_Tables")
+
+if (!dir.exists(plots_dir)){
+  dir.create(plots_dir)}
+
+#  Plots and Tables - Observed Historical (NOAA climographs)
+
+noaaClim_dir <- paste0(plots_dir,"/","NOAA_Climographs")
+
+if (!dir.exists(noaaClim_dir)){
+  dir.create(noaaClim_dir)}
+
+# Dashboard tables
+
+dash_dir <- paste(results_folder,"Dashboard",sep = "/")
+
+if (!dir.exists(dash_dir)){
+  dir.create(dash_dir)}
+
+```
+
+
+## Analyses and plots (Climographs) for observed historical data
+
+
+```{r Observed-historical, message=FALSE, warning=FALSE}
+
+
+source("./Code/NOAA/NOAA_AllDays_v2.R") # creates standard outputs (csv files and AllDays_hist dataframe)
+source("./Code/NOAA/NOAA_AllDays_Dashboard.R") # creates AllDays_Dash dataframe for Climate Viewer outputs
+source("./Code/NOAA/NOAA_monthSum_v2.R") # creates noaa_monthSum df and csv outputs
+source("./Code/NOAA/NOAA_monthSum_Dashboard.R") # creates noaaDashboard dataframe (to be combined later with futures)
+source("./Code/NOAA/NOAA_Climographs_createDF.R") # creates noaaClim list of dataframes for NOAA climograph plots
+source("./Code/NOAA/NOAA_ClimographPlots.R")
+
+```
+
+*This concludes the data concatenation and table/plot creation for the Observed Historical Period*
+
+
+## CLEAN UP GLOBAL ENVIRONMENT
+
+
+```{r prep-env-for-NOAA}
+
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
+                        "official_name",
+                        "variables",
+                        "results_folder",
+                        "unitsRX",
+                        "avdf",
+                        "elev",
+                        "years",
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^baseline"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
+
+```
+
+
+## ADD DERIVED VARIABLES
+
+NOTE: see comments within code. Functions assume the raw ncdf data does NOT use imperial units. 
+
+The next chunk creates AllDays.csv files as well as the AllDays dataframe for downstream processing
+
+```{r add-derived-vars, message=FALSE, warning=FALSE}
+
+# Add derived (recalculated) variables to dataframes
+# All functions are from the original LOCA_summarize.R script
+
+source("./Code/Create_AllDaysDF.R") # creates AllDays df (traditional outputs)
+source("./Code/Dashboard/AllDaysDash.R") # creates AllDaysDash df (climate viewer outputs)
+
+```
+
+Now that the AllDays.csv files have been created, it is no longer necessary to retain space-intensive objects in the environment. We can routinely remove objects we no longer need.
+
+```{r remove-extraneous-stuff}
+
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
+                        "official_name",
+                        "variables",
+                        "results_folder",
+                        "avg30",
+                        "avdf",
+                        "elev",
+                        "years",
+                        ls(pattern = "^AllDays"),
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
+
+```
+
+## Bioclimatic variables
+
+```{r Biolimatic-variables, message=FALSE}
+
+# Formerly Step 9A
+# Writes Bioclimatics csv directly into appropriate results folder on N: drive
+
+source('Code/Ecosystems_Climate_Data.R')
+
+```
+
+```{r remove-extraneous-stuff, warning=FALSE}
+
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
+                        "official_name",
+                        "variables",
+                        "results_folder",
+                        #"rx",
+                        "avdf",
+                        "elev",
+                        "years",
+                        "avg30",
+                        ls(pattern = "^AllDays"),
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
+
+```
+
+
+## MonthSum
+
+The next chunk creates MonthSum.csv files
+
+```{r MonthSum, message=FALSE}
+
+# input: AllDays dataframes
+# outputs: 
+  # monthSum.R
+    # MonthSumDF dataframe (for use downstream) 
+    # monthSum csv's (to Results folder)
+  
+  # monthSum_Dash.R
+    # Monthly Series spreadsheet for Dashboard
+    # 30 yr averages for Future Scenarios
+
+source("./Code/monthSum.R")
+source("./Code/Dashboard/monthSum_Dash.R")
+
+```
+
+
+```{r remove-extraneous-objects}
+
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
+                        "official_name",
+                        "variables",
+                        "results_folder",
+                        "elev",
+                        "years",
+                        "monthSumDF",
+                        "MonthlySeries",
+                        "avg30",
+                        ls(pattern = "^AllDays"),
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
+
+```
+
+## Climographs
+
+This chunk creates all climograph plots and places them within the results folder under Plots/Climographs
+
+```{r climographs, message=FALSE}
+
+
+source("./Code/ClimographsDF.R")
+source("./Code/Tables_and_Plots/Climographs/Climograph_Plots.R")
+
+```
+
+
+## Walter and Leith Diagrams
+
+This section creates WL Diagrams for both F and C and places the results in the results_folder (under Plots/Walter-Lieth). The specs are set for a 4.5 x 6.5 in plot, so the appearance in the viewer does not appear aligned, but the output should be as desired. 
+
+***START HERE***
+
+*NOTE TO SELF: Have to amend axes to account for mismatch in size between temp and precip. Also deal with margin argument*
+
+```{r walter-lieth-diagrams}
+
+source('./Code/Functions/WL_Adapted.R') # Walter-Lieth plots. Adapted from https://github.com/rOpenSpain/climaemet/blob/2375dd51183d898444af2c5d8b0804cbedde2cb2/R/climatogram.R by Annie Kellner 10-15-23  
+  
+# Directory for WL plots
+  
+wl_dir <- paste(plots_dir,"Walter-Lieth", sep = "/")
+
+if (!dir.exists(wl_dir)){
+  dir.create(wl_dir)}
+
+source('./Code/Tables_and_Plots/Walter-Lieth.R')
+```
+
+
+```{r remove-objects}
+
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
+                        "official_name",
+                        "variables",
+                        "results_folder",
+                        "elev",
+                        "years",
+                        "avg30",
+                        "monthSumDF",
+                        "MonthlySeries",
+                        ls(pattern = "^AllDays"),
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
+
+
+```
+
+## DiffHist
+
+The next chunk creates all things DiffHist (comparisons between future time periods and historical periods). Outputs include:
+  - original DiffHist .csv for reports
+  - diffHist dataframe for bar plots
+  - Dashboard tables
+
+```{r DiffHist, message=FALSE, warning=FALSE}
+
+source("./Code/DiffHist.R")
+source("./Code/Dashboard/MonthlySeries_DiffHist.R")
+source("./Code/Dashboard/Avg30_DiffHist.R")
+
+```
+
+The following chunk uses the monthSum and diffHist lists to create summary plots (bar charts).
+
+```{r bar-charts}
+
+bar_charts_dir <- paste(plots_dir,"Bar_Charts", sep = "/") 
+
+if (!dir.exists(bar_charts_dir)){
+  dir.create(bar_charts_dir)}
+
+add_month <- function(df){
+  df = df[1:12,]
+  #df = select(df, -month)
+  df = mutate(df, Month = month.abb)
+}
+
+
+source('./Code/Tables_and_Plots/Bar_Charts/Hist_Bar_Charts.R')
+source('./Code/Tables_and_Plots/Bar_Charts/Compare_Bar_Charts.R')
+source('./Code/Tables_and_Plots/Bar_Charts/Format_Bar_Charts.R') # Formatting plots 
+
+```
+
+
+### END DOCUMENT  ###
+
+
+
+
+
