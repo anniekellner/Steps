@@ -156,9 +156,9 @@ However, if you are re- specific segments of the script using previously extract
 
 ```{r get-workspace-image}
 
-shp <- shp_names[65] # CHANGE THIS TO INSTALLATION OF INTEREST
+#shp <- shp_names[65] # CHANGE THIS TO INSTALLATION OF INTEREST
 
-list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
+#list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/",shp), full.names = TRUE)
 
 ```
 
@@ -167,7 +167,7 @@ list.files(path = paste0("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspac
 
 # Load workspace image
 
-load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Pituffik_SB/Pituffik_SB_ACCESS-ESM1-5_20260713.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Pituffik_SB/Pituffik_SB_ACCESS-ESM1-5_20260713.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 
 ```
