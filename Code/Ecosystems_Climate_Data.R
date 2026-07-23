@@ -392,7 +392,7 @@ names(monthly.means.precip)[1]<-paste("praverage")
 sd.precip <- sd(monthly.means.precip$praverage)
 
 #annual precipitation / getting the sum of over historical period then dividing by the number of years to get annual average
-an.precip <- (sum(dat.hist$PPT_mm)/(years[2] - years[1]))
+an.precip <- (sum(dat.hist$PPT_mm)/n_years.hist)
 mo.precip <- an.precip/12
 
 #final calculation
@@ -412,7 +412,7 @@ precip.wettest.quarter.pre <- c(sum(q1.dat$PPT_in), sum(q2.dat$PPT_in), sum(q3.d
 
 #previous calculation is the sum over historical period of said quarter
 #divide to get the annual quarter calculation 
-precip.wettest.quarter <- precip.wettest.quarter.pre/(years[2] - years[1])
+precip.wettest.quarter <- precip.wettest.quarter.pre/(n_years.hist)
                                                       
 
 #value
@@ -429,7 +429,7 @@ precip.driest.quarter.pre <- c(sum(q1.dat$PPT_in), sum(q2.dat$PPT_in), sum(q3.da
 
 #previous calculation is the sum over historical period of said quarter
 #divide by number of years to get the annual quarter calculation 
-precip.driest.quarter <- precip.driest.quarter.pre/(years[2] - years[1])
+precip.driest.quarter <- precip.driest.quarter.pre/(n_years.hist)
 
 #value
 precip.driest.quarter
@@ -445,7 +445,7 @@ precip.coldest.quarter.pre <- c(sum(q1.dat$PPT_in), sum(q2.dat$PPT_in), sum(q3.d
 
 #previous calculation is the sum over the historical period of said quarter
 #divide by number of years to get the annual quarter calculation 
-precip.coldest.quarter <- precip.coldest.quarter.pre/(years[2] - years[1])
+precip.coldest.quarter <- precip.coldest.quarter.pre/n_years.hist)
 
 #value
 precip.coldest.quarter
@@ -461,7 +461,7 @@ precip.warmest.quarter.pre <- c(sum(q1.dat$PPT_in), sum(q2.dat$PPT_in), sum(q3.d
 
 #previous calculation is the sum over historical period of said quarter
 #divide to get the annual quarter calculation 
-precip.warmest.quarter <- precip.warmest.quarter.pre/(years[2] - years[1])
+precip.warmest.quarter <- precip.warmest.quarter.pre/(n_years.hist)
 
 
 #value
@@ -817,7 +817,7 @@ names(monthly.means.precip.sc1)[1]<-paste("praverage")
 sd.precip.sc1 <- sd(monthly.means.precip.sc1$praverage)
 
 #annual precipitation / getting the sum of over x years then dividing by x to get annual average
-an.precip.sc1 <- (sum(dat.RCP4.5.2030$PPT_mm)/(years[4] - years[3]))
+an.precip.sc1 <- (sum(dat.RCP4.5.2030$PPT_mm)/(n_years.fut1))
 mo.precip.sc1 <- an.precip.sc1/12
 
 #final calculation
@@ -837,7 +837,7 @@ precip.wettest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$PPT_in), sum(q2.dat.sc1$PPT_i
 
 #previous calculation is the sum over the historical period of said quarter
 #divide by 10 to get the annual quarter calculation
-precip.wettest.quarter.sc1 <- precip.wettest.quarter.pre.sc1/(years[4] - years[3])
+precip.wettest.quarter.sc1 <- precip.wettest.quarter.pre.sc1/(n_years.fut1)
 
 #value
 precip.wettest.quarter.sc1
@@ -853,7 +853,7 @@ precip.driest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$PPT_in), sum(q2.dat.sc1$PPT_in
 
 #previous calculation is the sum over historical period of said quarter
 #divide by 10 to get the annual quarter calculation 
-precip.driest.quarter.sc1 <- precip.driest.quarter.pre.sc1/(years[2] - years[1])
+precip.driest.quarter.sc1 <- precip.driest.quarter.pre.sc1/(n_years.hist)
 
 #value
 precip.driest.quarter.sc1
@@ -869,7 +869,7 @@ precip.coldest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$PPT_in), sum(q2.dat.sc1$PPT_i
 
 #previous calculation is the sum over historical period of said quarter
 #divide by 10 to get the annual quarter calculation 
-precip.coldest.quarter.sc1 <- precip.coldest.quarter.pre.sc1/(years[4] - years[3])
+precip.coldest.quarter.sc1 <- precip.coldest.quarter.pre.sc1/(n_years.fut1)
 
 #value
 precip.coldest.quarter.sc1
@@ -885,7 +885,7 @@ precip.warmest.quarter.pre.sc1 <- c(sum(q1.dat.sc1$PPT_in), sum(q2.dat.sc1$PPT_i
 
 #previous calculation is the sum over projected period of said quarter
 #divide to get the annual quarter calculation 
-precip.warmest.quarter.sc1 <- precip.warmest.quarter.pre.sc1/(years[4] - years[3])
+precip.warmest.quarter.sc1 <- precip.warmest.quarter.pre.sc1/(n_years.fut1)
 
 #value
 precip.warmest.quarter.sc1
@@ -1258,7 +1258,7 @@ precip.wettest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$PPT_in), sum(q2.dat.sc2$PPT_i
 
 #previous calculation is the sum over projected period of said quarter
 #divide by number of years to get the annual quarter calculation 
-precip.wettest.quarter.sc2 <- precip.wettest.quarter.pre.sc2/(years[6] - years[5])
+precip.wettest.quarter.sc2 <- precip.wettest.quarter.pre.sc2/(n_years.fut2)
 
 #value
 precip.wettest.quarter.sc2
@@ -1273,7 +1273,7 @@ precip.driest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$PPT_in), sum(q2.dat.sc2$PPT_in
               mean(q9.dat.sc2$PPT_in)*91, mean(q10.dat.sc2$PPT_in)*92, mean(q11.dat.sc2$PPT_in)*92, mean(q12.dat.sc2$PPT_in)*90.25))]
 
 
-precip.driest.quarter.sc2 <- precip.driest.quarter.pre.sc2/(years[6] - years[5])
+precip.driest.quarter.sc2 <- precip.driest.quarter.pre.sc2/(n_years.fut2)
 
 #value
 precip.driest.quarter.sc2
@@ -1289,7 +1289,7 @@ precip.coldest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$PPT_in), sum(q2.dat.sc2$PPT_i
 
 #previous calculation is the sum over historical period of said quarter
 #divide to get the annual quarter calculation 
-precip.coldest.quarter.sc2 <- precip.coldest.quarter.pre.sc2/(years[6] - years[5])
+precip.coldest.quarter.sc2 <- precip.coldest.quarter.pre.sc2/(n_years.fut2)
 
 #value
 precip.coldest.quarter.sc2
@@ -1305,7 +1305,7 @@ precip.warmest.quarter.pre.sc2 <- c(sum(q1.dat.sc2$PPT_in), sum(q2.dat.sc2$PPT_i
 
 #previous calculation is the sum over projected period of said quarter
 #divide to get the annual quarter calculation 
-precip.warmest.quarter.sc2 <- precip.warmest.quarter.pre.sc2/(years[6] - years[5])
+precip.warmest.quarter.sc2 <- precip.warmest.quarter.pre.sc2/(n_years.fut2)
 
 #value
 precip.warmest.quarter.sc2
@@ -1659,7 +1659,7 @@ names(monthly.means.precip.sc3)[1]<-paste("praverage")
 sd.precip.sc3 <- sd(monthly.means.precip.sc3$praverage)
 
 #annual precipitation / getting the sum of period then dividing by 12 to get annual average
-an.precip.sc3 <- (sum(dat.RCP8.5.2030$PPT_mm)/(years[4] - years[3]))
+an.precip.sc3 <- (sum(dat.RCP8.5.2030$PPT_mm)/(n_years.fut1))
 mo.precip.sc3 <- an.precip.sc3/12
 
 #final calculation
@@ -1677,7 +1677,7 @@ precip.wettest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$PPT_in), sum(q2.dat.sc3$PPT_i
               mean(q5.dat.sc3$PPT_in)*92, mean(q6.dat.sc3$PPT_in)*92, mean(q7.dat.sc3$PPT_in)*92, mean(q8.dat.sc3$PPT_in)*92, 
               mean(q9.dat.sc3$PPT_in)*91, mean(q10.dat.sc3$PPT_in)*92, mean(q11.dat.sc3$PPT_in)*92, mean(q12.dat.sc3$PPT_in)*90.25))]
 
-precip.wettest.quarter.sc3 <- precip.wettest.quarter.pre.sc3/(years[4] - years[3])
+precip.wettest.quarter.sc3 <- precip.wettest.quarter.pre.sc3/(n_years.fut1)
 
 #value
 precip.wettest.quarter.sc3
@@ -1692,7 +1692,7 @@ precip.driest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$PPT_in), sum(q2.dat.sc3$PPT_in
               mean(q9.dat.sc3$PPT_in)*91, mean(q10.dat.sc3$PPT_in)*92, mean(q11.dat.sc3$PPT_in)*92, mean(q12.dat.sc3$PPT_in)*90.25))]
 
 
-precip.driest.quarter.sc3 <- precip.driest.quarter.pre.sc3/(years[4] - years[3])
+precip.driest.quarter.sc3 <- precip.driest.quarter.pre.sc3/(n_years.fut1)
 
 #value
 precip.driest.quarter.sc3
@@ -1708,7 +1708,7 @@ precip.coldest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$PPT_in), sum(q2.dat.sc3$PPT_i
 
 #previous calculation is the sum over historical period of said quarter
 #divide to get the annual quarter calculation 
-precip.coldest.quarter.sc3 <- precip.coldest.quarter.pre.sc3/(years[4] - years[3])
+precip.coldest.quarter.sc3 <- precip.coldest.quarter.pre.sc3/(n_years.fut1)
 
 #value
 precip.coldest.quarter.sc3
@@ -1724,7 +1724,7 @@ precip.warmest.quarter.pre.sc3 <- c(sum(q1.dat.sc3$PPT_in), sum(q2.dat.sc3$PPT_i
 
 #previous calculation is the sum over projected period of said quarter
 #divide to get the annual quarter calculation 
-precip.warmest.quarter.sc3 <- precip.warmest.quarter.pre.sc3/(years[4] - years[3])
+precip.warmest.quarter.sc3 <- precip.warmest.quarter.pre.sc3/(n_years.fut1)
 
 #value
 precip.warmest.quarter.sc3
@@ -2075,7 +2075,7 @@ names(monthly.means.precip.sc4)[1]<-paste("praverage")
 sd.precip.sc4 <- sd(monthly.means.precip.sc4$praverage)
 
 #annual precipitation / getting the sum of years then dividing by 12 to get annual average
-an.precip.sc4 <- (sum(dat.RCP8.5.2050$PPT_mm)/(years[6] - years[5]))
+an.precip.sc4 <- (sum(dat.RCP8.5.2050$PPT_mm)/(n_years.fut2))
 mo.precip.sc4 <- an.precip.sc4/12
 
 #final calculation
@@ -2093,7 +2093,7 @@ precip.wettest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$PPT_in), sum(q2.dat.sc4$PPT_i
               mean(q5.dat.sc4$PPT_in)*92, mean(q6.dat.sc4$PPT_in)*92, mean(q7.dat.sc4$PPT_in)*92, mean(q8.dat.sc4$PPT_in)*92, 
               mean(q9.dat.sc4$PPT_in)*91, mean(q10.dat.sc4$PPT_in)*92, mean(q11.dat.sc4$PPT_in)*92, mean(q12.dat.sc4$PPT_in)*90.25))]
 
-precip.wettest.quarter.sc4 <- precip.wettest.quarter.pre.sc4/(years[6] - years[5])
+precip.wettest.quarter.sc4 <- precip.wettest.quarter.pre.sc4/(n_years.fut2)
 
 #value
 precip.wettest.quarter.sc4
@@ -2107,7 +2107,7 @@ precip.driest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$PPT_in), sum(q2.dat.sc4$PPT_in
               mean(q5.dat.sc4$PPT_in)*92, mean(q6.dat.sc4$PPT_in)*92, mean(q7.dat.sc4$PPT_in)*92, mean(q8.dat.sc4$PPT_in)*92, 
               mean(q9.dat.sc4$PPT_in)*91, mean(q10.dat.sc4$PPT_in)*92, mean(q11.dat.sc4$PPT_in)*92, mean(q12.dat.sc4$PPT_in)*90.25))]
 
-precip.driest.quarter.sc4 <- precip.driest.quarter.pre.sc4/(years[6] - years[5])
+precip.driest.quarter.sc4 <- precip.driest.quarter.pre.sc4/(n_years.fut2)
 
 #value
 precip.driest.quarter.sc4
@@ -2123,7 +2123,7 @@ precip.coldest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$PPT_in), sum(q2.dat.sc4$PPT_i
 
 #previous calculation is the sum over historical period of said quarter
 #divide to get the annual quarter calculation 
-precip.coldest.quarter.sc4 <- precip.coldest.quarter.pre.sc4/(years[6] - years[5])
+precip.coldest.quarter.sc4 <- precip.coldest.quarter.pre.sc4/(n_years.fut2)
 
 #value
 precip.coldest.quarter.sc4
@@ -2139,7 +2139,7 @@ precip.warmest.quarter.pre.sc4 <- c(sum(q1.dat.sc4$PPT_in), sum(q2.dat.sc4$PPT_i
 
 #previous calculation is the sum over projected period of said quarter
 #divide to get the annual quarter calculation 
-precip.warmest.quarter.sc4 <- precip.warmest.quarter.pre.sc4/(years[6] - years[5])
+precip.warmest.quarter.sc4 <- precip.warmest.quarter.pre.sc4/(n_years.fut2)
 
 #value
 precip.warmest.quarter.sc4
