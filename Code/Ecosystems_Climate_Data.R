@@ -445,7 +445,7 @@ precip.coldest.quarter.pre <- c(sum(q1.dat$PPT_in), sum(q2.dat$PPT_in), sum(q3.d
 
 #previous calculation is the sum over the historical period of said quarter
 #divide by number of years to get the annual quarter calculation 
-precip.coldest.quarter <- precip.coldest.quarter.pre/n_years.hist)
+precip.coldest.quarter <- precip.coldest.quarter.pre/n_years.hist
 
 #value
 precip.coldest.quarter
