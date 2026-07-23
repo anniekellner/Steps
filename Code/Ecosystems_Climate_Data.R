@@ -179,7 +179,7 @@ annual.mean.diurnal.range
 
 ##Isothermality
 #units in percent
-#how large day to night temperatures oscilate relative to the summer to winter oscillations
+#how large day to night temperatures oscillate relative to the summer to winter oscillations
 #ratio of mean diurnal range to the annual temperature range
 #(annual.mean.diurnal.range/annual.temp.range)*100
 
