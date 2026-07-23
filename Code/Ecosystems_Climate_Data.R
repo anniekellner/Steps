@@ -34,7 +34,7 @@ dat.RCP8.5.2030 <- AllDays[[4]]
 dat.RCP8.5.2050 <- AllDays[[5]]
 
 
-###HISTORICAL###
+### HISTORICAL ###
 
 #setting aside appropriate data
 
@@ -97,18 +97,20 @@ q12.dat <- rbind(dec.dat, jan.dat, feb.dat)
 
 #subsetting precipitation data
 
-jan.prav <- (sum(jan.dat$PPT_in))/(years[2] - years[1])
-feb.prav <- (sum(feb.dat$PPT_in))/(years[2] - years[1])
-mar.prav <- (sum(mar.dat$PPT_in))/(years[2] - years[1])
-apr.prav <- (sum(apr.dat$PPT_in))/(years[2] - years[1])
-may.prav <- (sum(may.dat$PPT_in))/(years[2] - years[1])
-jun.prav <- (sum(jun.dat$PPT_in))/(years[2] - years[1])
-jul.prav <- (sum(jul.dat$PPT_in))/(years[2] - years[1])
-aug.prav <- (sum(aug.dat$PPT_in))/(years[2] - years[1])
-sep.prav <- (sum(sep.dat$PPT_in))/(years[2] - years[1])
-oct.prav <- (sum(oct.dat$PPT_in))/(years[2] - years[1])
-nov.prav <- (sum(nov.dat$PPT_in))/(years[2] - years[1])
-dec.prav <- (sum(dec.dat$PPT_in))/(years[2] - years[1])
+n_years.hist <- length(years[1]:years[2]) # number of years in dataset
+
+jan.prav <- sum(jan.dat$PPT_in) / n_years.hist
+feb.prav <- (sum(feb.dat$PPT_in))/n_years.hist
+mar.prav <- (sum(mar.dat$PPT_in))/n_years.hist
+apr.prav <- (sum(apr.dat$PPT_in))/n_years.hist
+may.prav <- (sum(may.dat$PPT_in))/n_years.hist
+jun.prav <- (sum(jun.dat$PPT_in))/n_years.hist
+jul.prav <- (sum(jul.dat$PPT_in))/n_years.hist
+aug.prav <- (sum(aug.dat$PPT_in))/n_years.hist
+sep.prav <- (sum(sep.dat$PPT_in))/n_years.hist
+oct.prav <- (sum(oct.dat$PPT_in))/n_years.hist
+nov.prav <- (sum(nov.dat$PPT_in))/n_years.hist
+dec.prav <- (sum(dec.dat$PPT_in))/n_years.hist
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
@@ -521,18 +523,20 @@ q12.dat.sc1 <- rbind(dec.dat.sc1, jan.dat.sc1, feb.dat.sc1)
 
 #subsetting precipitation data
 
-jan.prav.dat.sc1 <- (sum(jan.dat.sc1$PPT_in))/(years[4] - years[3])
-feb.prav.dat.sc1 <- (sum(feb.dat.sc1$PPT_in))/(years[4] - years[3])
-mar.prav.dat.sc1 <- (sum(mar.dat.sc1$PPT_in))/(years[4] - years[3])
-apr.prav.dat.sc1 <- (sum(apr.dat.sc1$PPT_in))/(years[4] - years[3])
-may.prav.dat.sc1 <- (sum(may.dat.sc1$PPT_in))/(years[4] - years[3])
-jun.prav.dat.sc1 <- (sum(jun.dat.sc1$PPT_in))/(years[4] - years[3])
-jul.prav.dat.sc1 <- (sum(jul.dat.sc1$PPT_in))/(years[4] - years[3])
-aug.prav.dat.sc1 <- (sum(aug.dat.sc1$PPT_in))/(years[4] - years[3])
-sep.prav.dat.sc1 <- (sum(sep.dat.sc1$PPT_in))/(years[4] - years[3])
-oct.prav.dat.sc1 <- (sum(oct.dat.sc1$PPT_in))/(years[4] - years[3])
-nov.prav.dat.sc1 <- (sum(nov.dat.sc1$PPT_in))/(years[4] - years[3])
-dec.prav.dat.sc1 <- (sum(dec.dat.sc1$PPT_in))/(years[4] - years[3])
+n_years.fut1 <- length(years[3]:years[4])
+
+jan.prav.dat.sc1 <- (sum(jan.dat.sc1$PPT_in))/n_years.fut1
+feb.prav.dat.sc1 <- (sum(feb.dat.sc1$PPT_in))/n_years.fut1
+mar.prav.dat.sc1 <- (sum(mar.dat.sc1$PPT_in))/n_years.fut1
+apr.prav.dat.sc1 <- (sum(apr.dat.sc1$PPT_in))/n_years.fut1
+may.prav.dat.sc1 <- (sum(may.dat.sc1$PPT_in))/n_years.fut1
+jun.prav.dat.sc1 <- (sum(jun.dat.sc1$PPT_in))/n_years.fut1
+jul.prav.dat.sc1 <- (sum(jul.dat.sc1$PPT_in))/n_years.fut1
+aug.prav.dat.sc1 <- (sum(aug.dat.sc1$PPT_in))/n_years.fut1
+sep.prav.dat.sc1 <- (sum(sep.dat.sc1$PPT_in))/n_years.fut1
+oct.prav.dat.sc1 <- (sum(oct.dat.sc1$PPT_in))/n_years.fut1
+nov.prav.dat.sc1 <- (sum(nov.dat.sc1$PPT_in))/n_years.fut1
+dec.prav.dat.sc1 <- (sum(dec.dat.sc1$PPT_in))/n_years.fut1
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
@@ -942,18 +946,20 @@ q12.dat.sc2 <- rbind(dec.dat.sc2, jan.dat.sc2, feb.dat.sc2)
 
 #subsetting precipitation data
 
-jan.prav.dat.sc2 <- (sum(jan.dat.sc2$PPT_in))/(years[6] - years[5])
-feb.prav.dat.sc2 <- (sum(feb.dat.sc2$PPT_in))/(years[6] - years[5])
-mar.prav.dat.sc2 <- (sum(mar.dat.sc2$PPT_in))/(years[6] - years[5])
-apr.prav.dat.sc2 <- (sum(apr.dat.sc2$PPT_in))/(years[6] - years[5])
-may.prav.dat.sc2 <- (sum(may.dat.sc2$PPT_in))/(years[6] - years[5])
-jun.prav.dat.sc2 <- (sum(jun.dat.sc2$PPT_in))/(years[6] - years[5])
-jul.prav.dat.sc2 <- (sum(jul.dat.sc2$PPT_in))/(years[6] - years[5])
-aug.prav.dat.sc2 <- (sum(aug.dat.sc2$PPT_in))/(years[6] - years[5])
-sep.prav.dat.sc2 <- (sum(sep.dat.sc2$PPT_in))/(years[6] - years[5])
-oct.prav.dat.sc2 <- (sum(oct.dat.sc2$PPT_in))/(years[6] - years[5])
-nov.prav.dat.sc2 <- (sum(nov.dat.sc2$PPT_in))/(years[6] - years[5])
-dec.prav.dat.sc2 <- (sum(dec.dat.sc2$PPT_in))/(years[6] - years[5])
+n_years.fut2 <- length(years[5]:years[6])
+
+jan.prav.dat.sc2 <- (sum(jan.dat.sc2$PPT_in))/n_years.fut2
+feb.prav.dat.sc2 <- (sum(feb.dat.sc2$PPT_in))/n_years.fut2
+mar.prav.dat.sc2 <- (sum(mar.dat.sc2$PPT_in))/n_years.fut2
+apr.prav.dat.sc2 <- (sum(apr.dat.sc2$PPT_in))/n_years.fut2
+may.prav.dat.sc2 <- (sum(may.dat.sc2$PPT_in))/n_years.fut2
+jun.prav.dat.sc2 <- (sum(jun.dat.sc2$PPT_in))/n_years.fut2
+jul.prav.dat.sc2 <- (sum(jul.dat.sc2$PPT_in))/n_years.fut2
+aug.prav.dat.sc2 <- (sum(aug.dat.sc2$PPT_in))/n_years.fut2
+sep.prav.dat.sc2 <- (sum(sep.dat.sc2$PPT_in))/n_years.fut2
+oct.prav.dat.sc2 <- (sum(oct.dat.sc2$PPT_in))/n_years.fut2
+nov.prav.dat.sc2 <- (sum(nov.dat.sc2$PPT_in))/n_years.fut2
+dec.prav.dat.sc2 <- (sum(dec.dat.sc2$PPT_in))/n_years.fut2
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
@@ -1232,7 +1238,7 @@ names(monthly.means.precip.sc2)[1]<-paste("praverage")
 sd.precip.sc2 <- sd(monthly.means.precip.sc2$praverage)
 
 #annual precipitation / getting the sum of years then dividing by 12 to get annual average
-an.precip.sc2 <- (sum(dat.RCP4.5.2050$PPT_mm)/(years[6] - years[5]))
+an.precip.sc2 <- (sum(dat.RCP4.5.2050$PPT_mm)/n_years.fut2)
 mo.precip.sc2 <- an.precip.sc2/12
 
 #final calculation
@@ -1360,18 +1366,18 @@ q12.dat.sc3 <- rbind(dec.dat.sc3, jan.dat.sc3, feb.dat.sc3)
 
 #subsetting precipitation data
 
-jan.prav.dat.sc3 <- (sum(jan.dat.sc3$PPT_in))/(years[4] - years[3])
-feb.prav.dat.sc3 <- (sum(feb.dat.sc3$PPT_in))/(years[4] - years[3])
-mar.prav.dat.sc3 <- (sum(mar.dat.sc3$PPT_in))/(years[4] - years[3])
-apr.prav.dat.sc3 <- (sum(apr.dat.sc3$PPT_in))/(years[4] - years[3])
-may.prav.dat.sc3 <- (sum(may.dat.sc3$PPT_in))/(years[4] - years[3])
-jun.prav.dat.sc3 <- (sum(jun.dat.sc3$PPT_in))/(years[4] - years[3])
-jul.prav.dat.sc3 <- (sum(jul.dat.sc3$PPT_in))/(years[4] - years[3])
-aug.prav.dat.sc3 <- (sum(aug.dat.sc3$PPT_in))/(years[4] - years[3])
-sep.prav.dat.sc3 <- (sum(sep.dat.sc3$PPT_in))/(years[4] - years[3])
-oct.prav.dat.sc3 <- (sum(oct.dat.sc3$PPT_in))/(years[4] - years[3])
-nov.prav.dat.sc3 <- (sum(nov.dat.sc3$PPT_in))/(years[4] - years[3])
-dec.prav.dat.sc3 <- (sum(dec.dat.sc3$PPT_in))/(years[4] - years[3])
+jan.prav.dat.sc3 <- (sum(jan.dat.sc3$PPT_in))/n_years.fut1
+feb.prav.dat.sc3 <- (sum(feb.dat.sc3$PPT_in))/n_years.fut1
+mar.prav.dat.sc3 <- (sum(mar.dat.sc3$PPT_in))/n_years.fut1
+apr.prav.dat.sc3 <- (sum(apr.dat.sc3$PPT_in))/n_years.fut1
+may.prav.dat.sc3 <- (sum(may.dat.sc3$PPT_in))/n_years.fut1
+jun.prav.dat.sc3 <- (sum(jun.dat.sc3$PPT_in))/n_years.fut1
+jul.prav.dat.sc3 <- (sum(jul.dat.sc3$PPT_in))/n_years.fut1
+aug.prav.dat.sc3 <- (sum(aug.dat.sc3$PPT_in))/n_years.fut1
+sep.prav.dat.sc3 <- (sum(sep.dat.sc3$PPT_in))/n_years.fut1
+oct.prav.dat.sc3 <- (sum(oct.dat.sc3$PPT_in))/n_years.fut1
+nov.prav.dat.sc3 <- (sum(nov.dat.sc3$PPT_in))/n_years.fut1
+dec.prav.dat.sc3 <- (sum(dec.dat.sc3$PPT_in))/n_years.fut1
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
@@ -1780,18 +1786,18 @@ q12.dat.sc4 <- rbind(dec.dat.sc4, jan.dat.sc4, feb.dat.sc4)
 
 #subsetting precipitation data
 
-jan.prav.dat.sc4 <- (sum(jan.dat.sc4$PPT_in))/(years[6] - years[5])
-feb.prav.dat.sc4 <- (sum(feb.dat.sc4$PPT_in))/(years[6] - years[5])
-mar.prav.dat.sc4 <- (sum(mar.dat.sc4$PPT_in))/(years[6] - years[5])
-apr.prav.dat.sc4 <- (sum(apr.dat.sc4$PPT_in))/(years[6] - years[5])
-may.prav.dat.sc4 <- (sum(may.dat.sc4$PPT_in))/(years[6] - years[5])
-jun.prav.dat.sc4 <- (sum(jun.dat.sc4$PPT_in))/(years[6] - years[5])
-jul.prav.dat.sc4 <- (sum(jul.dat.sc4$PPT_in))/(years[6] - years[5])
-aug.prav.dat.sc4 <- (sum(aug.dat.sc4$PPT_in))/(years[6] - years[5])
-sep.prav.dat.sc4 <- (sum(sep.dat.sc4$PPT_in))/(years[6] - years[5])
-oct.prav.dat.sc4 <- (sum(oct.dat.sc4$PPT_in))/(years[6] - years[5])
-nov.prav.dat.sc4 <- (sum(nov.dat.sc4$PPT_in))/(years[6] - years[5])
-dec.prav.dat.sc4 <- (sum(dec.dat.sc4$PPT_in))/(years[6] - years[5])
+jan.prav.dat.sc4 <- (sum(jan.dat.sc4$PPT_in))/n_years.fut2
+feb.prav.dat.sc4 <- (sum(feb.dat.sc4$PPT_in))/n_years.fut2
+mar.prav.dat.sc4 <- (sum(mar.dat.sc4$PPT_in))/n_years.fut2
+apr.prav.dat.sc4 <- (sum(apr.dat.sc4$PPT_in))/n_years.fut2
+may.prav.dat.sc4 <- (sum(may.dat.sc4$PPT_in))/n_years.fut2
+jun.prav.dat.sc4 <- (sum(jun.dat.sc4$PPT_in))/n_years.fut2
+jul.prav.dat.sc4 <- (sum(jul.dat.sc4$PPT_in))/n_years.fut2
+aug.prav.dat.sc4 <- (sum(aug.dat.sc4$PPT_in))/n_years.fut2
+sep.prav.dat.sc4 <- (sum(sep.dat.sc4$PPT_in))/n_years.fut2
+oct.prav.dat.sc4 <- (sum(oct.dat.sc4$PPT_in))/n_years.fut2
+nov.prav.dat.sc4 <- (sum(nov.dat.sc4$PPT_in))/n_years.fut2
+dec.prav.dat.sc4 <- (sum(dec.dat.sc4$PPT_in))/n_years.fut2
 
 ## 1) Annual Mean Diurnal Range
 #difference between month's max and min temp averaged over 12 months
