@@ -33,7 +33,19 @@ for(i in 1:length(AllDays)){
 
 ##  ----   BioClimatics Variables ----- ##
 
-# Max Temperature of Warmest Month
+
+# Historical
+
+
+
+
+TMeanF_DF <- monthSumDF[[1]] %>%
+  slice_max(Avg_TMeanF, n = 1, with_ties = FALSE) %>%
+  pull(month)
+
+
+
+
 
 
 
