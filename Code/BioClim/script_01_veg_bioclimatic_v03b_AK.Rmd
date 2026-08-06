@@ -130,28 +130,28 @@ in_days_near_mod <- climate_f_in[[which(grepl("ssp245_2021", names_climate_f_in)
 
 in_monthsum_near_mod <- climate_f_in[[which(grepl("ssp245_2021", names_climate_f_in) & grepl("MonthSum", names_climate_f_in))]]
 
-## in_diffhist_near_mod <-climate_f_in[[which(grepl("ssp245_2021", names_climate_f_in) & grepl("DiffHist", names_climate_f_in))]] 
+in_diffhist_near_mod <-climate_f_in[[which(grepl("ssp245_2021", names_climate_f_in) & grepl("DiffHist", names_climate_f_in))]] 
 
 #- Far Moderate (ssp245_2051)
 in_days_far_mod <- climate_f_in[[which(grepl("ssp245_2051", names_climate_f_in) & grepl("AllDays", names_climate_f_in))]]
 
 in_monthsum_far_mod <- climate_f_in[[which(grepl("ssp245_2051", names_climate_f_in) & grepl("MonthSum", names_climate_f_in))]]
 
-## in_diffhist_far_mod <-climate_f_in[[which(grepl("ssp245_2051", names_climate_f_in) & grepl("DiffHist", names_climate_f_in))]] 
+in_diffhist_far_mod <-climate_f_in[[which(grepl("ssp245_2051", names_climate_f_in) & grepl("DiffHist", names_climate_f_in))]] 
 
 #- Near High (ssp585_2021)
 in_days_near_high <- climate_f_in[[which(grepl("ssp585_2021", names_climate_f_in) & grepl("AllDays", names_climate_f_in))]]
 
 in_monthsum_near_high <- climate_f_in[[which(grepl("ssp585_2021", names_climate_f_in) & grepl("MonthSum", names_climate_f_in))]]
 
-## in_diffhist_near_high <-climate_f_in[[which(grepl("ssp585_2021", names_climate_f_in) & grepl("DiffHist", names_climate_f_in))]] 
+in_diffhist_near_high <-climate_f_in[[which(grepl("ssp585_2021", names_climate_f_in) & grepl("DiffHist", names_climate_f_in))]] 
 
 #- Far High (ssp585_2051)
 in_days_far_high <- climate_f_in[[which(grepl("ssp585_2051", names_climate_f_in) & grepl("AllDays", names_climate_f_in))]]
 
 in_monthsum_far_high <- climate_f_in[[which(grepl("ssp585_2051", names_climate_f_in) & grepl("MonthSum", names_climate_f_in))]]
 
-## in_diffhist_far_near <-climate_f_in[[which(grepl("ssp585_2051", names_climate_f_in) & grepl("DiffHist", names_climate_f_in))]] 
+in_diffhist_far_near <-climate_f_in[[which(grepl("ssp585_2051", names_climate_f_in) & grepl("DiffHist", names_climate_f_in))]] 
 
 rm(climate_f_in)
 rm(names_climate_f_in)
