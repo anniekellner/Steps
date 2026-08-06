@@ -88,6 +88,7 @@ clim_res_installation <- "Naval_Station_Norfolk" # Changed per installation "LET
 climate_resultsjr <- normalizePath(
   path = file.path(
     "N:",
+    "RStor",
     "CEMML",
     "ClimateChange",
     "CC_Modeling",
@@ -110,7 +111,7 @@ This is loading directly from the climate team's results
 folder_peep <- list.files(path = climate_resultsjr, all.files = FALSE) |>
   as_tibble()
 
-# This is directed to the CSVs created by the Climate Team, rather than re-running their code
+# This is directed to the CSVs created by the Climate Team, rather than re-running their #code
 climate_f_in <- list.files(path = climate_resultsjr,
                                pattern = "\\.csv$",
                                full.names = TRUE) |>
