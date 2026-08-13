@@ -69,7 +69,7 @@ in_monthsum_far_high <- monthSumDF[[which(grepl("s2f2", scenarioFuture_names))]]
 in_diffhist_far_high <- diffHist[[which(grepl("s2f2", names(diffHist)))]]
 
 
-## MIGHT NOT NEED THIS
+## Ordering of Things
 
 name_scenario_order_wmonth <- c("month", "historical", "near_mod", "far_mod", "near_high", "far_high")
 name_scenario_order <- c("historical", "near_mod", "far_mod", "near_high", "far_high")
@@ -102,7 +102,7 @@ name_scenario_match_wordy_ordered_flow <- c(
 
 # Daily
 
-frankent_daily_00 <- mget(ls(pattern = "^in_days_")) |>
+frankent_daily <- mget(ls(pattern = "^in_days_")) |>
   imap(function(df, name) {
     prefix <- str_remove(name, "^in_days_")
     rename_with(df, \(x) str_c(prefix, "_", x), -date)
@@ -114,7 +114,7 @@ frankent_daily_00 <- mget(ls(pattern = "^in_days_")) |>
          ends_with("TMinF"), 
          ends_with("PPT_in"))
 
-daily_long <- frankent_daily_00 |> 
+daily_long <- frankent_daily |> 
   pivot_longer(-c(date),
                names_to = c("scenario", "variable"),
                names_pattern = "(historical|near_mod|near_high|far_mod|far_high)_(.*)",
@@ -122,7 +122,7 @@ daily_long <- frankent_daily_00 |>
   )
 
 
-frankent_daily_wmonth <- frankent_daily_00 |> 
+frankent_daily_w_month <- frankent_daily |> 
   mutate(month = month(date), 
          month_word = month(date, label = TRUE, abbr = FALSE)) |> 
   relocate(month, month_word, .after = date)
@@ -135,4 +135,108 @@ daily_long_wmonth <- frankent_daily_wmonth |>
     values_to = "value"
   )
 
+# Monthly
 
+frankent_monthly <- mget(ls(pattern = "^in_monthsum_")) |>
+  imap(function(df, name) {
+    prefix <- str_remove(name, "^in_monthsum_")
+    rename_with(df, function(x) {
+      clean_name <- str_remove(x, "Avg_")
+      str_c(prefix, "_", clean_name)
+    }, -month)
+  }) |>
+  reduce(full_join, by = "month") |> 
+  select(month,
+         ends_with("TMeanF"), 
+         ends_with("TMaxF"), 
+         ends_with("TMinF"), 
+         ends_with("PPT_in")
+  ) |> 
+  select(!contains("Abs_TminF")) |> 
+  slice_head(n = -2) |> 
+  mutate(month = as.numeric(month))
+
+monthly_long <- frankent_monthly |> 
+  pivot_longer(
+    cols = -c(month),
+    names_to = c("scenario", "variable"),
+    names_pattern = "(historical|near_mod|near_high|far_mod|far_high)_(.*)",
+    values_to = "value"
+  )
+
+frankent_monthly_w_month <- frankent_monthly |> 
+  mutate(month_word = lubridate::month(month, label = TRUE, abbr = FALSE), .after = month)
+
+monthly_long_w_month <- frankent_monthly_w_month |> 
+  pivot_longer(
+    cols = -c(month, month_word),
+    names_to = c("scenario", "variable"),
+    names_pattern = "(historical|near_mod|near_high|far_mod|far_high)_(.*)",
+    values_to = "value"
+  )
+
+monthly_all_temps <- monthly_long_w_month %>%
+  filter(variable %in% c("TMeanF", "TMaxF", "TMinF")) |>
+  rename(value_f = value) |>
+  mutate(
+    variable = str_replace(variable, "F$", "")
+  ) |>
+  mutate(
+    value_c = RasterUnitConvert(value_f, "FtoC"),
+    value_k = RasterUnitConvert(value_c, "CtoK")
+  )
+
+
+##    ---   INDIVIDUAL VARIABLES    ---   ##
+
+variables <- c(
+  "Annual Mean Diurnal Range (\u00B0F)",
+  "Isothermality (%)",
+  "Temperature Seasonality (standard deviation)",
+  "Temperature Seasonality (Coefficient of Variation)",
+  "Max Temperature of Warmest Month",
+  "Min Temperature of Coldest Month",
+  "Annual Temperature Range",
+  "Mean Temperature of Wettest Quarter (\u00B0F)",
+  "Mean Temperature of Driest Quarter (\u00B0F)",
+  "Mean Temperature of Warmest Quarter (\u00B0F)",
+  "Mean Temperature of Coldest Quarter (\u00B0F)",
+  "(Total??) Precipitation of Wettest Month (in)",
+  "Total Precipitation of Driest Month (in)",
+  "Precipitation Seasonality (Coefficient of Variation)",
+  "Total Precipitation of Wettest Quarter (in)",
+  "Total Precipitation of Driest Quarter (in)",
+  "Total Precipitation of Coldest Quarter (in)",
+  "Total Precipitation of Warmest Quarter (in)"
+)
+
+scenario_future_combos <- c(
+  "Historical",
+  "Near-Term Moderate",
+  "Far-Term Moderate",
+  "Near Term High",
+  "Far Term High"
+)
+
+
+## Max Temp of Warmest Month
+
+maxTMaxF_warmestMonth <- data.frame()
+
+warmestMonth <- monthSumDF[[1]] %>%
+  slice_max(Avg_TMaxF, n = 1, with_ties = FALSE) %>%
+  pull(month) 
+
+maxTMaxF <- AllDays[[1]] %>%
+  filter(month = warmestMonth) %>%
+  select(month, TMaxF) %>%
+  max(TMaxF)
+  
+
+
+
+
+
+
+
+  
