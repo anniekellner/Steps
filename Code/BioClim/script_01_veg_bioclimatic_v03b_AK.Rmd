@@ -101,7 +101,7 @@ climate_resultsjr <- normalizePath(
 ```
 
 ```{r setup-paths-out}
-outfolder <- here() # Set your own out folder
+outfolder <- here("./Results/Norfolk_BioClim") # Set your own out folder
 ```
 
 # Load in Data
@@ -151,7 +151,7 @@ in_days_far_high <- climate_f_in[[which(grepl("ssp585_2051", names_climate_f_in)
 
 in_monthsum_far_high <- climate_f_in[[which(grepl("ssp585_2051", names_climate_f_in) & grepl("MonthSum", names_climate_f_in))]]
 
-in_diffhist_far_near <-climate_f_in[[which(grepl("ssp585_2051", names_climate_f_in) & grepl("DiffHist", names_climate_f_in))]] 
+in_diffhist_far_high <-climate_f_in[[which(grepl("ssp585_2051", names_climate_f_in) & grepl("DiffHist", names_climate_f_in))]] 
 
 rm(climate_f_in)
 rm(names_climate_f_in)
