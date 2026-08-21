@@ -825,7 +825,9 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
 
 ```
 
-## Bioclimatic variables
+## Bioclimatic variables 
+
+*WILL NEED TO MOVE TO AFTER DIFFHIST*
 
 ```{r Biolimatic-variables, message=FALSE}
 
