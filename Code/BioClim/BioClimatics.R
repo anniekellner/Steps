@@ -221,17 +221,46 @@ scenario_future_combos <- c(
 
 ## Max Temp of Warmest Month
 
-maxTMaxF_warmestMonth <- data.frame()
+maxTemp_warmestMonth <- data.frame(Scenarios = scenario_future_combos,
+                                   Temp = double(length = 5L))
 
-warmestMonth <- monthSumDF[[1]] %>%
+for(i in 1:5){
+warmestMonth_label = monthSumDF[[i]] %>%
   slice_max(Avg_TMaxF, n = 1, with_ties = FALSE) %>%
-  pull(month) 
+  mutate(month = month.abb[month]) %>%
+  pull(month)
 
-maxTMaxF <- AllDays[[1]] %>%
-  filter(month = warmestMonth) %>%
-  select(month, TMaxF) %>%
-  max(TMaxF)
+maxTMaxF = AllDays[[i]] %>%
+  filter(month == warmestMonth_label) %>%
+  summarise(maxTMaxF = max(TMaxF, na.rm = TRUE)) %>%
+  pull(maxTMaxF) %>%
+  round(3)
+
+maxTemp_warmestMonth$Temp[i] = maxTMaxF
+}
+
+
+## Min Temp of Coldest Month
+
+minTemp_coldestMonth <- data.frame(Scenarios = scenario_future_combos,
+                                   Temp = double(length = 5L))
+
+for(i in 1:5){
+  coldestMonth_label = monthSumDF[[i]] %>%
+    slice_min(Avg_TMinF, n = 1, with_ties = FALSE) %>%
+    mutate(month = month.abb[month]) %>%
+    pull(month)
   
+  minTMinF = AllDays[[i]] %>%
+    filter(month == coldestMonth_label) %>%
+    summarise(minTMinF = min(TMinF, na.rm = TRUE)) %>%
+    pull(minTMinF) %>%
+    round(3)
+
+minTemp_coldestMonth$Temp[i] = minTMinF
+}
+    
+
 
 
 
