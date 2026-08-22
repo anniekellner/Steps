@@ -11,25 +11,50 @@
 
 ##  -----------  BEGIN SCRIPT --------------  ##
 
-## Modify AllDays df
+
 
 conflicts_prefer(month::lubridate) # set conflict preferences
 
+## Modify AllDays df
 
-# Create function for adding month (e.g., "Jan") to dataframe
+# Create function for adding month (e.g., "Jan") and year to dataframe
 
 add_month <- function(df){
   df = df %>%
     mutate(month = month(df$date, label = TRUE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")))
 }
 
-# loop to add month to dataframes
+for(i in 1:length(AllDays)){
+
+df = AllDays[[i]]
+df = df %>%
+  mutate(month = as.character(month(df$date,label = TRUE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")))) %>%
+  mutate(year = year(date)) 
+}
+
+
+# Create function for adding month (e.g., "Jan") and year to dataframe
+
+add_month <- function(df){
+  df = df %>%
+    mutate(month = month(df$date, label = TRUE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")))
+}
+
+# loop to add month and to dataframes
 
 for(i in 1:length(AllDays)){
   AllDays[[i]] = add_month(AllDays[[i]])
   AllDays[[i]]$month = as.character(AllDays[[i]]$month)
 }
 
+# Add year (code added 2026-08-22 by Annie Kellner)
+
+for(i in 1:length(AllDays)){
+  df = AllDays[[i]]
+  df = df %>%
+    mutate(year = year(date(df)))
+    
+}
 
 ##  ----   BioClimatics Variables ----- ##
 
@@ -259,11 +284,43 @@ for(i in 1:5){
 
 minTemp_coldestMonth$Temp[i] = minTMinF
 }
-    
 
 
+## Precipitation of Wettest Month
+
+precip_wettestMonth <- data.frame(Scenarios = scenario_future_combos,
+                                  Value = double(length = 5L))
+
+for(i in 1:5){
+
+wettestMonth_label = monthSumDF[[i]] %>%
+  slice_max(Avg_PPT_in, n = 1, with_ties = FALSE) %>%
+  mutate(month = month.abb[month]) %>%
+  pull(month)
+
+  sumPPT_in_wettestMonth = AllDays[[i]] %>%
+    filter(month == wettestMonth_label) %>%
+    group_by()
+    summarise(sumPPT_in = sum(PPT_in, na.rm = TRUE)) %>%
+    round(3)
+  
+  precip_wettestMonth$Value[i] = maxPPT_in
+}
 
 
+## Precipitation of Driest Month
+
+precip_driestMonth <- data.frame(Scenarios = scenario_future_combos,
+                                 Value = double(length = 5L))
+
+for(i in 1:5){
+  driestMonth_label = monthSumDF[[i]] %>%
+    slice_min(Avg_PPT_in, n = 1, with_ties = FALSE) %>%
+    mutate(month = month.abb[month]) %>%
+    pull(month)
+  
+  max
+}
 
 
 
