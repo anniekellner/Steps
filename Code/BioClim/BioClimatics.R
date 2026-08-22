@@ -28,8 +28,13 @@ for(i in 1:length(AllDays)){
 
 df = AllDays[[i]]
 df = df %>%
-  mutate(month = as.character(month(df$date,label = TRUE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")))) %>%
+  #mutate(month = as.character(month(df$date,label = TRUE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")))) %>%
+  mutate(date = date(date)) %>%
+  mutate(date = ymd(date)) %>%
   mutate(year = year(date)) 
+
+AllDays[[i]] = df
+
 }
 
 
@@ -47,14 +52,6 @@ for(i in 1:length(AllDays)){
   AllDays[[i]]$month = as.character(AllDays[[i]]$month)
 }
 
-# Add year (code added 2026-08-22 by Annie Kellner)
-
-for(i in 1:length(AllDays)){
-  df = AllDays[[i]]
-  df = df %>%
-    mutate(year = year(date(df)))
-    
-}
 
 ##  ----   BioClimatics Variables ----- ##
 
@@ -286,7 +283,8 @@ minTemp_coldestMonth$Temp[i] = minTMinF
 }
 
 
-## Precipitation of Wettest Month
+## Precipitation of Wettest Month (***NOTE: THIS RETRIEVES THE MAXIMUM SUM, NOT THE AVERAGE SUM ACROSS THE TIME PERIOD/SCENARIO)
+# The average value from Maria's calculations is identical to the monthSum table
 
 precip_wettestMonth <- data.frame(Scenarios = scenario_future_combos,
                                   Value = double(length = 5L))
@@ -298,17 +296,18 @@ wettestMonth_label = monthSumDF[[i]] %>%
   mutate(month = month.abb[month]) %>%
   pull(month)
 
-  sumPPT_in_wettestMonth = AllDays[[i]] %>%
+precip_wettestMonth = AllDays[[i]] %>%
     filter(month == wettestMonth_label) %>%
-    group_by()
-    summarise(sumPPT_in = sum(PPT_in, na.rm = TRUE)) %>%
-    round(3)
+    group_by(year) %>%
+    summarise(yrMonthSum = sum(PPT_in, na.rm = TRUE)) %>%
+    ungroup() %>%
+    slice_max(yrMonthSum, n = 1, with_ties = FALSE)
   
   precip_wettestMonth$Value[i] = maxPPT_in
 }
 
 
-## Precipitation of Driest Month
+## Precipitation of Driest Month - WAIT FOR MARIA RESPONSE RE: SUM OR AVERAGE (see Teams message 08-22-2026)
 
 precip_driestMonth <- data.frame(Scenarios = scenario_future_combos,
                                  Value = double(length = 5L))
