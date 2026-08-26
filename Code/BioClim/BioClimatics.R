@@ -120,7 +120,7 @@ for(i in 1:5){
   
   sumPPT_in_wettestMonth = AllDays[[i]] %>%
     filter(month == wettestMonth_label) %>%
-    group_by()
+    group_by(year) %>%
   summarise(sumPPT_in = sum(PPT_in, na.rm = TRUE)) %>%
     round(3)
   
