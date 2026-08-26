@@ -85,7 +85,7 @@ for(i in 1:length(AllDays)){
 ## Max Temp of Warmest Month
 
 maxTemp_warmestMonth <- data.frame(Scenarios = scenario_future_combos,
-                                   Temp = double(length = 5L))
+                                   Value = double(length = 5L))
 
 for(i in 1:5){
 warmestMonth_label = monthSumDF[[i]] %>%
@@ -95,46 +95,68 @@ warmestMonth_label = monthSumDF[[i]] %>%
 
 maxTMaxF = AllDays[[i]] %>%
   filter(month == warmestMonth_label) %>%
-  summarise(maxTMaxF = max(TMaxF, na.rm = TRUE)) %>%
-  pull(maxTMaxF)
+  summarise(maxTMaxF = max(TMaxF, na.rm = TRUE)) 
 
 maxTemp_warmestMonth$Temp[i] = maxTMaxF
 }
 
 
-## Precipitation of Wettest Month
+## Min Temp of Coldest Month
 
-# Sum of Precip in Wettest Month
+minTemp_coldestMonth <- data.frame(Scenarios = scenario_future_combos,
+                                   Value = double(length = 5L))
 
-## Precipitation of Wettest Month
+for(i in 1:5){
+  coldestMonth_label = monthSumDF[[i]] %>%
+    slice_min(Avg_TMaxF, n = 1, with_ties = FALSE) %>%
+    mutate(month = month.abb[month]) %>%
+    pull(month) 
+  
+  minTMinF = AllDays[[i]] %>%
+    filter(month == coldestMonth_label) %>%
+    summarise(minTMinF = min(TMinF, na.rm = TRUE)) 
+  
+  minTemp_coldestMonth$Temp[i] = minTMinF
+}  
+
+
+## Precipitation of Wettest Month 
+# Defined as mean precip of wettest month over scenario-future
 
 precip_wettestMonth <- data.frame(Scenarios = scenario_future_combos,
                                   Value = double(length = 5L))
 
 for(i in 1:5){
   
-  wettestMonth_label = monthSumDF[[i]] %>%
+  precip_wettestMonth$Value[i] = monthSumDF[[i]] %>%
     slice_max(Avg_PPT_in, n = 1, with_ties = FALSE) %>%
-    mutate(month = month.abb[month]) %>%
-    pull(month)
-  
-  sumPPT_in_wettestMonth = AllDays[[i]] %>%
-    filter(month == wettestMonth_label) %>%
-    group_by(year) %>%
-  summarise(sumPPT_in = sum(PPT_in, na.rm = TRUE)) %>%
-    round(3)
-  
-  precip_wettestMonth$Value[i] = maxPPT_in
+    pull(Avg_PPT_in)
 }
 
 
-# Sum of Precip in Driest Month - WAIT FOR MARIA RESPONSE RE: SUM OR AVERAGE
+## Precipitation of Driest Month
+
+precip_driestMonth <- data.frame(Scenarios = scenario_future_combos,
+                                 Value = double(length = 5L))
+
+for(i in 1:5){
+  
+  precip_driestMonth$Value[i] = monthSumDF[[i]] %>%
+    slice_min(Avg_PPT_in, n = 1, with_ties = FALSE) %>%
+    pull(Avg_PPT_in)
+}
 
 
 ###  ---   QUARTERLY CALCULATIONS  ---   ###
 
 ## Rolling 3-month windows from a 12-month climatology
 # start 11 = Nov-Dec-Jan, start 12 = Dec-Jan-Feb (same year, not next year)
+
+# Steps for calculating quarterly precip values: 
+  # 1. Ascertain 'wettest quarter', etc. from monthSum
+  # 2. Calculate total precip (sum) for each month-year combo within a given future-scenario
+  # 3. Calculate the mean for each month over the future-scenario
+  # 4. Add the resulting three means together 
 
 quarter_months <- function(start_month) {
   month.abb[((start_month - 1 + 0:2) %% 12) + 1]
@@ -147,26 +169,106 @@ roll_quarter <- function(x, fun = sum) {
 }
 
 ## Total Precipitation of Wettest Quarter
+  
 
 precip_wettestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                     Value = double(length = 5L))
+
+meanPPT = monthSumDF[[i]] %>%
+  mutate(month = as.numeric(month)) %>%
+  arrange(month) %>%
+  pull(Avg_PPT_in)
+
+wettest_start = which.max(roll_quarter(ppt, sum))
+wettest_quarter = quarter_months(wettest_start)
+
+
 for(i in 1:5){
   
-  ppt = monthSumDF[[i]] %>%
-    mutate(month = as.numeric(month)) %>%
-    arrange(month) %>%
-    pull(Avg_PPT_in)
+  sumPPT_ym = AllDays[[i]] %>%
+    filter(month %in% wettest_quarter) %>%
+    group_by(year, month) %>%
+    summarise(sumPPT = sum(PPT_in, na.rm = TRUE), .groups = "drop_last") %>%
+    ungroup()
   
-  wettest_start = which.max(roll_quarter(ppt, sum))
-  wettest_months = quarter_months(wettest_start)
-  
-  precip_wettestQuarter$Value[i] <- AllDays[[i]] %>%
-    filter(month %in% wettest_months) %>%
-    group_by(year) %>%
-    summarise(value = sum(PPT_in, na.rm = TRUE)) %>%
-    pull(value) %>%
+  precip_wettestQuarter$Value[i] = sumPPT_ym %>%
+    group_by(month) %>%
+    summarise(meanPPT = mean(sumPPT, na.rm = TRUE)) %>%
+    pull(meanPPT) %>%
+    sum() %>%
     round(3)
 }
 
-## CLARIFY METHODOLOGY. SEE TEAMS MESSAGE 08-24-2026
+
+## Precipitation of Coldest Quarter
+
+precip_coldestQuarter <- data.frame(Scenarios = scenario_future_combos,
+                                    Value = double(length = 5L))
+
+TMeanF = monthSumDF[[i]] %>%
+  mutate(month = as.numeric(month)) %>%
+  arrange(month) %>%
+  pull(Avg_TMeanF)
+
+coldest_start = which.min(roll_quarter(TMeanF))
+coldest_quarter = quarter_months(coldest_start)
+
+for(i in 1:5){
   
+  sum_PPT_coldestQ = AllDays[[i]] %>%
+    filter(month %in% coldest_quarter) %>%
+    group_by(year, month) %>%
+    summarise(sumPPT_coldQ = sum(PPT_in, na.rm = TRUE), .groups = "drop_last") %>%
+    ungroup()
+  
+  precip_coldestQuarter$Value[i] = sum_PPT_coldestQ %>%
+    group_by(month) %>%
+    summarise(meanPPT_coldestQ = mean(sumPPT_coldestQ, na.rm = TRUE)) %>%
+    pull(meanPPT_coldestQ) %>%
+    sum() %>%
+    round(3)
+}
+
+## Precipitation of Warmest Quarter
+
+precip_warmestQuarter <- data.frame(Scenarios = scenario_future_combos,
+                                    Value = double(length = 5L))
+
+warmest_start = which.max(roll_quarter(TMeanF))
+warmest_quarter = quarter_months(warmest_start)
+
+for(i in 1:5){
+  
+  sum_PPT_warmestQ = AllDays[[i]] %>%
+    filter(month %in% warmest_quarter) %>%
+    group_by(year, month) %>%
+    summarise(sumPPT_warmestQ = sum(PPT_in, na.rm = TRUE), .groups = "drop_last") %>%
+    ungroup()
+  
+  precip_warmestQuarter$Value[i] = sum_PPT_warmestQ %>%
+    group_by(month) %>%
+    summarise(meanPPT_warmestQ = mean(sum_PPT_warmestQ, na.rm = TRUE)) %>%
+    sum() %>%
+    round(3)
+}
+
+###   QUARTERLY TEMPS   ###
+
+# All temps in F  
+
+
+## Mean Temp of Wettest Quarter
+
+meanTemp_wettestQuarter <- data.frame(Scenarios = scenario_future_combos,
+                                      Value = double(length = 5L))
+
+for(i in 1:5){
+  
+  meanTemp_wettestQuarter$Value[i] = monthSumDF[[i]] %>%
+    filter(month %in% wettest_quarter) %>%
+    summarise(meanTemp_wettestQuarter = mean(TMeanF, na.rm = TRUE)) %>%
+    pull(meanTemp_wettestQuarter) %>%
+    round(3)
+}
+
+
