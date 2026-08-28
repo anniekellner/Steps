@@ -174,24 +174,24 @@ roll_quarter <- function(x, fun = sum) {
 precip_wettestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                     Value = double(length = 5L))
 
+for(i in 1:5){
+
 meanPPT = monthSumDF[[i]] %>%
   mutate(month = as.numeric(month)) %>%
   arrange(month) %>%
   pull(Avg_PPT_in)
 
-wettest_start = which.max(roll_quarter(ppt, sum))
+wettest_start = which.max(roll_quarter(meanPPT, sum))
 wettest_quarter = quarter_months(wettest_start)
 
-
-for(i in 1:5){
   
-  sumPPT_ym = AllDays[[i]] %>%
+sumPPT_ym = AllDays[[i]] %>%
     filter(month %in% wettest_quarter) %>%
     group_by(year, month) %>%
     summarise(sumPPT = sum(PPT_in, na.rm = TRUE), .groups = "drop_last") %>%
     ungroup()
   
-  precip_wettestQuarter$Value[i] = sumPPT_ym %>%
+precip_wettestQuarter$Value[i] = sumPPT_ym %>%
     group_by(month) %>%
     summarise(meanPPT = mean(sumPPT, na.rm = TRUE)) %>%
     pull(meanPPT) %>%
@@ -205,6 +205,8 @@ for(i in 1:5){
 precip_coldestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                     Value = double(length = 5L))
 
+for(i in 1:5){
+
 TMeanF = monthSumDF[[i]] %>%
   mutate(month = as.numeric(month)) %>%
   arrange(month) %>%
@@ -213,32 +215,34 @@ TMeanF = monthSumDF[[i]] %>%
 coldest_start = which.min(roll_quarter(TMeanF))
 coldest_quarter = quarter_months(coldest_start)
 
-for(i in 1:5){
+
+sum_PPT_coldestQ = AllDays[[i]] %>%
+  filter(month %in% coldest_quarter) %>%
+  group_by(year, month) %>%
+  summarise(sumPPT_coldQ = sum(PPT_in, na.rm = TRUE), .groups = "drop_last") %>%
+  ungroup()
   
-  sum_PPT_coldestQ = AllDays[[i]] %>%
-    filter(month %in% coldest_quarter) %>%
-    group_by(year, month) %>%
-    summarise(sumPPT_coldQ = sum(PPT_in, na.rm = TRUE), .groups = "drop_last") %>%
-    ungroup()
-  
-  precip_coldestQuarter$Value[i] = sum_PPT_coldestQ %>%
-    group_by(month) %>%
-    summarise(meanPPT_coldestQ = mean(sumPPT_coldestQ, na.rm = TRUE)) %>%
-    pull(meanPPT_coldestQ) %>%
-    sum() %>%
-    round(3)
+precip_coldestQuarter$Value[i] = sum_PPT_coldestQ %>%
+  group_by(month) %>%
+  summarise(meanPPT_coldestQ = mean(sumPPT_coldestQ, na.rm = TRUE)) %>%
+  pull(meanPPT_coldestQ) %>%
+  sum() %>%
+  round(3)
 }
+
 
 ## Precipitation of Warmest Quarter
 
 precip_warmestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                     Value = double(length = 5L))
 
-warmest_start = which.max(roll_quarter(TMeanF))
-warmest_quarter = quarter_months(warmest_start)
+
 
 for(i in 1:5){
-  
+
+  warmest_start = which.max(roll_quarter(TMeanF))
+  warmest_quarter = quarter_months(warmest_start)
+    
   sum_PPT_warmestQ = AllDays[[i]] %>%
     filter(month %in% warmest_quarter) %>%
     group_by(year, month) %>%
@@ -252,9 +256,11 @@ for(i in 1:5){
     round(3)
 }
 
+
 ###   QUARTERLY TEMPS   ###
 
-# All temps in F  
+# All temps in F 
+# Uses monthly data
 
 
 ## Mean Temp of Wettest Quarter
@@ -263,6 +269,18 @@ meanTemp_wettestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                       Value = double(length = 5L))
 
 for(i in 1:5){
+
+  # Get wettest Quarter
+  
+  meanPPT = monthSumDF[[i]] %>%
+    mutate(month = as.numeric(month)) %>%
+    arrange(month) %>%
+    pull(Avg_PPT_in)
+  
+  wettest_start = which.max(roll_quarter(meanPPT, sum))
+  wettest_quarter = quarter_months(wettest_start)
+  
+  # Get Mean Temp from monthSumDF
   
   meanTemp_wettestQuarter$Value[i] = monthSumDF[[i]] %>%
     filter(month %in% wettest_quarter) %>%
@@ -270,5 +288,157 @@ for(i in 1:5){
     pull(meanTemp_wettestQuarter) %>%
     round(3)
 }
+
+
+## Mean Temp of Driest Quarter
+
+meanTemp_driestQuarter <- data.frame(Scenarios = scenario_future_combos,
+                                     Value = double(length = 5L))
+
+for(i in 1:5){
+  
+  # Get Driest Quarter
+  
+  meanPPT = monthSumDF[[i]] %>%
+    mutate(month = as.numeric(month)) %>%
+    arrange(month) %>%
+    pull(Avg_PPT_in)
+  
+  driest_start = which.min(roll_quarter(meanPPT, sum))
+  driest_quarter = quarter_months(driest_start)
+  
+  meanTemp_driestQuarter$Value[i] = monthSumDF[[i]] %>%
+    filter(month %in% driest_quarter) %>%
+    summarise(meanTemp_driestQuarter = mean(TMeanF, na.rm = TRUE)) %>%
+    pull(meanTemp_driestQuarter) %>%
+    round(3)
+  
+}
+
+## Mean Temp Coldest Quarter
+
+meanTemp_coldestQuarter <- data.frame(Scenarios = scenario_future_combos,
+                                      Value = double(length = 5L))
+
+for(i in 1:5){
+  
+  TMeanF = monthSumDF[[i]] %>%
+    mutate(month = as.numeric(month)) %>%
+    arrange(month) %>%
+    pull(Avg_TMeanF)
+  
+  coldest_start = which.min(roll_quarter(TMeanF))
+  coldest_quarter = quarter_months(coldest_start)
+  
+  meanTemp_coldestQuarter$Value[i] = monthSumDF[[i]] %>%
+    filter(month %in% coldest_quarter) %>%
+    summarise(meanTemp_coldestQuarter = mean(TMeanF, na.rm = TRUE)) %>%
+    pull(meanTemp_coldestQuarter) %>%
+    round(3)
+  
+}
+
+
+## Mean Temp Warmest Quarter
+
+meanTemp_warmestQuarter <- data.frame(Scenarios = scenario_future_combos,
+                                      Value = double(length = 5L))
+
+for(i in 1:5){
+  
+  TMeanF = monthSumDF[[i]] %>%
+    mutate(month = as.numeric(month)) %>%
+    arrange(month) %>%
+    pull(Avg_TMeanF)
+  
+  warmest_start = which.max(roll_quarter(TMeanF))
+  warmest_quarter = quarter_months(warmest_start)
+  
+  meanTemp_warmestQuarter$Value[i] = monthSumDF[[i]] %>%
+    filter(month %in% warmest_quarter) %>%
+    summarise(meanTemp_warmestQuarter = mean(Avg_TMeanF, na.rm = TRUE)) %>%
+    pull(meanTemp_warmestQuarter) %>%
+    round(3)
+  
+}
+
+
+## #END QUARTERLY CALCULATIONS
+
+## Annual Temperature Range
+
+annual_temp_range <- data.frame(Scenarios = scenario_future_combos,
+                                Value = double(length = 5L))
+
+annual_temp_range$Value[i] = monthSumDF[[i]] %>%
+  summarize(annual_temp_range = max(Avg_TMaxF, na.rm = TRUE) - min(Avg_TMinF, na.rm = TRUE)) %>%
+  pull(annual_temp_range)
+
+
+## Annual Mean Diurnal Range
+
+annual_mean_diurnal_range <- data.frame(Scenarios = scenario_future_combos,
+                                        Value = double(length = 5L))
+
+for(i in 1:5){
+  
+  annual_mean_diurnal_range$Value[i] = monthSumDF[[i]] %>%
+    summarise(mean(Avg_TMaxF - Avg_TMinF, na.rm = TRUE))
+
+}
+
+
+## Isothermality
+
+isothermality <- data.frame(Scenarios = scenario_future_combos,
+                            Value = double(length = 5L))
+
+for(i in 1:5){
+  
+  annual_range = monthSumDF[[i]] %>%
+    summarize(max(Avg_TMaxF, na.rm = TRUE) - min(Avg_TMinF, na.rm = TRUE))
+  
+  isothermality$Value[i] = (annual_mean_diurnal_range/annual_range)*100  
+  
+}
+
+
+## Temperature Seasonality (standard deviation)
+
+temp_seasonality_sd <- data.frame(Scenarios = scenario_future_combos,
+                                  Value = double(length = 5L))
+
+for(i in 1:5){
+  
+  temp_seasonality_sd$Value[i] = monthSumDF[[i]] %>%
+    summarise(value = sd(Avg_TMeanF, na.rm = TRUE)) %>%
+    pull(value)
+  
+}
+
+
+## Temperature Seasonality (coefficient of variation)
+  # note: calculated in K to negate negative values. Result is a % so units are irrelevant.
+
+temp_seasonality_cv <- data.frame(Scenarios = scenario_future_combos,
+                                  Value = double(length = 5L))
+
+for(i in 1:5){
+  
+  meanTMeanF = monthSumDF[[i]] %>%
+    summarise(meanTMeanF = mean(Avg_TMeanF)) %>%
+    pull(meanTMeanF)
+  
+  # Kelvin conversions
+    
+  TMeanK = RasterUnitConvert(meanTMeanF, "FtoK")
+  
+  seasonalitySD_F = temp_seasonality_sd$Value[i]
+  seasonalitySD_K = RasterUnitConvert(seasonalitySD_F, "FtoK")
+  
+  temp_seasonality_cv$Value[i] = (seasonalitySD_K / TMeanK) * 100
+  
+}
+
 
 
