@@ -95,9 +95,10 @@ warmestMonth_label = monthSumDF[[i]] %>%
 
 maxTMaxF = AllDays[[i]] %>%
   filter(month == warmestMonth_label) %>%
-  summarise(maxTMaxF = max(TMaxF, na.rm = TRUE)) 
+  summarise(maxTMaxF = max(TMaxF, na.rm = TRUE)) %>%
+  pull(maxTMaxF)
 
-maxTemp_warmestMonth$Temp[i] = maxTMaxF
+maxTemp_warmestMonth$Value[i] = maxTMaxF
 }
 
 
@@ -114,9 +115,10 @@ for(i in 1:5){
   
   minTMinF = AllDays[[i]] %>%
     filter(month == coldestMonth_label) %>%
-    summarise(minTMinF = min(TMinF, na.rm = TRUE)) 
+    summarise(minTMinF = min(TMinF, na.rm = TRUE)) %>%
+    pull(minTMinF)
   
-  minTemp_coldestMonth$Temp[i] = minTMinF
+  minTemp_coldestMonth$Value[i] = minTMinF
 }  
 
 
@@ -147,6 +149,104 @@ for(i in 1:5){
 }
 
 
+## Annual Temperature Range
+
+annual_temp_range <- data.frame(Scenarios = scenario_future_combos,
+                                Value = double(length = 5L))
+
+for(i in 1:5){
+
+TMax = maxTemp_warmestMonth$Value[i]
+TMin = minTemp_coldestMonth$Value[i]
+  
+annual_temp_range$Value[i] = TMax - TMin
+
+}
+
+## Annual Mean Diurnal Range
+
+annual_mean_diurnal_range <- data.frame(Scenarios = scenario_future_combos,
+                                        Value = double(length = 5L))
+
+for(i in 1:5){
+  
+  annual_mean_diurnal_range$Value[i] = monthSumDF[[i]] %>%
+    summarise(amdr = mean(Avg_TMaxF - Avg_TMinF, na.rm = TRUE)) %>%
+    pull(amdr)
+  
+}
+
+
+## Isothermality
+
+isothermality <- data.frame(Scenarios = scenario_future_combos,
+                            Value = double(length = 5L))
+
+for(i in 1:5){
+  
+  diurnal_range = annual_mean_diurnal_range$Value[i]
+  temp_range = annual_temp_range$Value[i]
+  
+  isothermality$Value[i] = (diurnal_range / temp_range) * 100  
+  
+}
+
+
+## Temperature Seasonality (standard deviation)
+  # Kelvin calculation used for CV calculation
+
+temp_seasonality_sdF <- data.frame(Scenarios = scenario_future_combos, # Fahrenheit
+                                  Value = double(length = 5L))
+
+temp_seasonality_sdK <- data.frame(Scenarios = scenario_future_combos, # Kelvin
+                                   Value = double(length = 5L))
+
+# Add Kelvin to monthSumDF
+
+for(i in 1:length(monthSumDF)){
+
+  monthSumDF[[i]] <- monthSumDF[[i]] %>%
+  arrange(month) %>%
+  mutate(Avg_TMeanK = RasterUnitConvert(Avg_TMeanF, "FtoK")) 
+
+}
+
+
+for(i in 1:5){
+  
+  temp_seasonality_sdF$Value[i] = monthSumDF[[i]] %>%
+    summarise(value = sd(Avg_TMeanF, na.rm = TRUE)) %>%
+    pull(value)
+  
+  temp_seasonality_sdK$Value[i] = monthSumDF[[i]] %>%
+    summarise(value = sd(Avg_TMeanK, na.rm = TRUE)) %>%
+    pull(value)
+  
+}
+
+
+## Temperature Seasonality (coefficient of variation)
+# note: calculated in K to negate negative values. Result is a % so units are irrelevant.
+
+temp_seasonality_cv <- data.frame(Scenarios = scenario_future_combos,
+                                  Value = double(length = 5L))
+
+for(i in 1:5){
+  
+  meanTMeanF = monthSumDF[[i]] %>%
+    summarise(meanTMeanF = mean(Avg_TMeanF)) %>%
+    pull(meanTMeanF)
+  
+  # Kelvin conversions
+  
+  TMeanK = RasterUnitConvert(meanTMeanF, "FtoK")
+  
+  seasonalitySD_F = temp_seasonality_sdF$Value[i]
+  seasonalitySD_K = temp_seasonality_sdK$Value[i]
+  
+  temp_seasonality_cv$Value[i] = (seasonalitySD_K / TMeanK) * 100
+  
+}
 ###  ---   QUARTERLY CALCULATIONS  ---   ###
 
 ## Rolling 3-month windows from a 12-month climatology
@@ -365,80 +465,7 @@ for(i in 1:5){
 
 ## #END QUARTERLY CALCULATIONS
 
-## Annual Temperature Range
 
-annual_temp_range <- data.frame(Scenarios = scenario_future_combos,
-                                Value = double(length = 5L))
-
-annual_temp_range$Value[i] = monthSumDF[[i]] %>%
-  summarize(annual_temp_range = max(Avg_TMaxF, na.rm = TRUE) - min(Avg_TMinF, na.rm = TRUE)) %>%
-  pull(annual_temp_range)
-
-
-## Annual Mean Diurnal Range
-
-annual_mean_diurnal_range <- data.frame(Scenarios = scenario_future_combos,
-                                        Value = double(length = 5L))
-
-for(i in 1:5){
-  
-  annual_mean_diurnal_range$Value[i] = monthSumDF[[i]] %>%
-    summarise(mean(Avg_TMaxF - Avg_TMinF, na.rm = TRUE))
-
-}
-
-
-## Isothermality
-
-isothermality <- data.frame(Scenarios = scenario_future_combos,
-                            Value = double(length = 5L))
-
-for(i in 1:5){
-  
-  annual_range = monthSumDF[[i]] %>%
-    summarize(max(Avg_TMaxF, na.rm = TRUE) - min(Avg_TMinF, na.rm = TRUE))
-  
-  isothermality$Value[i] = (annual_mean_diurnal_range/annual_range)*100  
-  
-}
-
-
-## Temperature Seasonality (standard deviation)
-
-temp_seasonality_sd <- data.frame(Scenarios = scenario_future_combos,
-                                  Value = double(length = 5L))
-
-for(i in 1:5){
-  
-  temp_seasonality_sd$Value[i] = monthSumDF[[i]] %>%
-    summarise(value = sd(Avg_TMeanF, na.rm = TRUE)) %>%
-    pull(value)
-  
-}
-
-
-## Temperature Seasonality (coefficient of variation)
-  # note: calculated in K to negate negative values. Result is a % so units are irrelevant.
-
-temp_seasonality_cv <- data.frame(Scenarios = scenario_future_combos,
-                                  Value = double(length = 5L))
-
-for(i in 1:5){
-  
-  meanTMeanF = monthSumDF[[i]] %>%
-    summarise(meanTMeanF = mean(Avg_TMeanF)) %>%
-    pull(meanTMeanF)
-  
-  # Kelvin conversions
-    
-  TMeanK = RasterUnitConvert(meanTMeanF, "FtoK")
-  
-  seasonalitySD_F = temp_seasonality_sd$Value[i]
-  seasonalitySD_K = RasterUnitConvert(seasonalitySD_F, "FtoK")
-  
-  temp_seasonality_cv$Value[i] = (seasonalitySD_K / TMeanK) * 100
-  
-}
 
 
 
