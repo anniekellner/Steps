@@ -961,9 +961,9 @@ CEMML plain language: how much the day-to-night temperatures oscillate relative 
 ## Uses monthly and daily to calculate
 ### No conversion needed, as this is % 
 
-mdr <- temp_diurnal_range
+mdr <- temp_diurnal_range # annual mean diurnal range
 
-atr <- monthly_long_wmonth |>
+atr <- monthly_long_wmonth |> # annual temp range
   filter(variable %in% c("TMaxF", "TMinF")) |>
   pivot_wider(names_from = variable, values_from = value) |>
   group_by(scenario) |>
