@@ -512,9 +512,37 @@ for(i in 1:5){
 }
 
 
-## #END QUARTERLY CALCULATIONS
+## End quarterly calculations 
 
 
+##    ----    MAKE TABLE    ---   ##
 
+
+bioclim_table <- bind_rows(
+  list(
+    "Annual Mean Diurnal Range (\u00B0F)"              = annual_mean_diurnal_range,
+    "Isothermality (%)"                               = isothermality,
+    "Temperature Seasonality (standard deviation)"    = temp_seasonality_sdF,
+    "Temperature Seasonality (Coefficient of Variation)" = temp_seasonality_cv,
+    "Max Temperature of Warmest Month"                = maxTemp_warmestMonth,
+    "Min Temperature of Coldest Month"                = minTemp_coldestMonth,
+    "Annual Temperature Range"                        = annual_temp_range,
+    "Mean Temperature of Wettest Quarter (\u00B0F)"    = meanTemp_wettestQuarter,
+    "Mean Temperature of Driest Quarter (\u00B0F)"     = meanTemp_driestQuarter,
+    "Mean Temperature of Warmest Quarter (\u00B0F)"    = meanTemp_warmestQuarter,
+    "Mean Temperature of Coldest Quarter (\u00B0F)"    = meanTemp_coldestQuarter,
+    "Precipitation of Wettest Month (in)"             = precip_wettestMonth,
+    "Total Precipitation of Driest Month (in)"        = precip_driestMonth,
+    "Precipitation Seasonality (CV)"                  = precip_seasonality_cv,
+    "Total Precipitation of Wettest Quarter (in)"     = precip_wettestQuarter,
+    "Total Precipitation of Driest QUarter (in)"      = precip_driestQuarter,
+    "Total Precipitation of Coldest Quarter (in)"     = precip_coldestQuarter,
+    "Total Precipitation of Warmest Quarter (in)"     = precip_warmestQuarter
+  ),
+  .id = "Variable"
+) %>%
+  mutate(Value = round(Value,3)) %>%
+  pivot_wider(names_from = Scenarios, values_from = Value) %>%
+  relocate(Variable, all_of(scenario_future_combos))
 
 
