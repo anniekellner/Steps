@@ -956,33 +956,7 @@ bio_var_01 <- temp_diurnal_range
 
 CEMML plain language: how much the day-to-night temperatures oscillate relative to the summer-to-winter (annual) oscillations.
 
-```{r isothermality, eval=TRUE}
-# Re-creates "Isothermality, %" in bioclimatics table
-## Uses monthly and daily to calculate
-### No conversion needed, as this is % 
 
-mdr <- temp_diurnal_range # annual mean diurnal range
-
-atr <- monthly_long_wmonth |> # annual temp range
-  filter(variable %in% c("TMaxF", "TMinF")) |>
-  pivot_wider(names_from = variable, values_from = value) |>
-  group_by(scenario) |>
-  summarise(
-    atr = max(TMaxF, na.rm = TRUE) - min(TMinF, na.rm = TRUE),
-    .groups = "drop")
- 
-isothermality <- mdr |>
-  left_join(atr , by = "scenario") |>
-  mutate(
-    isothermality = (annual_mean_diurnal_range / atr) * 100
-  )
-
-bio_var_02 <- isothermality |> 
-  select(scenario, isothermality)
-
-#### Unable to get identical values from original Script
-##### Troubleshooting TBD
-```
 
 #### (3) Temperature Seasonality (Standard Deviation), °F
 "Definition: The amount of temperature variation over a given year (or averaged years) based on the standard deviation (variation) of monthly temperature averages." O’Donnell & Ignizio (2012) Furthermore," The standard deviation of the 12 mean monthly temperature values is calculated. The original AML® multiplies the result by 100, which was designed to preserve significant digits, but in our calculations we do not do multiply by 100."
@@ -1052,6 +1026,21 @@ annual_temp_range <- bio_var_05 |>
   )
 bio_var_07 <- annual_temp_range |> 
   select(scenario, annual_temp_range)
+```
+
+```{r isothermality, eval=TRUE}
+# Re-creates "Isothermality, %" in bioclimatics table
+## Uses monthly and daily to calculate
+### No conversion needed, as this is % 
+
+isothermality <- bio_var_01 |>
+  left_join(bio_var_07, by = "scenario") |>
+  mutate(
+    isothermality = (annual_mean_diurnal_range / annual_temp_range) * 100)
+ 
+bio_var_02 <- isothermality |> 
+  select(scenario, isothermality)
+
 ```
 
 ...
