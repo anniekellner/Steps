@@ -46,13 +46,12 @@ scenario_future_combos <- c(
 
 
 
-###  Modify AllDays df  ###
+###  ---  ADD COLUMNS FOR MONTH TO DATAFRAMES (BOTH NUMERIC [e.g., 1] AND ABBREVIATED [e.g., "Jan"])  ###
 
-conflicts_prefer(month::lubridate) # set conflict preferences
+
+## ALLDAYS
 
 # Add column for year
-
-# Add year (code added 2026-08-22 by Annie Kellner)
 
 for(i in 1:length(AllDays)){
   
@@ -65,19 +64,44 @@ for(i in 1:length(AllDays)){
   
 }
 
-# Create function for adding month (e.g., "Jan") to dataframe
+# Create function for adding month (e.g., "Jan") to AllDays df
 
 add_month_abbrev <- function(df){
   df = df %>%
-    mutate(month_abb = month(df$date, label = TRUE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")))
+    mutate(month_abb = lubridate::month(df$date, label = TRUE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")))
 }
 
-# loop to add month to dataframes
+# loop to add month_abb to AllDays df
 
 for(i in 1:length(AllDays)){
   AllDays[[i]] = add_month_abbrev(AllDays[[i]])
-  AllDays[[i]]$month_abb = as.character(AllDays[[i]]$month)
+  AllDays[[i]]$month_abb = as.character(AllDays[[i]]$month_abb)
 }
+
+
+## MONTHSUMDF
+
+# Rename 'month' column to 'month_num'
+
+for(i in 1:length(monthSumDF)){ 
+
+  
+  monthSumDF[[i]] = monthSumDF[[i]] %>%
+    rename(month_num = month)
+  
+}
+
+# Add month_abb column
+  
+for(i in 1:length(monthSumDF)){
+  
+  monthSumDF[[i]] = monthSumDF[[i]] %>%
+    mutate(month_abb = month.abb[month_num])
+  
+  monthSumDF[[i]]$month_abb = as.character(monthSumDF[[i]]$month_abb)
+  
+}
+
 
 
 ##    ---   INDIVIDUAL VARIABLES    ---   ##
