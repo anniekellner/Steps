@@ -55,6 +55,7 @@ conflicts_prefer(month::lubridate) # set conflict preferences
 # Add year (code added 2026-08-22 by Annie Kellner)
 
 for(i in 1:length(AllDays)){
+  
   df = AllDays[[i]]
   df = df %>%
     mutate(date = date(date)) %>%
@@ -66,16 +67,16 @@ for(i in 1:length(AllDays)){
 
 # Create function for adding month (e.g., "Jan") to dataframe
 
-add_month <- function(df){
+add_month_abbrev <- function(df){
   df = df %>%
-    mutate(month = month(df$date, label = TRUE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")))
+    mutate(month_abb = month(df$date, label = TRUE, abbr = TRUE, locale = Sys.getlocale("LC_TIME")))
 }
 
 # loop to add month to dataframes
 
 for(i in 1:length(AllDays)){
-  AllDays[[i]] = add_month(AllDays[[i]])
-  AllDays[[i]]$month = as.character(AllDays[[i]]$month)
+  AllDays[[i]] = add_month_abbrev(AllDays[[i]])
+  AllDays[[i]]$month_abb = as.character(AllDays[[i]]$month)
 }
 
 
@@ -299,8 +300,8 @@ precip_wettestQuarter <- data.frame(Scenarios = scenario_future_combos,
 for(i in 1:5){
 
 meanPPT = monthSumDF[[i]] %>%
-  mutate(month = as.numeric(month)) %>%
-  arrange(month) %>%
+  mutate(month_num = as.numeric(month)) %>%
+  arrange(month_num) %>%
   pull(Avg_PPT_in)
 
 wettest_start = which.max(roll_quarter(meanPPT, sum))
@@ -328,6 +329,11 @@ precip_driestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                    Value = double(length = 5L))
 
 for(i in 1:5){
+  
+  meanPPT = monthSumDF[[i]] %>%
+    mutate(month_num = as.numeric(month)) %>%
+    arrange(month_num) %>%
+    pull(Avg_PPT_in)
   
   driest_start = which.min(roll_quarter(meanPPT, sum))
   driest_quarter = quarter_months(driest_start)
@@ -388,6 +394,11 @@ precip_warmestQuarter <- data.frame(Scenarios = scenario_future_combos,
 
 for(i in 1:5){
 
+  TMeanF = monthSumDF[[i]] %>%
+    mutate(month_num = as.numeric(month)) %>%
+    arrange(month_num) %>%
+    pull(Avg_TMeanF)
+  
   warmest_start = which.max(roll_quarter(TMeanF))
   warmest_quarter = quarter_months(warmest_start)
     
@@ -422,18 +433,20 @@ for(i in 1:5){
   # Get wettest Quarter
   
   meanPPT = monthSumDF[[i]] %>%
-    mutate(month = as.numeric(month)) %>%
-    arrange(month) %>%
+    mutate(month_abb = month.abb(month)) %>%
+    arrange(month_num) %>%
     pull(Avg_PPT_in)
   
   wettest_start = which.max(roll_quarter(meanPPT, sum))
   wettest_quarter = quarter_months(wettest_start)
   
+  
   # Get Mean Temp from monthSumDF
   
   meanTemp_wettestQuarter$Value[i] = monthSumDF[[i]] %>%
-    filter(month %in% wettest_quarter) %>%
-    summarise(meanTemp_wettestQuarter = mean(TMeanF, na.rm = TRUE)) %>%
+    filter(month %in% wettest_quarter) %>% 
+    group_by()
+    summarise(meanTemp_wettestQuarter = mean(Avg_TMeanF, na.rm = TRUE)) %>%
     pull(meanTemp_wettestQuarter) %>%
     round(3)
 }
