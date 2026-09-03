@@ -825,42 +825,6 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
 
 ```
 
-## Bioclimatic variables 
-
-*WILL NEED TO MOVE TO AFTER DIFFHIST*
-
-```{r Biolimatic-variables, message=FALSE}
-
-# Formerly Step 9A
-# Writes Bioclimatics csv directly into appropriate results folder on N: drive
-
-source('Code/Ecosystems_Climate_Data.R')
-
-```
-
-```{r remove-extraneous-stuff, warning=FALSE}
-
-rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
-                        "official_name",
-                        "variables",
-                        "results_folder",
-                        #"rx",
-                        "avdf",
-                        "elev",
-                        "years",
-                        "avg30",
-                        ls(pattern = "^AllDays"),
-                        ls(pattern = "^model"), 
-                        ls(pattern = "^scenario"),
-                        ls(pattern = "^future"),
-                        ls(pattern = "dir"),
-                        ls(pattern = "^noaa"),
-                        ls(pattern = "^NOAA"),
-                        ls(pattern = "^results"),
-                        lsf.str()))) # all functions
-
-```
-
 
 ## MonthSum
 
@@ -880,6 +844,42 @@ The next chunk creates MonthSum.csv files
 
 source("./Code/monthSum.R")
 source("./Code/Dashboard/monthSum_Dash.R")
+
+```
+
+```{r remove-extraneous-objects}
+
+rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
+                        "official_name",
+                        "variables",
+                        "results_folder",
+                        "elev",
+                        "years",
+                        "monthSumDF",
+                        "MonthlySeries",
+                        "avg30",
+                        ls(pattern = "^AllDays"),
+                        ls(pattern = "^model"), 
+                        ls(pattern = "^scenario"),
+                        ls(pattern = "^future"),
+                        ls(pattern = "dir"),
+                        ls(pattern = "^noaa"),
+                        ls(pattern = "^NOAA"),
+                        ls(pattern = "^results"),
+                        lsf.str()))) # all functions
+
+```
+
+
+## Bioclimatic variables 
+
+
+```{r Biolimatic-variables, message=FALSE}
+
+# Formerly Step 9A
+# Writes Bioclimatics csv directly into appropriate results folder on N: drive
+
+source('Code/Bioclimatics.R')
 
 ```
 
@@ -906,6 +906,7 @@ rm(list=setdiff(ls(), c("shp", # These are the objects we want to keep
                         lsf.str()))) # all functions
 
 ```
+
 
 ## Climographs
 
