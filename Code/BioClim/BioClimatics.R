@@ -488,6 +488,7 @@ for(i in 1:5){
 ## Mean Temp of Wettest Quarter
   # Def: The average temperature (F) over the three consecutive months that receive the most precipitation. 
 
+
 meanTemp_wettestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                       Value = double(length = 5L))
 
@@ -502,7 +503,6 @@ for(i in 1:5){
   wettest_start = which.max(roll_quarter(meanPPT, sum))
   wettest_quarter = quarter_months(wettest_start)
   
-  
   # Get Mean Temp from monthSumDF
   
   meanTemp_wettestQuarter$Value[i] = monthSumDF[[i]] %>%
@@ -515,7 +515,7 @@ for(i in 1:5){
 
 ## Mean Temp of Driest Quarter
   # Def: The average temperature (F) over the three consecutive months that receive the least precipitation. 
-  # All data for calcs from monthSumDF
+
 
 meanTemp_driestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                      Value = double(length = 5L))
@@ -540,6 +540,7 @@ for(i in 1:5){
 }
 
 ## Mean Temp Coldest Quarter
+  # Def: the coolest average temperature when three consecutive months are averaged 
 
 meanTemp_coldestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                       Value = double(length = 5L))
@@ -547,16 +548,15 @@ meanTemp_coldestQuarter <- data.frame(Scenarios = scenario_future_combos,
 for(i in 1:5){
   
   TMeanF = monthSumDF[[i]] %>%
-    mutate(month = as.numeric(month)) %>%
-    arrange(month) %>%
+    arrange(month_num) %>%
     pull(Avg_TMeanF)
   
   coldest_start = which.min(roll_quarter(TMeanF))
   coldest_quarter = quarter_months(coldest_start)
   
   meanTemp_coldestQuarter$Value[i] = monthSumDF[[i]] %>%
-    filter(month %in% coldest_quarter) %>%
-    summarise(meanTemp_coldestQuarter = mean(TMeanF, na.rm = TRUE)) %>%
+    filter(month_abb %in% coldest_quarter) %>%
+    summarise(meanTemp_coldestQuarter = mean(Avg_TMeanF, na.rm = TRUE)) %>%
     pull(meanTemp_coldestQuarter) %>%
     round(3)
   
@@ -564,6 +564,7 @@ for(i in 1:5){
 
 
 ## Mean Temp Warmest Quarter
+  # Def: the warmest average temperature when three consecutive months are averaged 
 
 meanTemp_warmestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                       Value = double(length = 5L))
@@ -571,15 +572,14 @@ meanTemp_warmestQuarter <- data.frame(Scenarios = scenario_future_combos,
 for(i in 1:5){
   
   TMeanF = monthSumDF[[i]] %>%
-    mutate(month = as.numeric(month)) %>%
-    arrange(month) %>%
+    arrange(month_num) %>%
     pull(Avg_TMeanF)
   
   warmest_start = which.max(roll_quarter(TMeanF))
   warmest_quarter = quarter_months(warmest_start)
   
   meanTemp_warmestQuarter$Value[i] = monthSumDF[[i]] %>%
-    filter(month %in% warmest_quarter) %>%
+    filter(month_abb %in% warmest_quarter) %>%
     summarise(meanTemp_warmestQuarter = mean(Avg_TMeanF, na.rm = TRUE)) %>%
     pull(meanTemp_warmestQuarter) %>%
     round(3)
