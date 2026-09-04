@@ -103,11 +103,12 @@ for(i in 1:length(monthSumDF)){
 }
 
 
-
 ##    ---   INDIVIDUAL VARIABLES    ---   ##
 
 
 ## Max Temp of Warmest Month
+  # Def: the highest daily temperature recorded from the average hottest month
+  # month from monthSumDF; value from AllDays
 
 maxTemp_warmestMonth <- data.frame(Scenarios = scenario_future_combos,
                                    Value = double(length = 5L))
@@ -115,7 +116,6 @@ maxTemp_warmestMonth <- data.frame(Scenarios = scenario_future_combos,
 for(i in 1:5){
 warmestMonth_label = monthSumDF[[i]] %>%
   slice_max(Avg_TMaxF, n = 1, with_ties = FALSE) %>%
-  mutate(month = month.abb[month]) %>%
   pull(month) 
 
 maxTMaxF = AllDays[[i]] %>%
@@ -128,6 +128,9 @@ maxTemp_warmestMonth$Value[i] = maxTMaxF
 
 
 ## Min Temp of Coldest Month
+  # Def: the lowest daily temperature recorded from the average coldest month
+  # month from monthSumDF; value from AllDays
+
 
 minTemp_coldestMonth <- data.frame(Scenarios = scenario_future_combos,
                                    Value = double(length = 5L))
@@ -148,7 +151,8 @@ for(i in 1:5){
 
 
 ## Precipitation of Wettest Month 
-# Defined as mean precip of wettest month over scenario-future
+  # the average sum (inches) of rain in the average wettest month
+  # from monthSumDF
 
 precip_wettestMonth <- data.frame(Scenarios = scenario_future_combos,
                                   Value = double(length = 5L))
@@ -162,6 +166,8 @@ for(i in 1:5){
 
 
 ## Precipitation of Driest Month
+  # Def: the average sum (inches) of rain in the average driest month
+
 
 precip_driestMonth <- data.frame(Scenarios = scenario_future_combos,
                                  Value = double(length = 5L))
@@ -175,6 +181,8 @@ for(i in 1:5){
 
 
 ## Annual Temperature Range
+  # Def: the difference (degrees F) between the coldest day of the average coldest month to the warmest day of the average warmest month. 
+  # From previously determined values within script
 
 annual_temp_range <- data.frame(Scenarios = scenario_future_combos,
                                 Value = double(length = 5L))
@@ -189,6 +197,8 @@ annual_temp_range$Value[i] = TMax - TMin
 }
 
 ## Annual Mean Diurnal Range
+  # Def: The average difference between monthly means of highest and lowest temps, averaged over the year 
+  # from monthSumDF
 
 annual_mean_diurnal_range <- data.frame(Scenarios = scenario_future_combos,
                                         Value = double(length = 5L))
@@ -203,6 +213,8 @@ for(i in 1:5){
 
 
 ## Isothermality
+  # Def: how much the day-to-night temperatures oscillate relative to the summer-to-winter (annual) oscillations
+  # Uses metrics calculated within-script
 
 isothermality <- data.frame(Scenarios = scenario_future_combos,
                             Value = double(length = 5L))
@@ -217,8 +229,10 @@ for(i in 1:5){
 }
 
 
-## Temperature Seasonality (standard deviation)
-  # Kelvin calculation used for CV calculation
+## Temperature Seasonality (standard deviation and coefficient of variation)
+  # Def: The amount of temperature variation over the averaged based on the ratio of the standard deviation of the monthly mean temperatures to the mean monthly temperature (also known as the coefficient of variation). 
+  # Kelvin is used for cv to circumvent negative values. Results is a % so units are irrelevant
+  # Calculated from monthSumDF
 
 temp_seasonality_sdF <- data.frame(Scenarios = scenario_future_combos, # Fahrenheit
                                   Value = double(length = 5L))
@@ -237,21 +251,25 @@ for(i in 1:length(monthSumDF)){
 }
 
 
+# Temperature Seasonality: Standard Deviation
+
 for(i in 1:5){
   
   temp_seasonality_sdF$Value[i] = monthSumDF[[i]] %>%
     summarise(value = sd(Avg_TMeanF, na.rm = TRUE)) %>%
-    pull(value)
+    pull(value) %>%
+    round(3)
   
   temp_seasonality_sdK$Value[i] = monthSumDF[[i]] %>%
     summarise(value = sd(Avg_TMeanK, na.rm = TRUE)) %>%
-    pull(value)
+    pull(value) %>%
+    round(3)
   
 }
 
 
-## Temperature Seasonality (coefficient of variation)
-# note: calculated in K to negate negative values. Result is a % so units are irrelevant.
+## Temperature Seasonality: Coefficient of Variation
+
 
 temp_seasonality_cv <- data.frame(Scenarios = scenario_future_combos,
                                   Value = double(length = 5L))
@@ -261,6 +279,7 @@ for(i in 1:5){
   meanTMeanF = monthSumDF[[i]] %>%
     summarise(meanTMeanF = mean(Avg_TMeanF)) %>%
     pull(meanTMeanF)
+  
   
   # Kelvin conversions
   
@@ -275,6 +294,8 @@ for(i in 1:5){
 
 
 ## Precipitation Seasonality (coefficient of variation)
+  # Def: A measure of the variation in monthly precipitation over the course of the year.
+  # Calculated from monthSumDF
 
 precip_seasonality_cv <- data.frame(Scenarios = scenario_future_combos,
                                     Value = double(length = 5L))
@@ -297,13 +318,18 @@ for(i in 1:5){
 ###  ---   QUARTERLY CALCULATIONS  ---   ###
 
 ## Rolling 3-month windows from a 12-month climatology
-# start 11 = Nov-Dec-Jan, start 12 = Dec-Jan-Feb (same year, not next year)
+# start 11 = Nov-Dec-Jan, start 12 = Dec-Jan-Feb (info from Maria Gaetani, pers. comm. 08/2026)
 
-# Steps for calculating quarterly precip values: 
-  # 1. Ascertain 'wettest quarter', etc. from monthSum
-  # 2. Calculate total precip (sum) for each month-year combo within a given future-scenario
+# Steps for calculating quarterly values: 
+  # 1. Ascertain 'wettest quarter', etc. from monthSumDF
+  
+  #PRECIP:
+  # 2. Calculate total (sum) for each month-year combo within a given future-scenario
   # 3. Calculate the mean for each month over the future-scenario
   # 4. Add the resulting three means together 
+
+
+## FUNCTIONS REQUIRED FOR CALC'S
 
 quarter_months <- function(start_month) {
   month.abb[((start_month - 1 + 0:2) %% 12) + 1]
@@ -315,8 +341,15 @@ roll_quarter <- function(x, fun = sum) {
   vapply(1:12, function(j) fun(wrapped[j:(j + 2)]), numeric(1))
 }
 
+
+## VARIABLES
+
+
 ## Total Precipitation of Wettest Quarter
-  
+  # Def: The sum of precipitation (jn) that falls during the wettest three consecutive months of a year. 
+    # (see note above on 'consecutive')
+  # Determine 'wettest quarter' using monthSumDF; precip sum from AllDays
+
 
 precip_wettestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                     Value = double(length = 5L))
@@ -348,6 +381,8 @@ precip_wettestQuarter$Value[i] = sumPPT_ym_wet %>%
 
 
 ## Precipitation of Driest Quarter
+  # Def: The sum of precipitation in inches that falls during the driest three consecutive months of a year
+  # same as above wrt methodology/data
 
 precip_driestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                    Value = double(length = 5L))
@@ -378,8 +413,9 @@ for(i in 1:5){
 }
 
 
-
 ## Precipitation of Coldest Quarter
+  # Def: The sum of precipitation (in) during the coldest consecutive three months of a year.
+  # Same methodology as above
 
 precip_coldestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                     Value = double(length = 5L))
@@ -411,10 +447,12 @@ precip_coldestQuarter$Value[i] = sum_PPT_coldestQ %>%
 
 
 ## Precipitation of Warmest Quarter
+  # Def: The sum of precipitation (in) during the warmest consecutive three months of a year.
+  # Same methodology as above
+
 
 precip_warmestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                     Value = double(length = 5L))
-
 
 for(i in 1:5){
 
@@ -444,10 +482,11 @@ for(i in 1:5){
 ###   QUARTERLY TEMPS   ###
 
 # All temps in F 
-# Uses monthly data
+# Uses monthly data (monthSumDF) only
 
 
 ## Mean Temp of Wettest Quarter
+  # Def: The average temperature (F) over the three consecutive months that receive the most precipitation. 
 
 meanTemp_wettestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                       Value = double(length = 5L))
@@ -457,7 +496,6 @@ for(i in 1:5){
   # Get wettest Quarter
   
   meanPPT = monthSumDF[[i]] %>%
-    mutate(month_abb = month.abb(month)) %>%
     arrange(month_num) %>%
     pull(Avg_PPT_in)
   
@@ -468,8 +506,7 @@ for(i in 1:5){
   # Get Mean Temp from monthSumDF
   
   meanTemp_wettestQuarter$Value[i] = monthSumDF[[i]] %>%
-    filter(month %in% wettest_quarter) %>% 
-    group_by()
+    filter(month_abb %in% wettest_quarter) %>% 
     summarise(meanTemp_wettestQuarter = mean(Avg_TMeanF, na.rm = TRUE)) %>%
     pull(meanTemp_wettestQuarter) %>%
     round(3)
@@ -477,6 +514,8 @@ for(i in 1:5){
 
 
 ## Mean Temp of Driest Quarter
+  # Def: The average temperature (F) over the three consecutive months that receive the least precipitation. 
+  # All data for calcs from monthSumDF
 
 meanTemp_driestQuarter <- data.frame(Scenarios = scenario_future_combos,
                                      Value = double(length = 5L))
@@ -486,16 +525,15 @@ for(i in 1:5){
   # Get Driest Quarter
   
   meanPPT = monthSumDF[[i]] %>%
-    mutate(month = as.numeric(month)) %>%
-    arrange(month) %>%
+    arrange(month_num) %>%
     pull(Avg_PPT_in)
   
   driest_start = which.min(roll_quarter(meanPPT, sum))
   driest_quarter = quarter_months(driest_start)
   
   meanTemp_driestQuarter$Value[i] = monthSumDF[[i]] %>%
-    filter(month %in% driest_quarter) %>%
-    summarise(meanTemp_driestQuarter = mean(TMeanF, na.rm = TRUE)) %>%
+    filter(month_abb %in% driest_quarter) %>%
+    summarise(meanTemp_driestQuarter = mean(Avg_TMeanF, na.rm = TRUE)) %>%
     pull(meanTemp_driestQuarter) %>%
     round(3)
   
