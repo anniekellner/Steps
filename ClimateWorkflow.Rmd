@@ -167,13 +167,13 @@ However, if you are re- specific segments of the script using previously extract
 
 # Load workspace image
 
-load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Naval_Station_Norfolk/Naval_Station_Norfolk_ACCESS-ESM1-5_20260129.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
+#load("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Naval_Station_Norfolk/Naval_Station_Norfolk_ACCESS-ESM1-5_20260129.RData") # INSERT COPY-PASTED PATH TO .RDATA FILE
 
 # Load raster stack
 
-rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Naval_Station_Norfolk/rx_Naval_Station_Norfolk_ACCESS-ESM1-5_20260129.tif") #INSERT COPY-PASTED PATH TO .TIF FILE
+#rx <- rast("N:/RStor/CEMML/ClimateChange/CC_Modeling/Data/Workspace Images/Naval_Station_Norfolk/rx_Naval_Station_Norfolk_ACCESS-ESM1-5_20260129.tif") #INSERT COPY-PASTED PATH TO .TIF FILE
 
-unitsRX <- units(rx)
+#unitsRX <- units(rx)
 
 ```
 
@@ -202,7 +202,7 @@ The output following the code chunk will confirm your selections. You can easily
 
 ```{r enter-base-name}
 
-shp <- shp_names[65] 
+shp <- shp_names[55] 
 
 official_name <- official_base_names[46] # These names serve as titles for the climograph and Walter-Lieth plots
 
