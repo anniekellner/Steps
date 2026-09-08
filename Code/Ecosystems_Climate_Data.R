@@ -191,7 +191,7 @@ f.to.c <- function(temp) {
 
 #absolute max and min and converting to celsius
 abs.tmax.f <- max(dat.hist$TMaxF)
-abs.max.c <- f.to.c(abs.tmax.f)
+abs.max.c <- RasterUnitConvert(abs.tmax.f, ConvertType = "FtoC")
 abs.tmin.f <- min(dat.hist$TMinF)
 abs.tmin.c <- f.to.c(abs.tmin.f)
 
@@ -235,6 +235,9 @@ f.to.k <- function(temp) {
 
 #function created, lets get Kelvin values for each month
 jan.k <- f.to.k(jan.tav)
+jan.k2 <- RasterUnitConvert(jan.tav, "FtoK")
+
+
 feb.k <- f.to.k(feb.tav)
 mar.k <- f.to.k(mar.tav)
 apr.k <- f.to.k(apr.tav)

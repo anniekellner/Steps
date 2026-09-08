@@ -1,0 +1,1297 @@
+---
+title: "Veg Team Bioclimatics and HVI: Step 01 - Calculate Bioclimatic Variables"
+author: "M.S. Gaetani"
+date: "20260723"
+output: html_document
+---
+
+\vspace{-1cm}
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning=FALSE)
+```
+
+# Information and References
+This document was developed by Maria S. Gaetani while employed by the Center for Environmental Management of Military Lands (CEMML) at Colorado State University. This is part of a larger workflow to determine the Habitat Vulnerability Index (HVI) for naturally occurring vegetation on Military Installations, adapted from NatureServe methodologies.
+
+Until this point (July 2026) the Climate Team has assembled an Excel Workbook called "Changes in Monthly Means_Installation.xlsx and another "Bioclimatic Variables" csv. This is set up to pull the component inputs directly from the staged results from the Climate Team (in the future this can all be stitched together).
+
+This Script is currently in development as standalone step for bioclimatic and HVI Exposure calculations. The objective is to produce a bioclimatic table for inclusion with reporting AND a bioclimatic+BP table equivalent with numeric value and a written values for analysis. It will support written explanation of direction/magnitude/timing of change from the historical baseline for each scenario for all variables.
+
+It will then pass into calculating the Exposure for the installation and format tables for output. 
+
+Future Steps will capture updates to Group Level Resilience calculations. 
+
+## References 
+[Vegetation Team SOP](https://colostate.sharepoint.com/sites/CEMML_Eagle_Team/_layouts/15/Doc.aspx?sourcedoc=%7Bfd6609d7-827e-4935-b6af-5a41a6edba21%7D&action=edit&wd=target%282.5_SME%20Analysis-Ecosys%20Terr%20Veg.one%7C0accd065-74ac-4f61-8174-dec0a564324f%2F2.5.1%20Ecosystem%20%20HVI%20Analysis%7C5d5d32c7-728e-4da6-ab57-1aa868821333%2F%29&wdorigin=703&wdpartid=%7B1129b36c-0074-4b65-9836-1c1ff9a770ad%7D%7B187%7D&wdsectionfileid=%7B2f30a89a-4f38-4380-9e61-b38c82451c00%7D) 
+
+1. [Comer, P. J., Hak, J. C., Reid, M. S., Auer, S. L., Schulz, K. A., Hamilton, H. H., Smyth, R. L., & Kling, M. M. (2019). Habitat climate change vulnerability index applied to major vegetation types of the western interior United States. Land, 8(7), 108. https://doi.org/10.3390/land8070108](https://www.mdpi.com/2073-445X/8/7/108)
+
+
+2. [O’Donnell, M. S., & Ignizio, D. A. (2012). Bioclimatic predictors for supporting ecological applications in the conterminous United States. In U.S. Geological Survey Data Series 691. U.S. Geological Survey](https://pubs.usgs.gov/ds/691/ds691.pdf)
+
+## Drive Locations
+★ Down from however you have mapped Rstor (\\acns.colostate.edu\WCNR-Network)
+
+★\CEMML\ClimateChange\1_USAFClimate\1_USAF_Natural_Resources\20_2_0004_RevisitingPhase1
+
+★\CEMML\ClimateChange\2_NavyClimate\Round2_Extremes_INRMP_integ
+
+★\CEMML\ClimateChange\CC_Modeling\Results\
+
+## Assorted Notes
+👁 Please keep outputs contained to either a scratch space or a specific Veg Team folder.
+
+👁 FYI R and Excel round differently - briefly see https://cran.rstudio.com/doc/FAQ/R-FAQ.html#Why-doesn_0027t-R-think-these-numbers-are-equal_003f & the classic StackOverflow explanation https://stackoverflow.com/questions/9508518/why-are-these-numbers-not-equal; I am rounding to three decimal places in this script using the R functionality. 
+
+👁 TBD about how to incorporate inundation values for Groups when writing output excel sheets.
+
+# Setup
+```{r setup-workspace, echo=FALSE, message=FALSE, results='hide'}
+# Periodically Check Versions
+## R.Version()
+
+# options to turn off scientific notation and limit the number of digits
+options(scipen = 999)
+options(digits = 5) # this only changes what we see, not the calculations
+
+# set seed
+set.seed(54)
+
+# install task specific packages as needed
+## check to see if you're going to need rtools and if you can install it
+if(!require("remotes")) install.packages("remotes")
+
+# load usual packages
+hush <- suppressPackageStartupMessages
+hush(library(rmarkdown))
+hush(library(tidyverse))
+hush(library(readxl))
+hush(library(openxlsx))
+hush(library(kableExtra))
+hush(library(tinytex))
+hush(library(knitr))
+hush(library(scales))
+hush(library(ggpubr))
+hush(library(janitor))
+hush(library(here))
+
+# load task specific packages
+## This is where you load GIS packages, should you need them
+```
+
+```{r setup-paths-climateteam, eval = TRUE}
+# This sets a path to the bioclimatic csv directly in the Climate Team's Results 
+clim_results <- "Results"
+clim_res_type <- "Results_ACCESS-ESM1-5"
+clim_res_installation <- "Naval_Station_Norfolk" # Changed per installation "LETTERS_NAME"
+
+climate_resultsjr <- normalizePath(
+  path = file.path(
+    "N:",
+    "CEMML",
+    "ClimateChange",
+    "CC_Modeling",
+    clim_results,
+    clim_res_type,
+    clim_res_installation
+  ),
+  winslash = "/"
+)
+```
+
+```{r setup-paths-out}
+outfolder <- here() # Set your own out folder
+```
+
+# Load in Data
+This is loading directly from the climate team's results
+
+```{r data-load-wrangle, echo = FALSE, message = FALSE, warning = FALSE, include = TRUE}
+folder_peep <- list.files(path = climate_resultsjr, all.files = FALSE) |>
+  as_tibble()
+
+# This is directed to the CSVs created by the Climate Team, rather than re-running their code
+climate_f_in <- list.files(path = climate_resultsjr,
+                               pattern = "\\.csv$",
+                               full.names = TRUE) |>
+  set_names(~ tools::file_path_sans_ext(basename(.x))) |>
+  map(read_csv)
+
+names_climate_f_in <- names(climate_f_in)
+
+#- Historical
+in_days_historical <- climate_f_in[[which(grepl("historical", names_climate_f_in) & grepl("AllDays", names_climate_f_in))]]
+
+in_monthsum_historical <- climate_f_in[[which(grepl("historical", names_climate_f_in) & grepl("MonthSum", names_climate_f_in))]]
+
+#- Near Moderate (ssp245_2021)
+in_days_near_mod <- climate_f_in[[which(grepl("ssp245_2021", names_climate_f_in) & grepl("AllDays", names_climate_f_in))]]
+
+in_monthsum_near_mod <- climate_f_in[[which(grepl("ssp245_2021", names_climate_f_in) & grepl("MonthSum", names_climate_f_in))]]
+
+## in_diffhist_near_mod <-climate_f_in[[which(grepl("ssp245_2021", names_climate_f_in) & grepl("DiffHist", names_climate_f_in))]] 
+
+#- Far Moderate (ssp245_2051)
+in_days_far_mod <- climate_f_in[[which(grepl("ssp245_2051", names_climate_f_in) & grepl("AllDays", names_climate_f_in))]]
+
+in_monthsum_far_mod <- climate_f_in[[which(grepl("ssp245_2051", names_climate_f_in) & grepl("MonthSum", names_climate_f_in))]]
+
+## in_diffhist_far_mod <-climate_f_in[[which(grepl("ssp245_2051", names_climate_f_in) & grepl("DiffHist", names_climate_f_in))]] 
+
+#- Near High (ssp585_2021)
+in_days_near_high <- climate_f_in[[which(grepl("ssp585_2021", names_climate_f_in) & grepl("AllDays", names_climate_f_in))]]
+
+in_monthsum_near_high <- climate_f_in[[which(grepl("ssp585_2021", names_climate_f_in) & grepl("MonthSum", names_climate_f_in))]]
+
+## in_diffhist_near_high <-climate_f_in[[which(grepl("ssp585_2021", names_climate_f_in) & grepl("DiffHist", names_climate_f_in))]] 
+
+#- Far High (ssp585_2051)
+in_days_far_high <- climate_f_in[[which(grepl("ssp585_2051", names_climate_f_in) & grepl("AllDays", names_climate_f_in))]]
+
+in_monthsum_far_high <- climate_f_in[[which(grepl("ssp585_2051", names_climate_f_in) & grepl("MonthSum", names_climate_f_in))]]
+
+## in_diffhist_far_near <-climate_f_in[[which(grepl("ssp585_2051", names_climate_f_in) & grepl("DiffHist", names_climate_f_in))]] 
+
+rm(climate_f_in)
+rm(names_climate_f_in)
+```
+
+# Re-create Bioclimatic Information
+This will involve components previously found in the "Changes in Monthly Means_installation.xlsx" Workbook and creates an entire Bioclimatic Table for output. 
+## Stage useful dataframes/tibbles
+## Frankentibble Names
+```{r frankentibble-names }
+# I  modify the names of the scenarios and sometimes variables for my own readability.
+
+# My preferred order is
+name_scenario_order_wmonth <- c("month", "historical", "near_mod", "far_mod", "near_high", "far_high")
+
+name_scenario_order <- c("historical", "near_mod", "far_mod", "near_high", "far_high")
+
+# The mapping is
+name_scenario_match_asis <- c(
+  "historical" = "historical_1985 - 2014",# the spacing of the file names in the folder is different on DiffHist
+  "near_mod" = "ssp245_2021 - 2050",
+  "near_high" = "ssp585_2021 - 2050",
+  "far_mod" =  "ssp245_2051 - 2080",
+  "far_high" = "ssp585_2051 - 2080"
+)
+
+name_scenario_match_wordy_ordered_time <- c(
+  "historical" = "Historical",
+  "near_mod" = "Moderate Disruption Near Term",
+  "near_high" = "High Disruption Near Term",
+  "far_mod" =  "Moderate Disruption Far Term",
+  "far_high" = "High Disruption Far Term"
+)
+
+name_scenario_match_wordy_ordered_flow <- c(
+  "historical" = "Historical",
+  "near_mod" = "Moderate Disruption Near Term",
+  "far_mod" =  "Moderate Disruption Far Term",
+  "near_high" = "High Disruption Near Term",
+  "far_high" = "High Disruption Far Term"
+) ### This matches the report flow
+```
+
+## Frankentibble Generation 
+```{r frankentibble-daily}
+frankent_daily_00 <- mget(ls(pattern = "^in_days_")) |>
+  imap(function(df, name) {
+    prefix <- str_remove(name, "^in_days_")
+    rename_with(df, \(x) str_c(prefix, "_", x), -date)
+  }) |>
+  reduce(full_join, by = "date") |> 
+  select(date, 
+         ends_with("TMeanF"), 
+         ends_with("TMaxF"), 
+         ends_with("TMinF"), 
+         ends_with("PPT_in"))
+
+daily_long <- frankent_daily_00 |> 
+  pivot_longer(-c(date),
+    names_to = c("scenario", "variable"),
+    names_pattern = "(historical|near_mod|near_high|far_mod|far_high)_(.*)",
+    values_to = "value"
+  )
+
+frankent_daily_wmonth <- frankent_daily_00 |> 
+  mutate(month = month(date), 
+    month_word = month(date, label = TRUE, abbr = FALSE)) |> 
+  relocate(month, month_word, .after = date)
+
+daily_long_wmonth <- frankent_daily_wmonth |> 
+  pivot_longer(
+    -c(date,month,month_word),
+    names_to = c("scenario", "variable"),
+    names_pattern = "(historical|near_mod|near_high|far_mod|far_high)_(.*)",
+    values_to = "value"
+  )
+```
+
+```{r frankentibble-monthly, warning=FALSE}
+## Monthly Data comes in already rounded to three places after the decimal 
+frankent_monthly_00 <- mget(ls(pattern = "^in_monthsum_")) |>
+  imap(function(df, name) {
+    prefix <- str_remove(name, "^in_monthsum_")
+    rename_with(df, function(x) {
+      clean_name <- str_remove(x, "Avg_")
+      str_c(prefix, "_", clean_name)
+    }, -month)
+  }) |>
+  reduce(full_join, by = "month") |> 
+  select(month,
+         ends_with("TMeanF"), 
+         ends_with("TMaxF"), 
+         ends_with("TMinF"), 
+         ends_with("PPT_in")
+         ) |> 
+  select(!contains("Abs_TminF")) |> 
+  slice_head(n = -2) |> 
+  mutate(month = as.numeric(month))
+
+monthly_long <- frankent_monthly_00|> 
+  pivot_longer(
+    cols = -c(month),
+    names_to = c("scenario", "variable"),
+    names_pattern = "(historical|near_mod|near_high|far_mod|far_high)_(.*)",
+    values_to = "value"
+  )
+
+frankent_monthly_wmonth <- frankent_monthly_00 |> 
+   mutate(month_word = lubridate::month(month, label = TRUE, abbr = FALSE), .after = month)
+
+monthly_long_wmonth <- frankent_monthly_wmonth |> 
+  pivot_longer(
+    cols = -c(month, month_word),
+    names_to = c("scenario", "variable"),
+    names_pattern = "(historical|near_mod|near_high|far_mod|far_high)_(.*)",
+    values_to = "value"
+  )
+
+```
+
+```{r franken-tibble-montly-all-temps}
+# These will be valuable for the miscellaneous variable calculations
+
+monthly_temps_multi_unit <- monthly_long_wmonth |>
+  filter(variable %in% c("TMeanF", "TMaxF", "TMinF")) |>
+  rename(value_f = value) |>
+  mutate(
+    variable = str_replace(variable, "F$", "")
+  ) |>
+  mutate(
+    value_c = (value_f - 32) * 5/9,
+    value_k = value_c + 273.15
+    )
+```
+
+## Individual Variables
+
+### Temperature
+#### Baseline Tave
+BP ~~ Baseline Period
+
+"((monthly mean of daily maximum temperatures - monthly mean of daily minimum temperatures))/2 per month" O’Donnell & Ignizio (2012)
+
+CEMML plain language: Tave is the mean of the average monthly temperature in Fahrenheit
+```{r bp-tave}
+# Re-creates "BP Tave" tab in "Changes in Monthly Means"
+## Uses monthly averages as input data to calculate
+### Matches existing example
+
+tave_monthly_00 <- frankent_monthly_wmonth  |> 
+  select(("month")|("month_word")| ends_with("TMeanF")) |> 
+  mutate(across(-"month_word", as.numeric)) |> 
+  rename_with(~ str_replace(., ".monthsum.*", ""), -1)|> 
+ select(starts_with(name_scenario_order_wmonth))
+
+bp_tave_monthly <- tave_monthly_00  |> 
+  mutate(across(-c(month, month_word, historical_TMeanF), ~ .x - historical_TMeanF, .names = "{.col}_diffy"))
+```
+
+#### Baseline Tmax
+BP ~~ Baseline Period
+
+"monthly mean of daily maximum temperatures" O’Donnell & Ignizio (2012)
+
+CEMML plain language: the average maximum monthly temperature in Fahrenheit
+```{r bp-tmax}
+# Re-creates "BP Tmax" tab in "Changes in Monthly Means"
+## Uses monthly input data to calculate
+### Matches existing example
+
+tmax_monthly_00 <- frankent_monthly_wmonth  |> 
+  select(("month")|("month_word")| ends_with("TMaxF")) |> 
+  mutate(across(-"month_word", as.numeric)) |> 
+  rename_with(~ str_replace(., ".monthsum.*", ""), -1)|> 
+ select(starts_with(name_scenario_order_wmonth))
+
+bp_tmax_monthly <- tmax_monthly_00  |> 
+  mutate(across(-c(month, month_word, historical_TMaxF), ~ .x - historical_TMaxF, .names = "{.col}_diffy"))
+```
+
+#### Baseline Tmin
+BP ~~ Baseline Period
+
+"monthly mean of daily minimum temperatures" O’Donnell & Ignizio (2012)
+
+CEMML plain language: the average minimum monthly temperature in Fahrenheit
+```{r bp-tmin}
+# Re-creates "BP Tmin" tab in "Changes in Monthly Means"
+## Uses monthly input data to calculate
+### Matches existing example
+
+tmin_monthly_00 <- frankent_monthly_wmonth  |> 
+  select(("month")|("month_word")| ends_with("TMinF")) |> 
+  mutate(across(-"month_word", as.numeric)) |> 
+  rename_with(~ str_replace(., ".monthsum.*", ""), -1)|> 
+ select(starts_with(name_scenario_order_wmonth))
+
+bp_tmin_monthly <- tmin_monthly_00  |> 
+  mutate(across(-c(month, month_word, historical_TMinF), ~ .x - historical_TMinF, .names = "{.col}_diffy"))
+```
+
+#### (x5) Max Temperature of Warmest Month
+"The maximum monthly temperature occurrence over a given year (time-series) or averaged span of years (normal)" O’Donnell & Ignizio (2012)
+
+CEMML plain language: the highest daily temperature recorded from the average hottest month
+
+~The CEMML SOP has a slight variation, this chunk is included for reference. 
+```{r tmax-warmest-month eval=FALSE}
+tmax_max_daily_00 <- daily_long |>
+  filter(!is.na(value), variable == "TMaxF") |>
+  mutate(
+    year = year(date),
+    month_name = month(date, label = TRUE, abbr = FALSE)) |>
+  group_by(scenario, month_name) |>
+  summarise(
+    avg_tmax = mean(value, na.rm = TRUE),
+    .groups = "drop") 
+
+tmax_max_month_from_daily <- tmax_max_daily_00 |> 
+  group_by(scenario) |>
+  filter(avg_tmax == max(avg_tmax, na.rm = TRUE)) |>
+  ungroup()
+
+tmax_max <- daily_long |> 
+  filter(!is.na(value), variable == "TMaxF") |> 
+  mutate(
+    year = year(date),
+    month_name = month(date, label = TRUE, abbr = FALSE)
+  ) |> 
+  group_by(scenario, month_name) |> 
+  summarise(
+    target_max_tmax = max(value, na.rm = TRUE),
+    .groups = "drop"
+  ) |> 
+  left_join(tmax_max_month_from_daily, by = c("scenario", "month_name")) |> 
+  filter(!is.na(avg_tmax)) |> 
+  select(scenario, month_name, target_max_tmax) # if you want the value to compare add avg_tmax
+
+x_bio_var_05 <- tmax_max |> 
+  rename(x_warmest_month = month_name,
+         x_warmest_temp_warmest_month = target_max_tmax)
+```
+
+#### (5) Max Temperature of Warmest Month
+from CEMML SOP: The warmest month is the calendar month with the highest average air temperature (Tave) in a specific location. 
+```{r tave-warmest-month}
+# Creates "Max Temperature of Warmest Month, °F" in bioclimatics table AND additionally provides the month
+## Uses daily input data to calculate
+
+tave_max_daily_00 <- daily_long |> 
+  filter(!is.na(value), variable == "TMeanF") |> 
+  mutate(month_name = month(date, label = TRUE, abbr = FALSE)) |> 
+  group_by(scenario, month_name) |> 
+  summarise(avg_tave = mean(value, na.rm = TRUE), .groups = "drop") |> 
+  group_by(scenario) |> 
+  filter(avg_tave == max(avg_tave, na.rm = TRUE)) |> 
+  ungroup()
+
+tave_max_month_from_daily <- daily_long |> 
+  filter(!is.na(value), variable == "TMaxF") |> 
+  mutate(month_name = month(date, label = TRUE, abbr = FALSE)) |> 
+  group_by(scenario, month_name) |> 
+  summarise(target_max_tmax = max(value, na.rm = TRUE), .groups = "drop")
+
+bio_var_05 <- tave_max_daily_00 |> 
+  left_join(tave_max_month_from_daily , by = c("scenario", "month_name")) |> 
+  select(scenario, 
+         max_temp_warmest_month = target_max_tmax,
+         warmest_month = month_name)
+```
+
+#### (x6) Min Temperature of Coldest Month
+"The minimum monthly temperature occurrence over a given year (time-series) or
+averaged span of years (normal)." O’Donnell & Ignizio (2012)
+
+CEMML plain language: the lowest daily temperature recorded from the average coldest month
+
+~The CEMML SOP has a slight variation, this chunk is included for reference.
+```{r tmin-coldest-month eval= FALSE}
+tmin_min_daily_00 <- daily_long |>
+  filter(!is.na(value), variable == "TMinF") |>
+  mutate(
+    year = year(date),
+    month_name = month(date, label = TRUE, abbr = FALSE)) |> 
+  group_by(scenario, month_name) |>
+  summarise(
+    avg_tmin = mean(value, na.rm = TRUE),
+    .groups = "drop") 
+
+tmin_min_month_from_daily <- tmin_min_daily_00 |> 
+  group_by(scenario) |>
+  filter(avg_tmin == min(avg_tmin, na.rm = TRUE)) |>
+  ungroup()
+
+tmin_min <- daily_long |> 
+  filter(!is.na(value), variable == "TMinF") |> 
+  mutate(
+    year = year(date),
+    month_name = month(date, label = TRUE, abbr = FALSE) 
+  ) |> 
+  group_by(scenario, month_name) |> 
+  summarise(
+    target_min_tmin = min(value, na.rm = TRUE),
+    .groups = "drop"
+  ) |> 
+  left_join(tmin_min_month_from_daily, by = c("scenario", "month_name")) |> 
+  filter(!is.na(avg_tmin)) |> 
+  select(scenario, month_name, target_min_tmin) 
+
+x_bio_var_06 <- tmin_min|> 
+  rename(x_coldest_month = month_name,
+         x_coldest_temp_coldest_month = target_min_tmin)
+```
+
+#### (6) Min Temperature of Coldest Month
+From CEMML SOP: The coldest month is the calendar month with the lowest average air temperature (Tave) in a specific location. (It is determined by Tave but not by Tmin, which is an one-time event)
+```{r tave-coldest-month}
+# Creates "Min Temperature of Coldest Month, °F" in Bioclimatics table AND gives the month
+## Uses daily input data to calculate
+
+tave_min_daily_00 <- daily_long |> 
+  filter(!is.na(value), variable == "TMeanF") |> 
+  mutate(month_name = month(date, label = TRUE, abbr = FALSE)) |> 
+  group_by(scenario, month_name) |> 
+  summarise(avg_tmean = mean(value, na.rm = TRUE), .groups = "drop") |> 
+  filter(!is.nan(avg_tmean)) |> 
+  group_by(scenario) |> 
+  filter(avg_tmean == min(avg_tmean, na.rm = TRUE)) |> 
+  ungroup()
+
+tmin_month_from_daily <- daily_long |> 
+  filter(!is.na(value), variable == "TMinF") |> 
+  mutate(month_name = month(date, label = TRUE, abbr = FALSE)) |> 
+  group_by(scenario, month_name) |> 
+  summarise(target_min_tmin = min(value, na.rm = TRUE), .groups = "drop")
+
+bio_var_06 <- tave_min_daily_00 |> 
+  left_join(tmin_month_from_daily, by = c("scenario", "month_name"))|>
+  select(scenario,
+         min_temp_coldest_month = target_min_tmin,
+         coldest_month = month_name
+         )
+```
+
+### Precipitation
+
+#### Baseline Monthly Precip
+BP ~~ Baseline Period
+
+CEMML plain language: average total precipitation for each month of the year
+
+```{r bp-precip-from-monthly}
+# Re-create content of "BP Precip" tab in "Changes in Monthly Means"
+## Uses monthly input data to calculate
+### Matches existing example
+
+precip_monthly_00 <- frankent_monthly_wmonth  |> 
+  select(("month")|("month_word")| ends_with("PPT_in")) |> 
+  mutate(across(-"month_word", as.numeric)) |> 
+  rename_with(~ str_replace(., ".monthsum.*", ""), -1)|> 
+ select(starts_with(name_scenario_order_wmonth))
+
+precip_sum_month_from_monthly_avg <- precip_monthly_00  |> 
+  mutate(across(-c(month, month_word, historical_PPT_in), ~ .x - historical_PPT_in, .names = "{.col}_diffy"))
+```
+
+```{r bp-precip-from-daily}
+# Re-creates "BP Precip" tab in "Changes in Monthly Means"
+## Uses daily precip input to calculate
+### This matches the values in the changes in monthly means sheet   
+
+precip_sum_month_from_daily <- daily_long |> 
+  filter(variable == "PPT_in") |> 
+  mutate(
+    date = as.Date(date), 
+    year = lubridate::year(date),
+    month = lubridate::month(date, label = TRUE, abbr = FALSE)) |> 
+  group_by(scenario, year, month) |> 
+  summarise(
+    precip_month_summed = if(all(is.na(value))) NA_real_ else sum(value, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+precip_sum_month_from_daily_avg <- precip_sum_month_from_daily |> 
+  group_by(scenario, month) |> 
+  summarise(
+    mean_annual_precip_summed = mean(precip_month_summed, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+precip_sum_month_from_daily_avg_wide <- precip_sum_month_from_daily_avg |> 
+  pivot_wider(
+    names_from = scenario, 
+    values_from = mean_annual_precip_summed
+  )
+
+precip_sum_month_from_daily_avg_wide_01 <- precip_sum_month_from_daily_avg_wide |>   mutate(across(
+        -c(month, historical), 
+       ~ .x - historical, 
+    .names = "{.col}_diffy"
+  ))
+```
+
+#### (12) Precipitation of Wettest Month
+
+ "Definition: This index identifies the total precipitation that prevails during the wettest month." O’Donnell & Ignizio (2012)
+
+More information from O’Donnell & Ignizio (2012):
+They have a different number for the variable.
+To calculate this bioclimatic predictor we identify the month with the highest cumulative precipitation total.
+
+CEMML plain language: the sum (inches) of rain in the average wettest month
+
+```{r precip-wettest-month}
+# Recreates "Precipitation of Wettest Month, inches" in bioclimatics table and includes the month
+## Uses daily input data to calculate
+
+precip_max_sum_month_from_daily <- precip_sum_month_from_daily_avg |> 
+  group_by(scenario) |> 
+  slice_max(mean_annual_precip_summed, n = 1, with_ties = FALSE) |>   ungroup()
+
+bio_var_12 <- precip_max_sum_month_from_daily |> 
+  rename(wettest_month_precip = mean_annual_precip_summed,
+          wettest_month = month)
+```
+
+#### (13) Precipitation of Driest Month
+"Definition: This index identifies the total precipitation that prevails during the driest month." O’Donnell & Ignizio (2012)
+
+More information from O’Donnell & Ignizio (2012):
+They have a different number for the variable.
+
+To calculate this bioclimatic predictor we identify the month with the lowest cumulative precipitation total
+
+CEMML plain language: the sum (inches) of rain in the average driest month
+
+```{r precip-driest-month}
+# Recreates "Precipitation of Driest Month, inches" in bioclimatics table and includes the month
+## Uses daily input data to calculate
+
+precip_min_sum_month_from_daily <- precip_sum_month_from_daily_avg |> group_by(scenario) |> 
+  slice_min(mean_annual_precip_summed, n = 1) |> 
+  ungroup()
+
+bio_var_13 <- precip_min_sum_month_from_daily |> 
+rename(driest_month_precip = mean_annual_precip_summed,
+       driest_month = month)
+```
+
+## Quarters
+Figure out the "floating" quarters for variables which are quarterly (spanning three months but all within the same year).
+
+```{r quarterlies-from-monthly}
+# These quarterlies are made with the Month Data
+## Trying an if/else for keeping the months ALL within the same year, rather than averaging into the next year from month 11 and 12
+quarterlies_from_monthly <- monthly_long_wmonth  |> 
+  group_by(scenario, variable)  |> 
+  arrange(month, .by_group = TRUE) |> 
+  mutate(
+    quarterly_value = if_else(
+      variable == "PPT_in",
+      map_dbl(row_number(), ~ sum(value[((.x - 1 + 0:2) %% n()) + 1])),
+      map_dbl(row_number(), ~ mean(value[((.x - 1 + 0:2) %% n()) + 1]))
+    )
+  ) |> 
+  ungroup()
+```
+
+```{r quarterlies-from-daily}
+# These quarterlies are from the daily data
+## Trying the approach where you convert 12 months into 14 months then reduce, which allows for november and december to have a rolling average.
+
+monthly_holder <- daily_long_wmonth |> 
+  filter(!is.na(value)) |> 
+  mutate(year = year(date)) |> 
+  group_by(scenario, variable, year, month, month_word) |> 
+  summarise(
+    value = if (first(variable) == "PPT_in") { 
+      sum(value, na.rm = TRUE)
+    } else {
+      mean(value, na.rm = TRUE)
+    },
+    .groups = "drop"
+  ) |> 
+  group_by(scenario, variable, month, month_word) |> 
+  summarise(
+    value = mean(value, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+extra_months <- monthly_holder |> 
+  group_by(scenario, variable) |> 
+  arrange(month, .by_group = TRUE) |> 
+  reframe(
+    month = c(month, month[1:2]),
+    month_word = c(month_word, month_word[1:2]),
+    value = c(value, value[1:2])
+  ) |> 
+  ungroup()
+
+quarterlies_from_daily <- extra_months |> 
+  group_by(scenario, variable) |> 
+  mutate(
+    quarterly_value = if (first(variable) == "PPT_in") { 
+      value + lead(value, 1) + lead(value, 2)
+    } else {
+      (value + lead(value, 1) + lead(value, 2)) / 3
+    }
+  ) |> 
+  slice(1:12) |> 
+  ungroup()
+```
+
+### Quarterly Temps
+
+#### (10) Mean Temperature of Warmest Quarter 
+"Definition: This quarterly index approximates mean temperatures that prevail during the warmest quarter." O’Donnell & Ignizio (2012) Further, "To calculate this bioclimatic predictor we first identify the warmest quarter of the year (the average temperatures of each month in the quarter are summed; the quarter with the highest value is selected). If quarterly ties occur, the first chronological quarter is selected as the warmest quarter. We then calculate the average temperature for the three months in the warmest quarter"
+
+CEMML plain language: the warmest average temperature when three consecutive months are averaged 
+
+```{r quarterlies-mean-temp-warmest}
+# Re-creates "Mean Temperature of Warmest Quarter, °F" in bioclimatics table
+## Uses monthly input to calculate
+### This matches the values in the changes in monthly means sheet, but not the bioclimatics table
+
+tave_warmest_q <- quarterlies_from_monthly |>
+  filter(variable == "TMeanF") |>
+  group_by(scenario, variable) |>
+  arrange(month, .by_group = TRUE)|>
+  slice_max(quarterly_value, n = 1, with_ties = FALSE) |>
+  mutate(
+    start_month_warmest_q = month,
+    warmest_quarter = paste(
+      substr(levels(month_word)[month], 1, 3),
+      substr(levels(month_word)[(month %% 12) + 1], 1, 3),
+      substr(levels(month_word)[((month + 1) %% 12) + 1], 1, 3),
+      sep = "-")
+    ) |> ungroup() |>
+  select(
+    scenario,
+    variable, # Keep variable only if needed for join later
+    warmest_quarter_mean_temp = quarterly_value,
+    warmest_quarter_start = start_month_warmest_q,
+    warmest_quarter_words = warmest_quarter
+    )
+ 
+bio_var_10 <- tave_warmest_q
+```
+
+#### (11) Mean Temperature of Coldest Quarter
+"Definition: This quarterly index approximates mean  temperatures that prevail during the coldest quarter." O’Donnell & Ignizio (2012) Further, To calculate this bioclimatic predictor we first identify the coolest quarter of the year(the average temperatures of each month in the quarter are summed; the quarter
+with the lowest value is selected). If quarterly ties occur, the first chronological quarter is selected as the coolest quarter. We then calculate the average temperature for the three months in the coldest quarter.
+
+CEMML plain language: the coolest average temperature when three consecutive months are averaged 
+
+```{r quarterlies-mean-temp-coolest}
+# Re-creates "Mean Temperature of Coldest Quarter, °F" in bioclimatics table
+## Uses monthly input to calculate
+### This matches the values in the changes in monthly means sheet, but not the bioclimatics table
+
+tave_coolest_q <- quarterlies_from_monthly |>
+  filter(variable == "TMeanF") |>
+  group_by(scenario, variable)  |>arrange(month, .by_group = TRUE) |>
+  slice_min(quarterly_value, n = 1, with_ties = FALSE) |>
+  mutate(
+    start_month_coolest_q = month,
+    coolest_quarter = paste(
+      substr(levels(month_word)[month], 1, 3),
+      substr(levels(month_word)[(month %% 12) + 1], 1, 3),
+      substr(levels(month_word)[((month + 1) %% 12) + 1], 1, 3),
+      sep = "-")
+    ) |> 
+  ungroup() |>
+  select(
+    scenario,
+    variable,
+    coldest_quarter_mean_temp = quarterly_value,
+    coldest_quarter_start = start_month_coolest_q,
+    coldest_quarter_words = coolest_quarter)
+
+bio_var_11 <- tave_coolest_q
+```
+
+### Quarterly Precip
+
+#### (15) Precipitation of Wettest Quarter
+"Definition: This quarterly index approximates total precipitation that prevails during the wettest quarter." O’Donnell & Ignizio (2012) Further, "to derive this bioclimatic predictor we first identify the three consecutive months with the highest cumulative precipitation total and then we sum the
+precipitation values for all three months. If quarterly ties occur, the first chronological quarter is selected as the wettest quarter."
+
+CEMML plain language: The sum of precipitation in inches that falls during the wettest three consecutive months of a year.
+
+```{r quarterlies-precip-wettest}
+# Re-creates "Precipitation of Wettest Quarter, inches" in bioclimatics table
+## Uses monthly input to calculate - (3 Month Period Sum of PPT_in)
+
+precip_max_avg_q <- quarterlies_from_monthly |> 
+  filter(variable == "PPT_in") |> 
+  group_by(scenario) |> 
+  arrange(month, .by_group = TRUE) |> 
+  slice_max(quarterly_value, n = 1, with_ties = FALSE) |> 
+  mutate(
+    precip_wettest_quarter = quarterly_value,
+    start_month_wettest_q  = month,
+    wettest_quarter = paste(
+      substr(levels(month_word)[month], 1, 3),
+      substr(levels(month_word)[(month %% 12) + 1], 1, 3),
+      substr(levels(month_word)[((month + 1) %% 12) + 1], 1, 3),
+      sep = "-"
+      )
+    ) |>
+  ungroup() |>
+  select(scenario, variable,precip_wettest_quarter, start_month_wettest_q, wettest_quarter)
+
+bio_var_15 <- precip_max_avg_q |> 
+  rename(wettest_quarter_start = start_month_wettest_q,
+         wettest_quarter_words = wettest_quarter)
+```
+
+#### (16) Precipitation of Driest Quarter
+"Definition: This quarterly index approximates total precipitation that prevails during the driest quarter." O’Donnell & Ignizio (2012) Further, "To derive this bioclimatic predictor we first identify the three consecutive months with the lowest cumulative precipitation total and then we sum the precipitation values for all three months. If quarterly ties occur, the first chronological quarter is selected as the driest quarter.
+
+CEMML plain language: The sum of precipitation in inches that falls during the driest three consecutive months of a year.
+
+```{r quarterlies-precip-driest}
+# Re-creates "Precipitation of Driest Quarter, inches" in bioclimatics table
+## Uses monthly input to calculate - (3 Month Period Sum of PPT_in)
+
+precip_min_avg_q <- quarterlies_from_monthly |>
+  filter(variable == "PPT_in") |> 
+  group_by(scenario) |>
+  arrange(month, .by_group = TRUE) |>
+  slice_min(quarterly_value, n = 1, with_ties = FALSE) |>
+  mutate(
+    precip_driest_quarter = quarterly_value,
+    start_month_driest_q  = month,
+    driest_quarter = paste(
+      substr(levels(month_word)[month], 1, 3),
+      substr(levels(month_word)[(month %% 12) + 1], 1, 3),
+      substr(levels(month_word)[((month + 1) %% 12) + 1], 1, 3),
+      sep = "-"
+      )
+    ) |> 
+  ungroup() |>
+  select(scenario, variable, start_month_driest_q, driest_quarter, precip_driest_quarter)
+
+bio_var_16 <- precip_min_avg_q|> 
+  select(scenario,
+         variable,
+         precip_driest_quarter,
+         driest_quarter_start = start_month_driest_q,
+         driest_quarter_words = driest_quarter)
+```
+
+## Combo Crosses
+
+#### (8) Mean Temperature of Wettest Quarter
+"Definition: This quarterly index approximates mean temperatures that prevail during the wettest season." O’Donnell & Ignizio (2012) Further, "To calculate this bioclimatic predictor we first identify the three consecutive months with the highest cumulative precipitation total. In the unlikely event that the exact same amount of precipitation was recorded for two different quarters (constituting a quarterly tie for maximum precipitation), temperature data will be taken from the quarter that comes first chronologically. We then calculate the average temperature for the three
+months with the highest cumulative precipitation."
+
+CEMML plain language: The average temperature in Fahrenheit over the three consecutive months that receive the most precipitation. 
+
+```{r combo-temp-wettest}
+# Re-creates "Mean Temperature of Wettest Quarter, °F" in bioclimatics table
+## Uses monthly input to calculate 
+
+combo_temp_wettest_q <- quarterlies_from_monthly |> 
+  filter(variable == "TMeanF") |> 
+  left_join(
+    precip_max_avg_q, 
+    by = "scenario") |> 
+  filter(month == start_month_wettest_q) |> 
+  select(
+    scenario,
+    wettest_quarter_mean_temp = quarterly_value,
+    wettest_quarter_start = start_month_wettest_q, 
+    wettest_quarter_words = wettest_quarter, 
+    #wettest_quarter_precip = precip_wettest_quarter,
+    )
+
+bio_var_08 <- combo_temp_wettest_q 
+```
+
+### (9) Mean Temperature of Driest Quarter, °F
+"Definition: This quarterly index approximates mean temperatures that prevail during the driest quarter." O’Donnell & Ignizio (2012) Furthermore,"to calculate this bioclimatic predictor we first identify the three consecutive months with the lowest cumulative precipitation total. In the unlikely event that the exact same amount of precipitation was recorded for two different quarters (constituting a quarterly tie for minimum precipitation), temperature data will be taken from the quarter that comes first chronologically. We then calculate the average temperature for the three months with the lowest cumulative precipitation.
+
+CEMML plain language: The average temperature in Fahrenheit over the three consecutive months that receive the least precipitation. 
+
+```{r combo-temp-driest}
+# Re-creates "Mean Temperature of Driest Quarter, °F" in bioclimatics table
+## Uses monthly input to calculate 
+
+combo_temp_driest_q <- quarterlies_from_monthly |> 
+  filter(variable == "TMeanF") |> 
+  left_join(
+    precip_min_avg_q, 
+    by = "scenario")|>
+  filter(month == start_month_driest_q) |> 
+  select(
+    scenario, 
+    driest_quarter_mean_temp = quarterly_value,
+    driest_quarter_start = start_month_driest_q, 
+    driest_quarter_words = driest_quarter)
+
+bio_var_09 <- combo_temp_driest_q
+```
+
+### (17) Precipitation of Coldest Quarter
+"Definition: This quarterly index approximates total precipitation that prevails during the coldest quarter." O’Donnell & Ignizio (2012) Furthermore, "To calculate this bioclimatic predictor we first identify the coldest quarter of the year (the average temperatures of each month in the quarter are summed; the quarter with the lowest value is selected). If quarterly ties occur, the first chronological quarter is selected as the lowest quarter. The precipitation values for the three months in this quarter are then summed." 
+
+CEMML plain language: The sum of precipitation during the coldest consecutive three months of a year.
+
+```{r combo-precip-coolest}
+# Re-creates "Precipitation of Coldest Quarter, inches" in bioclimatics table
+## Uses monthly input to calculate 
+
+combo_precip_coolest_q <- quarterlies_from_monthly |> 
+  filter(variable == "PPT_in") |> 
+  left_join(
+    tave_coolest_q |> select(-variable), 
+    by = "scenario"
+    ) |> 
+  filter(month == coldest_quarter_start) |> 
+  select(
+    scenario,
+    coldest_quarter_precip = quarterly_value,
+    coldest_quarter_start,
+    coldest_quarter_words)
+
+bio_var_17 <- combo_precip_coolest_q
+```
+
+### (18) Precipitation of Warmest Quarter
+"Definition: This quarterly index approximates total precipitation that prevails during the warmest quarter." O’Donnell & Ignizio (2012) Furthermore, "To calculate this bioclimatic predictor we first identify the warmest quarter of the year (the average temperatures of each month in the quarter are summed; the quarter with the highest value is selected). If quarterly ties occur, the first  chronological quarter is selected as the warmest quarter. The precipitation values for the three months in this quarter are then summed"
+
+CEMML plain language: The sum of precipitation during the warmest consecutive three months of a year.
+
+```{r combo-precip-warmest}
+# Re-creates "Precipitation of Warmest Quarter, inches" in bioclimatics table
+## Uses monthly input to calculate 
+
+combo_precip_warmest_q <- quarterlies_from_monthly |>
+  filter(variable == "PPT_in") |> 
+  left_join(
+    tave_warmest_q |> select(-variable), 
+    by = "scenario"
+    ) |>
+  filter(month == warmest_quarter_start) |>
+  select(
+    scenario,
+    precip_warmest_quarter = quarterly_value,
+    warmest_quarter_start,
+    warmest_quarter_words
+    )
+
+bio_var_18 <- combo_precip_warmest_q
+```
+
+## Other Variables
+They can currently be pulled directly from the Bioclimatics Table, but need to be included to complete the update. 
+
+#### (x1) Annual Mean Temperature
+O’Donnell & Ignizio (2012) define their first variable, Bio 1—Annual Mean Temperature, as the annual mean temperature."The climate inputs are averaged across the year to acquire the annual mean temperature. We calculate the average temperature for each month, and then average these results over twelve months."
+
+This is not included in the CEMML Bioclimatics table. 
+```{r annual-mean-temp eval=FALSE}
+# We do not use this in our reporting, it was not previously generated
+## Uses monthly input to calculate (per description)
+
+x_bio_var_01 <- monthly_long_wmonth |>
+  filter(variable == "TMeanF") |>
+  group_by(scenario, variable) |>
+  summarise(
+    annual_mean_temp = mean(value, na.rm = TRUE),
+    .groups = "drop")
+```
+
+#### (1) Annual Mean Diurnal Range
+"Definition: The mean of the monthly temperature ranges (monthly maximum minus monthly minimum). Since the climate data inputs are monthly or averaged months across multiple years, this calculation uses recorded temperature fluctuation within a month to capture diurnal temperature range. Using monthly averages in this manner is mathematically equivalent to calculating the temperature range for each day in a month, and averaging these values for the month." O’Donnell & Ignizio (2012) Furthermore, "Each monthly diurnal range is the difference between that month’s maximum and minimum temperature. This difference is then averaged over the twelve months of the year."
+
+CEMML plain language: The average difference between highest and lowest daily temperatures when scaled up from days to months, then averaged for the year. 
+
+```{r annual-diurnal-range}
+# Re-creates "Annual Mean Diurnal Range, °F" in bioclimatics table
+## Uses monthly input to calculate 
+
+temp_diurnal_range <- monthly_long_wmonth |>
+  filter(variable %in% c("TMaxF", "TMinF")) |>
+  pivot_wider(
+    names_from = variable, 
+    values_from = value) |>
+  group_by(scenario) |>
+  summarise(
+   annual_mean_diurnal_range = mean(TMaxF - TMinF, na.rm = TRUE),
+    .groups = "drop")
+
+bio_var_01 <- temp_diurnal_range
+```
+#### (2) Isothermality, %
+"Definition: Isothermality quantifies how large the day-to-night temperatures oscillate relative to the summer-to-winter (annual) oscillations." O’Donnell & Ignizio (2012) Furthermore, "Isothermality is derived by calculating the ratio of the mean diurnal range to the annual temperature range, and then multiplying by 100."
+
+[Bio_var"2" is Each monthly diurnal range is the difference between that month’s maximum and minimum temperature. This difference is then averaged over the twelve months of the year. and Bio_var"7" isThis is calculated by subtracting Bio 6 (Minimum Temperature of Coldest Month) from Bio 5 (Maximum Temperature of Warmest Month)]
+
+CEMML plain language: how much the day-to-night temperatures oscillate relative to the summer-to-winter (annual) oscillations.
+
+```{r isothermality, eval=TRUE}
+# Re-creates "Isothermality, %" in bioclimatics table
+## Uses monthly and daily to calculate
+### No conversion needed, as this is % 
+
+mdr <- temp_diurnal_range
+
+atr <- monthly_long_wmonth |>
+  filter(variable %in% c("TMaxF", "TMinF")) |>
+  pivot_wider(names_from = variable, values_from = value) |>
+  group_by(scenario) |>
+  summarise(
+    atr = max(TMaxF, na.rm = TRUE) - min(TMinF, na.rm = TRUE),
+    .groups = "drop")
+ 
+isothermality <- mdr |>
+  left_join(atr , by = "scenario") |>
+  mutate(
+    isothermality = (annual_mean_diurnal_range / atr) * 100
+  )
+
+bio_var_02 <- isothermality |> 
+  select(scenario, isothermality)
+
+#### Unable to get identical values from original Script
+##### Troubleshooting TBD
+```
+
+#### (3) Temperature Seasonality (Standard Deviation), °F
+"Definition: The amount of temperature variation over a given year (or averaged years) based on the standard deviation (variation) of monthly temperature averages." O’Donnell & Ignizio (2012) Furthermore," The standard deviation of the 12 mean monthly temperature values is calculated. The original AML® multiplies the result by 100, which was designed to preserve significant digits, but in our calculations we do not do multiply by 100."
+
+CEMML plain language: The amount of temperature variation over the averaged years based on the standard deviation (variation) of monthly temperature averages.
+
+~ this describes how the seasonal temperature changes from month to month through a "average" year, lower values indicate temps do not vary much between the seasons, higher values indicate stronger "seasonal" temperatures.   
+
+```{r temperature-seasonality-sd}
+# Re-creates "Temperature Seasonality (Standard Deviation), °F" in bioclimatics table
+## Uses monthly input to calculate 
+
+temp_seasonality_sd <- monthly_temps_multi_unit |>
+  filter(variable == "TMean") |>
+  group_by(scenario) |>
+  summarise(
+    seasonality_f = sd(value_f, na.rm = TRUE),
+    seasonality_c = sd(value_c, na.rm = TRUE),
+    .groups = "drop")
+
+details_bio_var_03 <- temp_seasonality_sd #this retains Temp in C for comparison
+
+bio_var_03 <- temp_seasonality_sd |> 
+  select(!seasonality_c) |> 
+  rename(temp_seasonality_sd = seasonality_f)
+
+# NOTE: our table is explicitly labeled as in F - however, the older code matches the value as if it was calculated in C. I have retained the value in F to match the label and rest of variables.
+```
+
+#### (4) Temperature Seasonality (Coefficient of Variation), %
+"Definition: The amount of temperature variation over a given period based on the ratio of the standard deviation of the monthly mean temperatures to the mean monthly temperature (also known as the coefficient of variation (CV))." O’Donnell & Ignizio (2012) Furthermore, "for this calculation, temperature values are converted to degrees Kelvin so negative temperatures values do not occur and it avoids the possibility of having to divide by zero. CV is calculated by first averaging the minimum temperature and maximum temperature values for each month. Then the standard deviation of the 12 mean monthly temperature values is calculated. We then divide the standard deviation by the mean monthly temperature (Bio 1 in °K) and multiply this by 100."
+
+CEMML plain language: The amount of temperature variation over the averaged based on the ratio of the standard deviation of the monthly mean temperatures to the mean monthly temperature (also known as the coefficient of variation). 
+
+~ the CV is generally treated as a sub-variable to the Seasonality sd, it indicates how large the seasonal temperature difference is relative to the overall temperature. Although it is calculated in K, it's a % so the units are cancelled out. 
+
+```{r temperature-seasonality-cv}
+# Re-creates "Temperature Seasonality (Coefficient of Variation), %" in bioclimatics table
+## Uses monthly input to calculate 
+
+temp_seasonality_cv <- monthly_temps_multi_unit |>
+  filter(variable == "TMean") |>
+  group_by(scenario) |>
+  summarise(
+    sd_kelvin   = sd(value_k, na.rm = TRUE),
+    mean_kelvin = mean(value_k, na.rm = TRUE),
+    temp_seasonality_cv = (sd_kelvin / mean_kelvin) * 100,
+    .groups = "drop") |>
+  select(scenario, temp_seasonality_cv)
+
+bio_var_04 <- temp_seasonality_cv
+```
+
+#### (7) Annual Temperature Range, °F
+"Definition: A measure of temperature variation over a given period. "O’Donnell & Ignizio (2012) Furthermore, This is calculated by subtracting Bio 6 (Minimum Temperature of Coldest Month) from Bio 5 (Maximum Temperature of Warmest Month)."
+
+CEMML plain language: the range of potential temps from the coldest day of the average coldest month to the warmest day of the average warmest month. 
+
+```{r annual-temperature-range-tave}
+# Re-creates "Annual Temperature Range, °F" in bioclimatics table
+## Uses previously calculated variables to evaluate 
+
+annual_temp_range <- bio_var_05 |>
+  left_join(bio_var_06, by = "scenario") |>
+  mutate(
+    annual_temp_range = max_temp_warmest_month - min_temp_coldest_month
+  )
+bio_var_07 <- annual_temp_range |> 
+  select(scenario, annual_temp_range)
+```
+
+...
+#### (14) Precipitation Seasonality (Coefficient of Variation), %
+"Definition: This is a measure of the variation in monthly precipitation totals over the course of the year. This index is the ratio of the standard deviation of the monthly total precipitation to the mean monthly total precipitation (also known as the coefficient of variation) and is expressed as a percentage." "O’Donnell & Ignizio (2012) Furthermore, "to derive this bioclimatic predictor we first calculate the standard deviation of the 12 monthly precipitation totals. We then divide this result by the mean monthly precipitation value. One is added to the denominator to avoid strange CV values where mean rainfall is less than 1. Lastly, we multiply the result by 100."
+
+CEMML plain language:A measure of the variation in monthly precipitation over the course of the year.
+
+```{r precip-seasonality-cv}
+# Re-creates "Precipitation Seasonality (Coefficient of Variation), %" in bioclimatics table
+## Uses monthly data input to calculate 
+### This does not match the values in the bioclimatics table
+
+precip_seasonality_cv <- monthly_long_wmonth |>
+  filter(variable == "PPT_in") |>
+  group_by(scenario) |>
+  summarise(
+    precip_seasonality_standard_deviation = sd(value, na.rm = TRUE),
+    precip_monthly_average = mean(value, na.rm = TRUE),
+    precip_seasonality_cv = (precip_seasonality_standard_deviation / (precip_monthly_average + 1)) * 100,
+    .groups = "drop"
+  )
+
+bio_var_14 <- precip_seasonality_cv |> 
+  select(scenario, precip_seasonality_cv)
+#- NOTE: there were several unusual parts used in "Ecosystems_Climate_data" - this chunk does not match those outputs, however it does look like the old code was reporting standard deviation for biovar 14 rather than CV.The value from this chunk is correctly reporting CV.
+```
+
+# Comparisons and QA
+## Bioclimatic Table 
+
+Stage to replicate the Bioclimatics table currently in use 
+
+CEMML Numbering:
+0	'Installation Name' 'bioclimatic variables'
+1	Annual Mean Diurnal Range, °F
+2	Isothermality, %
+3	Temperature Seasonality (Standard Deviation), °F
+4	Temperature Seasonality (Coefficient of Variation), %
+5	Max Temperature of Warmest Month, °F
+6	Min Temperature of Coldest Month, °F
+7	Annual Temperature Range, °F
+8	Mean Temperature of Wettest Quarter, °F
+9	Mean Temperature of Driest Quarter, °F
+10	Mean Temperature of Warmest Quarter, °F
+11	Mean Temperature of Coldest Quarter, °F
+12	Precipitation of Wettest Month, inches
+13	Precipitation of Driest Month, inches
+14	Precipitation Seasonality (Coefficient of Variation), %
+15	Precipitation of Wettest Quarter, inches
+16	Precipitation of Driest Quarter, inches
+17	Precipitation of Coldest Quarter, inches
+18	Precipitation of Warmest Quarter, inches
+
+O’Donnell & Ignizio (2012) Numbering: 
+Bio 1—Annual Mean Temperature
+Bio 2—Annual Mean Diurnal Range
+Bio 3—Isothermality
+Bio 4—Temperature Seasonality (Standard Deviation)
+Bio 4a—Temperature Seasonality (CV)
+Bio 5—Max Temperature of Warmest Month
+Bio 6—Min Temperature of Coldest Month
+Bio 7—Annual Temperature Range
+Bio 8—Mean Temperature of Wettest Quarter
+Bio 9—Mean Temperature of Driest Quarter
+Bio 10—Mean Temperature of Warmest Quarter
+Bio 11—Mean Temperature of Coldest Quarter
+Bio 12—Annual Precipitation
+Bio 13—Precipitation of Wettest Month
+Bio 14—Precipitation of Driest Month
+Bio 15—Precipitation Seasonality (CV)
+Bio 16—Precipitation of Wettest Quarter
+Bio 17—Precipitation of Driest Quarter
+Bio 18—Precipitation of Warmest Quarter
+Bio 19—Precipitation of Coldest Quarter
+
+```{r bioclimatic-staging}
+##### Use a Function
+f_bio_var <- function(data, var_num) {
+  data <- data |> select(-any_of("variable"))
+  bv_cols <- setdiff(names(data), "scenario")
+  timing_col <- bv_cols[sapply(data[bv_cols], function(x) is.character(x) || is.factor(x) || is.ordered(x))]
+  
+  numeric_cols <- bv_cols[sapply(data[bv_cols], is.numeric)]
+  
+  neat_rows <- data |>
+    select(scenario, all_of(timing_col), all_of(numeric_cols)) |>
+    # note: round to three decimals
+    mutate(across(all_of(numeric_cols), \(x) round(x, 3))) |> 
+    pivot_longer(
+      cols = -scenario,
+      names_to = "bv",
+      values_to = "value",
+      values_transform = list(value = as.character)
+    ) |>
+    mutate(
+      bv_order = match(bv, c(numeric_cols, timing_col)),
+      index = paste0(var_num, "_", bv_order),
+      
+      name = bv |> 
+        str_replace_all("_", " ") |> 
+        str_to_title() |> 
+        str_replace_all("Temp", "Temperature") |> 
+        str_replace_all("Precip", "Precipitation") |> 
+        str_replace_all("Sd", "(SD)") |> 
+        str_replace_all("Cv", "(CV)")
+    ) |>
+    select(-bv, -bv_order) |>
+    pivot_wider(names_from = scenario, values_from = value) |>
+    relocate(index, name) |>
+    arrange(index)
+  
+  return(neat_rows)
+}
+
+# index 
+bio_var_list <- list(
+  "1" = bio_var_01,
+  "2" = bio_var_02,
+  "3" = bio_var_03,
+  "4" = bio_var_04,
+  "5" = bio_var_05,
+  "6" = bio_var_06,
+  "7" = bio_var_07,
+  "8" = bio_var_08,
+  "9" = bio_var_09,
+  "10" = bio_var_10,
+  "11" = bio_var_11,
+  "12" = bio_var_12,
+  "13" = bio_var_13,
+  "14" = bio_var_14,
+  "15" = bio_var_15,
+  "16" = bio_var_16,
+  "17" = bio_var_17,
+  "18" = bio_var_18
+)
+
+# build the table
+bio_var_out <- bio_var_list  |>  
+  imap(~ f_bio_var(.x, .y)) |>  
+  bind_rows() |> 
+  relocate(index, name, all_of(name_scenario_order))
+
+```
+
+## Top Five
+```{r top-five}
+# Make another function for piecewise top ariables
+get_top_variables <- function(data, variable_list, n_slice, rank_start) {
+  data |>
+    filter(name %in% variable_list) |>
+    pivot_longer(cols = starts_with("change_"), names_to = "column", values_to = "value") |>
+    filter(!is.na(value)) |>
+    arrange(desc(abs(value))) |>
+    distinct(name, .keep_all = TRUE) |>
+    slice_head(n = n_slice) |>
+    mutate(rank_group = rank_start + row_number() - 1) |>
+    select(name, rank_group)
+}
+
+
+# Get top five
+bioclim_with_changes <- bio_var_out |>
+  filter(!str_detect(index, "_2$|_3$")) |>
+  mutate(across(c(historical, near_mod, far_mod, near_high, far_high), as.numeric)) |>
+  mutate(
+    change_near_mod  = near_mod - historical,
+    change_far_mod   = far_mod - historical,
+    change_near_high = near_high - historical,
+    change_far_high  = far_high - historical
+  )
+
+vars_temp <- c(
+  "Annual Mean Diurnal Range",
+  "Isothermality",
+  #"Temperature Seasonality (SD)",
+  #"Temperature Seasonality (CV)",
+  "Max Temperature Warmest Month",
+  "Min Temperature Coldest Month",
+  #"Annual Temperature Range",
+  "Wettest Quarter Mean Temperature",
+  "Driest Quarter Mean Temperature",
+  "Warmest Quarter Mean Temperature",
+  "Coldest Quarter Mean Temperature"
+)
+
+vars_precip <- c(
+  "Wettest Month Precipitation",
+  "Driest Month Precipitation",
+  #"Precipitation Seasonality (CV)",
+  "Precipitation Wettest Quarter",
+  "Precipitation Driest Quarter",
+  "Coldest Quarter Precipitation",
+  "Precipitation Warmest Quarter"
+)
+
+top4_temp  <- get_top_variables(bioclim_with_changes, vars_temp, n_slice = 4, rank_start = 1)
+top_precip <- get_top_variables(bioclim_with_changes, vars_precip, n_slice = 1, rank_start = 5)
+top_five   <- bind_rows(top4_temp, top_precip)
+```
+
+## Comparison Table
+```{r bio-var-comparison-1}
+# Heavy Support from internet sources including Stack Overflow, Reddit, and an old lesson plan 
+
+num_rows <- bioclim_with_changes |>
+  mutate(
+    near_mod_change  = as.character(round(change_near_mod, 3)),
+    far_mod_change   = as.character(round(change_far_mod, 3)),
+    near_high_change = as.character(round(change_near_high, 3)),
+    far_high_change  = as.character(round(change_far_high, 3)),
+    across(c(historical, near_mod, far_mod, near_high, far_high), as.character)
+  ) |>
+  select(-starts_with("change_")) # remove number columns
+
+
+text_rows <- bio_var_out |>
+  filter(str_detect(index, "_2$|_3$")) |>
+  mutate(
+    near_mod_change  = if_else(near_mod == historical, "Same", paste0(historical, " -> ", near_mod)),
+    far_mod_change   = if_else(far_mod == historical, "Same", paste0(historical, " -> ", far_mod)),
+    near_high_change = if_else(near_high == historical, "Same", paste0(historical, " -> ", near_high)),
+    far_high_change  = if_else(far_high == historical, "Same", paste0(historical, " -> ", far_high)),
+    across(c(historical, near_mod, far_mod, near_high, far_high), as.character)
+  )
+
+
+bio_var_comparisons <- bind_rows(num_rows, text_rows) |>
+  mutate(top_five = if_else(name %in% top_five$name, "Yes", "No")) |>
+  separate_wider_delim(index, delim = "_", names = c("ix_main", "ix_sub"), cols_remove = FALSE) |>
+  mutate(across(c(ix_main, ix_sub), as.numeric)) |>
+  arrange(ix_main, ix_sub) |>
+  select(-ix_main, -ix_sub) |>
+  relocate(index, name, top_five, historical, near_mod, near_mod_change, far_mod, 
+           far_mod_change, near_high, near_high_change, far_high, far_high_change) |>
+  mutate(top_five = if_else(str_detect(index, "_1$"), top_five, NA_character_))
+```
+
+## Other
+What do we want to retain from the 'BP Tables'
+
+# Next
+Go to step 02 for Exposure
+Go to step 03 to create formatted tables in excel
