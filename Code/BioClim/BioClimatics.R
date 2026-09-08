@@ -604,7 +604,7 @@ bioclim_table <- bind_rows(
     "Total Precipitation of Driest Month (in)"        = precip_driestMonth,
     "Precipitation Seasonality (CV)"                  = precip_seasonality_cv,
     "Total Precipitation of Wettest Quarter (in)"     = precip_wettestQuarter,
-    "Total Precipitation of Driest QUarter (in)"      = precip_driestQuarter,
+    "Total Precipitation of Driest Quarter (in)"      = precip_driestQuarter,
     "Total Precipitation of Coldest Quarter (in)"     = precip_coldestQuarter,
     "Total Precipitation of Warmest Quarter (in)"     = precip_warmestQuarter
   ),
