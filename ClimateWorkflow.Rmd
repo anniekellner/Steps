@@ -520,7 +520,7 @@ results_s2f2 <- list()
 
 for(i in 1:length(files_baseline)){
   r = rast(files_baseline[[i]])
-  times = time(r)
+  times = as.Date(time(r))
   varName = varnames(r)[1]
   vals = data.frame(unlist(r[cell], use.names = FALSE))
   colnames(vals) = varName
@@ -532,7 +532,7 @@ for(i in 1:length(files_baseline)){
 
 for(i in 1:length(files_s1f1)){
   r = rast(files_s1f1[[i]])
-  times = time(r)
+  times = as.Date(time(r))
   varName = varnames(r)[1]
   vals = data.frame(unlist(r[cell], use.names = FALSE))
   colnames(vals) = varName
@@ -544,7 +544,7 @@ for(i in 1:length(files_s1f1)){
  
 for(i in 1:length(files_s1f2)){
   r = rast(files_s1f2[[i]])
-  times = time(r)
+  times = as.Date(time(r))
   varName = varnames(r)[1]
   vals = data.frame(unlist(r[cell], use.names = FALSE))
   colnames(vals) = varName
@@ -556,7 +556,7 @@ for(i in 1:length(files_s1f2)){
 
 for(i in 1:length(files_s2f1)){
   r = rast(files_s2f1[[i]])
-  times = time(r)
+  times = as.Date(time(r))
   varName = varnames(r)[1]
   vals = data.frame(unlist(r[cell], use.names = FALSE))
   colnames(vals) = varName
@@ -568,7 +568,7 @@ for(i in 1:length(files_s2f1)){
 
 for(i in 1:length(files_s2f2)){
   r = rast(files_s2f2[[i]])
-  times = time(r)
+  times = as.Date(time(r))
   varName = varnames(r)[1]
   vals = data.frame(unlist(r[cell], use.names = FALSE))
   colnames(vals) = varName

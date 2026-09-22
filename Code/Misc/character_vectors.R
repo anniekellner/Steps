@@ -13,7 +13,8 @@ models <- c("HADGEM2-ES",
             "MIROC6",     
             "MPI-ESM1-2-HR",
             "EC-Earth3-Veg-LR",
-            "ACCESS-ESM1-5")
+            "ACCESS-ESM1-5",
+            "GFDL-ESM4")
 
 
 shp_names <- c("Homestead_ARB", 
@@ -76,11 +77,20 @@ shp_names <- c("Homestead_ARB",
               "Holloman_Air_Force_Base",
               "611_-_King_Salmon_Airport",
               "NWS_Yorktown",
+              "611_-_Kokee_Air_Force_Station",
               "NSA_Panama_City",
               "611_-_Cold_Bay_Long_Range_Radar_Site",
               "611_-_Indian_Mountain",
+              "NAVSTA_Mayport",
               "NAS_Jacksonville",
-              "Pituffik_SB")           
+              "Pituffik_SB",
+              "SUBASE_Kings_Bay",
+              "611_-_Fort_Yukon_Long_Range_Radar_Site",
+              "JBPHH_1",
+              "JBPHH_2",
+              "JBPHH_3",
+              "JBPHH_4",
+              "Clear_SFS")           
 
 
 official_base_names <- c("NAVBASE Kitsap",     
@@ -124,9 +134,18 @@ official_base_names <- c("NAVBASE Kitsap",
                          "Holloman Air Force Base",
                          "King Salmon Airport",
                          "Naval Weapons Station Yorktown",
+                         "611 Sites - Kokee Air Force Station",
                          "NSA Panama City",
                          "Cold Bay Long Range Radar Site",
                          "Indian Mountain Air Force Station",
+                         "Naval Station Mayport",
                          "Naval Air Station Jacksonville",
-                         "Pituffik Space Force Base") 
+                         "Pituffik Space Force Base",
+                         "Naval Submarine Base Kings Bay",
+                         "Fort Yukon Long Range Radar Site",
+                         "Joint Base Pearl Harbor-Hickam Sites - Main Base and Surrounding Areas (Zone 1)",
+                         "Joint Base Pearl Harbor-Hickam Sites - Main Base and Surrounding Areas (Zone 2)",
+                         "Joint Base Pearl Harbor-Hickam Sites - Main Base and Surrounding Areas (Zone 3)",
+                         "Joint Base Pearl Harbor-Hickam Sites - Main Base and Surrounding Areas (Zone 4)",
+                         "Clear Space Force Station") 
                         
