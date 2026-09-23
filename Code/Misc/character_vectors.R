@@ -83,10 +83,6 @@ shp_names <- c("Homestead_ARB",
               "611_-_Indian_Mountain",
               "NAVSTA_Mayport",
               "NAS_Jacksonville",
-              "Pituffik_SB",
-  
-              "Pituffik_SB",
-              "SUBASE_Kings_Bay",
               "611_-_Fort_Yukon_Long_Range_Radar_Site",
               "JBPHH_1",
               "JBPHH_2",
@@ -94,7 +90,6 @@ shp_names <- c("Homestead_ARB",
               "JBPHH_4",
               "Clear_SFS",
               "Pituffik_SB",
-              "NAVSTA_Mayport",
               "SUBASE_Kings_Bay", # RData file
               "NSB_Kings_Bay") #    Output Dir    
 
