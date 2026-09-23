@@ -90,7 +90,11 @@ shp_names <- c("Homestead_ARB",
               "JBPHH_2",
               "JBPHH_3",
               "JBPHH_4",
-              "Clear_SFS")           
+              "Clear_SFS",
+              "Pituffik_SB",
+              "NAVSTA_Mayport",
+              "SUBASE_Kings_Bay", # RData file
+              "NSB_Kings_Bay") #    Output Dir    
 
 
 official_base_names <- c("NAVBASE Kitsap",     
