@@ -84,6 +84,8 @@ shp_names <- c("Homestead_ARB",
               "NAVSTA_Mayport",
               "NAS_Jacksonville",
               "Pituffik_SB",
+  
+              "Pituffik_SB",
               "SUBASE_Kings_Bay",
               "611_-_Fort_Yukon_Long_Range_Radar_Site",
               "JBPHH_1",
